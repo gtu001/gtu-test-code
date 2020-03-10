@@ -65,3 +65,10 @@
 	$ svn cleanup
 	$ svn status <--複製開頭為Ｌ路徑
 	$ svn unlock <path>
+
+
+取得某特定版本的某檔
+---
+	$ svn up -r <version> <path_to_file>
+	Ex : svn up -r 51 EupGobal/app/src/main/res/layout/activity_login.xml
+

@@ -4,6 +4,8 @@ import android.content.Context;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Handler;
+import android.os.Looper;
 import android.widget.Toast;
 
 import com.example.gtu001.qrcodemaker.Mp3Bean;
@@ -296,11 +298,10 @@ public class Mp3PlayerHandler {
         MyReplayListObj mMyReplayListObj;
         Context context;
         private Timer timer;
+        private boolean isClose = false;
 
         private void close() {
-            if (timer != null) {
-                timer.cancel();
-            }
+            isClose = true;
         }
 
         public StoreStatusThread(MyReplayListObj mMyReplayListObj, Context context) {
@@ -310,9 +311,17 @@ public class Mp3PlayerHandler {
         }
 
         public void run() {
+            if (isClose && timer != null) {
+                this.cancel();
+            }
             if (mMyReplayListObj != null) {
                 Mp3PlayerActivity.InitListViewHandler.saveCurrentMp3(mMyReplayListObj.currentName, mMyReplayListObj.currentPath, mMyReplayListObj.mp3PlayerHandler.getCurrentPosition(), context);
-                Toast.makeText(context, "儲存:" + mMyReplayListObj.currentName + " - " + mMyReplayListObj.mp3PlayerHandler.getCurrentPosition(), Toast.LENGTH_SHORT).show();
+                new Handler(Looper.getMainLooper()).post(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(context, "儲存:" + mMyReplayListObj.currentName + " - " + mMyReplayListObj.mp3PlayerHandler.getCurrentPosition(), Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
         }
     }

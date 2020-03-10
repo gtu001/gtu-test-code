@@ -12,25 +12,29 @@ from openpyxl.styles.colors import Color
 from openpyxl.styles import Font, Color
 
 
-def cellEnglishToPos_toInt(column):
+def cellEnglishToPos_toInt(column, startByZero=False):
     '''用英文欄位取得相對row的index'''
     '''
 columnIndex 從1起算
 '''
     column = column.upper().strip()
-    total = 0;
+    total = 0
     _length = len(column)
     for i, c in enumerate(column, 0):
         total += (ord(c) - 64) * pow(26, _length - i - 1)
 #     total -= 1
+    if startByZero :
+        total = total - 1
     return total
 
 
-def cellEnglishToPos_toStr(columnIndex):
+def cellEnglishToPos_toStr(columnIndex, startByZero=False):
     '''取回excel的column名'''
     '''
 columnIndex 從1起算
 '''
+    if startByZero :
+        columnIndex = columnIndex + 1
     map = {}
     tmpColumn = columnIndex
     while True:
@@ -81,7 +85,8 @@ def getCellValue(column, row, startByZero=False):
     elif column.isdigit() :
         cell = row[int(column) + offset]
     else :
-        cell = row[cellEnglishToPos_toInt(column)] 
+        columnIdx = cellEnglishToPos_toInt(column, startByZero)
+        cell = row[columnIdx] 
     if cell.value is None or \
         str(type(cell.value)) == "<class 'NoneType'>" :
         return ""

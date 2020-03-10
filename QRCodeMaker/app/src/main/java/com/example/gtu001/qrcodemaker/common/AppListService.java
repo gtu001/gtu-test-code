@@ -189,8 +189,8 @@ public class AppListService {
                 AppInfoDAO.AppInfo vo = lst2.get(ii);
                 AppInfo vo2 = _findByLst1(vo.getInstalledPackage(), lst);
                 if (vo2 == null) {
-                    service.deleteId(vo2.getInstalledPackage());
-                    logLst.add("D " + vo2.getInstalledPackage());
+                    service.deleteId(vo.getInstalledPackage());
+                    logLst.add("D " + vo.getInstalledPackage());
                 } else {
                 }
             }
