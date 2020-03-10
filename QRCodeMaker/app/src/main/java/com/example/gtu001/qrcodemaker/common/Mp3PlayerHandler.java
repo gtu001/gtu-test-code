@@ -4,6 +4,7 @@ import android.content.Context;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.widget.Toast;
 
 import com.example.gtu001.qrcodemaker.Mp3Bean;
 import com.example.gtu001.qrcodemaker.Mp3PlayerActivity;
@@ -311,6 +312,7 @@ public class Mp3PlayerHandler {
         public void run() {
             if (mMyReplayListObj != null) {
                 Mp3PlayerActivity.InitListViewHandler.saveCurrentMp3(mMyReplayListObj.currentName, mMyReplayListObj.currentPath, mMyReplayListObj.mp3PlayerHandler.getCurrentPosition(), context);
+                Toast.makeText(context, "儲存:" + mMyReplayListObj.currentName + " - " + mMyReplayListObj.mp3PlayerHandler.getCurrentPosition(), Toast.LENGTH_SHORT).show();
             }
         }
     }

@@ -29,6 +29,7 @@ import org.apache.commons.lang3.Validate;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,7 +52,7 @@ public class UrlPlayerDialog_bg {
     private List<Mp3Bean> totalUrlList;
     private int currentIndex = -1;
     private int replayMode = -1;
-    private static AtomicReference<UrlPlayerServiceHander> urlPlayerServiceHander = new AtomicReference<UrlPlayerServiceHander>();
+    private AtomicReference<UrlPlayerServiceHander> urlPlayerServiceHander = new AtomicReference<UrlPlayerServiceHander>();
     private PercentProgressBarTimer mPercentProgressBarTimer;
 
     public UrlPlayerDialog_bg(Context context) {
@@ -77,11 +78,8 @@ public class UrlPlayerDialog_bg {
             currentIndex = totalUrlList.indexOf(this.bean);
         }
 
-        //只做一次
-        if (this.urlPlayerServiceHander.get() == null || this.urlPlayerServiceHander.get().initNotDone(context)) {
-            this.urlPlayerServiceHander.set(new UrlPlayerServiceHander());
-            this.urlPlayerServiceHander.get().init(context);
-        }
+        this.urlPlayerServiceHander.set(new UrlPlayerServiceHander());
+        this.urlPlayerServiceHander.get().init(context);
         return this;
     }
 
@@ -117,8 +115,8 @@ public class UrlPlayerDialog_bg {
             @Override
             public void onClick(View v) {
                 try {
-                    urlPlayerServiceHander.get().getMService().pauseAndResume();
-                    String currentStatusMsg = urlPlayerServiceHander.get().getMService().isPlaying() ? "播放中" : "暫停";
+                    urlPlayerServiceHander.get().pauseAndResume();
+                    String currentStatusMsg = urlPlayerServiceHander.get().isPlaying() ? "播放中" : "暫停";
                     Toast.makeText(context, currentStatusMsg, Toast.LENGTH_SHORT).show();
                 } catch (IllegalArgumentException ex) {
                     Log.e(TAG, ex.getMessage(), ex);
@@ -134,7 +132,7 @@ public class UrlPlayerDialog_bg {
             @Override
             public void onClick(View v) {
                 try {
-                    String result = urlPlayerServiceHander.get().getMService().stopPlay();
+                    String result = urlPlayerServiceHander.get().stopPlay();
                     if (StringUtils.isNotBlank(result)) {
                         Validate.isTrue(false, result);
                     }
@@ -152,7 +150,7 @@ public class UrlPlayerDialog_bg {
             @Override
             public void onClick(View v) {
                 try {
-                    urlPlayerServiceHander.get().getMService().backwardOrBackward(-20);
+                    urlPlayerServiceHander.get().backwardOrBackward(-20);
                 } catch (IllegalArgumentException ex) {
                     Log.e(TAG, ex.getMessage(), ex);
                     Toast.makeText(context, ex.getMessage(), Toast.LENGTH_SHORT).show();
@@ -167,7 +165,7 @@ public class UrlPlayerDialog_bg {
             @Override
             public void onClick(View v) {
                 try {
-                    urlPlayerServiceHander.get().getMService().backwardOrBackward(20);
+                    urlPlayerServiceHander.get().backwardOrBackward(20);
                 } catch (IllegalArgumentException ex) {
                     Log.e(TAG, ex.getMessage(), ex);
                     Toast.makeText(context, ex.getMessage(), Toast.LENGTH_SHORT).show();
@@ -186,17 +184,17 @@ public class UrlPlayerDialog_bg {
                     text_title.setText(UrlPlayerDialog_bg.this.bean.getName());
                     text_content.setText(UrlPlayerDialog_bg.this.bean.getUrl());
 
-                    if (urlPlayerServiceHander.get().getMService().isPlaying()) {
-                        String result = urlPlayerServiceHander.get().getMService().startPlay(UrlPlayerDialog_bg.this.bean.getName(), UrlPlayerDialog_bg.this.bean.getUrl(), -1);
+                    if (urlPlayerServiceHander.get().isPlaying()) {
+                        String result = urlPlayerServiceHander.get().startPlay(UrlPlayerDialog_bg.this.bean.getName(), UrlPlayerDialog_bg.this.bean.getUrl(), -1);
                         if (StringUtils.isNotBlank(result)) {
                             Validate.isTrue(false, result);
                         }
                     } else {
-                        String result = urlPlayerServiceHander.get().getMService().startPlay(UrlPlayerDialog_bg.this.bean.getName(), UrlPlayerDialog_bg.this.bean.getUrl(), -1);
+                        String result = urlPlayerServiceHander.get().startPlay(UrlPlayerDialog_bg.this.bean.getName(), UrlPlayerDialog_bg.this.bean.getUrl(), -1);
                         if (StringUtils.isNotBlank(result)) {
                             Validate.isTrue(false, result);
                         }
-                        urlPlayerServiceHander.get().getMService().pauseAndResume();
+                        urlPlayerServiceHander.get().pauseAndResume();
                     }
                 } catch (IllegalArgumentException ex) {
                     Log.e(TAG, ex.getMessage(), ex);
@@ -216,17 +214,17 @@ public class UrlPlayerDialog_bg {
                     text_title.setText(UrlPlayerDialog_bg.this.bean.getName());
                     text_content.setText(UrlPlayerDialog_bg.this.bean.getUrl());
 
-                    if (urlPlayerServiceHander.get().getMService().isPlaying()) {
-                        String result = urlPlayerServiceHander.get().getMService().startPlay(UrlPlayerDialog_bg.this.bean.getName(), UrlPlayerDialog_bg.this.bean.getUrl(), -1);
+                    if (urlPlayerServiceHander.get().isPlaying()) {
+                        String result = urlPlayerServiceHander.get().startPlay(UrlPlayerDialog_bg.this.bean.getName(), UrlPlayerDialog_bg.this.bean.getUrl(), -1);
                         if (StringUtils.isNotBlank(result)) {
                             Validate.isTrue(false, result);
                         }
                     } else {
-                        String result = urlPlayerServiceHander.get().getMService().startPlay(UrlPlayerDialog_bg.this.bean.getName(), UrlPlayerDialog_bg.this.bean.getUrl(), -1);
+                        String result = urlPlayerServiceHander.get().startPlay(UrlPlayerDialog_bg.this.bean.getName(), UrlPlayerDialog_bg.this.bean.getUrl(), -1);
                         if (StringUtils.isNotBlank(result)) {
                             Validate.isTrue(false, result);
                         }
-                        urlPlayerServiceHander.get().getMService().pauseAndResume();
+                        urlPlayerServiceHander.get().pauseAndResume();
                     }
                 } catch (IllegalArgumentException ex) {
                     Log.e(TAG, ex.getMessage(), ex);
@@ -286,7 +284,7 @@ public class UrlPlayerDialog_bg {
                         }
                     } catch (Exception ex) {
                     }
-                    urlPlayerServiceHander.get().getMService().onProgressChange(progress);
+                    urlPlayerServiceHander.get().onProgressChange(progress);
                 } catch (RemoteException e) {
                     Log.e(TAG, "progressBar ERR : " + e.getMessage(), e);
                     Toast.makeText(context, "mp3讀取錯誤", Toast.LENGTH_SHORT).show();
@@ -318,7 +316,7 @@ public class UrlPlayerDialog_bg {
         mPercentProgressBarTimer = new PercentProgressBarTimer(this.context, progressBar, text_timer, text_title, text_content);
     }
 
-    private static class PercentProgressBarTimer {
+    private class PercentProgressBarTimer {
         private AtomicBoolean isPercentProgressTrigger = new AtomicBoolean(false);
         private Context context;
         private Timer timer;
@@ -355,13 +353,13 @@ public class UrlPlayerDialog_bg {
                 @Override
                 public void run() {
                     try {
-                        if (urlPlayerServiceHander.get() == null || !urlPlayerServiceHander.get().getMService().isInitDone()) {
+                        if (urlPlayerServiceHander.get() == null || !urlPlayerServiceHander.get().isInitOk()) {
                             return;
                         }
 
-                        final int percent = urlPlayerServiceHander.get().getMService().getProgressPercent();
-                        final String timeTxt = urlPlayerServiceHander.get().getMService().getProgressTime();
-                        final Map<String, String> map = urlPlayerServiceHander.get().getMService().getCurrentBean();
+                        final int percent = urlPlayerServiceHander.get().getProgressPercent();
+                        final String timeTxt = urlPlayerServiceHander.get().getProgressTime();
+                        final Map<String, String> map = urlPlayerServiceHander.get().getCurrentBean();
                         Log.v(TAG, "[PercentProgressBarTimer] == " + timeTxt + "\t" + percent);
                         handler.post(new Runnable() {
                             @Override
@@ -375,21 +373,16 @@ public class UrlPlayerDialog_bg {
                         });
                     } catch (final Exception e) {
                         Log.e(TAG, "[PercentProgressBarTimer] ERR : " + e.getMessage(), e);
+                        try {
+                            timer.cancel();
+                        } catch (Exception ex2) {
+                        }
                     }
                 }
             }, 0, 1000L);
         }
     }
 
-    public static void stopService(Context context) {
-        try {
-            urlPlayerServiceHander.get().getMService().stopSelf();
-            urlPlayerServiceHander.get().startStopService(false, context);
-            Toast.makeText(context, "停止服務!!", Toast.LENGTH_SHORT).show();
-        } catch (Exception ex) {
-            Log.e(TAG, ex.getMessage(), ex);
-        }
-    }
 
     private void nextUrl() {
         if (totalUrlList == null || totalUrlList.isEmpty()) {
@@ -414,18 +407,21 @@ public class UrlPlayerDialog_bg {
     }
 
     private class UrlPlayerServiceHander {
-        private boolean isClose = false;
-        private IUrlPlayerService mService;
         private ServiceConnection mConnection;
+        private IUrlPlayerService mService;
 
-        private IUrlPlayerService getMService() {
-            Log.v(TAG, "[getMService]" + mService);
-            return mService;
+        public boolean isInitOk() {
+            if (mService != null && mConnection != null) {
+                return true;
+            }
+            return false;
         }
 
         private void init(Context context) {
-            mConnection = getMConnection();
-            startStopService(true, context);
+            if (mConnection == null) {
+                mConnection = getMConnection();
+            }
+            ServiceUtil.startStopService(true, context, UrlPlayerService.class);
             this.bindServiceMethod(true, context);
         }
 
@@ -435,9 +431,11 @@ public class UrlPlayerDialog_bg {
                 if (isOn) {
                     Log.v(TAG, "[bindServiceMethod] true");
                     context.bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+                    Toast.makeText(context, "---init ok 1", Toast.LENGTH_SHORT).show();
                 } else {
                     Log.v(TAG, "[bindServiceMethod] false");
                     context.unbindService(mConnection);
+                    Toast.makeText(context, "---shutdown ok", Toast.LENGTH_SHORT).show();
                 }
             }
         }
@@ -448,39 +446,100 @@ public class UrlPlayerDialog_bg {
                 public void onServiceConnected(ComponentName className, IBinder service) {
                     Log.v(TAG, "[onServiceConnected] called");
                     mService = IUrlPlayerService.Stub.asInterface(service);
-                    isClose = false;
                     Log.v(TAG, "[mService] init " + mService);
+                    Toast.makeText(context, "---init ok 2", Toast.LENGTH_SHORT).show();
                 }
 
                 @Override
                 public void onServiceDisconnected(ComponentName arg0) {
                     Log.v(TAG, "[onServiceDisconnected] called");
                     mService = null;
-                    isClose = true;
                     Log.v(TAG, "[mService] setNull ");
+                    Toast.makeText(context, "---shutdown ok 2", Toast.LENGTH_SHORT).show();
                 }
             };
         }
 
-        /**
-         * 開啟/停止 服務
-         */
-        private void startStopService(boolean isStart, Context context) {
-            ServiceUtil.startStopService(isStart, context, UrlPlayerService.class);
+        //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+        public void setReplayMode(final String currentName, final int currentPosition, List<String> nameLst, List<String> pathLst, boolean isRandom) throws RemoteException {
+            if (mService == null) {
+                Toast.makeText(context, "未初始化", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            mService.setReplayMode(currentName, currentPosition, nameLst, pathLst, isRandom);
         }
 
-        private boolean initNotDone(Context context) {
-            Log.e(TAG, "#...initNotDone...start");
-            if (!ServiceUtil.isServiceRunning(context, UrlPlayerService.class)) {
-                Log.e(TAG, "\tServiceUtil.isServiceRunning : off");
-                return true;
+        public void pauseAndResume() throws RemoteException {
+            if (mService == null) {
+                Toast.makeText(context, "未初始化", Toast.LENGTH_SHORT).show();
+                return;
             }
-            if (mService == null || mConnection == null) {
-                Log.e(TAG, "\tmService : " + mService);
-                Log.e(TAG, "\tmConnection : " + mConnection);
-                return true;
+            mService.pauseAndResume();
+        }
+
+        public boolean isPlaying() throws RemoteException {
+            if (mService == null) {
+                Toast.makeText(context, "未初始化", Toast.LENGTH_SHORT).show();
+                return false;
             }
-            return false;
+            return mService.isPlaying();
+        }
+
+        public String stopPlay() throws RemoteException {
+            if (mService == null) {
+                Toast.makeText(context, "未初始化", Toast.LENGTH_SHORT).show();
+                return "";
+            }
+            return mService.stopPlay();
+        }
+
+        public void backwardOrBackward(int time) throws RemoteException {
+            if (mService == null) {
+                Toast.makeText(context, "未初始化", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            mService.backwardOrBackward(time);
+        }
+
+        public String startPlay(String name, String url, int currentPosition) throws RemoteException {
+            if (mService == null) {
+                Toast.makeText(context, "未初始化", Toast.LENGTH_SHORT).show();
+                return "";
+            }
+            return mService.startPlay(name, url, currentPosition);
+        }
+
+        public void onProgressChange(int percent) throws RemoteException {
+            if (mService == null) {
+                Toast.makeText(context, "未初始化", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            mService.onProgressChange(percent);
+        }
+
+        public int getProgressPercent() throws RemoteException {
+            if (mService == null) {
+                Toast.makeText(context, "未初始化", Toast.LENGTH_SHORT).show();
+                return -1;
+            }
+            return mService.getProgressPercent();
+        }
+
+        public String getProgressTime() throws RemoteException {
+            if (mService == null) {
+                Toast.makeText(context, "未初始化", Toast.LENGTH_SHORT).show();
+                return "";
+            }
+            return mService.getProgressTime();
+        }
+
+        public Map getCurrentBean() throws RemoteException {
+            if (mService == null) {
+                Toast.makeText(context, "未初始化", Toast.LENGTH_SHORT).show();
+                return Collections.EMPTY_MAP;
+            }
+            return mService.getCurrentBean();
         }
     }
 
@@ -503,7 +562,8 @@ public class UrlPlayerDialog_bg {
                 }
                 Map<String, String> toMap = new HashMap<String, String>();
                 toMap.put(bean.getName(), bean.getUrl());
-                self.urlPlayerServiceHander.get().getMService().setReplayMode(bean.getName(), bean.getLastPositionInt(), Arrays.asList(bean.getName()), Arrays.asList(bean.getUrl()), false);
+
+                self.urlPlayerServiceHander.get().setReplayMode(bean.getName(), bean.getLastPositionInt(), Arrays.asList(bean.getName()), Arrays.asList(bean.getUrl()), false);
                 Toast.makeText(self.context, "重複播放一首", Toast.LENGTH_SHORT).show();
             }
         },//
@@ -520,7 +580,7 @@ public class UrlPlayerDialog_bg {
                     pathLst.add(b.getUrl());
                 }
 
-                self.urlPlayerServiceHander.get().getMService().setReplayMode(bean.getName(), bean.getLastPositionInt(), nameLst, pathLst, false);
+                self.urlPlayerServiceHander.get().setReplayMode(bean.getName(), bean.getLastPositionInt(), nameLst, pathLst, false);
                 Toast.makeText(self.context, "重複播放全部", Toast.LENGTH_SHORT).show();
             }
         },//
@@ -537,7 +597,7 @@ public class UrlPlayerDialog_bg {
                     pathLst.add(b.getUrl());
                 }
 
-                self.urlPlayerServiceHander.get().getMService().setReplayMode(bean.getName(), bean.getLastPositionInt(), nameLst, pathLst, true);
+                self.urlPlayerServiceHander.get().setReplayMode(bean.getName(), bean.getLastPositionInt(), nameLst, pathLst, true);
                 Toast.makeText(self.context, "重複播放全部(隨機)", Toast.LENGTH_SHORT).show();
             }
         },//
