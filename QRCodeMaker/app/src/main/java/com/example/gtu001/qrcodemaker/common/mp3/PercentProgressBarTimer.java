@@ -87,7 +87,7 @@ public class PercentProgressBarTimer {
                 } catch (final Exception e) {
                     Log.e(TAG, "[PercentProgressBarTimer] ERR : " + e.getMessage(), e);
                     try {
-                        timer.cancel();
+                        cancel();
                     } catch (Exception ex2) {
                     }
                 }

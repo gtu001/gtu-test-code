@@ -319,7 +319,7 @@ public class Mp3PlayerHandler {
                 new Handler(Looper.getMainLooper()).post(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(context, "儲存:" + mMyReplayListObj.currentName + " - " + mMyReplayListObj.mp3PlayerHandler.getCurrentPosition(), Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(context, "儲存:" + mMyReplayListObj.currentName + " - " + mMyReplayListObj.mp3PlayerHandler.getCurrentPosition(), Toast.LENGTH_SHORT).show();
                     }
                 });
             }
