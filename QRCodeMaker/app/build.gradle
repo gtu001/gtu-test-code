@@ -6,7 +6,7 @@ android {
 
     defaultConfig {
         applicationId "com.example.gtu001.qrcodemaker"
-        minSdkVersion 18 //16
+        minSdkVersion 16 //16
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"

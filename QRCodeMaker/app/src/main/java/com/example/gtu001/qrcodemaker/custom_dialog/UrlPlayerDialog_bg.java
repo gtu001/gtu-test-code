@@ -61,6 +61,10 @@ public class UrlPlayerDialog_bg {
     public UrlPlayerDialog_bg setUrl(String message, Mp3Bean bean, List<Mp3Bean> totalUrlList) {
         this.bean = bean;
 
+        if (this.bean == null) {
+            Toast.makeText(context, "當前mp3為空!", Toast.LENGTH_LONG).show();
+        }
+
         this.message = message;
         this.totalUrlList = totalUrlList;
         Log.v(TAG, "<<<<<<<< totalUrlList size : " + totalUrlList.size());
@@ -113,20 +117,9 @@ public class UrlPlayerDialog_bg {
             @Override
             public void onClick(View v) {
                 try {
-//                    if (urlPlayerServiceHander.get().getMService().isInitDone()) {
-//                        String name = UrlPlayerDialog_bg.this.bean.getName();
-//                        String url = UrlPlayerDialog_bg.this.bean.getUrl();
-//                        Log.v(TAG, "clickStartPlay : " + name + " , " + url);
-//                        String result = urlPlayerServiceHander.get().getMService().startPlay(name, url);
-//                        if (StringUtils.isNotBlank(result)) {
-//                            Validate.isTrue(false, result);
-//                        }
-//                        Toast.makeText(context, "開始撥放", Toast.LENGTH_SHORT).show();
-//                    } else {
                     urlPlayerServiceHander.get().getMService().pauseAndResume();
                     String currentStatusMsg = urlPlayerServiceHander.get().getMService().isPlaying() ? "播放中" : "暫停";
                     Toast.makeText(context, currentStatusMsg, Toast.LENGTH_SHORT).show();
-//                    }
                 } catch (IllegalArgumentException ex) {
                     Log.e(TAG, ex.getMessage(), ex);
                     Toast.makeText(context, ex.getMessage(), Toast.LENGTH_SHORT).show();
@@ -505,8 +498,9 @@ public class UrlPlayerDialog_bg {
             @Override
             void apply(UrlPlayerDialog_bg self) throws RemoteException {
                 Mp3Bean bean = self.bean;
-                List<Mp3Bean> totalUrlList = self.totalUrlList;
-
+                if (bean == null) {
+                    bean = new Mp3Bean();
+                }
                 Map<String, String> toMap = new HashMap<String, String>();
                 toMap.put(bean.getName(), bean.getUrl());
                 self.urlPlayerServiceHander.get().getMService().setReplayMode(bean.getName(), bean.getLastPositionInt(), Arrays.asList(bean.getName()), Arrays.asList(bean.getUrl()), false);
