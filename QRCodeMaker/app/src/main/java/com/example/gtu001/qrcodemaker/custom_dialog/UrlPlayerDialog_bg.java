@@ -80,8 +80,12 @@ public class UrlPlayerDialog_bg {
             currentIndex = totalUrlList.indexOf(this.bean);
         }
 
-        this.urlPlayerServiceHander.set(new UrlPlayerServiceHander());
-        this.urlPlayerServiceHander.get().init(context);
+        if (this.urlPlayerServiceHander.get() == null) {
+            this.urlPlayerServiceHander.set(new UrlPlayerServiceHander());
+        }
+        if (!this.urlPlayerServiceHander.get().isInitOk()) {
+            this.urlPlayerServiceHander.get().init(context);
+        }
         return this;
     }
 

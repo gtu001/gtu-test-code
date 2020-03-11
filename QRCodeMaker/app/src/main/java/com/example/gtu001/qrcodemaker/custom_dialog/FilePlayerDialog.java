@@ -11,7 +11,7 @@ import android.widget.Toast;
 
 import com.example.gtu001.qrcodemaker.R;
 import com.example.gtu001.qrcodemaker.common.ImageButtonImageHelper;
-import com.example.gtu001.qrcodemaker.common.Mp3PlayerHandler;
+import com.example.gtu001.qrcodemaker.common.mp3.Mp3PlayerHandler;
 
 import java.io.File;
 
