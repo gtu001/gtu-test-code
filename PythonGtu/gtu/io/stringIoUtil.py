@@ -1,5 +1,6 @@
 
 import io
+from gtu.error import errorHandler
 
 '''
 from gtu.io import stringIoUtil
@@ -14,15 +15,23 @@ def tempStringReader(text):
 
     
 
-def multiInput():
-    str = input("請輸入內容")
+def multiInput(exitArry=("exit", "quit")):
+    try :
+        strVal = input("請輸入內容")
+    except Exception as ex :
+        errorHandler.printStackTrace2(ex)
     while True :
-        line = input()
-        if line.strip() in ("exit", "quit"):
+        try :
+            line = input()
+        except Exception as ex :
+            errorHandler.printStackTrace2(ex)
+        tmpLine = line.strip()
+        if len(tmpLine) != 0 and tmpLine in exitArry :
             break
-        str += line + "\r\n"
-    return str
+        strVal += line + "\r\n"
+    return strVal
     
+
 
 if __name__ == '__main__':
     data = multiInput()
