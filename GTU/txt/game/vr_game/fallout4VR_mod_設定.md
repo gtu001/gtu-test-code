@@ -34,3 +34,10 @@ https://m.gamer.com.tw/forum/C.php?bsn=60606&snA=1602
 		[Archive]
 		bInvalidateOlderFiles=1
 		sResourceDataDirsFinal=
+
+
+
+安裝 fallout 4 cheat terminal
+---
+	https://www.nexusmods.com/fallout4/mods/13285
+	開啟道具 INV -> MISC -> Cheat Terminal Portable

@@ -9,6 +9,8 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -16,6 +18,10 @@ import java.util.EventObject;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -39,8 +45,10 @@ import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
 
 import gtu._work.ui.JMenuBarUtil.JMenuAppender;
+import gtu.clipboard.ClipboardUtil;
 import gtu.constant.PatternCollection;
 import gtu.file.FileUtil;
+import gtu.mp4.FfmpegHelper;
 import gtu.properties.PropertiesGroupUtils;
 import gtu.properties.PropertiesUtil;
 import gtu.runtime.ProcessWatcher;
@@ -90,6 +98,10 @@ public class Mp3TransferUI extends JFrame {
     private JTextField volumnFixText;
     private JLabel lblNewLabel_3;
     private JTextField encodingText;
+    private JLabel lblNewLabel_4;
+    private JLabel lblNewLabel_5;
+    private JTextField mp3StartText;
+    private JTextField mp3EndText;
 
     /**
      * Launch the application.
@@ -131,9 +143,9 @@ public class Mp3TransferUI extends JFrame {
         tabbedPane.addTab("基本設定", null, panel, null);
         panel.setLayout(new FormLayout(new ColumnSpec[] { FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow"), },
                 new RowSpec[] { FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
-                        FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
-                        FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
-                        RowSpec.decode("default:grow"), }));
+                        FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
+                        FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
+                        FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, RowSpec.decode("default:grow"), }));
 
         lblNewLabel = new JLabel("ffmepg");
         panel.add(lblNewLabel, "2, 2, right, default");
@@ -172,6 +184,20 @@ public class Mp3TransferUI extends JFrame {
         encodingText = new JTextField();
         panel.add(encodingText, "4, 8, fill, default");
         encodingText.setColumns(10);
+
+        lblNewLabel_4 = new JLabel("開始00:00:00");
+        panel.add(lblNewLabel_4, "2, 10, right, default");
+
+        mp3StartText = new JTextField();
+        panel.add(mp3StartText, "4, 10, fill, default");
+        mp3StartText.setColumns(10);
+
+        lblNewLabel_5 = new JLabel("結束00:00:00");
+        panel.add(lblNewLabel_5, "2, 12, right, default");
+
+        mp3EndText = new JTextField();
+        panel.add(mp3EndText, "4, 12, fill, default");
+        mp3EndText.setColumns(10);
 
         panel_7 = new JPanel();
         panel.add(panel_7, "4, 18, fill, fill");
@@ -229,6 +255,13 @@ public class Mp3TransferUI extends JFrame {
             @Override
             public void keyPressed(KeyEvent e) {
                 JListUtil.newInstance(ffmpegList).defaultJListKeyPressed(e);
+                swingUtil.invokeAction("ffmpegList.keyPress", e);
+            }
+        });
+        ffmpegList.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                swingUtil.invokeAction("ffmpegList.click", e);
             }
         });
         panel_1.add(JCommonUtil.createScrollComponent(ffmpegList), BorderLayout.CENTER);
@@ -277,6 +310,18 @@ public class Mp3TransferUI extends JFrame {
         TEST_DEFAULT_EVENT, //
         JTabbedPane_ChangeIndex, //
         ;
+    }
+
+    private String getMp3StartEnd(String text) {
+        text = StringUtils.trimToEmpty(text);
+        Pattern ptn = Pattern.compile("\\d{2}\\:\\d{2}\\:\\d{2}");
+        Matcher mth = ptn.matcher(text);
+        if (mth.matches()) {
+            return text;
+        } else {
+            JCommonUtil._jOptionPane_showMessageDialog_error("錯誤時間格式 00:00:00");
+        }
+        return "";
     }
 
     private void applyAllEvents() {
@@ -342,15 +387,22 @@ public class Mp3TransferUI extends JFrame {
             }
 
             private void run_inner(final ZFile aviFile, final File targetDir, final PrintStream outStream) {
+                JCommonUtil.isBlankErrorMsg(ffmpegText.getText(), "ffmpeg未設定");
+
                 RuntimeBatPromptModeUtil inst = RuntimeBatPromptModeUtil.newInstance();
                 inst.runInBatFile(true);
                 File newMp3File = FileUtil.getNewSubName(new File(targetDir, aviFile.file.getName()), "mp3");
-                String command = String.format("\"%1$s\" -i \"%2$s\" -b:a 192K -vn -af \"volume=%4$s\" \"%3$s\"", //
-                        StringUtils.trimToEmpty(ffmpegText.getText()), //
-                        StringUtils.trimToEmpty(aviFile.file.getAbsolutePath()), //
-                        newMp3File.getAbsolutePath(), //
-                        getVolumnFixTextValue() //
-                );
+                File newMp3File2 = FileUtil.getNewSubName(new File(targetDir, aviFile.file.getName()), "mp4");
+
+                String command = FfmpegHelper.newInstance()//
+                        .setFfmpegExe(StringUtils.trimToEmpty(ffmpegText.getText()))//
+                        .setSourceFile(StringUtils.trimToEmpty(aviFile.file.getAbsolutePath()))//
+                        .setTargetFile(newMp3File.getAbsolutePath())//
+                        .setVolume(getVolumnFixTextValue())//
+                        .setFromPosition(getMp3StartEnd(mp3StartText.getText()))//
+                        .setToPosition(getMp3StartEnd(mp3EndText.getText()))//
+                        .build();//
+
                 inst.command(command);
                 aviFile.isStart = true;
                 JCommonUtil.updateUI(ffmpegList, logArea);
@@ -391,6 +443,38 @@ public class Mp3TransferUI extends JFrame {
                 } catch (Exception ex) {
                     volumnFixText.setText("1");
                 }
+            }
+        });
+        swingUtil.addActionHex("ffmpegList.click", new Action() {
+            @Override
+            public void action(EventObject evt) throws Exception {
+            }
+        });
+
+        swingUtil.addActionHex("ffmpegList.keyPress", new Action() {
+            @Override
+            public void action(EventObject evt) throws Exception {
+                final File targetDir = new File(StringUtils.trimToEmpty(targetDirText.getText()));
+                ZFile aviFile = JListUtil.getLeadSelectionObject(ffmpegList);
+
+                File newMp3File = FileUtil.getNewSubName(new File(targetDir, aviFile.file.getName()), "mp3");
+                File newMp3File2 = FileUtil.getNewSubName(new File(targetDir, aviFile.file.getName()), "mp4");
+
+                final String command = FfmpegHelper.newInstance()//
+                        .setFfmpegExe(StringUtils.trimToEmpty(ffmpegText.getText()))//
+                        .setSourceFile(StringUtils.trimToEmpty(aviFile.file.getAbsolutePath()))//
+                        .setTargetFile(newMp3File.getAbsolutePath())//
+                        .setVolume(getVolumnFixTextValue())//
+                        .setFromPosition(getMp3StartEnd(mp3StartText.getText()))//
+                        .setToPosition(getMp3StartEnd(mp3EndText.getText()))//
+                        .build();//
+                
+                new Timer().schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        ClipboardUtil.getInstance().setContents(command);
+                    }
+                }, 500);
             }
         });
     }
