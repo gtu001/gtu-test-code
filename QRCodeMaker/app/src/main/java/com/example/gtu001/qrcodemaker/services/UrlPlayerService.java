@@ -354,6 +354,11 @@ public class UrlPlayerService extends Service {
             UrlPlayerService.this.pause();
         }
 
+        @Override
+        public boolean isAlive() throws RemoteException {
+            return true;
+        }
+
         UrlPlayerService getService() {
             return UrlPlayerService.this;
         }

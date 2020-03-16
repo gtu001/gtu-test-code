@@ -32,4 +32,6 @@ interface IUrlPlayerService {
     void start();
 
     void pause();
+
+    boolean isAlive();
 }

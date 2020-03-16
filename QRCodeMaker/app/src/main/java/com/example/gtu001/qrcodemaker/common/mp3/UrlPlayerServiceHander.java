@@ -72,81 +72,86 @@ public class UrlPlayerServiceHander {
 
     //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
+    private boolean tryOk(Context context) throws RemoteException {
+        if (mService == null || mConnection == null) {
+            Toast.makeText(context, "未初始化1", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        try {
+            return mService.isAlive();
+        } catch (android.os.DeadObjectException ex) {
+            mService = null;
+            mConnection = null;
+            Toast.makeText(context, "未初始化2", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+    }
+
     public void setReplayMode(final String currentName, final int currentPosition, List<String> nameLst, List<String> pathLst, boolean isRandom, Context context) throws RemoteException {
-        if (mService == null) {
-            Toast.makeText(context, "未初始化", Toast.LENGTH_SHORT).show();
+        if (!tryOk(context)) {
             return;
         }
         mService.setReplayMode(currentName, currentPosition, nameLst, pathLst, isRandom);
     }
 
     public void pauseAndResume(Context context) throws RemoteException {
-        if (mService == null) {
-            Toast.makeText(context, "未初始化", Toast.LENGTH_SHORT).show();
+        if (!tryOk(context)) {
             return;
         }
         mService.pauseAndResume();
     }
 
     public boolean isPlaying(Context context) throws RemoteException {
-        if (mService == null) {
-            Toast.makeText(context, "未初始化", Toast.LENGTH_SHORT).show();
+        if (!tryOk(context)) {
             return false;
         }
         return mService.isPlaying();
     }
 
     public String stopPlay(Context context) throws RemoteException {
-        if (mService == null) {
-            Toast.makeText(context, "未初始化", Toast.LENGTH_SHORT).show();
+        if (!tryOk(context)) {
             return "";
         }
         return mService.stopPlay();
     }
 
     public void backwardOrBackward(int time, Context context) throws RemoteException {
-        if (mService == null) {
-            Toast.makeText(context, "未初始化", Toast.LENGTH_SHORT).show();
+        if (!tryOk(context)) {
             return;
         }
         mService.backwardOrBackward(time);
     }
 
     public String startPlay(String name, String url, int currentPosition, Context context) throws RemoteException {
-        if (mService == null) {
-            Toast.makeText(context, "未初始化", Toast.LENGTH_SHORT).show();
+        if (!tryOk(context)) {
             return "";
         }
         return mService.startPlay(name, url, currentPosition);
     }
 
     public void onProgressChange(int percent, Context context) throws RemoteException {
-        if (mService == null) {
-            Toast.makeText(context, "未初始化", Toast.LENGTH_SHORT).show();
+        if (!tryOk(context)) {
             return;
         }
         mService.onProgressChange(percent);
     }
 
     public int getProgressPercent(Context context) throws RemoteException {
-        if (mService == null) {
-            Toast.makeText(context, "未初始化", Toast.LENGTH_SHORT).show();
+        if (!tryOk(context)) {
             return -1;
         }
         return mService.getProgressPercent();
     }
 
     public String getProgressTime(Context context) throws RemoteException {
-        if (mService == null) {
-            Toast.makeText(context, "未初始化", Toast.LENGTH_SHORT).show();
+        if (!tryOk(context)) {
             return "";
         }
         return mService.getProgressTime();
     }
 
     public Map getCurrentBean(Context context) throws RemoteException {
-        if (mService == null) {
-            Toast.makeText(context, "未初始化", Toast.LENGTH_SHORT).show();
+        if (!tryOk(context)) {
             return Collections.EMPTY_MAP;
         }
         return mService.getCurrentBean();
