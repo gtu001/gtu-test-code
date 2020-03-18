@@ -36,6 +36,7 @@ GTA5 VR
 
 按鍵
 ---
+#若沒反應先按"F11"
 F11         Toggle hotkeys - off at start
 0           Cycle stereo mode in cutscenes (normal, dynamic, flat screen) - dynamic at start
 T           Cycle dominant eye for aiming down sights (none, left, right) - right at start
@@ -56,3 +57,9 @@ NUMPAD 0    Toggle position tracking - on at start
 NUMPAD 2    Toggle stereo rendering (alternate eyes) - on at start
 NUMPAD 3    Toggle darts/tennis FOV override - on at start
 
+
+
+解決地圖載入不完全的工具
+---
+	https://www.gta5-mods.com/misc/lag-world-not-loading-fix-simple-easy
+	遊戲開啟後執行bat即可
