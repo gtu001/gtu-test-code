@@ -1605,6 +1605,10 @@ public class EnglishSearchUI extends JFrame {
             // writeNewData(text);
             int wordSize = writeNewData2(text, false);
             setTitle("生字數 : " + wordSize);
+            
+            if(searchEnglishIdTextController.isFocusOwner()) {
+                searchEnglishIdTextController.setSelectAll();
+            }
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
         } finally {
