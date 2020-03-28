@@ -1,5 +1,6 @@
 DiRT_Rally_啟動方式
 (A)
+	https://github.com/LibreVR/Revive/releases/download/1.4.2/ReviveInstaller.exe
 	1.下載revive 1.4.2
 		安裝位置換一下 revive_1.4.2
 	2.開啟後去系統列點右鍵, 選Patch

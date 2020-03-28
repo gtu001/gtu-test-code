@@ -1352,10 +1352,17 @@ public class EnglishSearchUI extends JFrame {
                 focusSearchEnglishIdText();
 
                 // 開啟時自動查詢
-                if (StringUtils.isNotBlank(searchEnglishIdTextController.getText()) && //
-                        autoSearchChk.isSelected()) {
-                    queryButtonAction(false);
+                if (StringUtils.isNotBlank(searchEnglishIdTextController.getText())) {
+                    if(autoSearchChk.isSelected()) {
+                        queryButtonAction(false);
+                    }
                 }
+                
+                new Timer().schedule(new TimerTask(){
+                    @Override
+                    public void run() {
+                        searchEnglishIdTextController.setSelectAll();
+                    }}, 300);
             } catch (Exception ex) {
                 JCommonUtil.handleException(ex);
             } finally {
