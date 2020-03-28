@@ -15,3 +15,13 @@ Heres a few important things that aren't noted in the text document:
 -hlvr_shotgun_grant_upgrades 3: Give shotgun with all upgrades
 
 
+
+＝＝＝＝＝＝＝＝
+修改中文方式
+---
+	C:\Users\YOUR_NAME\AppData\Roaming\Goldberg SteamEmu Saves\settings\language.txt
+
+	裡面改成 tchinese
+
+	可支援語言列表
+		https://github.com/GeospatialDaryl/Goldberemu/blob/master/Readme_release.txt
