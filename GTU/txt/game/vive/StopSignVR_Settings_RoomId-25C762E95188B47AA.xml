@@ -46,27 +46,27 @@
 		</Box>
 		<Box Name="2" Width="0.231351f" Height="0.258900f" Depth="1.004811f" FullOnDistance_Meters="0.500000f" FullOffDistance_Meters="0.800000f" Active="true" AlertForImpacts="true" SilentWarningWhenClose="true" SidesImage="BoxSkin_WireframeBlue.png" TextureQuality="50">
 			<Center HmdMatrix34="
-				0.994099f, 0.107281f, -0.016051f, -0.833474f, 
-				-0.106843f, 0.993934f, 0.026066f, 0.359016f, 
-				0.018750f, -0.024197f, 0.999532f, 0.423481f"/>
+				0.993706f, 0.110932f, -0.015561f, -0.422723f, 
+				-0.111220f, 0.993614f, -0.019011f, 0.451100f, 
+				0.013353f, 0.020622f, 0.999699f, 0.384380f"/>
 		</Box>
-		<Box Name="3" Width="0.735503f" Height="0.251459f" Depth="0.279407f" FullOnDistance_Meters="0.500000f" FullOffDistance_Meters="0.800000f" Active="false" AlertForImpacts="true" SilentWarningWhenClose="true" SidesImage="BoxSkin_WireframeBlue.png" TextureQuality="30">
+		<Box Name="3" Width="0.735503f" Height="0.251459f" Depth="0.279407f" FullOnDistance_Meters="0.500000f" FullOffDistance_Meters="0.800000f" Active="true" AlertForImpacts="true" SilentWarningWhenClose="true" SidesImage="BoxSkin_WireframeBlue.png" TextureQuality="30">
 			<Center HmdMatrix34="
-				0.999875f, -0.010546f, -0.011807f, 0.048358f, 
-				0.009295f, 0.994806f, -0.101361f, 0.721292f, 
-				0.012814f, 0.101239f, 0.994780f, -0.135626f"/>
+				0.999652f, -0.020328f, -0.016810f, 0.220795f, 
+				0.019799f, 0.999321f, -0.031045f, 0.718035f, 
+				0.017429f, 0.030702f, 0.999376f, -0.487784f"/>
 		</Box>
 		<Box Name="4" Width="0.641475f" Height="0.250000f" Depth="0.250000f" FullOnDistance_Meters="0.500000f" FullOffDistance_Meters="0.800000f" Active="true" AlertForImpacts="true" SilentWarningWhenClose="true" SidesImage="BoxSkin_WireframeBlue.png" TextureQuality="10">
 			<Center HmdMatrix34="
-				-0.999940f, 0.005818f, 0.009734f, -0.176092f, 
-				0.006060f, 0.999664f, 0.025228f, 1.251306f, 
-				-0.009583f, 0.025287f, -0.999639f, 1.197543f"/>
+				-0.999994f, 0.003061f, -0.002356f, 0.182805f, 
+				0.003114f, 0.999709f, -0.023956f, 1.372700f, 
+				0.002283f, -0.023962f, -0.999712f, 0.912701f"/>
 		</Box>
 		<Box Name="5" Width="0.689931f" Height="0.250000f" Depth="0.250000f" FullOnDistance_Meters="0.500000f" FullOffDistance_Meters="0.800000f" Active="true" AlertForImpacts="true" SilentWarningWhenClose="true" SidesImage="BoxSkin_WireframeBlue.png" TextureQuality="100">
 			<Center HmdMatrix34="
-				-0.018359f, 0.044706f, -0.998832f, 1.103686f, 
-				0.010584f, 0.998953f, 0.044517f, 1.227178f, 
-				0.999776f, -0.009755f, -0.018812f, 0.596985f"/>
+				0.029874f, -0.006673f, -0.999532f, 1.433298f, 
+				-0.017980f, 0.999813f, -0.007212f, 1.320549f, 
+				0.999392f, 0.018187f, 0.029749f, 0.231527f"/>
 		</Box>
 		<!--
 		Add extra boxes by copying and uncommenting these lines. Change Box Name from 'x' to correct number:
