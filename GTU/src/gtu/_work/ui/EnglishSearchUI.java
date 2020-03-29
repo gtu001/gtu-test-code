@@ -1362,6 +1362,7 @@ public class EnglishSearchUI extends JFrame {
                     @Override
                     public void run() {
                         searchEnglishIdTextController.setSelectAll();
+                        searchEnglishIdTextController.focus();
                     }}, 300);
             } catch (Exception ex) {
                 JCommonUtil.handleException(ex);
@@ -1714,6 +1715,10 @@ public class EnglishSearchUI extends JFrame {
 
         private boolean isFocusOwner() {
             return get().isFocusOwner();
+        }
+        
+        private void focus() {
+            JCommonUtil.focusComponent(searchEnglishIdText, false, null);
         }
 
         private JComboBox getCombobox() {
