@@ -36,6 +36,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -45,7 +46,6 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Callable;
-import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
@@ -188,6 +188,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
     private JToggleButton toggleChangeColorBtn;
     private HyperlinkJTextPaneHandler mHyperlinkJTextPaneHandler;
     private ImageIconConst mImageIconConst;
+    private LastestUpdateKeeper mLastestUpdateKeeper;
 
     /**
      * Launch the application.
@@ -376,15 +377,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
             JButton showInDirectoryBtn = new JButton("目錄");
             showInDirectoryBtn.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    try {
-                        String url = StringUtils.trimToEmpty(urlText.getText());
-                        File file = DesktopUtil.getFile(url);
-                        if (file.exists()) {
-                            DesktopUtil.browseFileDirectory(file);
-                        }
-                    } catch (Exception ex) {
-                        JCommonUtil.handleException(ex);
-                    }
+                    openFileDirectory();
                 }
             });
             panel_2.add(showInDirectoryBtn);
@@ -579,6 +572,10 @@ public class BrowserHistoryHandlerUI extends JFrame {
             pack();
             this.setSize(900, 500);// XXX <---------- 設寬高度
 
+            // ============================================================================================================
+            // ============================================================================================================
+            // ============================================================================================================
+
             configSelf.reflectInit(this);
 
             if (configSelf.getConfigProp().containsKey("bookmarkConfigText")) {
@@ -593,6 +590,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
             }
 
             mImageIconConst = new ImageIconConst(urlTable);
+            mLastestUpdateKeeper = new LastestUpdateKeeper();
 
             JCommonUtil.defaultToolTipDelay();
             JCommonUtil.setJFrameDefaultSetting(this);
@@ -620,8 +618,11 @@ public class BrowserHistoryHandlerUI extends JFrame {
         }
     }
 
-    private List<UrlConfig> getUrlConfigList() {
+    private List<UrlConfig> getUrlConfigList(boolean reload) {
         List<UrlConfig> lst = new ArrayList<UrlConfig>();
+        if (reload) {
+            bookmarkConfig.reload();
+        }
         for (Enumeration<?> enu = bookmarkConfig.getConfigProp().keys(); enu.hasMoreElements();) {
             String url = (String) enu.nextElement();
             final String title_tag_remark_time = bookmarkConfig.getConfigProp().getProperty(url);
@@ -640,7 +641,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
 
     private void bootstartStarting() {
         List<UrlConfig> bootLst = new ArrayList<UrlConfig>();
-        List<UrlConfig> lst = getUrlConfigList();
+        List<UrlConfig> lst = getUrlConfigList(false);
         for (UrlConfig d : lst) {
             if (StringUtils.isNotBlank(d.bootStart)) {
                 bootLst.add(d);
@@ -1099,6 +1100,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
             d.remark = remark;
             d.commandType = commandType;
             d.timestampLastest = DateFormatUtils.format(System.currentTimeMillis(), "yyyy/MM/dd HH:mm:ss");
+            d.updateTimestamp = DateFormatUtils.format(System.currentTimeMillis(), "yyyy/MM/dd HH:mm:ss");
             d.isUseRemarkOpen = isUseRemarkOpen;
             d.isHidden = isHidden;
             d.orderMark = orderMark;
@@ -1113,6 +1115,8 @@ public class BrowserHistoryHandlerUI extends JFrame {
             tagComboBoxUtil.setSelectItemAndText(tag);
 
             JCommonUtil._jOptionPane_showMessageDialog_info("儲存成功!");
+
+            mLastestUpdateKeeper.update(true);
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
         }
@@ -1466,9 +1470,87 @@ public class BrowserHistoryHandlerUI extends JFrame {
             }
 
             // 重設bookmarkConfig 時間
-            this.setTitle("書籤最後修改時間 : " + DateFormatUtils.format(bookmarkConfig.getPropFile().lastModified(), "yyyy/MM/dd HH:mm:ss"));
+            mLastestUpdateKeeper.update(false);
         } finally {
             searchBool.set(false);
+        }
+    }
+
+    private class LastestUpdateKeeper {
+        String latestAdd;
+        String latestUpdate;
+
+        private String getLatestModify(List<UrlConfig> lst) {
+            Collections.sort(lst, new Comparator<UrlConfig>() {
+                SimpleDateFormat SDF = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+
+                @Override
+                public int compare(UrlConfig o1, UrlConfig o2) {
+                    if (StringUtils.isBlank(o1.updateTimestamp)) {
+                        return 1;
+                    } else if (StringUtils.isNotBlank(o1.updateTimestamp) && StringUtils.isBlank(o2.updateTimestamp)) {
+                        return -1;
+                    } else if (StringUtils.isBlank(o1.updateTimestamp) && StringUtils.isBlank(o2.updateTimestamp)) {
+                        return 0;
+                    }
+                    try {
+                        Date d1 = SDF.parse(o1.updateTimestamp);
+                        Date d2 = SDF.parse(o2.updateTimestamp);
+                        if (d1.after(d2)) {
+                            return -1;
+                        } else if (d1.before(d2)) {
+                            return 1;
+                        }
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                    return 0;
+                }
+            });
+            UrlConfig urlConf = lst.get(0);
+            String tmp = urlConf.title + "_" + urlConf.updateTimestamp;
+            return tmp;
+        }
+
+        private String getLatestAdd(List<UrlConfig> lst) {
+            Collections.sort(lst, new Comparator<UrlConfig>() {
+                SimpleDateFormat SDF = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+
+                @Override
+                public int compare(UrlConfig o1, UrlConfig o2) {
+                    if (StringUtils.isBlank(o1.timestamp)) {
+                        return 1;
+                    } else if (StringUtils.isNotBlank(o1.timestamp) && StringUtils.isBlank(o2.timestamp)) {
+                        return -1;
+                    } else if (StringUtils.isBlank(o1.timestamp) && StringUtils.isBlank(o2.timestamp)) {
+                        return 0;
+                    }
+                    try {
+                        Date d1 = SDF.parse(o1.timestamp);
+                        Date d2 = SDF.parse(o2.timestamp);
+                        if (d1.after(d2)) {
+                            return -1;
+                        } else if (d1.before(d2)) {
+                            return 1;
+                        }
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                    return 0;
+                }
+            });
+            UrlConfig urlConf = lst.get(0);
+            String tmp = urlConf.title + "_" + urlConf.timestamp;
+            return tmp;
+        }
+
+        public void update(boolean reload) {
+            if (reload || StringUtils.isBlank(latestAdd) || StringUtils.isBlank(latestUpdate)) {
+                List<UrlConfig> lst = getUrlConfigList(reload);
+                latestAdd = getLatestAdd(lst);
+                latestUpdate = getLatestModify(lst);
+            }
+            BrowserHistoryHandlerUI.this.setTitle("新增 : " + latestAdd + ", 修改 : " + latestUpdate);
         }
     }
 
@@ -1653,6 +1735,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
         String isHidden;// 是否隱藏此項目
         String orderMark; // 特許排序
         String bootStart; // 開啟馬上執行
+        String updateTimestamp; // 最後修改時間
 
         private static SpecialCharHandler specialCharHandler;
 
@@ -1672,8 +1755,9 @@ public class BrowserHistoryHandlerUI extends JFrame {
             String remark = specialCharHandler.getBeforeSave(d.remark);
             String orderMark = specialCharHandler.getBeforeSave(d.orderMark);
             String bootStart = specialCharHandler.getBeforeSave(d.bootStart);
+            String updateTimestamp = specialCharHandler.getBeforeSave(d.updateTimestamp);
             return title + "^" + tag + "^" + remark + "^" + timestamp + "^" + commandType + "^" + timestampLastest + "^" + clickTimes + "^" + isUseRemarkOpen + "^" + isHidden + "^" + orderMark + "^"
-                    + bootStart;
+                    + bootStart + "^" + updateTimestamp;
         }
 
         private static String getArryStr(String[] args, int index) {
@@ -1697,6 +1781,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
                 String isHidden = getArryStr(args, 8);
                 String orderMark = getArryStr(args, 9);
                 String bootStart = getArryStr(args, 10);
+                String updateTimestamp = getArryStr(args, 11);
 
                 UrlConfig d = new UrlConfig();
                 d.title = title;
@@ -1711,6 +1796,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
                 d.isHidden = isHidden;
                 d.orderMark = orderMark;
                 d.bootStart = bootStart;
+                d.updateTimestamp = updateTimestamp;
 
                 return d;
             }
@@ -1926,15 +2012,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
                             .addJMenuItem("開啟目錄", new ActionListener() {
                                 @Override
                                 public void actionPerformed(ActionEvent e) {
-                                    try {
-                                        String url = StringUtils.trimToEmpty(urlText.getText());
-                                        File file = DesktopUtil.getFile(url);
-                                        if (file.exists()) {
-                                            DesktopUtil.browseFileDirectory(file);
-                                        }
-                                    } catch (Exception ex) {
-                                        JCommonUtil.handleException(ex);
-                                    }
+                                    openFileDirectory();
                                 }
                             })//
                             .addJMenuItem("檔案以參數開啟", new ActionListener() {
@@ -2129,6 +2207,23 @@ public class BrowserHistoryHandlerUI extends JFrame {
         Exception ex) {
             JCommonUtil.handleException(ex);
         }
+    }
+
+    private void openFileDirectory() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    String url = StringUtils.trimToEmpty(urlText.getText());
+                    File file = DesktopUtil.getFile(url);
+                    if (file.exists()) {
+                        DesktopUtil.browseFileDirectory(file);
+                    }
+                } catch (Exception ex) {
+                    JCommonUtil.handleException(ex);
+                }
+            }
+        }).start();
     }
 
     private void initAddSaveShortcutKeyEvent() {
