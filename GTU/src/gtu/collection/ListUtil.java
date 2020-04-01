@@ -24,6 +24,10 @@ public class ListUtil {
         System.out.println("done...");
     }
 
+    public static void setJdk16SortSetting() {
+        System.setProperty("java.util.Arrays.useLegacyMergeSort", "true");
+    }
+
     /**
      * 建立一個lazyList當get超出範圍時會動態建立到符合的範圍 Ex : list = [] -> list.get(0) -> [T]
      * list = [] -> list.get(2) -> [null, null, T]

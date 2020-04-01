@@ -104,6 +104,7 @@ import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
 
 import gtu.clipboard.ClipboardUtil;
+import gtu.collection.ListUtil;
 import gtu.constant.PatternCollection;
 import gtu.distribition.NormalDistributionFilter;
 import gtu.file.FileUtil;
@@ -135,6 +136,11 @@ import gtu.thread.util.ThreadUtil;
 import taobe.tec.jcc.JChineseConvertor;
 
 public class BrowserHistoryHandlerUI extends JFrame {
+
+    static {
+        ListUtil.setJdk16SortSetting();
+    }
+
     private static final long serialVersionUID = 1L;
     private JTextField titleText;
     private JTextField urlText;
