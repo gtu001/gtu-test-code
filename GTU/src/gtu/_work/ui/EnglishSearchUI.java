@@ -244,7 +244,7 @@ public class EnglishSearchUI extends JFrame {
 
         @Override
         public void focusGained(FocusEvent e) {
-            focusSearchEnglishIdText();
+            searchEnglishIdTextController.focusSearchEnglishIdText();
         }
     };
 
@@ -1349,21 +1349,17 @@ public class EnglishSearchUI extends JFrame {
                     JCommonUtil.setLocationToRightBottomCorner(this);
                 }
 
-                focusSearchEnglishIdText();
+                searchEnglishIdTextController.focusSearchEnglishIdText();
 
                 // 開啟時自動查詢
                 if (StringUtils.isNotBlank(searchEnglishIdTextController.getText())) {
-                    if(autoSearchChk.isSelected()) {
+                    if (autoSearchChk.isSelected()) {
                         queryButtonAction(false);
                     }
                 }
-                
-                new Timer().schedule(new TimerTask(){
-                    @Override
-                    public void run() {
-                        searchEnglishIdTextController.setSelectAll();
-                        searchEnglishIdTextController.focus();
-                    }}, 300);
+
+                // searchEnglishIdTextController.doFocus();
+
             } catch (Exception ex) {
                 JCommonUtil.handleException(ex);
             } finally {
@@ -1613,8 +1609,8 @@ public class EnglishSearchUI extends JFrame {
             // writeNewData(text);
             int wordSize = writeNewData2(text, false);
             setTitle("生字數 : " + wordSize);
-            
-            if(searchEnglishIdTextController.isFocusOwner()) {
+
+            if (searchEnglishIdTextController.isFocusOwner()) {
                 searchEnglishIdTextController.setSelectAll();
             }
         } catch (Exception ex) {
@@ -1671,22 +1667,6 @@ public class EnglishSearchUI extends JFrame {
         }
     }
 
-    private boolean focusSearchEnglishIdText() {
-        boolean isRobotFocus = JCommonUtil.focusComponent(searchEnglishIdTextController.get(), robotFocusChk.isSelected(), new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent paramActionEvent) {
-                mEnglishIdDropdownHandler.hidePopup4EnglishIdText();
-            }//
-        });
-        if (!isRobotFocus) {
-            mEnglishIdDropdownHandler.hidePopup4EnglishIdText();
-        }
-        searchEnglishIdTextController.getCombobox().hidePopup();
-        searchEnglishIdTextController.setSelectAll();
-        searchEnglishIdTextController.getCombobox().hidePopup();
-        return isRobotFocus;
-    }
-
     private class SearchEnglishIdTextController {
         private void setText(String text) {
             // searchEnglishIdText.setText("");
@@ -1703,6 +1683,9 @@ public class EnglishSearchUI extends JFrame {
         }
 
         private void setSelectAll() {
+            if (mouseSelectionChk.isSelected()) {
+                return;
+            }
             String text = get().getText();
             get().setSelectionStart(0);
             get().setSelectionEnd(text.length());
@@ -1716,7 +1699,7 @@ public class EnglishSearchUI extends JFrame {
         private boolean isFocusOwner() {
             return get().isFocusOwner();
         }
-        
+
         private void focus() {
             JCommonUtil.focusComponent(searchEnglishIdText, false, null);
         }
@@ -1727,6 +1710,36 @@ public class EnglishSearchUI extends JFrame {
 
         private JTextComponent get() {
             return (JTextComponent) searchEnglishIdText.getEditor().getEditorComponent();
+        }
+
+        private void focusSearchEnglishIdText() {
+            new Timer().schedule(new TimerTask() {
+                int repeatTime = 0;
+
+                @Override
+                public void run() {
+                    // =================================================
+                    boolean isRobotFocus = JCommonUtil.focusComponent(searchEnglishIdTextController.get(), robotFocusChk.isSelected(), new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent paramActionEvent) {
+                            mEnglishIdDropdownHandler.hidePopup4EnglishIdText();
+                        }//
+                    });
+                    if (!isRobotFocus) {
+                        mEnglishIdDropdownHandler.hidePopup4EnglishIdText();
+                    }
+                    searchEnglishIdTextController.getCombobox().hidePopup();
+                    searchEnglishIdTextController.setSelectAll();
+                    searchEnglishIdTextController.getCombobox().hidePopup();
+
+                    // =================================================
+                    if (searchEnglishIdTextController.isFocusOwner() || repeatTime >= 5) {
+                        this.cancel();
+                    } else {
+                        repeatTime++;
+                    }
+                }
+            }, 200, 200);
         }
     }
 
