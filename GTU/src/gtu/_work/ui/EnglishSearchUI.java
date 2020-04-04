@@ -1719,14 +1719,16 @@ public class EnglishSearchUI extends JFrame {
                 @Override
                 public void run() {
                     // =================================================
-                    boolean isRobotFocus = JCommonUtil.focusComponent(searchEnglishIdTextController.get(), robotFocusChk.isSelected(), new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent paramActionEvent) {
+                    if(!searchEnglishIdTextController.isFocusOwner()) {
+                        boolean isRobotFocus = JCommonUtil.focusComponent(searchEnglishIdTextController.get(), robotFocusChk.isSelected(), new ActionListener() {
+                            @Override
+                            public void actionPerformed(ActionEvent paramActionEvent) {
+                                mEnglishIdDropdownHandler.hidePopup4EnglishIdText();
+                            }//
+                        });
+                        if (!isRobotFocus) {
                             mEnglishIdDropdownHandler.hidePopup4EnglishIdText();
-                        }//
-                    });
-                    if (!isRobotFocus) {
-                        mEnglishIdDropdownHandler.hidePopup4EnglishIdText();
+                        }
                     }
                     searchEnglishIdTextController.getCombobox().hidePopup();
                     searchEnglishIdTextController.setSelectAll();
