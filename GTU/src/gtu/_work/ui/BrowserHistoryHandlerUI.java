@@ -70,6 +70,7 @@ import javax.swing.JToggleButton;
 import javax.swing.WindowConstants;
 import javax.swing.table.DefaultTableModel;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
@@ -1553,8 +1554,13 @@ public class BrowserHistoryHandlerUI extends JFrame {
         public void update(boolean reload) {
             if (reload || StringUtils.isBlank(latestAdd) || StringUtils.isBlank(latestUpdate)) {
                 List<UrlConfig> lst = getUrlConfigList(reload);
-                latestAdd = getLatestAdd(lst);
-                latestUpdate = getLatestModify(lst);
+                if (!CollectionUtils.isEmpty(lst)) {
+                    latestAdd = getLatestAdd(lst);
+                    latestUpdate = getLatestModify(lst);
+                } else {
+                    latestAdd = "NA";
+                    latestUpdate = "NA";
+                }
             }
             BrowserHistoryHandlerUI.this.setTitle("新增 : " + latestAdd + ", 修改 : " + latestUpdate);
         }
