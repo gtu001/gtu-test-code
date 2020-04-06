@@ -162,6 +162,9 @@ public class BrowserHistoryHandlerUI extends JFrame {
                 configSelf = new PropertiesUtilBean(new File("/media/gtu001/OLD_D/my_tool/"), BrowserHistoryHandlerUI.class.getSimpleName() + "_linux");
             }
         }
+        if (configSelf == null) {
+            configSelf = new PropertiesUtilBean(BrowserHistoryHandlerUI.class, BrowserHistoryHandlerUI.class.getSimpleName());
+        }
         System.out.println("configFile : " + configSelf.getPropFile());
     }
 
@@ -627,8 +630,11 @@ public class BrowserHistoryHandlerUI extends JFrame {
 
     private List<UrlConfig> getUrlConfigList(boolean reload) {
         List<UrlConfig> lst = new ArrayList<UrlConfig>();
-        if (reload) {
+        if (reload && bookmarkConfig != null) {
             bookmarkConfig.reload();
+        }
+        if (bookmarkConfig == null || bookmarkConfig.getConfigProp() == null) {
+            return lst;
         }
         for (Enumeration<?> enu = bookmarkConfig.getConfigProp().keys(); enu.hasMoreElements();) {
             String url = (String) enu.nextElement();
