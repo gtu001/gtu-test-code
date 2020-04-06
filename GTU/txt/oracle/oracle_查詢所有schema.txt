@@ -3,4 +3,13 @@
 --查詢系統schema
 select distinct owner from  dba_tables t ;
 
-select distinct tablespace_name from  dba_tables t 
+select distinct tablespace_name from  dba_tables t
+
+
+---
+-- 查詢schema有的資料表與筆數
+ 
+SELECT t.OWNER , t.TABLE_NAME , t.TABLESPACE_NAME, t.NUM_ROWS 
+FROM all_tables t 
+order by 3,1,2
+ 
