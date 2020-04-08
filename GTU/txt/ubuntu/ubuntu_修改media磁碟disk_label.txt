@@ -1,0 +1,29 @@
+查詢磁碟機
+	df -T | awk '{print $1,$2,$NF}' | grep "^/dev"
+
+已mount
+	mount | grep "^/dev"
+
+未mount
+	lsblk
+
+查詢磁碟系統
+	sudo blkid
+	or
+	file -sL /dev/sd*
+
+
+修改標籤
+EXT2/3/4
+	查詢 sudo e2label 磁碟代號(/dev/sdx)
+	變更 sudo e2label 磁碟代號(/dev/sdx) 磁碟名稱
+
+FAT
+	1.安裝 sudo apt install mtools
+	查詢 sudo MTOOLS_SKIP_CHECK=1 mlabel -i 磁碟代號(/dev/sdx) -s
+	變更 sudo MTOOLS_SKIP_CHECK=1 mlabel -i 磁碟代號(/dev/sdx) ::磁碟標簽名稱
+
+NTFS
+	1.安裝 sudo apt install ntfs-3g
+	查詢 sudo ntfslabel 磁碟代號(/dev/sdx)
+	變更 sudo ntfslabel 磁碟代號(/dev/sdx) 磁碟標簽名稱
