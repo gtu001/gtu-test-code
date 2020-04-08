@@ -15,7 +15,7 @@
 		 bcdedit /set "{bootmgr}" path \EFI\ubuntu\grubx64.efi
 */
 
-5. 用大白菜開機 將啟動磁區設定為 ubuntu
+5. 用大白菜開機 將啟動磁區設定為 ubuntu (** 重要 : 設定好圍起動磁區再灌 ubuntu **)
 
 6. 用 ubuntu 開機選 try ubuntu without install
 
