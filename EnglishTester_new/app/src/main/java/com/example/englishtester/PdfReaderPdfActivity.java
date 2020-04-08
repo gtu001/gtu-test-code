@@ -648,6 +648,7 @@ public class PdfReaderPdfActivity extends FragmentActivity implements FloatViewS
 
         private void initReference() {
             String fileName = PdfViewerMainHandler.PdfPageTitleHandler.fixNameToTitle(epubViewerMainHandler.getDto().getBookFile().getName());
+            fileName = fileName.replaceAll("'", "''");
 
             StringBuilder sb = new StringBuilder();
             sb.append(" select file_name , bookmark_type, max(insert_date) as insert_date, page_index      ");

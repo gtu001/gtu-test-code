@@ -647,6 +647,7 @@ public class MobiReaderMobiActivity extends FragmentActivity implements FloatVie
 
         private void initReference() {
             String fileName = MobiViewerMainHandler.MobiPageTitleHandler.fixNameToTitle(epubViewerMainHandler.getDto().getBookFile().getName());
+            fileName = fileName.replaceAll("'", "''");
 
             StringBuilder sb = new StringBuilder();
             sb.append(" select file_name , bookmark_type, max(insert_date) as insert_date, page_index      ");

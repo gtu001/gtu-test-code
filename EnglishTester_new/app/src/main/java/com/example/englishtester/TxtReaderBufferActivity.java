@@ -663,6 +663,7 @@ public class TxtReaderBufferActivity extends FragmentActivity implements FloatVi
 
         private void initReference() {
             String fileName = EpubViewerMainHandler.EpubPageTitleHandler.fixNameToTitle(txtBufferViewerMainHandler.getDto().getBookFile().getName());
+            fileName = fileName.replaceAll("'", "''");
 
             StringBuilder sb = new StringBuilder();
             sb.append(" select file_name , bookmark_type, max(insert_date) as insert_date, page_index      ");
