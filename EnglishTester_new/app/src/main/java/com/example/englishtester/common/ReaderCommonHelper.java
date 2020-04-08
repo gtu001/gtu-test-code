@@ -251,6 +251,8 @@ public class ReaderCommonHelper {
                 scrollYService.updateCurrentScrollY(scrollView1.getScrollY());
                 scrollYService.updateMaxHeight(ScrollViewHelper.getMaxHeight(scrollView1));
 
+                Toast.makeText(context, "CH : " + scrollView1.getScrollY() + " -- " + currentTitle, Toast.LENGTH_SHORT).show();
+
                 Log.v(TAG, "[recordY][scrollY]   " + currentTitle + " -> " + scrollView1.getScrollY());
                 Log.v(TAG, "[recordY][maxHeight] " + currentTitle + " -> " + ScrollViewHelper.getMaxHeight(scrollView1));
             }
@@ -268,11 +270,11 @@ public class ReaderCommonHelper {
                     doScrollToY(scrollView1, yPos);
 
                     if (scrollView1.getScrollY() != yPos) {
-                        Toast.makeText(context, "Y pos 未成功 : " + yPos + "/" + ScrollViewHelper.getMaxHeight(scrollView1), Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(context, "Y pos 未成功 : " + yPos + "/" + ScrollViewHelper.getMaxHeight(scrollView1), Toast.LENGTH_SHORT).show();
                         scrollToY(scrollView1, yPos);
                     } else {
 //                        Log.line(TAG, "成功回復Y pos !! : " + yPos);
-                        Toast.makeText(context, "成功回復Y pos !! : " + yPos, Toast.LENGTH_LONG).show();
+//                        Toast.makeText(context, "成功回復Y pos !! : " + yPos, Toast.LENGTH_LONG).show();
                     }
                 }
             });
