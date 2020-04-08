@@ -46,7 +46,7 @@ public class Mp3PlayerActivity extends Activity implements ActivityCompat.OnRequ
 
     private static final String TAG = Mp3PlayerActivity.class.getSimpleName();
 
-    private static final String FILE_TYPE_PTN = "(avi|rmvb|rm|mp4|mp3|m4a|flv|3gp|flac|webm)";
+    private static final String FILE_TYPE_PTN = "(avi|rmvb|rm|mp4|mp3|m4a|flv|3gp|flac|webm|wmv|mkv|m4s)";
     private static final String[] EXTENSION_DIR = new String[]{"/storage/1D0E-2671/Android/data/com.ghisler.android.TotalCommander/My Documents/"};
 
     private ListView listView;
