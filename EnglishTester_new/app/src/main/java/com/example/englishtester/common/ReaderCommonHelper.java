@@ -419,10 +419,9 @@ public class ReaderCommonHelper {
                 long result = recentTxtMarkDAO.insertWord(vo1);
                 Log.v(TAG, "[updateMaxHeight] " + (result > 0 ? "[success]" : "[fail]") + ReflectionToStringBuilder.toString(vo1));
             } else {
-                //只要作一次
-//                vo1.setScrollYPos(maxHeight);
-//                long result = recentTxtMarkDAO.updateByVO(vo1);
-//                Log.v(TAG, "[updateMaxHeight] " + (result > 0 ? "[success]" : "[fail]") + ReflectionToStringBuilder.toString(vo1));
+                vo1.setScrollYPos(maxHeight);
+                long result = recentTxtMarkDAO.updateByVO(vo1);
+                Log.v(TAG, "[updateMaxHeight] " + (result > 0 ? "[success]" : "[fail]") + ReflectionToStringBuilder.toString(vo1));
             }
             MAX_Y_HOLDER.put(fileName, vo1);
         }
