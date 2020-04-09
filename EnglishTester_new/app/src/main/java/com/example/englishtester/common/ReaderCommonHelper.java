@@ -27,6 +27,7 @@ import com.example.englishtester.R;
 import com.example.englishtester.RecentTxtMarkDAO;
 import com.example.englishtester.common.interf.ITxtReaderActivityDTO;
 
+import org.apache.commons.collections.map.LRUMap;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.springframework.cglib.core.internal.Function;
@@ -251,7 +252,7 @@ public class ReaderCommonHelper {
                 scrollYService.updateCurrentScrollY(scrollView1.getScrollY());
                 scrollYService.updateMaxHeight(ScrollViewHelper.getMaxHeight(scrollView1));
 
-                Toast.makeText(context, "CH : " + scrollView1.getScrollY() + " -- " + currentTitle, Toast.LENGTH_SHORT).show();
+//                Toast.makeText(context, "CH : " + scrollView1.getScrollY() + " -- " + currentTitle, Toast.LENGTH_SHORT).show();
 
                 Log.v(TAG, "[recordY][scrollY]   " + currentTitle + " -> " + scrollView1.getScrollY());
                 Log.v(TAG, "[recordY][maxHeight] " + currentTitle + " -> " + ScrollViewHelper.getMaxHeight(scrollView1));
@@ -327,6 +328,9 @@ public class ReaderCommonHelper {
 
         private static final String TAG = ScrollYService.class.getSimpleName();
 
+        private static LRUMap CURRENT_Y_HOLDER = new LRUMap(50);
+        private static LRUMap MAX_Y_HOLDER = new LRUMap(50);
+
         String fileName;
         RecentTxtMarkDAO recentTxtMarkDAO;
 
@@ -340,7 +344,6 @@ public class ReaderCommonHelper {
                     RecentTxtMarkDAO.RecentTxtMarkSchmea.FILE_NAME + "=? and " + //
                             RecentTxtMarkDAO.RecentTxtMarkSchmea.BOOKMARK_TYPE + "=? ", //
                     new String[]{fileName, String.valueOf(bookmarkType)});
-
             if (!list.isEmpty()) {
                 return list.get(0);
             }
@@ -384,7 +387,12 @@ public class ReaderCommonHelper {
         }
 
         public void updateCurrentScrollY(int currentScrollY) {
-            RecentTxtMarkDAO.RecentTxtMark vo1 = getScrollYVO();
+            RecentTxtMarkDAO.RecentTxtMark vo1 = null;
+            if (CURRENT_Y_HOLDER.containsKey(fileName)) {
+                vo1 = (RecentTxtMarkDAO.RecentTxtMark) CURRENT_Y_HOLDER.get(fileName);
+            } else {
+                vo1 = getScrollYVO();
+            }
             if (vo1 == null) {
                 vo1 = createVO(RecentTxtMarkDAO.BookmarkTypeEnum.SCROLL_Y_POS.getType());
                 vo1.setScrollYPos(currentScrollY);
@@ -395,20 +403,28 @@ public class ReaderCommonHelper {
                 long result = recentTxtMarkDAO.updateByVO(vo1);
                 Log.v(TAG, "[updateCurrentScrollY] " + (result > 0 ? "[success]" : "[fail]") + ReflectionToStringBuilder.toString(vo1));
             }
+            CURRENT_Y_HOLDER.put(fileName, vo1);
         }
 
         public void updateMaxHeight(int maxHeight) {
-            RecentTxtMarkDAO.RecentTxtMark vo1 = getMaxHeightYVO();
+            RecentTxtMarkDAO.RecentTxtMark vo1 = null;
+            if (MAX_Y_HOLDER.containsKey(fileName)) {
+                vo1 = (RecentTxtMarkDAO.RecentTxtMark) MAX_Y_HOLDER.get(fileName);
+            } else {
+                vo1 = getMaxHeightYVO();
+            }
             if (vo1 == null) {
                 vo1 = createVO(RecentTxtMarkDAO.BookmarkTypeEnum.SCROLLVIEW_HEIGHT.getType());
                 vo1.setScrollYPos(maxHeight);
                 long result = recentTxtMarkDAO.insertWord(vo1);
                 Log.v(TAG, "[updateMaxHeight] " + (result > 0 ? "[success]" : "[fail]") + ReflectionToStringBuilder.toString(vo1));
             } else {
-                vo1.setScrollYPos(maxHeight);
-                long result = recentTxtMarkDAO.updateByVO(vo1);
-                Log.v(TAG, "[updateMaxHeight] " + (result > 0 ? "[success]" : "[fail]") + ReflectionToStringBuilder.toString(vo1));
+                //只要作一次
+//                vo1.setScrollYPos(maxHeight);
+//                long result = recentTxtMarkDAO.updateByVO(vo1);
+//                Log.v(TAG, "[updateMaxHeight] " + (result > 0 ? "[success]" : "[fail]") + ReflectionToStringBuilder.toString(vo1));
             }
+            MAX_Y_HOLDER.put(fileName, vo1);
         }
     }
 

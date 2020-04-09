@@ -398,7 +398,7 @@ public class TxtReaderBufferActivity extends FragmentActivity implements FloatVi
 
             if (getScrollView1() != null) {
                 //記錄舊的 scrollView Y
-                scrollViewYHolder.recordY(this.getTitle().toString(), getScrollView1());
+//                scrollViewYHolder.recordY(this.getTitle().toString(), getScrollView1());
             }
 
             if (getScrollView1() != null) {
@@ -993,6 +993,8 @@ public class TxtReaderBufferActivity extends FragmentActivity implements FloatVi
             my.translateBtn.setTag("translateBtn-" + position);
             my.scrollView1.setTag("scrollView1-" + position);
 
+            doScrollChangeRecord(my.scrollView1);
+
             //init view
             self.initViewpagerChildrenView(my.txtReaderView, my.translateView, my.translateBtn);
 
@@ -1000,6 +1002,20 @@ public class TxtReaderBufferActivity extends FragmentActivity implements FloatVi
 
             PageForwardThread pageForwardThread = new PageForwardThread(my, position);
             pageForwardThread.start();
+        }
+
+        private void doScrollChangeRecord(ScrollView scrollView1) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                scrollView1.setOnScrollChangeListener(new View.OnScrollChangeListener() {
+                    @Override
+                    public void onScrollChange(View view, int i, int i1, int i2, int i3) {
+                        if (getScrollView1() != null) {
+                            //記錄舊的 scrollView Y
+                            scrollViewYHolder.recordY(TxtReaderBufferActivity.this.getTitle().toString(), getScrollView1());
+                        }
+                    }
+                });
+            }
         }
 
         @Override
