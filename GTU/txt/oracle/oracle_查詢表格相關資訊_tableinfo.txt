@@ -17,7 +17,7 @@ ALL_TAB_COLUMNS包含了Table、View、Cluster的欄位資料(我還發現一些
           C.COLUMN_NAME = R.COLUMN_NAME
         WHERE  1=1 
            [ and C.OWNER  = upper(:schema) ]
-           [ and C.TABLE_NAME = upper(:tableName) ]
+           [ and C.TABLE_NAME like '%' || upper(:tableName) || '%' ]
         ORDER BY C.TABLE_NAME, C.COLUMN_ID
 
 

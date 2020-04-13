@@ -1,0 +1,42 @@
+---
+- comboLst: [
+    ]
+  configKeyText: 起訖日
+  exampleArea: 起日 startDate 迄日 endDate
+  fromVal: (.*?)\s+(.*?)\s+(.*?)\s+(.*)
+  multiLine: false
+  toVal: |2-
+                <TR class=common>
+                    <TD class="title5">#1#</TD>
+                    <TD class="input5">
+                        <Input class="coolDatePicker" onClick="laydate({elem: '##2#'});"  dateFormat="short" name=#2# id="#2#"><span class="icon"><a onClick="laydate({elem: '##2#'});"><img src="../common/laydate/skins/default/icon.png" /></a></span>
+                    </TD>
+                    <TD class=title5>#3#</TD>
+                    <TD class="input5">
+                        <Input class="coolDatePicker" onClick="laydate({elem: '##4#'});"  dateFormat="short" name=#4# id="#4#"><span class="icon"><a onClick="laydate({elem: '##4#'});"><img src="../common/laydate/skins/default/icon.png" /></a></span>
+                    </TD>
+                </TR>
+  tradeOff: ''
+- comboLst: [
+    ]
+  configKeyText: codeValue_下拉
+  exampleArea: 下拉測試 txtDropDownTest accidentcode
+  fromVal: (.*?)\s+(.*?)\s+(.*)
+  multiLine: false
+  toVal: |2-
+                <tr>
+                    <TD class=title5>#1#</TD>
+                    <TD class="input5">
+                        <Input style="background:url(../common/images/select--bg_03.png) no-repeat right center" class=codeno
+                               name=#2# id="#2#"
+                               onclick="return showCodeList('#3#',[this,#2#Name],[0,1],null,[3],['risktype3'],1,'200');"
+                               ondblclick="return showCodeList('#3#',[this,#2#Name],[0,1],null,[3],['risktype3'],1,'200');"
+                               onkeyup="return showCodeListKey('#3#',[this,#2#Name],[0,1],null,[3],['risktype3'],1,'500');">
+                        <input class=codename name=#2#Name id="#2#Name" readonly=true>
+                    </TD>
+                    <TD class="title5"></TD>
+                    <TD class="input5">
+                    </TD>
+                </TR>
+  tradeOff: ''
+...

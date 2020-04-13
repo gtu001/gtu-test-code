@@ -1,0 +1,7 @@
+<dependency>
+  <groupId>gtu.log.finder</groupId> 
+  <artifactId>DebugMointerUI</artifactId> 
+  <version>1.0</version>
+  <scope>system</scope>
+  <systemPath>d:\my_tool\DebugMointerUI\DebugMointerUI.jar</systemPath> 
+</dependency>

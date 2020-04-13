@@ -561,6 +561,15 @@ public class RegexReplacer extends javax.swing.JFrame {
                         }
                     });
                     {
+                        loadYmlBtn = new JButton("讀取yml");
+                        loadYmlBtn.addActionListener(new ActionListener() {
+                            public void actionPerformed(ActionEvent e) {
+                                reloadingConfigFromFile(new File(yamlConfigFileText.getText()));
+                            }
+                        });
+                        panel_1.add(loadYmlBtn);
+                    }
+                    {
                         freemarkBaseDirText = new JTextField();
                         JCommonUtil.jTextFieldSetFilePathMouseEvent(freemarkBaseDirText, true);
                         freemarkBaseDirText.setToolTipText("設定freemark專案目錄");
@@ -858,6 +867,7 @@ public class RegexReplacer extends javax.swing.JFrame {
     AtomicBoolean replaceLock = new AtomicBoolean(false);
     private JTextField freemarkBaseDirText;
     private JButton distinctResultBtn;
+    private JButton loadYmlBtn;
 
     private void exeucteActionPerformed(ActionEvent evt) {
         if (replaceLock.get()) {
