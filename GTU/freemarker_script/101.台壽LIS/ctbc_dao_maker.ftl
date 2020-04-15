@@ -22,6 +22,16 @@
         <#return rtn>
 </#function>
 
+<#function getColParamArgsLst3>
+        <#local rtn = "">
+        <#local lst = []>
+        <#list columnLst as col>
+                <#local lst = lst + [ col ]>
+        </#list>
+        <#local rtn = my.listJoin(lst, " , ")>
+        <#return rtn>
+</#function>
+
 <#function getGridName>
         <#local rtn = "">
         <#if grid?? && grid?has_content>
@@ -45,6 +55,72 @@
     <#return funObj>
 </#function>
 
+<#macro showAlert001>
+    <#local hasSerial = "N">
+    <#list columnLst as col>
+        <#if col?is_first && col?contains("序號")>
+            <#local hasSerial = "Y">
+        </#if>
+        <#local currentIndex = col?index>
+        <#if hasSerial == "Y">
+            <#local currentIndex = currentIndex - 1>
+        </#if>
+        <#if col?is_first && hasSerial =="Y">
+            "${col} : " + "na" + "\n" + //
+        <#elseif col?is_last>
+            "${col} : " + arrResult[0][${currentIndex}] + "\n"//
+        <#else>
+            "${col} : " + arrResult[0][${currentIndex}] + "\n" + //
+        </#if>
+    </#list>
+</#macro>
+
+<#macro makeQueryResultToMap>
+    <#local hasSerial = "N">
+    <#list columnLst as col>
+        <#if col?is_first && col?contains("序號")>
+            <#local hasSerial = "Y">
+        </#if>
+        <#local currentIndex = col?index>
+        <#if hasSerial == "Y">
+            <#local currentIndex = currentIndex - 1>
+        </#if>
+        <#if col?is_first && hasSerial =="Y">
+        <#else>
+            dataMap['${col}'] = arrResult[0][${currentIndex}];
+        </#if>
+    </#list>
+</#macro>
+
+<#macro TR_generate_001>
+    <#local needSkip = "N">
+    <#list columnLst as col>
+        <#if col?contains("序號")>
+            <#continue>
+        </#if>
+        <#if needSkip == "Y">
+            <#local needSkip = "N">
+            <#continue>
+        </#if>
+        <TR class=common>
+            <TD class="title5">${col}</TD>
+            <TD class="input5">
+                <Input class="common" name="${col}" id="${col}">
+            </TD>
+            <#if col?index < columnLst?size-1>
+                <#local colNext = columnLst[col?index + 1]>
+                <#local needSkip = "Y">
+            <#else>
+                <#local colNext = "">
+                <#local needSkip = "N">
+            </#if>
+            <TD class="title5">${colNext}</TD>
+            <TD class="input5">
+                <Input class="common" name="${colNext}" id="${colNext}">
+            </TD>
+        </tr>
+    </#list>
+</#macro>
 
 ////////////////////////////////////////////////////
 
@@ -177,10 +253,11 @@
             }
             //查询成功则拆分字符串，返回二维数组
             arrResult = decodeEasyQueryResult(turnPage.strQueryResult);
-            alert("CODETYPE : " + arrResult[0][0] + "\n"//
-                 + "CODE : " + arrResult[0][1] + "\n"//
-                 + "CODENAME : " + arrResult[0][2] + "\n"//
-                 + "CODEALIAS : " + arrResult[0][3] + "");//
+            alert(
+                <@showAlert001 /> 
+                 );//
+
+            <@makeQueryResultToMap />
         }
     }
 
@@ -202,7 +279,7 @@ import com.sinosoft.utility.SSRS;
 @EasyQuery
 public interface ${getFunObj()['sqlClass']} {
 
-    @SQL(value = "Select * from XXXXXXXXX where 1=1   ${getColParamArgsLst()}  ", clauses = {
+    @SQL(value = "Select ${getColParamArgsLst3()} from XXXXXXXXX where 1=1   ${getColParamArgsLst()}  ", clauses = {
     <#list columnLst as col>
             <#assign paramX = "#{" + "para${col?index}" + "}" />
             @Clause(key = ${col?index}, clause = "and ${col} = '${paramX}'", expression = "${paramX} != empty"),
@@ -252,10 +329,70 @@ public class ${getFunObj()['controllerClass']} extends AbstractController {
 }
 
 ////////////////////////////////////////////////////
-////////////////////////////////////////////////////
-////////////////////////////////////////////////////
-////////////////////////////////////////////////////
-////////////////////////////////////////////////////
-////////////////////////////////////////////////////
+
+            <#list columnLst as col>
+            String ${col} = request.getParameter("${col}");
+            </#list>
+            <#list columnLst as col>
+            logger.info("${col}:" + ${col});
+            </#list>
+            
+            <#list columnLst as col>
+            mTransferData.setNameAndValue("${col}", ${col});
+            </#list>
+
+
 ////////////////////////////////////////////////////
 
+
+    <div id="datahandlebox">
+        <table>
+            <tr>
+                <td class="common"><IMG src="../common/images/butExpand.gif" style="cursor:hand;"
+                                        OnClick="showPage(this,datachange_box);"></td>
+                <td class=titleImg>數據更新</td>
+            </tr>
+        </table>
+        <table class="common">
+            <@TR_generate_001 />           
+        </table>
+        <div id="divCmdButton">
+            <INPUT VALUE="增加" TYPE=button id="insertButton" onClick="insertClick()" class="cssButton">
+            <INPUT VALUE="更新" TYPE=button id="updateButton" onClick="updateClick()" class="cssButton">
+            <INPUT VALUE="删除" TYPE=button id="deleteButton" onClick="deleteClick()" class="cssButton">
+            <INPUT VALUE="返回" TYPE=button id="cancelButton" onClick="cancelClick()" class="cssButton">
+        </div>
+    </div>
+
+
+////////////////////////////////////////////////////
+
+    private LCRollBackLogSchema getVO(TransferData tData) {
+        <#list columnLst as col>
+            String ${col} = (String) tData.getValueByName("${col}");
+        </#list>
+
+        OLDMAKEDATE = PubFun.getCurrentDate();
+        OLDMAKETIME = PubFun.getCurrentTime();
+        MAKEDATE = PubFun.getCurrentDate();
+        MAKETIME = PubFun.getCurrentTime();
+
+        LCRollBackLogSchema schema = new LCRollBackLogSchema();
+        <#list columnLst as col>
+            schema.set${col}(${col});
+        </#list>
+
+        logger.debug("## schema : " + ReflectionToStringBuilder.toString(schema, ToStringStyle.MULTI_LINE_STYLE));
+        return schema;
+    }
+
+////////////////////////////////////////////////////
+////////////////////////////////////////////////////
+////////////////////////////////////////////////////
+////////////////////////////////////////////////////
+////////////////////////////////////////////////////
+////////////////////////////////////////////////////
+////////////////////////////////////////////////////
+////////////////////////////////////////////////////
+////////////////////////////////////////////////////
+////////////////////////////////////////////////////
