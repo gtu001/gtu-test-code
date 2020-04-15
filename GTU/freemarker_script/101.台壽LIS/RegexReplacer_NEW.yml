@@ -39,4 +39,548 @@
                     </TD>
                 </TR>
   tradeOff: ''
+- comboLst: [
+    ]
+  configKeyText: schema.setter
+  exampleArea: |-
+    /**
+     * Copyright (c) 2002 Sinosoft Co.,LTD.
+     * All right reserved.
+     */
+
+    package com.sinosoft.lis.schema;
+
+    import com.sinosoft.lis.db.LCRollBackLogDB;
+    import com.sinosoft.lis.pubfun.FDate;
+    import com.sinosoft.persistence.Column;
+    import com.sinosoft.persistence.Id;
+    import com.sinosoft.persistence.Schema;
+    import com.sinosoft.persistence.Table;
+    import com.sinosoft.persistence.impl.SchemaHelper;
+    import com.sinosoft.utility.CErrors;
+    import lombok.EqualsAndHashCode;
+    import lombok.Getter;
+    import lombok.Setter;
+    import lombok.experimental.Accessors;
+    import lombok.extern.slf4j.Slf4j;
+
+    import java.sql.ResultSet;
+    import java.util.Date;
+
+    /**
+     * <p>ClassName: LCRollBackLogSchema </p>
+     * <p>Description: DB层 Schema 类文件 </p>
+     * <p>Company: Sinosoft Co.,LTD </p>
+     * @Database Schema2
+     * @author Makerx2
+     * @CreateDatetime 2019-03-16 16:05:12 959
+     */
+    @Table(name = "LCRollBackLog")
+    @EqualsAndHashCode
+    @Accessors(chain = true)
+    @Slf4j
+    public class LCRollBackLogSchema implements Schema<LCRollBackLogSchema, LCRollBackLogDB>, Cloneable {
+        // @Field
+        @Getter
+        @Setter
+        @Id
+        @Column(index = 0, name = "SerialNo", desc = "流水号", type = Schema.TYPE_STRING)
+        private String serialNo;
+
+        @Getter
+        @Setter
+        @Column(index = 1, name = "PolNo", desc = "保单号", type = Schema.TYPE_STRING)
+        private String polNo;
+
+        @Getter
+        @Setter
+        @Column(index = 2, name = "GrpPolNo", desc = "集体保单号码", type = Schema.TYPE_STRING)
+        private String grpPolNo;
+
+        @Getter
+        @Setter
+        @Column(index = 3, name = "OtherNo", desc = "其它号码", type = Schema.TYPE_STRING)
+        private String otherNo;
+
+        @Getter
+        @Setter
+        @Column(index = 4, name = "OtherNoType", desc = "其它号码类型", type = Schema.TYPE_STRING)
+        private String otherNoType;
+
+        @Getter
+        @Setter
+        @Column(index = 5, name = "Type", desc = "回滚类型", type = Schema.TYPE_STRING)
+        private String type;
+
+        @Getter
+        @Column(index = 6, name = "Money", desc = "回滚金额", type = Schema.TYPE_DOUBLE)
+        private double money;
+
+        @Getter
+        @Setter
+        @Column(index = 7, name = "OldOperator", desc = "原操作员", type = Schema.TYPE_STRING)
+        private String oldOperator;
+
+        @Column(index = 8, name = "OldMakeDate", desc = "原数据入机日期", type = Schema.TYPE_DATE)
+        private Date oldMakeDate;
+
+        @Getter
+        @Setter
+        @Column(index = 9, name = "OldMakeTime", desc = "原数据入机时间", type = Schema.TYPE_STRING)
+        private String oldMakeTime;
+
+        @Getter
+        @Setter
+        @Column(index = 10, name = "ManageCom", desc = "管理机构", type = Schema.TYPE_STRING)
+        private String manageCom;
+
+        @Getter
+        @Setter
+        @Column(index = 11, name = "Operator", desc = "回滚操作员", type = Schema.TYPE_STRING)
+        private String operator;
+
+        @Column(index = 12, name = "MakeDate", desc = "入机日期", type = Schema.TYPE_DATE)
+        private Date makeDate;
+
+        @Getter
+        @Setter
+        @Column(index = 13, name = "MakeTime", desc = "入机时间", type = Schema.TYPE_STRING)
+        private String makeTime;
+
+        @Getter
+        @Setter
+        @Column(index = 14, name = "Remark", desc = "原因描述", type = Schema.TYPE_STRING)
+        private String remark;
+
+        @Getter
+        @Setter
+        @Column(index = 15, name = "GrpContNo", desc = "集体合同号", type = Schema.TYPE_STRING)
+        private String grpContNo;
+
+        @Getter
+        @Setter
+        @Column(index = 16, name = "StandbyFlag1", desc = "备用属性字段1", type = Schema.TYPE_STRING)
+        private String standbyFlag1;
+
+        @Getter
+        @Setter
+        @Column(index = 17, name = "StandbyFlag2", desc = "备用属性字段2", type = Schema.TYPE_STRING)
+        private String standbyFlag2;
+
+
+        public static final int FIELDNUM = 18; // 数据库表的字段个数
+
+        private FDate fDate = new FDate(); // 处理日期
+
+        public CErrors mErrors; // 错误信息
+
+        // @Constructor
+        public LCRollBackLogSchema() {
+            mErrors = new CErrors();
+        }
+
+        // @Method
+        public Object clone() throws CloneNotSupportedException {
+            LCRollBackLogSchema cloned = (LCRollBackLogSchema) super.clone();
+            cloned.fDate = (FDate) fDate.clone();
+            cloned.mErrors = (CErrors) mErrors.clone();
+            SchemaHelper.cloneDate(cloned, this, this.getClass());
+            return cloned;
+        }
+
+        public String[] getPK() {
+            return SchemaHelper.getPK(this.getClass());
+        }
+
+        public LCRollBackLogSchema setMoney(double aMoney) {
+            money = aMoney;
+            return this;
+        }
+
+        public LCRollBackLogSchema setMoney(String aMoney) {
+            if (aMoney != null && !aMoney.equals("") && !aMoney.equals("null")) {
+                money = new Double(aMoney);
+            }
+            return this;
+        }
+
+        public String getOldMakeDate() {
+            if (oldMakeDate != null)
+                return fDate.getString(oldMakeDate);
+            else
+                return null;
+        }
+
+        public LCRollBackLogSchema setOldMakeDate(Date aOldMakeDate) {
+            oldMakeDate = aOldMakeDate;
+            return this;
+        }
+
+        public LCRollBackLogSchema setOldMakeDate(String aOldMakeDate) {
+            if (aOldMakeDate != null && !aOldMakeDate.equals("") && !aOldMakeDate.equals("null")) {
+                oldMakeDate = fDate.getDate(aOldMakeDate);
+            } else {
+                oldMakeDate = null;
+            }
+            return this;
+        }
+
+        public String getMakeDate() {
+            if (makeDate != null)
+                return fDate.getString(makeDate);
+            else
+                return null;
+        }
+
+        public LCRollBackLogSchema setMakeDate(Date aMakeDate) {
+            makeDate = aMakeDate;
+            return this;
+        }
+
+        public LCRollBackLogSchema setMakeDate(String aMakeDate) {
+            if (aMakeDate != null && !aMakeDate.equals("") && !aMakeDate.equals("null")) {
+                makeDate = fDate.getDate(aMakeDate);
+            } else {
+                makeDate = null;
+            }
+            return this;
+        }
+
+        public LCRollBackLogSchema setSchema(LCRollBackLogSchema aLCRollBackLogSchema) {
+            SchemaHelper.setSchema(aLCRollBackLogSchema, this);
+            return this;
+        }
+
+        public boolean setSchema(ResultSet rs, int i) {
+            return SchemaHelper.setSchema(this, rs, mErrors, log);
+        }
+
+        public LCRollBackLogSchema getSchema() {
+            LCRollBackLogSchema aLCRollBackLogSchema = new LCRollBackLogSchema();
+            aLCRollBackLogSchema.setSchema(this);
+            return aLCRollBackLogSchema;
+        }
+
+        public LCRollBackLogDB getDB() {
+            LCRollBackLogDB aDBOper = new LCRollBackLogDB();
+            aDBOper.setSchema(this);
+            return aDBOper;
+        }
+
+        public String encode() {
+            return SchemaHelper.encode(this);
+        }
+
+        public boolean decode(String strMessage) {
+            return SchemaHelper.decode(this, strMessage);
+        }
+
+        public String getV(String FCode) {
+            return SchemaHelper.getV(this, FCode);
+        }
+
+        public String getV(int nFieldIndex) {
+            return SchemaHelper.getV(this, nFieldIndex);
+        }
+
+        public boolean setV(String FCode, String FValue) {
+            return SchemaHelper.setV(this, FCode, FValue);
+        }
+
+        public int getFieldCount() {
+            return FIELDNUM;
+        }
+
+        public int getFieldIndex(String strFieldName) {
+            return SchemaHelper.getFieldIndex(this.getClass(), strFieldName);
+        }
+
+        public String getFieldName(int nFieldIndex) {
+            return SchemaHelper.getFieldName(this.getClass(), nFieldIndex);
+        }
+
+        public int getFieldType(String strFieldName) {
+            return SchemaHelper.getFieldType(this.getClass(), strFieldName);
+        }
+
+        public int getFieldType(int nFieldIndex) {
+            return SchemaHelper.getFieldType(this.getClass(), nFieldIndex);
+        }
+    }
+  fromVal: private\s+.*?\s+(\w+);
+  multiLine: false
+  toVal: schema.set${arry[1]?cap_first}(${arry[1]?upper_case});
+  tradeOff: '{"arry":[],"not_arry":[],"sourceFiles":[],"ftl":"arry","only_match":true}'
+- comboLst: [
+    ]
+  configKeyText: schema.setter_2
+  exampleArea: |-
+    /**
+     * Copyright (c) 2002 Sinosoft Co.,LTD.
+     * All right reserved.
+     */
+
+    package com.sinosoft.lis.schema;
+
+    import com.sinosoft.lis.db.LCRollBackLogDB;
+    import com.sinosoft.lis.pubfun.FDate;
+    import com.sinosoft.persistence.Column;
+    import com.sinosoft.persistence.Id;
+    import com.sinosoft.persistence.Schema;
+    import com.sinosoft.persistence.Table;
+    import com.sinosoft.persistence.impl.SchemaHelper;
+    import com.sinosoft.utility.CErrors;
+    import lombok.EqualsAndHashCode;
+    import lombok.Getter;
+    import lombok.Setter;
+    import lombok.experimental.Accessors;
+    import lombok.extern.slf4j.Slf4j;
+
+    import java.sql.ResultSet;
+    import java.util.Date;
+
+    /**
+     * <p>ClassName: LCRollBackLogSchema </p>
+     * <p>Description: DB层 Schema 类文件 </p>
+     * <p>Company: Sinosoft Co.,LTD </p>
+     * @Database Schema2
+     * @author Makerx2
+     * @CreateDatetime 2019-03-16 16:05:12 959
+     */
+    @Table(name = "LCRollBackLog")
+    @EqualsAndHashCode
+    @Accessors(chain = true)
+    @Slf4j
+    public class LCRollBackLogSchema implements Schema<LCRollBackLogSchema, LCRollBackLogDB>, Cloneable {
+        // @Field
+        @Getter
+        @Setter
+        @Id
+        @Column(index = 0, name = "SerialNo", desc = "流水号", type = Schema.TYPE_STRING)
+        private String serialNo;
+
+        @Getter
+        @Setter
+        @Column(index = 1, name = "PolNo", desc = "保单号", type = Schema.TYPE_STRING)
+        private String polNo;
+
+        @Getter
+        @Setter
+        @Column(index = 2, name = "GrpPolNo", desc = "集体保单号码", type = Schema.TYPE_STRING)
+        private String grpPolNo;
+
+        @Getter
+        @Setter
+        @Column(index = 3, name = "OtherNo", desc = "其它号码", type = Schema.TYPE_STRING)
+        private String otherNo;
+
+        @Getter
+        @Setter
+        @Column(index = 4, name = "OtherNoType", desc = "其它号码类型", type = Schema.TYPE_STRING)
+        private String otherNoType;
+
+        @Getter
+        @Setter
+        @Column(index = 5, name = "Type", desc = "回滚类型", type = Schema.TYPE_STRING)
+        private String type;
+
+        @Getter
+        @Column(index = 6, name = "Money", desc = "回滚金额", type = Schema.TYPE_DOUBLE)
+        private double money;
+
+        @Getter
+        @Setter
+        @Column(index = 7, name = "OldOperator", desc = "原操作员", type = Schema.TYPE_STRING)
+        private String oldOperator;
+
+        @Column(index = 8, name = "OldMakeDate", desc = "原数据入机日期", type = Schema.TYPE_DATE)
+        private Date oldMakeDate;
+
+        @Getter
+        @Setter
+        @Column(index = 9, name = "OldMakeTime", desc = "原数据入机时间", type = Schema.TYPE_STRING)
+        private String oldMakeTime;
+
+        @Getter
+        @Setter
+        @Column(index = 10, name = "ManageCom", desc = "管理机构", type = Schema.TYPE_STRING)
+        private String manageCom;
+
+        @Getter
+        @Setter
+        @Column(index = 11, name = "Operator", desc = "回滚操作员", type = Schema.TYPE_STRING)
+        private String operator;
+
+        @Column(index = 12, name = "MakeDate", desc = "入机日期", type = Schema.TYPE_DATE)
+        private Date makeDate;
+
+        @Getter
+        @Setter
+        @Column(index = 13, name = "MakeTime", desc = "入机时间", type = Schema.TYPE_STRING)
+        private String makeTime;
+
+        @Getter
+        @Setter
+        @Column(index = 14, name = "Remark", desc = "原因描述", type = Schema.TYPE_STRING)
+        private String remark;
+
+        @Getter
+        @Setter
+        @Column(index = 15, name = "GrpContNo", desc = "集体合同号", type = Schema.TYPE_STRING)
+        private String grpContNo;
+
+        @Getter
+        @Setter
+        @Column(index = 16, name = "StandbyFlag1", desc = "备用属性字段1", type = Schema.TYPE_STRING)
+        private String standbyFlag1;
+
+        @Getter
+        @Setter
+        @Column(index = 17, name = "StandbyFlag2", desc = "备用属性字段2", type = Schema.TYPE_STRING)
+        private String standbyFlag2;
+
+
+        public static final int FIELDNUM = 18; // 数据库表的字段个数
+
+        private FDate fDate = new FDate(); // 处理日期
+
+        public CErrors mErrors; // 错误信息
+
+        // @Constructor
+        public LCRollBackLogSchema() {
+            mErrors = new CErrors();
+        }
+
+        // @Method
+        public Object clone() throws CloneNotSupportedException {
+            LCRollBackLogSchema cloned = (LCRollBackLogSchema) super.clone();
+            cloned.fDate = (FDate) fDate.clone();
+            cloned.mErrors = (CErrors) mErrors.clone();
+            SchemaHelper.cloneDate(cloned, this, this.getClass());
+            return cloned;
+        }
+
+        public String[] getPK() {
+            return SchemaHelper.getPK(this.getClass());
+        }
+
+        public LCRollBackLogSchema setMoney(double aMoney) {
+            money = aMoney;
+            return this;
+        }
+
+        public LCRollBackLogSchema setMoney(String aMoney) {
+            if (aMoney != null && !aMoney.equals("") && !aMoney.equals("null")) {
+                money = new Double(aMoney);
+            }
+            return this;
+        }
+
+        public String getOldMakeDate() {
+            if (oldMakeDate != null)
+                return fDate.getString(oldMakeDate);
+            else
+                return null;
+        }
+
+        public LCRollBackLogSchema setOldMakeDate(Date aOldMakeDate) {
+            oldMakeDate = aOldMakeDate;
+            return this;
+        }
+
+        public LCRollBackLogSchema setOldMakeDate(String aOldMakeDate) {
+            if (aOldMakeDate != null && !aOldMakeDate.equals("") && !aOldMakeDate.equals("null")) {
+                oldMakeDate = fDate.getDate(aOldMakeDate);
+            } else {
+                oldMakeDate = null;
+            }
+            return this;
+        }
+
+        public String getMakeDate() {
+            if (makeDate != null)
+                return fDate.getString(makeDate);
+            else
+                return null;
+        }
+
+        public LCRollBackLogSchema setMakeDate(Date aMakeDate) {
+            makeDate = aMakeDate;
+            return this;
+        }
+
+        public LCRollBackLogSchema setMakeDate(String aMakeDate) {
+            if (aMakeDate != null && !aMakeDate.equals("") && !aMakeDate.equals("null")) {
+                makeDate = fDate.getDate(aMakeDate);
+            } else {
+                makeDate = null;
+            }
+            return this;
+        }
+
+        public LCRollBackLogSchema setSchema(LCRollBackLogSchema aLCRollBackLogSchema) {
+            SchemaHelper.setSchema(aLCRollBackLogSchema, this);
+            return this;
+        }
+
+        public boolean setSchema(ResultSet rs, int i) {
+            return SchemaHelper.setSchema(this, rs, mErrors, log);
+        }
+
+        public LCRollBackLogSchema getSchema() {
+            LCRollBackLogSchema aLCRollBackLogSchema = new LCRollBackLogSchema();
+            aLCRollBackLogSchema.setSchema(this);
+            return aLCRollBackLogSchema;
+        }
+
+        public LCRollBackLogDB getDB() {
+            LCRollBackLogDB aDBOper = new LCRollBackLogDB();
+            aDBOper.setSchema(this);
+            return aDBOper;
+        }
+
+        public String encode() {
+            return SchemaHelper.encode(this);
+        }
+
+        public boolean decode(String strMessage) {
+            return SchemaHelper.decode(this, strMessage);
+        }
+
+        public String getV(String FCode) {
+            return SchemaHelper.getV(this, FCode);
+        }
+
+        public String getV(int nFieldIndex) {
+            return SchemaHelper.getV(this, nFieldIndex);
+        }
+
+        public boolean setV(String FCode, String FValue) {
+            return SchemaHelper.setV(this, FCode, FValue);
+        }
+
+        public int getFieldCount() {
+            return FIELDNUM;
+        }
+
+        public int getFieldIndex(String strFieldName) {
+            return SchemaHelper.getFieldIndex(this.getClass(), strFieldName);
+        }
+
+        public String getFieldName(int nFieldIndex) {
+            return SchemaHelper.getFieldName(this.getClass(), nFieldIndex);
+        }
+
+        public int getFieldType(String strFieldName) {
+            return SchemaHelper.getFieldType(this.getClass(), strFieldName);
+        }
+
+        public int getFieldType(int nFieldIndex) {
+            return SchemaHelper.getFieldType(this.getClass(), nFieldIndex);
+        }
+    }
+  fromVal: private\s+.*?\s+(\w+);
+  multiLine: false
+  toVal: schema.set${arry[1]?cap_first}(schema2.get${arry[1]?cap_first}());
+  tradeOff: '{"arry":[],"not_arry":[],"sourceFiles":[],"ftl":"arry","only_match":true}'
 ...

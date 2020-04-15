@@ -76,6 +76,7 @@
 </#macro>
 
 <#macro makeQueryResultToMap>
+    dataMap = {};
     <#local hasSerial = "N">
     <#list columnLst as col>
         <#if col?is_first && col?contains("序號")>
@@ -87,7 +88,7 @@
         </#if>
         <#if col?is_first && hasSerial =="Y">
         <#else>
-            dataMap['${col}'] = arrResult[0][${currentIndex}];
+            dataMap['${col}'] = trimToEmpty(arrResult[0][${currentIndex}]);
         </#if>
     </#list>
 </#macro>
@@ -261,6 +262,37 @@
         }
     }
 
+    function clearForm() {
+        <#list columnLst as col>
+        document.all('${col}').value = '';
+        </#list>
+    }
+
+    function trimToEmpty(strVal) {
+        if (strVal == undefined) {
+            return '';
+        }
+        return String(strVal).trim();
+    }
+
+    function copyDataMapToForm() {
+        if(dataMap == null) {
+            return false;
+        }
+        var errLst = new Array();
+        for(var k in dataMap) {
+            try{
+                document.all(k).value = dataMap[k];
+            }catch(e) {
+                errLst.push(k);
+            }
+        }
+        if(errLst.length != 0) {
+            alert("欄位錯誤 : " + errLst);
+        }
+    }
+
+    
 </script>
 
 
