@@ -63,3 +63,10 @@ NUMPAD 3    Toggle darts/tennis FOV override - on at start
 ---
 	https://www.gta5-mods.com/misc/lag-world-not-loading-fix-simple-easy
 	遊戲開啟後執行bat即可
+
+
+
+更新script
+---
+	http://dev-c.com/gtav/scripthookv
+	解壓縮放到GTA5根目錄即可
