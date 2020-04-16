@@ -1,9 +1,42 @@
+import requests
+from bs4 import BeautifulSoup as bs
+from selenium import webdriver
+from gtu.reflect import checkSelf
+
+from selenium.webdriver.remote.webdriver import WebDriver as WD
+from gtu.web_crawler.selenium_test import seleniumUtil
+from threading import Thread
+from threading import Timer
+from gtu.net import ssl_util
+
+from gtu.util import queue_test_001
+from gtu.string import stringUtil
+
+import sys
+import time
+import re
+from enum import Enum
+from gtu.io import fileUtil
+from gtu.error import errorHandler
+
+from abc import ABCMeta, abstractmethod
+from gtu.net import ssl_util
+from gtu.io import LogWriter
+from gtu.datetime import dateUtil
+
+from gtu.net import simple_request_handler_001
+import time
+import os
+
+#=======================================================
 from selenium import webdriver
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import asyncio
+
+
 
 login_account_name = "employeeId"
 login_phone_name = "mobileNo"
@@ -14,7 +47,7 @@ phone_num_data = '0954006788' #0905137990
 
 login_url = "https://wits-rms.wistronits.cn/healthy-tp/login";
 login_url_2 = "https://wits-rms.wistronits.cn/healthy-tp/im011a";
-driver = webdriver.Chrome()
+driver = seleniumUtil.getDriver()
 work_country_id = 'workProvince'
 work_city_id = 'workCity'
 temperature_id = 'temperatureType0'
@@ -53,8 +86,8 @@ async def login2():
     family_status = driver.find_element_by_id(familyStatusKb0_id)
     driver.execute_script("arguments[0].click();", family_status)
     #button 提交
-    #submitBtn = driver.find_element_by_css_selector('div.col-12 > button')
-    #driver.execute_script("arguments[0].click();", submitBtn)
+    submitBtn = driver.find_element_by_css_selector('div.col-12 > button')
+    driver.execute_script("arguments[0].click();", submitBtn)
 
 async def main():
     await login()
