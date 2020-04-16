@@ -3,7 +3,8 @@ const express = require('express');
 // 建立 Router 物件
 const router = express.Router();
 const app = express();
-var port = process.env.PORT || 8000;
+const PORT = process.env.PORT || 8001;
+const HOST = '0.0.0.0';
 
 // 舊方法
 app.get('/sample', function(req, res) {
@@ -51,8 +52,10 @@ router.param('name', function(req, res, next, name) {
 // 將路由套用至應用程式
 app.use('/', router);
 // ---- 啟動伺服器 ----
-app.listen(port);
+//app.listen(PORT, HOST);
+app.listen(PORT);
 
 module.exports = router;
 module.exports = app;
 
+console.log(`Running on http://${HOST}:${PORT}`);

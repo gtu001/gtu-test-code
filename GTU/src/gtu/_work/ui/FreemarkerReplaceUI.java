@@ -56,6 +56,7 @@ import gtu.swing.util.JFrameUtil;
 import gtu.swing.util.JListUtil;
 import gtu.swing.util.JMouseEventUtil;
 import gtu.swing.util.JPopupMenuUtil;
+import gtu.swing.util.JSwingCommonConfigUtil;
 import gtu.swing.util.JTextAreaUtil;
 import net.sf.json.JSONObject;
 import net.sf.json.JSONSerializer;
@@ -74,6 +75,9 @@ public class FreemarkerReplaceUI extends JFrame {
     private JList filePathList;
     private JList recentFileList;
     private PropertiesUtilBean config = new PropertiesUtilBean(FreemarkerReplaceUI.class);
+    {
+        config = JSwingCommonConfigUtil.checkTestingPropertiesUtilBean(config, getClass(), FreemarkerReplaceUI.class.getSimpleName());
+    }
     private AtomicReference<File> keepFile = new AtomicReference<File>();
     private JTextField encodeText;
     private JTextField baseDirText;
@@ -567,6 +571,37 @@ public class FreemarkerReplaceUI extends JFrame {
         }
     }
 
+    private void doProcessChoiceFiles() {
+        try {
+            Validate.notNull(keepFile.get(), "請先選擇腳本或儲存");
+
+            JSONObject jsonObj = JSONObject.fromObject(StringUtils.trimToEmpty(jsonArea.getText()));
+            Map<String, Object> root = JSONObject2CollectionUtil2.jsonToMap(jsonObj);
+
+            File dir = new File(FileUtil.DESKTOP_DIR, getFileName(keepFile.get()));
+            dir.mkdirs();
+
+            String encoding = StringUtils.trimToEmpty(encodeText.getText());
+
+            List<File> fileLst = JListUtil.getLeadSelectionArry(filePathList);
+            for (int ii = 0; ii < fileLst.size(); ii++) {
+                File tempFile = fileLst.get(ii);
+                FileOutputStream fos = new FileOutputStream(new File(dir, tempFile.getName()));
+
+                File projectBaseDir = new File(StringUtils.trimToEmpty(baseDirText.getText()));
+                if (!projectBaseDir.exists() || !projectBaseDir.isDirectory()) {
+                    JCommonUtil._jOptionPane_showMessageDialog_info("專案目錄不存在使用當前目錄!");
+                    projectBaseDir = null;
+                }
+                FreeMarkerSimpleUtil.replace(projectBaseDir, tempFile, root, fos, encoding);
+            }
+
+            JCommonUtil._jOptionPane_showMessageDialog_info("done...");
+        } catch (Exception ex) {
+            JCommonUtil.handleException(ex);
+        }
+    }
+
     private MouseAdapter fileMouseAdapter = new MouseAdapter() {
         @Override
         public void mouseClicked(MouseEvent arg0) {
@@ -584,8 +619,15 @@ public class FreemarkerReplaceUI extends JFrame {
                 if (file.get() == null || !file.get().exists()) {
                     return;
                 }
+
                 if (JMouseEventUtil.buttonRightClick(1, arg0)) {
                     JPopupMenuUtil.newInstance(filePathList)//
+                            .addJMenuItem("轉換所選檔案", new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    doProcessChoiceFiles();
+                                }
+                            })//
                             .addJMenuItem("開啟檔案", new ActionListener() {
                                 @Override
                                 public void actionPerformed(ActionEvent e) {

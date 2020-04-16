@@ -581,6 +581,6 @@
     }
   fromVal: private\s+.*?\s+(\w+);
   multiLine: false
-  toVal: schema.set${arry[1]?cap_first}(schema2.get${arry[1]?cap_first}());
+  toVal: toSchema.set${arry[1]?cap_first}(fromSchema.get${arry[1]?cap_first}());
   tradeOff: '{"arry":[],"not_arry":[],"sourceFiles":[],"ftl":"arry","only_match":true}'
 ...

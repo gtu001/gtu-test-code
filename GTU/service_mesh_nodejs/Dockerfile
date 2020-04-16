@@ -13,3 +13,4 @@ COPY . .
 
 EXPOSE 8001
 CMD ["npm", "start"]
+#CMD ["node", "healthCheck.js"]
