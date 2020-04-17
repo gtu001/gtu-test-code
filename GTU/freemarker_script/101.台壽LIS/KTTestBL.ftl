@@ -33,6 +33,16 @@
     <#return rtn>
 </#function>
 
+<#function getPkArgs>
+    <#local rtn = "">
+    <#local lst = []>
+    <#list pkColumnLst2 as col>
+        <#local varData = "String " + col + ""  />
+        <#local lst = lst + [ varData ]>
+    </#list>
+    <#local rtn = my.listJoin(lst, ", ")>
+    <#return rtn>
+</#function>
 
 ////////////////////////////////////////////////////
 
@@ -155,8 +165,18 @@ public class ${getBlObj()['blClass']} implements BusinessService {
     }
 
     private ${getBlObj()['table']}Schema findByPk(${getBlObj()['table']}Schema schema) {
-        String polno = schema.getPolNo();
-        String serialNo = schema.getSerialNo();
+        <#list pkColumnLst2 as col>
+        String ${col} = schema.get${col?cap_first}();
+        </#list>
+        ${getBlObj()['table']}Set t${getBlObj()['table']}Set = m${getBlObj()['table']}DB.executeQuery("select * from ${getBlObj()['table']} where ${getPkWhereCondition()}");
+        logger.debug("# size = " + t${getBlObj()['table']}Set.size());
+        if (t${getBlObj()['table']}Set.size() != 0) {
+            return t${getBlObj()['table']}Set.get(1);
+        }
+        return null;
+    }
+
+    private ${getBlObj()['table']}Schema findByPk(${getPkArgs()}) {
         ${getBlObj()['table']}Set t${getBlObj()['table']}Set = m${getBlObj()['table']}DB.executeQuery("select * from ${getBlObj()['table']} where ${getPkWhereCondition()}");
         logger.debug("# size = " + t${getBlObj()['table']}Set.size());
         if (t${getBlObj()['table']}Set.size() != 0) {

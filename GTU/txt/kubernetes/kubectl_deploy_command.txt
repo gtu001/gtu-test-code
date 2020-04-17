@@ -1,4 +1,4 @@
-﻿# Startup miniKube
+﻿# Startup miniKube <啟動要用admin開啟cmd>
 	minikube start
 	minikube config set vm-driver virtualbox (option)
 	kubectl config use-context minikube (option)
