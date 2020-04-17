@@ -9,6 +9,8 @@ minikube ssh
 
 # Open the kubernetes dashboard for your local cluster
 minikube dashboard
+	預設網址
+	http://192.168.99.101:30000/#!/overview?namespace=default
 
 
 # List the services exposed via a node port

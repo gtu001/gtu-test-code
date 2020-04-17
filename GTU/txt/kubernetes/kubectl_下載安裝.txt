@@ -11,5 +11,9 @@ window 安裝
 	https://storage.googleapis.com/kubernetes-release/release/v1.15.0/bin/windows/amd64/kubectl.exe
 	
 
+下載後放到 path 底下
+	kubectl.exe 
+	
+
 測試是否可run
 	$ kubectl version

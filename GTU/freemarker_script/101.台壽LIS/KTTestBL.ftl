@@ -47,39 +47,24 @@
 ////////////////////////////////////////////////////
 
 
+
 package com.sinosoft.lis.controller.kttest;
 
-import java.util.Map;
-
-import org.apache.commons.beanutils.BeanUtils;
-import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sinosoft.lis.acc.PubInsuAccFun;
-import com.sinosoft.lis.db.LCGrpIvstPlanDB;
-import com.sinosoft.lis.db.LCInsureAccDB;
-import com.sinosoft.lis.db.LCInsureAccTraceDB;
-import com.sinosoft.lis.db.LCPerInvestPlanDB;
 import com.sinosoft.lis.db.LCPolDB;
-import com.sinosoft.lis.db.LCPremToAccDB;
 import com.sinosoft.lis.db.${getBlObj()['table']}DB;
 import com.sinosoft.lis.i18n.I18nMessage;
 import com.sinosoft.lis.pubfun.GlobalInput;
-import com.sinosoft.lis.pubfun.MMap;
 import com.sinosoft.lis.pubfun.PubFun;
 import com.sinosoft.lis.pubfun.PubFun1;
 import com.sinosoft.lis.pubfun.PubSubmit;
-import com.sinosoft.lis.schema.LCInsureAccTraceSchema;
 import com.sinosoft.lis.schema.LCPolSchema;
-import com.sinosoft.lis.schema.LCPremToAccSchema;
 import com.sinosoft.lis.schema.${getBlObj()['table']}Schema;
-import com.sinosoft.lis.vdb.${getBlObj()['table']}DBSet;
-import com.sinosoft.lis.vschema.LCInsureAccSet;
-import com.sinosoft.lis.vschema.LCInsureAccTraceSet;
-import com.sinosoft.lis.vschema.LCPremToAccSet;
+import com.sinosoft.lis.tb.ProposalApproveBLS;
 import com.sinosoft.lis.vschema.${getBlObj()['table']}Set;
 import com.sinosoft.service.BusinessService;
 import com.sinosoft.service.stereotype.Service;
@@ -107,29 +92,191 @@ import com.sinosoft.utility.VData;
  * Company:sinosoft
  * </p>
  *
- * @author:ck
+ * @author: Troy
  * @version 1.0
- * @Cleaned QianLy 2009-07-16
+ * @Cleaned Troy ${my.ciDate1(.now, '-')}
  */
 
 @Service(name = "${getBlObj()['blClass']}")
 public class ${getBlObj()['blClass']} implements BusinessService {
     private static final Logger logger = LoggerFactory.getLogger(${getBlObj()['blClass']}.class);
 
-    private GlobalInput _GlobalInput = new GlobalInput();
+    /** 传入数据的容器 */
+    private VData mInputData = new VData();
+    /** 数据操作字符串 */
+    private String mOperate;
+    /** 错误处理类 */
     public CErrors mErrors = new CErrors();
-    private TransferData _TransferData = new TransferData();
 
-    private ${getBlObj()['table']}DBSet m${getBlObj()['table']}DBSet = new ${getBlObj()['table']}DBSet();
-    private ${getBlObj()['table']}DB m${getBlObj()['table']}DB = new ${getBlObj()['table']}DB();
-    private ${getBlObj()['table']}Set m${getBlObj()['table']}Set = new ${getBlObj()['table']}Set();
+    /** 业务处理相关变量 */
+    /** 保单数据 */
+    private ${getBlObj()['table']}Schema m${getBlObj()['table']}Schema = new ${getBlObj()['table']}Schema();
+    /** 全局数据 */
+    private GlobalInput mGlobalInput = new GlobalInput();
+    private TransferData mTransferData = new TransferData();
 
-    public ${getBlObj()['blClass']}() {
+    // @Constructor
+    public KTTestBL() {
     }
 
-    public ${getBlObj()['blClass']}(GlobalInput tGlobalInput) {
-        _GlobalInput = tGlobalInput;
+    public KTTestBL(GlobalInput tGlobalInput) {
+        mGlobalInput = tGlobalInput;
     }
+
+    /**
+     * 数据提交的公共方法
+     * 
+     * @param: cInputData
+     *             传入的数据 cOperate 数据操作字符串
+     * @return:
+     */
+    public boolean submitData(VData data, String Operater) {
+        // 将传入的数据拷贝到本类中
+        mInputData = (VData) data.clone();
+        this.mOperate = Operater;
+
+        // 将外部传入的数据分解到本类的属性中，准备处理
+        if (this.getInputData() == false) {
+            return false;
+        }
+        logger.debug("---getInputData---");
+
+        // 校验传入的数据
+        if (this.checkData() == false) {
+            return false;
+        }
+        logger.debug("---checkData---");
+
+        // 根据业务逻辑对数据进行处理
+        if (this.dealData() == false) {
+            return false;
+        }
+        logger.debug("---dealData---");
+
+        // 装配处理好的数据，准备给后台进行保存
+        this.prepareOutputData();
+        logger.debug("---prepareOutputData---");
+
+        // 数据提交、保存
+//        ProposalApproveBLS tProposalApproveBLS = new ProposalApproveBLS();
+//        if (tProposalApproveBLS.submitData(mInputData, Operater) == false) {
+//            // @@错误处理
+//            this.mErrors.copyAllErrors(tProposalApproveBLS.mErrors);
+//            return false;
+//        }
+        logger.debug("---commitData---");
+        return true;
+    }
+
+    /**
+     * 将外部传入的数据分解到本类的属性中
+     * 
+     * @param: 无
+     * @return: boolean
+     */
+    private boolean getInputData() {
+        // 全局变量
+        mGlobalInput.setSchema((GlobalInput) mInputData.getObjectByObjectName("GlobalInput", 0));
+        // 保单
+        ${getBlObj()['table']}Schema t${getBlObj()['table']}Schema = new ${getBlObj()['table']}Schema();
+        t${getBlObj()['table']}Schema.setSchema((${getBlObj()['table']}Schema) mInputData.getObjectByObjectName("${getBlObj()['table']}Schema", 0));
+
+        ${getBlObj()['table']}DB t${getBlObj()['table']}DB = new ${getBlObj()['table']}DB();
+
+        <#list pkColumnLst2 as col>
+        t${getBlObj()['table']}DB.set${col}(t${getBlObj()['table']}Schema.get${col}());
+        </#list>
+        if (t${getBlObj()['table']}DB.getInfo() == false) {
+            // @@错误处理
+            errorMessage("getInputData", "投保单查询失败!", "xIDx155879950081170XidX");
+            return false;
+        }
+        m${getBlObj()['table']}Schema.setSchema(t${getBlObj()['table']}DB);
+        return true;
+    }
+    
+    /**
+     * 校验传入的数据
+     * 
+     * @param: 无
+     * @return: boolean
+     */
+    private boolean checkData() {
+        if (!m${getBlObj()['table']}Schema.getGrpContNo().trim().equals("0")) {
+            // @@错误处理
+            errorMessage("checkData", "此单不是投保单，不能进行复核操作!", "xIDx155879955816563XidX");
+            return false;
+        }
+        if (!m${getBlObj()['table']}Schema.getGrpPolNo().trim().equals("0")) {
+            // @@错误处理
+            errorMessage("checkData", "此投保单已经开始核保，不能进行复核操作!", "xIDx155879955818177XidX");
+            return false;
+        }
+        /**
+         * @todo 查询该次申请的投保单是否已经被其他用户申请
+         */
+        ${getBlObj()['table']}DB t${getBlObj()['table']}DB = new ${getBlObj()['table']}DB();
+        <#list pkColumnLst2 as col>
+        t${getBlObj()['table']}DB.set${col}(t${getBlObj()['table']}Schema.get${col}());
+        </#list>
+        ${getBlObj()['table']}Set t${getBlObj()['table']}Set = t${getBlObj()['table']}DB.query();
+        if (t${getBlObj()['table']}Set.get(1).getMakeDate() == null) {
+            // @@错误处理
+            errorMessage("checkData", "此投保单已经被操作员选取，不能重复进行操作!", "xIDx155879964781357XidX");
+            return false;
+        }
+        return true;
+    }
+
+    private void errorMessage(String functionName, String chMessage, String messageCode) {
+        CError tError = new CError();
+        tError.moduleName = getClass().getSimpleName();
+        tError.functionName = functionName;
+        tError.errorMessage(new I18nMessage(chMessage, messageCode));
+        this.mErrors.addOneError(tError);
+    }
+    
+    private boolean dealData() {
+        mGlobalInput = (GlobalInput) mInputData.getObjectByObjectName("GlobalInput", 0);
+        mTransferData = (TransferData) mInputData.getObjectByObjectName("TransferData", 0);
+
+        ${getBlObj()['table']}Schema schema = getVO(mTransferData);
+        boolean updateSuccess = false;
+
+        if ("insert".equals(mOperate)) {
+            schema.getDB().insert();
+            updateSuccess = true;
+        } else if ("update".equals(mOperate)) {
+            ${getBlObj()['table']}Schema schema2 = this.findByPk(schema);
+            if (schema2 == null) {
+                schema.getDB().insert();
+                updateSuccess = true;
+            } else {
+                copySchemaToSchema(schema, schema2);
+                schema2.getDB().update();
+                updateSuccess = true;
+            }
+        } else if ("delete".equals(mOperate)) {
+            ${getBlObj()['table']}Schema schema2 = this.findByPk(schema);
+            if (schema2 != null) {
+                schema2.getDB().delete();
+                updateSuccess = true;
+            }
+        }
+        return updateSuccess;
+    }
+    
+    /**
+     * 根据业务逻辑对数据进行处理
+     * 
+     * @param: 无
+     * @return: void
+     */
+    private void prepareOutputData() {
+        mInputData.clear();
+        mInputData.add(m${getBlObj()['table']}Schema);
+    }
+
 
     private ${getBlObj()['table']}Schema getVO(TransferData tData) {
         <#list columnLst as col>
@@ -164,11 +311,31 @@ public class ${getBlObj()['blClass']} implements BusinessService {
         </#list>
     }
 
+
+    private ${getBlObj()['table']}Schema findByPk2(${getBlObj()['table']}Schema schema) {
+        ${getBlObj()['table']}DB t${getBlObj()['table']}DB = new ${getBlObj()['table']}DB();
+        
+        <#list pkColumnLst2 as col>
+        t${getBlObj()['table']}DB.set${col}(t${getBlObj()['table']}Schema.get${col}());// 复核节点
+        </#list>
+        ${getBlObj()['table']}Set t${getBlObj()['table']}Set = t${getBlObj()['table']}DB.query();
+        
+        logger.debug("# size = " + t${getBlObj()['table']}Set.size());
+        if (t${getBlObj()['table']}DB.getInfo() == false) {
+            // @@错误处理
+            errorMessage("getInputData", "投保单查询失败!", "xIDx155879950081170XidX");
+        }else if (t${getBlObj()['table']}Set.size() != 0) {
+            return t${getBlObj()['table']}Set.get(1);
+        }
+        return null;
+    }
+
     private ${getBlObj()['table']}Schema findByPk(${getBlObj()['table']}Schema schema) {
+        ${getBlObj()['table']}DB t${getBlObj()['table']}DB = new ${getBlObj()['table']}DB();
         <#list pkColumnLst2 as col>
         String ${col} = schema.get${col?cap_first}();
         </#list>
-        ${getBlObj()['table']}Set t${getBlObj()['table']}Set = m${getBlObj()['table']}DB.executeQuery("select * from ${getBlObj()['table']} where ${getPkWhereCondition()}");
+        ${getBlObj()['table']}Set t${getBlObj()['table']}Set = t${getBlObj()['table']}DB.executeQuery("select * from ${getBlObj()['table']} where ${getPkWhereCondition()}");
         logger.debug("# size = " + t${getBlObj()['table']}Set.size());
         if (t${getBlObj()['table']}Set.size() != 0) {
             return t${getBlObj()['table']}Set.get(1);
@@ -177,7 +344,8 @@ public class ${getBlObj()['blClass']} implements BusinessService {
     }
 
     private ${getBlObj()['table']}Schema findByPk(${getPkArgs()}) {
-        ${getBlObj()['table']}Set t${getBlObj()['table']}Set = m${getBlObj()['table']}DB.executeQuery("select * from ${getBlObj()['table']} where ${getPkWhereCondition()}");
+        ${getBlObj()['table']}DB t${getBlObj()['table']}DB = new ${getBlObj()['table']}DB();
+        ${getBlObj()['table']}Set t${getBlObj()['table']}Set = t${getBlObj()['table']}DB.executeQuery("select * from ${getBlObj()['table']} where ${getPkWhereCondition()}");
         logger.debug("# size = " + t${getBlObj()['table']}Set.size());
         if (t${getBlObj()['table']}Set.size() != 0) {
             return t${getBlObj()['table']}Set.get(1);
@@ -185,41 +353,8 @@ public class ${getBlObj()['blClass']} implements BusinessService {
         return null;
     }
 
-    /**
-     ** 投連計價批處理調用 FundPriceCalAuto
-     */
-    public boolean submitData(VData data, String Operater) {
-        _GlobalInput = (GlobalInput) data.getObjectByObjectName("GlobalInput", 0);
-        _TransferData = (TransferData) data.getObjectByObjectName("TransferData", 0);
-
-        ${getBlObj()['table']}Schema schema = getVO(_TransferData);
-        boolean updateSuccess = false;
-
-        if ("insert".equals(Operater)) {
-            schema.getDB().insert();
-            updateSuccess = true;
-        } else if ("update".equals(Operater)) {
-            ${getBlObj()['table']}Schema schema2 = this.findByPk(schema);
-            if (schema2 == null) {
-                schema.getDB().insert();
-                updateSuccess = true;
-            } else {
-                copySchemaToSchema(schema, schema2);
-                schema2.getDB().update();
-                updateSuccess = true;
-            }
-        } else if ("delete".equals(Operater)) {
-            ${getBlObj()['table']}Schema schema2 = this.findByPk(schema);
-            if (schema2 != null) {
-                schema2.getDB().delete();
-                updateSuccess = true;
-            }
-        }
-        return updateSuccess;
-    }
-
     /////////////////////////////////////////////////////////////////////////
-    
+
     private boolean sbmtData(VData data) {
         PubSubmit pubSubmit = new PubSubmit();
         if (!pubSubmit.submitData(data, "")) {
@@ -297,3 +432,6 @@ public class ${getBlObj()['blClass']} implements BusinessService {
         return m${getBlObj()['table']}DB.executeQuery(sqlbv);
     }
 }
+
+
+////////////////////////////////////////////////////
