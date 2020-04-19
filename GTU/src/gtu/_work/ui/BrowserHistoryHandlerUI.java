@@ -44,6 +44,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -200,6 +202,8 @@ public class BrowserHistoryHandlerUI extends JFrame {
     private ImageIconConst mImageIconConst;
     private LastestUpdateKeeper mLastestUpdateKeeper;
 
+    private Map<String, PeriodThread> periodSecHolder = new HashMap<String, PeriodThread>();
+
     /**
      * Launch the application.
      */
@@ -351,6 +355,11 @@ public class BrowserHistoryHandlerUI extends JFrame {
             bootstartCombobox.setModel(b1model);
             panel_4.add(bootstartCombobox);
 
+            periodSecText = new JTextField();
+            panel_4.add(periodSecText);
+            periodSecText.setColumns(5);
+            periodSecText.setToolTipText("設定執行週期(秒)");
+
             JPanel panel_2 = new JPanel();
             panel.add(panel_2, "4, 15, fill, fill");
             modifyTimeLabel = new JLabel("修改時間");
@@ -364,25 +373,25 @@ public class BrowserHistoryHandlerUI extends JFrame {
                 }
             });
 
-            final JButton btnNewButton = new JButton("開啟");
-            btnNewButton.addActionListener(new ActionListener() {
+            openUrlBtn = new JButton("開啟");
+            openUrlBtn.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     try {
                         String url = StringUtils.trimToEmpty(urlText.getText());
-                        commandTypeSetting.getValue().doOpen(url, BrowserHistoryHandlerUI.this);
+                        doOpenUrlMaster(url);
                     } catch (Exception ex) {
                         JCommonUtil.handleException(ex);
                     }
                 }
             });
-            btnNewButton.addMouseListener(new MouseAdapter() {
+            openUrlBtn.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
                     String url = StringUtils.trimToEmpty(urlText.getText());
-                    doRightClickShowMenuAction(btnNewButton, e, url);
+                    doRightClickShowMenuAction(openUrlBtn, e, url);
                 }
             });
-            panel_2.add(btnNewButton);
+            panel_2.add(openUrlBtn);
 
             JButton showInDirectoryBtn = new JButton("目錄");
             showInDirectoryBtn.addActionListener(new ActionListener() {
@@ -626,6 +635,41 @@ public class BrowserHistoryHandlerUI extends JFrame {
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
         }
+    }
+
+    private void doOpenUrlMaster(String url) {
+        boolean isPeriodProc = false;
+        if (StringUtils.isNotBlank(periodSecText.getText()) && StringUtils.isNumericSpace(periodSecText.getText())) {
+            int periodSecs = Integer.parseInt(StringUtils.trimToEmpty(periodSecText.getText()));
+            isPeriodProc = true;
+            if (periodSecHolder.containsKey(url)) {
+                if (periodSecHolder.get(url).stop == false) {
+                    periodSecHolder.get(url).stop = true;
+                }
+            } else {
+                PeriodThread task = new PeriodThread(url, periodSecHolder);
+                task.doStart(true, periodSecs);
+                periodSecHolder.put(url, task);
+            }
+        }
+        if (!isPeriodProc) {
+            commandTypeSetting.getValue().doOpen(url, BrowserHistoryHandlerUI.this);
+        }
+        if (periodSecHolder.containsKey(url)) {
+            String lbl = periodSecHolder.get(url).stop ? "結束" : "進行中";
+            openUrlBtn.setText("週期執行(" + lbl + ")");
+        } else {
+            openUrlBtn.setText("開啟");
+        }
+    }
+
+    private boolean isPeriodSecRunning(String url) {
+        if (periodSecHolder.containsKey(url)) {
+            if (!periodSecHolder.get(url).stop) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private List<UrlConfig> getUrlConfigList(boolean reload) {
@@ -1079,6 +1123,8 @@ public class BrowserHistoryHandlerUI extends JFrame {
 
     private void saveCurrentBookmarkBtnAction() {
         try {
+            Validate.isTrue(StringUtils.isNumericSpace(periodSecText.getText()), "periodSec 必須是數值");
+
             String url = StringUtils.trimToEmpty(urlText.getText());
             String title = StringUtils.trimToEmpty(titleText.getText());
             String tag = StringUtils.trimToEmpty(tagComboBox.getSelectedItem().toString());
@@ -1088,6 +1134,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
             String isHidden = hiddenChk.isSelected() ? "Y" : "N";
             String orderMark = StringUtils.trimToEmpty((String) orderMarkComboBox.getSelectedItem());//
             String bootStart = StringUtils.trimToEmpty(String.valueOf(bootstartCombobox.getSelectedItem()));
+            String periodSec = StringUtils.trimToEmpty(periodSecText.getText());
 
             Validate.notNull(bookmarkConfig, "請先設定bookmark設定黨路徑");
             // Validate.notEmpty(url, "url 為空");
@@ -1118,6 +1165,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
             d.isHidden = isHidden;
             d.orderMark = orderMark;
             d.bootStart = bootStart;
+            d.periodSec = periodSec;
 
             bookmarkConfig.getConfigProp().setProperty(url, UrlConfig.getConfigValue(d));
             bookmarkConfig.store();
@@ -1158,6 +1206,8 @@ public class BrowserHistoryHandlerUI extends JFrame {
     private AtomicBoolean searchBool = new AtomicBoolean(false);
     private JComboBox orderMarkComboBox;
     private JComboBox bootstartCombobox;
+    private JTextField periodSecText;
+    private JButton openUrlBtn;
 
     private void initLoading(final JProgressBarHelper progressBarHelper) {
         try {
@@ -1754,6 +1804,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
         String orderMark; // 特許排序
         String bootStart; // 開啟馬上執行
         String updateTimestamp; // 最後修改時間
+        String periodSec;// 週期執行
 
         private static SpecialCharHandler specialCharHandler;
 
@@ -1774,8 +1825,9 @@ public class BrowserHistoryHandlerUI extends JFrame {
             String orderMark = specialCharHandler.getBeforeSave(d.orderMark);
             String bootStart = specialCharHandler.getBeforeSave(d.bootStart);
             String updateTimestamp = specialCharHandler.getBeforeSave(d.updateTimestamp);
+            String periodSec = specialCharHandler.getBeforeSave(d.periodSec);
             return title + "^" + tag + "^" + remark + "^" + timestamp + "^" + commandType + "^" + timestampLastest + "^" + clickTimes + "^" + isUseRemarkOpen + "^" + isHidden + "^" + orderMark + "^"
-                    + bootStart + "^" + updateTimestamp;
+                    + bootStart + "^" + updateTimestamp + "^" + periodSec;
         }
 
         private static String getArryStr(String[] args, int index) {
@@ -1800,6 +1852,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
                 String orderMark = getArryStr(args, 9);
                 String bootStart = getArryStr(args, 10);
                 String updateTimestamp = getArryStr(args, 11);
+                String periodSec = getArryStr(args, 12);
 
                 UrlConfig d = new UrlConfig();
                 d.title = title;
@@ -1815,6 +1868,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
                 d.orderMark = orderMark;
                 d.bootStart = bootStart;
                 d.updateTimestamp = updateTimestamp;
+                d.periodSec = periodSec;
 
                 return d;
             }
@@ -1925,7 +1979,9 @@ public class BrowserHistoryHandlerUI extends JFrame {
             System.out.println("[open]<<<" + d.title + " = " + d.url);
 
             if (JMouseEventUtil.buttonLeftClick(2, e)) {
-                commandTypeSetting.getValue().doOpen(d.url, BrowserHistoryHandlerUI.this);
+                // commandTypeSetting.getValue().doOpen(d.url,
+                // BrowserHistoryHandlerUI.this);
+                doOpenUrlMaster(d.url);
             } else {
                 doRightClickShowMenuAction(urlTable, e, d.url);
             }
@@ -1946,6 +2002,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
             useRemarkOpenChk.setSelected("Y".equals(d.isUseRemarkOpen));
             hiddenChk.setSelected("Y".equals(d.isHidden));
             bootstartCombobox.setSelectedItem(StringUtils.trimToEmpty(d.bootStart));
+            periodSecText.setText(StringUtils.trimToEmpty(d.periodSec));
         } catch (Exception ex) {
             if (throwEx) {
                 throw new RuntimeException(ex);
@@ -2351,6 +2408,9 @@ public class BrowserHistoryHandlerUI extends JFrame {
             }
 
             RuntimeBatPromptModeUtil inst = RuntimeBatPromptModeUtil.newInstance().command(command);
+            if (isPeriodSecRunning(d.url)) {
+                inst.runInBatFile(false);
+            }
             if (!isSaveBatFile) {
                 int waittingTime = 0;
                 try {
@@ -2824,6 +2884,49 @@ public class BrowserHistoryHandlerUI extends JFrame {
 
             // 重設bookmarkConfig 時間
             BrowserHistoryHandlerUI.this.setTitle("書籤最後修改時間 : " + DateFormatUtils.format(bookmarkConfig.getPropFile().lastModified(), "yyyy/MM/dd HH:mm:ss"));
+        }
+    }
+
+    private class PeriodThread extends TimerTask {
+        private boolean stop = false;
+        private Map<String, PeriodThread> periodSecHolder;
+        private String url;
+        private Timer timer = new Timer();
+
+        public PeriodThread(String url, Map<String, PeriodThread> periodSecHolder) {
+            this.url = url;
+            this.periodSecHolder = periodSecHolder;
+        }
+
+        public void doStart(boolean doInstant, int second) {
+            long startLag = second * 1000;
+            long period = second * 1000;
+            if (doInstant) {
+                startLag = 0;
+            }
+            timer.schedule(this, startLag, period);
+        }
+
+        private void removeThis() {
+            for (String mUrl : periodSecHolder.keySet()) {
+                if (StringUtils.equals(mUrl, this.url)) {
+                    periodSecHolder.remove(mUrl);
+                    System.out.println("period Remove : " + this.url);
+                    break;
+                }
+            }
+        }
+
+        @Override
+        public void run() {
+            if (stop) {
+                this.cancel();
+                removeThis();
+                return;
+            }
+            {
+                commandTypeSetting.getValue().doOpen(this.url, BrowserHistoryHandlerUI.this);
+            }
         }
     }
 }
