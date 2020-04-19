@@ -1,3 +1,6 @@
+# 確認有安裝
+	minikube version
+
 
 # Get the IP of the local kubernetes cluster
 minikube ip

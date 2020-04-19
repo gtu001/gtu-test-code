@@ -3,3 +3,17 @@
 curl -Lo minikube https://storage.googleapis.com/minikube/releases/v0.28.0/minikube-linux-amd64 && chmod +x minikube && sudo mv minikube /usr/local/bin/
 
 
+## 取得最新板的方法
+	https://github.com/kubernetes/minikube/releases/
+
+	對連結 minikube-linux-amd64 複製連結路徑
+
+	curl -Lo minikube <貼到這裡> && chmod +x minikube && sudo mv minikube /usr/local/bin/
+
+curl -Lo minikube https://github.com/kubernetes/minikube/releases/download/v1.9.2/minikube-linux-amd64 && chmod +x minikube && sudo mv minikube /usr/local/bin/
+
+
+## 啟動
+	minikube start --driver=[none, podman, virtualbox, vmware, docker, kvm2]
+
+
