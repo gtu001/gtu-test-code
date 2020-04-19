@@ -16,7 +16,7 @@
 <#macro mingoDate date>民國${date[0..3]?number-1911}年${date[4..5]?number}月${date[6..7]?number}日</#macro>
 
 <#-- 民國年 -->
-<#function mingoDate1 date>
+<#function mingoDate1 date delimit="">
         <#if date?is_date>
                 <#local nd=date?date>
         <#elseif date?is_string && date?matches('\\d{8}')>
@@ -27,11 +27,16 @@
         <#local year=nd[0..3]?number-1911>
         <#local month=nd[4..5]?number>
         <#local dddd=nd[6..7]?number>
-        <#return "${year}年${month}月${dddd}日">
+
+        <#if delimit?? && delimit != "">
+            <#return "${year?left_pad(3,'0')}${delimit}${month?left_pad(2,'0')}${delimit}${dddd?left_pad(2,'0')}">
+        <#else>
+            <#return "${year?left_pad(3,'0')}年${month?left_pad(2,'0')}月${dddd?left_pad(2,'0')}日">
+        </#if>
 </#function>
 
 <#-- 西元年 -->
-<#function ciDate1 date>
+<#function ciDate1 date delimit="/">
         <#if date?is_date>
                 <#local nd=date?date>
         <#elseif date?is_string && date?matches('\\d{8}')>
@@ -42,7 +47,7 @@
         <#local year=nd[0..3]?number?c>
         <#local month=nd[4..5]?number>
         <#local dddd=nd[6..7]?number>
-        <#return "${year}/${month}/${dddd}">
+        <#return "${year?left_pad(4,'0')}${delimit}${month?left_pad(2,'0')}${delimit}${dddd?left_pad(2,'0')}">
 </#function>
 
 <#-- 陣列串接 -->

@@ -116,6 +116,11 @@ public class AlwaysOpenUI extends JFrame {
                     if(tglbtnStartend.isSelected()) {
                         timer = new Timer();
                         timer.schedule(createTask(), 0, Integer.parseInt(sec) * 1000);
+                        
+                        if(StringUtils.isNumeric(sec)) {
+                            config.getConfigProp().setProperty("sec", sec);
+                            config.store();
+                        }
                     }else {
                         timer.cancel();
                     }
@@ -162,6 +167,7 @@ public class AlwaysOpenUI extends JFrame {
         });
         panel.add(tglbtnStartend, "4, 16");
         
+        JCommonUtil.setJFrameCenter(this);
         HideInSystemTrayHelper.newInstance().apply(this, "保持登入工具", "resource/images/ico/whtsuvifzdlhiqcxubpu.ico");
     }
     
