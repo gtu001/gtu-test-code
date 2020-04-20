@@ -46,6 +46,14 @@
 	</target>
 	-->
 
+	<target name="jarToExe" if="${enable}">
+		<echo># jarToExe = ${enable}</echo>
+		<jarToExe jarPath="${desktop}/${main_class}.jar" exePath="${desktop}/${main_class}.exe" launch4jExe="${launch4jExe}">
+			<icon enable="true">${src_dir}/resource/images/ico/${icon_name}</icon>
+			<singleton enable="true">${main_class}</singleton>
+		</jarToExe>
+	</target>
+
 	<target name="buildClassSet" if="${enable}">
 		<echo># buildClassSet = ${enable}</echo>
 		<mkdir dir="${jars_dir}" />
@@ -103,7 +111,7 @@
 		<antcall target="compiler" />
 
 		<antcall target="runClass">
-			<param name="enable" value="true" />
+			<param name="enable" value="false" />
 		</antcall>
 
 		<antcall target="createJar">
@@ -111,7 +119,7 @@
 		</antcall>
 
 		<antcall target="runJar">
-			<param name="enable" value="true" />
+			<param name="enable" value="false" />
 		</antcall>
 
 		<antcall target="moveJarToDesktop">
@@ -134,6 +142,16 @@
 		<antcall target="notify">
 			<param name="enable" value="true" />
 		</antcall>
+	</target>
+
+	<target name="notify">
+		<echo># notify ...</echo>
+		<!--
+			<exec executable="cmd">
+				<arg value="/c start echo create ${main_class}.jar complete!!" />
+			</exec>
+			-->
+		<notify type="info" title="build完成" message="create ${main_class}.jar complete!!" />
 	</target>
 
 	<target name="compiler">
@@ -166,8 +184,8 @@
 			-->
 		<jar destfile="${main_class}.jar">
 			<zipfileset dir="${build_dir}">
-				<exclude name="/META-INF/**" />
-				<include name="/META-INF/MANIFEST.MF" />
+				<exclude name="META-INF/**" />
+				<include name="META-INF/MANIFEST.MF" />
 				<include name="**/*" />
 			</zipfileset>
 			<manifest>

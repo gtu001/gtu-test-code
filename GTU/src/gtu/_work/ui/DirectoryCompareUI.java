@@ -1,6 +1,7 @@
 package gtu._work.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -61,15 +62,16 @@ import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
 
+import gtu.clipboard.ClipboardUtil;
 import gtu.file.FileUtil;
 import gtu.file.FileUtil.FileZ;
 import gtu.file.OsInfoUtil;
 import gtu.properties.PropertiesUtilBean;
-import gtu.runtime.ProcessWatcher;
 import gtu.runtime.RuntimeBatPromptModeUtil;
 import gtu.swing.util.JCommonUtil;
-import gtu.swing.util.JFrameUtil;
 import gtu.swing.util.JCommonUtil.HandleDocumentEvent;
+import gtu.swing.util.JFrameUtil;
+import gtu.swing.util.JMouseEventUtil;
 import gtu.swing.util.JPopupMenuUtil;
 import gtu.swing.util.JTableUtil;
 import gtu.swing.util.JTextAreaUtil;
@@ -144,6 +146,24 @@ public class DirectoryCompareUI extends javax.swing.JFrame {
         super();
         initGUI();
     }
+    
+    private MouseAdapter pasteEvent = new MouseAdapter() {
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            String strVal = ClipboardUtil.getInstance().getContents();
+            if (StringUtils.isNotBlank(strVal)) {
+                if (JMouseEventUtil.buttonRightClick(1, e)) {
+                    JPopupMenuUtil.newInstance((Component) e.getSource()).addJMenuItem("貼上", new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            JTextArea txt = ((JTextArea) e.getSource());
+                            txt.setText(strVal);
+                        }
+                    }).applyEvent(e).show();
+                }
+            }
+        }
+    };
 
     private void initGUI() {
         try {
@@ -177,6 +197,7 @@ public class DirectoryCompareUI extends javax.swing.JFrame {
                             }));
                             jPanel2.add(leftDirText);
                             JTextFieldUtil.setupDragDropFilePath(leftDirText, null);
+                            leftDirText.addMouseListener(pasteEvent);
                         }
                         {
                             rightDirText = new JTextArea();
@@ -191,6 +212,7 @@ public class DirectoryCompareUI extends javax.swing.JFrame {
                             }));
                             jPanel2.add(rightDirText);
                             JTextFieldUtil.setupDragDropFilePath(rightDirText, null);
+                            rightDirText.addMouseListener(pasteEvent);
                         }
                         {
                             executeBtn = new JButton();
