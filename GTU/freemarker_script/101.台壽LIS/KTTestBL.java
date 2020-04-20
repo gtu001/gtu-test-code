@@ -1,52 +1,5 @@
 <#import "/lib.ftl" as my>  
-
-<#function getBlObj>
-    <#assign myHash = {"blClass", "BlTestTableBL", "table":"BlTestTable"}>
-    <#if !blObj??>
-        <#assign blObj = {}>
-    </#if>
-    <#list myHash?keys as key>
-        <#if blObj[key]??>
-            blObj[key] = myHash[key]
-        </#if>
-    </#list>
-    <#return blObj>
-</#function>
-
-
-<#if ! columnLst2??>
-    <#assign columnLst2 = columnLst />
-</#if>
-
-<#if ! pkColumnLst2??>
-    <#assign pkColumnLst2 = ['AAAA', 'BBBB'] />
-</#if>
-
-<#function getPkWhereCondition>
-    <#local rtn = "">
-    <#local lst = []>
-    <#list pkColumnLst2 as col>
-        <#local varData = " " + col + " = '\" + " + col + " + \"' "  />
-        <#local lst = lst + [ varData ]>
-    </#list>
-    <#local rtn = my.listJoin(lst, " and ")>
-    <#return rtn>
-</#function>
-
-<#function getPkArgs>
-    <#local rtn = "">
-    <#local lst = []>
-    <#list pkColumnLst2 as col>
-        <#local varData = "String " + col + ""  />
-        <#local lst = lst + [ varData ]>
-    </#list>
-    <#local rtn = my.listJoin(lst, ", ")>
-    <#return rtn>
-</#function>
-
-////////////////////////////////////////////////////
-
-
+<#import "ctbc_dao_maker.ftl" as ct>  
 
 package com.sinosoft.lis.controller.kttest;
 
@@ -56,16 +9,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sinosoft.lis.db.LCPolDB;
-import com.sinosoft.lis.db.${getBlObj()['table']}DB;
+import com.sinosoft.lis.db.${ct.getBlObj()['table']}DB;
 import com.sinosoft.lis.i18n.I18nMessage;
 import com.sinosoft.lis.pubfun.GlobalInput;
 import com.sinosoft.lis.pubfun.PubFun;
 import com.sinosoft.lis.pubfun.PubFun1;
 import com.sinosoft.lis.pubfun.PubSubmit;
 import com.sinosoft.lis.schema.LCPolSchema;
-import com.sinosoft.lis.schema.${getBlObj()['table']}Schema;
+import com.sinosoft.lis.schema.${ct.getBlObj()['table']}Schema;
 import com.sinosoft.lis.tb.ProposalApproveBLS;
-import com.sinosoft.lis.vschema.${getBlObj()['table']}Set;
+import com.sinosoft.lis.vschema.${ct.getBlObj()['table']}Set;
 import com.sinosoft.service.BusinessService;
 import com.sinosoft.service.stereotype.Service;
 import com.sinosoft.utility.CError;
@@ -97,12 +50,13 @@ import com.sinosoft.utility.VData;
  * @Cleaned Troy ${my.ciDate1(.now, '-')}
  */
 
-@Service(name = "${getBlObj()['blClass']}")
-public class ${getBlObj()['blClass']} implements BusinessService {
-    private static final Logger logger = LoggerFactory.getLogger(${getBlObj()['blClass']}.class);
+@Service(name = "${ct.getBlObj()['blClass']}")
+public class ${ct.getBlObj()['blClass']} implements BusinessService {
+    private static final Logger logger = LoggerFactory.getLogger(${ct.getBlObj()['blClass']}.class);
 
     /** 传入数据的容器 */
     private VData mInputData = new VData();
+    private VData mResult = new VData();
     /** 数据操作字符串 */
     private String mOperate;
     /** 错误处理类 */
@@ -110,10 +64,12 @@ public class ${getBlObj()['blClass']} implements BusinessService {
 
     /** 业务处理相关变量 */
     /** 保单数据 */
-    private ${getBlObj()['table']}Schema m${getBlObj()['table']}Schema = new ${getBlObj()['table']}Schema();
+    private ${ct.getBlObj()['table']}Schema m${ct.getBlObj()['table']}Schema = new ${ct.getBlObj()['table']}Schema();
     /** 全局数据 */
     private GlobalInput mGlobalInput = new GlobalInput();
     private TransferData mTransferData = new TransferData();
+
+    private MMap mMap = new MMap();
 
     // @Constructor
     public KTTestBL() {
@@ -158,13 +114,17 @@ public class ${getBlObj()['blClass']} implements BusinessService {
         logger.debug("---prepareOutputData---");
 
         // 数据提交、保存
-//        ProposalApproveBLS tProposalApproveBLS = new ProposalApproveBLS();
-//        if (tProposalApproveBLS.submitData(mInputData, Operater) == false) {
-//            // @@错误处理
-//            this.mErrors.copyAllErrors(tProposalApproveBLS.mErrors);
-//            return false;
-//        }
         logger.debug("---commitData---");
+        if (!tPubSubmit.submitData(mResult, mOperate)) {
+            // @@错误处理
+            this.mErrors.copyAllErrors(tPubSubmit.mErrors);
+            CError tError = new CError();
+            tError.moduleName = "${ct.getBlObj()['blClass']}";
+            tError.functionName = "submitData";
+            tError.errorMessage(new I18nMessage("数据提交失败!", "xIDx155879948680528XidX"));
+            this.mErrors.addOneError(tError);
+            return false;
+        }
         return true;
     }
 
@@ -175,23 +135,27 @@ public class ${getBlObj()['blClass']} implements BusinessService {
      * @return: boolean
      */
     private boolean getInputData() {
+        mGlobalInput = (GlobalInput) mInputData.getObjectByObjectName("GlobalInput", 0);
+        mTransferData = (TransferData) mInputData.getObjectByObjectName("TransferData", 0);
+        mLCRollBackLogSchema = (LCRollBackLogSchema) mInputData.getObjectByObjectName("LCRollBackLogSchema", 0);
+
         // 全局变量
         mGlobalInput.setSchema((GlobalInput) mInputData.getObjectByObjectName("GlobalInput", 0));
         // 保单
-        ${getBlObj()['table']}Schema t${getBlObj()['table']}Schema = new ${getBlObj()['table']}Schema();
-        t${getBlObj()['table']}Schema.setSchema((${getBlObj()['table']}Schema) mInputData.getObjectByObjectName("${getBlObj()['table']}Schema", 0));
+        ${ct.getBlObj()['table']}Schema t${ct.getBlObj()['table']}Schema = new ${ct.getBlObj()['table']}Schema();
+        t${ct.getBlObj()['table']}Schema.setSchema((${ct.getBlObj()['table']}Schema) mInputData.getObjectByObjectName("${ct.getBlObj()['table']}Schema", 0));
 
-        ${getBlObj()['table']}DB t${getBlObj()['table']}DB = new ${getBlObj()['table']}DB();
+        ${ct.getBlObj()['table']}DB t${ct.getBlObj()['table']}DB = new ${ct.getBlObj()['table']}DB();
 
         <#list pkColumnLst2 as col>
-        t${getBlObj()['table']}DB.set${col}(t${getBlObj()['table']}Schema.get${col}());
+        t${ct.getBlObj()['table']}DB.set${col}(t${ct.getBlObj()['table']}Schema.get${col}());
         </#list>
-        if (t${getBlObj()['table']}DB.getInfo() == false) {
+        if (t${ct.getBlObj()['table']}DB.getInfo() == false) {
             // @@错误处理
             errorMessage("getInputData", "投保单查询失败!", "xIDx155879950081170XidX");
             return false;
         }
-        m${getBlObj()['table']}Schema.setSchema(t${getBlObj()['table']}DB);
+        m${ct.getBlObj()['table']}Schema.setSchema(t${ct.getBlObj()['table']}DB);
         return true;
     }
     
@@ -202,12 +166,12 @@ public class ${getBlObj()['blClass']} implements BusinessService {
      * @return: boolean
      */
     private boolean checkData() {
-        if (!m${getBlObj()['table']}Schema.getGrpContNo().trim().equals("0")) {
+        if (!m${ct.getBlObj()['table']}Schema.getGrpContNo().trim().equals("0")) {
             // @@错误处理
             errorMessage("checkData", "此单不是投保单，不能进行复核操作!", "xIDx155879955816563XidX");
             return false;
         }
-        if (!m${getBlObj()['table']}Schema.getGrpPolNo().trim().equals("0")) {
+        if (!m${ct.getBlObj()['table']}Schema.getGrpPolNo().trim().equals("0")) {
             // @@错误处理
             errorMessage("checkData", "此投保单已经开始核保，不能进行复核操作!", "xIDx155879955818177XidX");
             return false;
@@ -215,12 +179,12 @@ public class ${getBlObj()['blClass']} implements BusinessService {
         /**
          * @todo 查询该次申请的投保单是否已经被其他用户申请
          */
-        ${getBlObj()['table']}DB t${getBlObj()['table']}DB = new ${getBlObj()['table']}DB();
+        ${ct.getBlObj()['table']}DB t${ct.getBlObj()['table']}DB = new ${ct.getBlObj()['table']}DB();
         <#list pkColumnLst2 as col>
-        t${getBlObj()['table']}DB.set${col}(t${getBlObj()['table']}Schema.get${col}());
+        t${ct.getBlObj()['table']}DB.set${col}(t${ct.getBlObj()['table']}Schema.get${col}());
         </#list>
-        ${getBlObj()['table']}Set t${getBlObj()['table']}Set = t${getBlObj()['table']}DB.query();
-        if (t${getBlObj()['table']}Set.get(1).getMakeDate() == null) {
+        ${ct.getBlObj()['table']}Set t${ct.getBlObj()['table']}Set = t${ct.getBlObj()['table']}DB.query();
+        if (t${ct.getBlObj()['table']}Set.get(1).getMakeDate() == null) {
             // @@错误处理
             errorMessage("checkData", "此投保单已经被操作员选取，不能重复进行操作!", "xIDx155879964781357XidX");
             return false;
@@ -237,17 +201,16 @@ public class ${getBlObj()['blClass']} implements BusinessService {
     }
     
     private boolean dealData() {
-        mGlobalInput = (GlobalInput) mInputData.getObjectByObjectName("GlobalInput", 0);
-        mTransferData = (TransferData) mInputData.getObjectByObjectName("TransferData", 0);
+        ${ct.getBlObj()['table']}Schema schema = m${ct.getBlObj()['table']}Schema;
 
-        ${getBlObj()['table']}Schema schema = getVO(mTransferData);
+        ${ct.getBlObj()['table']}Schema schema = getVO(mTransferData);
         boolean updateSuccess = false;
 
         if ("insert".equals(mOperate)) {
             schema.getDB().insert();
             updateSuccess = true;
         } else if ("update".equals(mOperate)) {
-            ${getBlObj()['table']}Schema schema2 = this.findByPk(schema);
+            ${ct.getBlObj()['table']}Schema schema2 = this.findByPk(schema);
             if (schema2 == null) {
                 schema.getDB().insert();
                 updateSuccess = true;
@@ -257,7 +220,7 @@ public class ${getBlObj()['blClass']} implements BusinessService {
                 updateSuccess = true;
             }
         } else if ("delete".equals(mOperate)) {
-            ${getBlObj()['table']}Schema schema2 = this.findByPk(schema);
+            ${ct.getBlObj()['table']}Schema schema2 = this.findByPk(schema);
             if (schema2 != null) {
                 schema2.getDB().delete();
                 updateSuccess = true;
@@ -274,11 +237,11 @@ public class ${getBlObj()['blClass']} implements BusinessService {
      */
     private void prepareOutputData() {
         mInputData.clear();
-        mInputData.add(m${getBlObj()['table']}Schema);
+        mInputData.add(m${ct.getBlObj()['table']}Schema);
     }
 
 
-    private ${getBlObj()['table']}Schema getVO(TransferData tData) {
+    private ${ct.getBlObj()['table']}Schema getVO(TransferData tData) {
         <#list columnLst as col>
         <#if col?contains("序號")>
             <#continue>
@@ -289,7 +252,7 @@ public class ${getBlObj()['blClass']} implements BusinessService {
         OLDMAKEDATE = PubFun.getCurrentDate();
         OLDMAKETIME = PubFun.getCurrentTime();
 
-        ${getBlObj()['table']}Schema schema = new ${getBlObj()['table']}Schema();
+        ${ct.getBlObj()['table']}Schema schema = new ${ct.getBlObj()['table']}Schema();
 
         <#list columnLst as col>
         <#if col?contains("序號")>
@@ -302,7 +265,7 @@ public class ${getBlObj()['blClass']} implements BusinessService {
         return schema;
     }
 
-    private void copySchemaToSchema(${getBlObj()['table']}Schema fromSchema, ${getBlObj()['table']}Schema toScheam) {
+    private void copySchemaToSchema(${ct.getBlObj()['table']}Schema fromSchema, ${ct.getBlObj()['table']}Schema toScheam) {
         <#list columnLst2 as col>
         <#if col?contains("序號")>
             <#continue>
@@ -311,44 +274,58 @@ public class ${getBlObj()['blClass']} implements BusinessService {
         </#list>
     }
 
+    private ${ct.getBlObj()['table']}Schema findByPk(${ct.getBlObj()['table']}Schema schema) {
+        ${ct.getBlObj()['table']}DB t${ct.getBlObj()['table']}DB = new ${ct.getBlObj()['table']}DB();
 
-    private ${getBlObj()['table']}Schema findByPk2(${getBlObj()['table']}Schema schema) {
-        ${getBlObj()['table']}DB t${getBlObj()['table']}DB = new ${getBlObj()['table']}DB();
-        
         <#list pkColumnLst2 as col>
-        t${getBlObj()['table']}DB.set${col}(t${getBlObj()['table']}Schema.get${col}());// 复核节点
+        t${ct.getBlObj()['table']}DB.set${col}(t${ct.getBlObj()['table']}Schema.get${col}());// 复核节点
         </#list>
-        ${getBlObj()['table']}Set t${getBlObj()['table']}Set = t${getBlObj()['table']}DB.query();
-        
-        logger.debug("# size = " + t${getBlObj()['table']}Set.size());
-        if (t${getBlObj()['table']}DB.getInfo() == false) {
-            // @@错误处理
-            errorMessage("getInputData", "投保单查询失败!", "xIDx155879950081170XidX");
-        }else if (t${getBlObj()['table']}Set.size() != 0) {
-            return t${getBlObj()['table']}Set.get(1);
+
+        if (t${ct.getBlObj()['table']}DB.getInfo() != false) {
+            return t${ct.getBlObj()['table']}DB.getSchema();
         }
         return null;
     }
 
-    private ${getBlObj()['table']}Schema findByPk(${getBlObj()['table']}Schema schema) {
-        ${getBlObj()['table']}DB t${getBlObj()['table']}DB = new ${getBlObj()['table']}DB();
+    private ${ct.getBlObj()['table']}Schema findByPk2(${ct.getBlObj()['table']}Schema schema) {
+        ${ct.getBlObj()['table']}DB t${ct.getBlObj()['table']}DB = new ${ct.getBlObj()['table']}DB();
+
         <#list pkColumnLst2 as col>
-        String ${col} = schema.get${col?cap_first}();
+        t${ct.getBlObj()['table']}DB.set${col}(t${ct.getBlObj()['table']}Schema.get${col}());// 复核节点
         </#list>
-        ${getBlObj()['table']}Set t${getBlObj()['table']}Set = t${getBlObj()['table']}DB.executeQuery("select * from ${getBlObj()['table']} where ${getPkWhereCondition()}");
-        logger.debug("# size = " + t${getBlObj()['table']}Set.size());
-        if (t${getBlObj()['table']}Set.size() != 0) {
-            return t${getBlObj()['table']}Set.get(1);
+
+        ${ct.getBlObj()['table']}Set t${ct.getBlObj()['table']}Set = t${ct.getBlObj()['table']}DB.query();
+        logger.debug("# size = " + t${ct.getBlObj()['table']}Set.size());
+
+        if (t${ct.getBlObj()['table']}Set.size() != 0) {
+            return t${ct.getBlObj()['table']}Set.get(1);
         }
         return null;
     }
 
-    private ${getBlObj()['table']}Schema findByPk(${getPkArgs()}) {
-        ${getBlObj()['table']}DB t${getBlObj()['table']}DB = new ${getBlObj()['table']}DB();
-        ${getBlObj()['table']}Set t${getBlObj()['table']}Set = t${getBlObj()['table']}DB.executeQuery("select * from ${getBlObj()['table']} where ${getPkWhereCondition()}");
-        logger.debug("# size = " + t${getBlObj()['table']}Set.size());
-        if (t${getBlObj()['table']}Set.size() != 0) {
-            return t${getBlObj()['table']}Set.get(1);
+    private ${ct.getBlObj()['table']}Schema findByPk3(${ct.getBlObj()['table']}Schema schema) {
+        ${ct.getBlObj()['table']}DB t${ct.getBlObj()['table']}DB = new ${ct.getBlObj()['table']}DB();
+        String sql = "select * from ${ct.getBlObj()['table']} where ${ct.getPkWhereCondition2()}";
+        SQLwithBindVariables sqlbv = new SQLwithBindVariables();
+        sqlbv.sql(sql);
+        <#list pkColumnLst2 as col>
+        sqlbv.put("${col}", schema.get${col?cap_first}());
+        </#list>
+
+        ${ct.getBlObj()['table']}Set t${ct.getBlObj()['table']}Set = t${ct.getBlObj()['table']}DB.executeQuery(sqlbv);
+        logger.debug("# size = " + t${ct.getBlObj()['table']}Set.size());
+        if (t${ct.getBlObj()['table']}Set.size() != 0) {
+            return t${ct.getBlObj()['table']}Set.get(1);
+        }
+        return null;
+    }
+
+    private ${ct.getBlObj()['table']}Schema findByPk4(${ct.getPkArgs()}) {
+        ${ct.getBlObj()['table']}DB t${ct.getBlObj()['table']}DB = new ${ct.getBlObj()['table']}DB();
+        ${ct.getBlObj()['table']}Set t${ct.getBlObj()['table']}Set = t${ct.getBlObj()['table']}DB.executeQuery("select * from ${ct.getBlObj()['table']} where ${ct.getPkWhereCondition()}");
+        logger.debug("# size = " + t${ct.getBlObj()['table']}Set.size());
+        if (t${ct.getBlObj()['table']}Set.size() != 0) {
+            return t${ct.getBlObj()['table']}Set.get(1);
         }
         return null;
     }
@@ -409,27 +386,6 @@ public class ${getBlObj()['blClass']} implements BusinessService {
         ExeSQL tExeSQL = new ExeSQL();
         double dd = Double.parseDouble(tExeSQL.getOneValue(tSql));
         return dd;
-    }
-
-    public ${getBlObj()['table']}Set queryDoc(String docCode, String bussType, String subType) {
-        String sql = "select * from ES_DOC_MAIN ";
-        sql += " where  DocCode='?DocCode?' ";
-        sql += " and BussType='?BussType?' ";
-        sql += " and SubType='?SubType?' ";
-        sql += " union ";
-        sql += "select * from ES_DOC_MAIN ";
-        sql += " where  exists (select 1 from es_doc_relation c where c.bussno = ES_DOC_MAIN.Doccode  and c.busstype = ES_DOC_MAIN.Busstype"
-                + " and c.subtype = ES_DOC_MAIN.Subtype and c.DocCode='?DocCode?'  and c.doccode is not null ";
-        sql += " and c.BussType='?BussType?' ";
-        sql += " and c.SubType='?SubType?' )";
-
-        SQLwithBindVariables sqlbv = new SQLwithBindVariables();
-        sqlbv.sql(sql);
-        sqlbv.put("DocCode", docCode);
-        sqlbv.put("BussType", bussType);
-        sqlbv.put("SubType", subType);
-
-        return m${getBlObj()['table']}DB.executeQuery(sqlbv);
     }
 }
 

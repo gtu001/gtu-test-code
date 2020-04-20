@@ -1,5 +1,40 @@
 <#import "/lib.ftl" as my>  
 
+<#function getFunObj>
+    <#assign myHash = { "pkg": "app", 
+                        "sqlClass": "DSScanContSql", 
+                        "sqlMethod" : "DSScanContSql0", 
+                        "module" : "ind_bpo", 
+                        "controllerClass" : "DSScanContController", 
+                        "uiClass" : "DSSestUI" 
+                        }>
+    <#if !funObj??>
+        <#assign funObj = {}>
+    </#if>
+    <#list myHash?keys as key>
+        <#if ! funObj[key]??>
+            <#assign funObj = funObj + {key: myHash[key]} />
+        </#if>
+    </#list>
+    <#return funObj>
+</#function>
+
+<#function getBlObj>
+    <#assign myHash = {"blClass", "BlTestTableBL", 
+                       "table":"BlTestTable"
+                       }>
+    <#if !blObj??>
+        <#assign blObj = {}>
+    </#if>
+    <#list myHash?keys as key>
+        <#if ! blObj[key]??>
+            <#assign blObj = blObj + {key: myHash[key]} />
+        </#if>
+    </#list>
+    <#return blObj>
+</#function>
+
+
 <#function getColParamArgsLst>
         <#local rtn = "">
         <#local lst = []>
@@ -42,18 +77,6 @@
         <#return rtn>
 </#function>
 
-<#function getFunObj>
-    <#assign myHash = { "pkg": "app", "sqlClass": "DSScanContSql", "sqlMethod" : "DSScanContSql0", "module" : "ind_bpo", "controllerClass" : "DSScanContController" }>
-    <#if !funObj??>
-        <#assign funObj = {}>
-    </#if>
-    <#list myHash?keys as key>
-        <#if funObj[key]??>
-            funObj[key] = myHash[key]
-        </#if>
-    </#list>
-    <#return funObj>
-</#function>
 
 <#macro showAlert001>
     <#local hasSerial = "N">
@@ -122,6 +145,47 @@
         </tr>
     </#list>
 </#macro>
+
+<#if ! columnLst2??>
+    <#assign columnLst2 = columnLst />
+</#if>
+
+<#if ! pkColumnLst2??>
+    <#assign pkColumnLst2 = ['AAAA', 'BBBB'] />
+</#if>
+
+<#function getPkWhereCondition>
+    <#local rtn = "">
+    <#local lst = []>
+    <#list pkColumnLst2 as col>
+        <#local varData = " " + col + " = '\" + " + col + " + \"' "  />
+        <#local lst = lst + [ varData ]>
+    </#list>
+    <#local rtn = my.listJoin(lst, " and ")>
+    <#return rtn>
+</#function>
+
+<#function getPkWhereCondition2>
+    <#local rtn = "">
+    <#local lst = []>
+    <#list pkColumnLst2 as col>
+        <#local varData = " " + col + " = '?" + col + "?'"  />
+        <#local lst = lst + [ varData ]>
+    </#list>
+    <#local rtn = my.listJoin(lst, " and ")>
+    <#return rtn>
+</#function>
+
+<#function getPkArgs>
+    <#local rtn = "">
+    <#local lst = []>
+    <#list pkColumnLst2 as col>
+        <#local varData = "String " + col + ""  />
+        <#local lst = lst + [ varData ]>
+    </#list>
+    <#local rtn = my.listJoin(lst, ", ")>
+    <#return rtn>
+</#function>
 
 ////////////////////////////////////////////////////
 
