@@ -475,7 +475,7 @@ public class PropertyEditUI extends javax.swing.JFrame {
                                 public void mouseClicked(MouseEvent evt) {
                                     if (JMouseEventUtil.buttonRightClick(1, evt)) {
                                         JTableUtil jTabUtil = JTableUtil.newInstance(propTable);
-                                        int[] rows = jTabUtil.getSelectedRows();
+                                        int[] rows = jTabUtil.getSelectedRows(true);
                                         for (int ii : rows) {
                                             System.out.println(jTabUtil.getModel().getValueAt(ii, 1));
                                         }
