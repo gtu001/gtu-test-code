@@ -6,7 +6,8 @@
                         "sqlMethod" : "DSScanContSql0", 
                         "module" : "ind_bpo", 
                         "controllerClass" : "DSScanContController", 
-                        "uiClass" : "DSSestUI" 
+                        "uiClass" : "DSSestUI" ,
+                        "qryJsp" : "KTTestInput.jsp"
                         }>
     <#if !funObj??>
         <#assign funObj = {}>
