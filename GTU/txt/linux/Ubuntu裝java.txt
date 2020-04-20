@@ -30,6 +30,8 @@ lsb_release -a
 
 
 ---
+版本太舊
+
 	sudo apt-get install openjdk-8-jdk
 	
 	
@@ -53,3 +55,11 @@ lsb_release -a
 	sudo update-alternatives --config java
 	sudo update-alternatives --config javac
 	sudo update-alternatives --config javaws	
+
+
+
+----
+可用版
+
+	sudo apt update
+	sudo apt install default-jdk
