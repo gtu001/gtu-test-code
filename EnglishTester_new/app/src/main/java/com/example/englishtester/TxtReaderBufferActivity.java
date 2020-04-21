@@ -52,6 +52,7 @@ import com.example.englishtester.common.TitleTextSetter;
 import com.example.englishtester.common.TxtReaderAppenderSpanClass;
 import com.example.englishtester.common.ViewPagerHelper;
 import com.example.englishtester.common.epub.base.EpubViewerMainHandler;
+import com.example.englishtester.common.html.parser.HtmlWordParser;
 import com.example.englishtester.common.interf.IDropboxFileLoadService;
 import com.example.englishtester.common.interf.ITxtReaderActivity;
 import com.example.englishtester.common.interf.TxtBufferActivityInterface;
@@ -440,8 +441,8 @@ public class TxtReaderBufferActivity extends FragmentActivity implements FloatVi
             dialog.get().setMessage("讀取中...");
             dialog.get().show();
 
-            final AtomicReference<File> epubFileZ = new AtomicReference<>();
-            epubFileZ.set(epubFile);
+            final AtomicReference<File> txtFileZ = new AtomicReference<>();
+            txtFileZ.set(epubFile);
 
             new Thread(new Runnable() {
 
@@ -461,7 +462,7 @@ public class TxtReaderBufferActivity extends FragmentActivity implements FloatVi
                         public void run() {
                             String titleVal = "";
                             if (title == null) {
-                                titleVal = epubFileZ.get().getName();
+                                titleVal = txtFileZ.get().getName();
                             } else {
                                 titleVal = title;
                             }
@@ -472,9 +473,11 @@ public class TxtReaderBufferActivity extends FragmentActivity implements FloatVi
                     });
                 }
 
-                private void epubProcess() {
+                private void htmlProcess() {
                     try {
-                        File file = epubFileZ.get();
+                        File file = txtFileZ.get();
+
+                        TxtBufferViewerMainHandler.TxtBufferDTO dto = txtBufferViewerMainHandler.getDto();
 
                         //設定書籍 及 初始化
                         txtBufferViewerMainHandler.initBook(file, TxtReaderBufferActivity.this);
@@ -520,12 +523,12 @@ public class TxtReaderBufferActivity extends FragmentActivity implements FloatVi
                 public void run() {
                     try {
                         if (txtFileGetterCall != null) {
-                            epubFileZ.set(txtFileGetterCall.call());
+                            txtFileZ.set(txtFileGetterCall.call());
                         }
 
                         setTitleNameProcess();
 
-                        this.epubProcess();
+                        this.htmlProcess();
                     } catch (Exception ex) {
                         throw new RuntimeException(ex);
                     } finally {
@@ -934,10 +937,6 @@ public class TxtReaderBufferActivity extends FragmentActivity implements FloatVi
         }
 
         protected void setTextViewContent() {
-            long startTime = System.currentTimeMillis();
-
-            pageHolder = txtBufferViewerMainHandler.gotoPosition(position);
-
             handler.post(new Runnable() {
 
                 private void processContent() {
@@ -954,14 +953,18 @@ public class TxtReaderBufferActivity extends FragmentActivity implements FloatVi
 
                 @Override
                 public void run() {
+                    long startTime = System.currentTimeMillis();
+
+                    pageHolder = txtBufferViewerMainHandler.gotoPosition(position);
+
                     this.processContent();
+
+                    my.isDone = true;
+
+                    long duringTime = System.currentTimeMillis() - startTime;
+                    Log.v(TAG, "duringTime : " + duringTime);
                 }
             });
-
-            my.isDone = true;
-
-            long duringTime = System.currentTimeMillis() - startTime;
-            Log.v(TAG, "duringTime : " + duringTime);
         }
     }
 
@@ -1149,6 +1152,32 @@ public class TxtReaderBufferActivity extends FragmentActivity implements FloatVi
 
     public int getCurrentPageIndex() {
         return viewPager.getCurrentItem();
+    }
+
+
+    /*
+     * 取得 dropbox dir images
+     */
+    public void loadingImages(HtmlWordParser wordParser, TxtBufferViewerMainHandler.TxtBufferDTO dto) {
+        for (int ii = 0; ii < 10; ii++)
+            Log.v(TAG, "[HtmlWordParser START]");
+
+        String dropboxPicDir = wordParser.getPicDirForDropbox();
+
+        for (int ii = 0; ii < 10; ii++)
+            Log.v(TAG, "[HtmlWordParser END]");
+
+        Log.v(TAG, "[setTxtContentFromFile] dropboxPicDir = " + dropboxPicDir);
+
+        //設定default pic root dir
+//                        dto.setCacheDir(TxtReaderBufferActivity.this.getCacheDir());
+
+        if (StringUtils.isNotBlank(dropboxPicDir)) {
+            File dropboxPicDirF = dropboxFileLoadService.downloadHtmlReferencePicDir(dropboxPicDir, -1);
+            dto.setDropboxPicDir(dropboxPicDirF);
+        } else {
+            dto.setDropboxPicDir(null);
+        }
     }
 
     // ↓↓↓↓↓↓ 按兩下回前頁-------------------------------------------------------------------

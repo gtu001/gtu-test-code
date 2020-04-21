@@ -1456,7 +1456,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         private transient Runnable scrollRecordApplyer;
         private transient TextView txtView;//傳遞原文View
         private AtomicBoolean bookmarkMode = new AtomicBoolean(false);//是否開啟bookmark mode
-        private AtomicBoolean isImageLoadMode = new AtomicBoolean(true);//是否開啟bookmark mode
+        private AtomicBoolean isImageLoadMode = new AtomicBoolean(true);//是否loading 圖片
         private transient Map<Integer, TxtReaderAppenderSpanClass.WordSpan> bookmarkHolder;
         private AtomicReference<Integer> bookmarkIndexHolder = new AtomicReference<Integer>(-1);
         private File cacheDir;

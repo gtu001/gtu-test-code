@@ -7,9 +7,9 @@ import java.io.File;
 
 public interface IImageLoaderCandidate {
 
-    public boolean isGifFile();
+    boolean isGifFile();
 
-    public Bitmap getResult(int fixWidth);
+    Bitmap getResult(int fixWidth);
 
-    public File getLocalFile();
+    File getLocalFile();
 }

@@ -6,6 +6,7 @@ import com.example.englishtester.common.html.parser.HtmlPdfParser;
 import com.example.englishtester.common.html.parser.HtmlWordParser;
 import com.example.englishtester.common.interf.TxtBufferActivityInterface;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
 
@@ -57,6 +58,10 @@ public class TxtBufferNavigator {
 
             HtmlWordParser wordParser = HtmlWordParser.newInstance();
             String $tempResultContent = wordParser.getFromContent(htmlContent);
+
+            //-------------------------------------------------- 取得 dropbox dir images ↓↓↓↓↓↓
+            txtBufferActivityInterface.loadingImages(wordParser, dto);
+            //-------------------------------------------------- 取得 dropbox dir images ↑↑↑↑↑↑
 
             TxtReaderAppender txtReaderAppender = new TxtReaderAppender(txtBufferActivityInterface, txtBufferActivityInterface.getRecentTxtMarkService(), dto, this.dto.getTxtView());
             Triple<List<TxtReaderAppender.TxtAppenderProcess>, List<String>, List<String>> pageHolder = txtReaderAppender.getAppendTxt_HtmlFromWord_4TxtBuffer(currentInitSpinePos, $tempResultContent, txtBufferActivityInterface.getFixScreenWidth());

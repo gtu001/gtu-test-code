@@ -12,6 +12,7 @@ import com.dropbox.core.v2.DbxClientV2;
 import com.example.englishtester.common.DropboxUtilV2;
 import com.example.englishtester.common.FileUtilGtu;
 import com.example.englishtester.common.MockServiceMacker;
+import com.example.englishtester.common.NetWorkUtil;
 import com.example.englishtester.common.interf.IDropboxFileLoadService;
 
 
@@ -168,7 +169,7 @@ public class DropboxFileLoadService implements IDropboxFileLoadService {
     public static boolean isPicFileType(String name) {
         if (StringUtils.isNotBlank(name) &&
                 name.matches(".*\\.(jpg|jpeg|png|gif|bmp|pcx|tiff|tga|exif|pfx|svg|psd|cdr|pcd|dxf|ufo|eps)")
-                ) {
+        ) {
             return true;
         }
         return false;
@@ -183,6 +184,10 @@ public class DropboxFileLoadService implements IDropboxFileLoadService {
                     File dirFile = new File(context.getCacheDir(), dropboxDirName);
                     if (!dirFile.exists()) {
                         dirFile.mkdirs();
+                    }
+
+                    if (!NetWorkUtil.connectionTest(context)) {
+                        return dirFile;
                     }
 
                     final DbxClientV2 client = getClient();

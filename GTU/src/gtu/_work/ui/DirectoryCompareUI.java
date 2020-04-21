@@ -149,17 +149,17 @@ public class DirectoryCompareUI extends javax.swing.JFrame {
     
     private MouseAdapter pasteEvent = new MouseAdapter() {
         @Override
-        public void mouseClicked(MouseEvent e) {
-            String strVal = ClipboardUtil.getInstance().getContents();
+        public void mouseClicked(final MouseEvent e1) {
+            final String strVal = ClipboardUtil.getInstance().getContents();
             if (StringUtils.isNotBlank(strVal)) {
-                if (JMouseEventUtil.buttonRightClick(1, e)) {
-                    JPopupMenuUtil.newInstance((Component) e.getSource()).addJMenuItem("貼上", new ActionListener() {
+                if (JMouseEventUtil.buttonRightClick(1, e1)) {
+                    JPopupMenuUtil.newInstance((Component) e1.getSource()).addJMenuItem("貼上", new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
-                            JTextArea txt = ((JTextArea) e.getSource());
+                            JTextArea txt = ((JTextArea) e1.getSource());
                             txt.setText(strVal);
                         }
-                    }).applyEvent(e).show();
+                    }).applyEvent(e1).show();
                 }
             }
         }

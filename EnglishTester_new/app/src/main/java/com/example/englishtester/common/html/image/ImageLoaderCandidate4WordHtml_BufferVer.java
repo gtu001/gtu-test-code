@@ -46,11 +46,11 @@ public class ImageLoaderCandidate4WordHtml_BufferVer extends ImageLoaderCandidat
     private File getLocalFile(String filename) {
         try {
             String realName = URLDecoder.decode(filename, HtmlWordParser.WORD_HTML_ENCODE);
-            File localPicFile = new File(dto.getCurrentHtmlFile().getParentFile(), realName);
-            if (localPicFile.exists() && localPicFile.canRead()) {
-                Log.v(TAG, "[check local pic path]" + localPicFile);
-                return localPicFile;
-            }
+//            File localPicFile = new File(dto.getCurrentHtmlFile().getParentFile(), realName);
+//            if (localPicFile.exists() && localPicFile.canRead()) {
+//                Log.v(TAG, "[check local pic path]" + localPicFile);
+//                return localPicFile;
+//            }
 
             if (dto.getDropboxPicDir() == null && realName.contains("/")) {
                 String middleDir = realName.substring(0, realName.lastIndexOf("/"));
@@ -63,7 +63,7 @@ public class ImageLoaderCandidate4WordHtml_BufferVer extends ImageLoaderCandidat
             }
             File dropboxPic = new File(dto.getDropboxPicDir(), imageFileName);
             if (dropboxPic.exists() && dropboxPic.canRead()) {
-                Log.v(TAG, "[check local pic path]" + localPicFile);
+                Log.v(TAG, "[check local pic path]" + dropboxPic);
                 return dropboxPic;
             }
 

@@ -8,6 +8,8 @@ import com.example.englishtester.common.interf.ITxtReaderActivityDTO;
 import com.example.englishtester.common.mobi.base.MobiViewerMainHandler;
 import com.example.englishtester.common.txtbuffer.base.TxtBufferViewerMainHandler;
 
+import java.net.URLDecoder;
+
 /**
  * Created by gtu001 on 2018/8/8.
  */
@@ -30,8 +32,21 @@ public class ImageLoaderFactory {
         return new ImageLoaderFactory(isNeedLoadImage, onlinePicLoader, dto);
     }
 
+    private String decodeUrl(String srcData) {
+        try {
+            srcData = URLDecoder.decode(srcData, "UTF8");
+        } catch (Exception e) {
+            Log.e(TAG, "ERR : pic_url decode = " + e.getMessage(), e);
+        }
+        return srcData;
+    }
+
     public IImageLoaderCandidate getLoader(String srcData, String altData) {
         Log.v(TAG, "#-- getLoader --start");
+
+        srcData = decodeUrl(srcData);
+        altData = decodeUrl(altData);
+
         Log.v(TAG, "srcData - " + srcData);
         Log.v(TAG, "altData - " + altData);
         if (this.dto instanceof TxtReaderActivity.TxtReaderActivityDTO) {

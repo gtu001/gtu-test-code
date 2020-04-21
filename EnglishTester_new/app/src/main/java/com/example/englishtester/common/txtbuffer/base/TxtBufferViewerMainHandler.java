@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
@@ -232,7 +233,10 @@ public class TxtBufferViewerMainHandler {
         private boolean goDirectLink;
         private Stack<Integer> goDirectLinkStack = new Stack<Integer>();
 
+        private AtomicBoolean isImageLoadMode = new AtomicBoolean(true);//是否loading 圖片
+
         private File currentHtmlFile;
+
         private File dropboxPicDir;
 
         private int pageIndex = 0;
@@ -262,7 +266,7 @@ public class TxtBufferViewerMainHandler {
 
         @Override
         public boolean isImageLoadMode() {
-            return false;
+            return isImageLoadMode.get();
         }
 
         public void setFileName(String fname) {
@@ -341,6 +345,10 @@ public class TxtBufferViewerMainHandler {
 
         public File getCurrentHtmlFile() {
             return currentHtmlFile;
+        }
+
+        public void setDropboxPicDir(File dropboxPicDir) {
+            this.dropboxPicDir = dropboxPicDir;
         }
 
         public File getDropboxPicDir(){

@@ -576,6 +576,7 @@ public abstract class HtmlBaseParser {
         while (mth.find()) {
             String spanContent = mth.group();
             spanContent = _step3_imageProc_WordMode(spanContent, isPure, checkPic);
+            spanContent = _step3_imageProc_WordMode2(spanContent, isPure, checkPic);
             spanContent = _step3_imageProc_InternetMode(spanContent, isPure, checkPic);
             spanContent = StringUtil_.appendReplacementEscape(spanContent);
             mth.appendReplacement(sb, spanContent);
@@ -658,6 +659,31 @@ public abstract class HtmlBaseParser {
 
     protected String _step3_imageProc_WordMode(String content, boolean isPure, String checkPic) {
         Pattern titleStylePtn = Pattern.compile("\\<img(?:.|\n)*?src\\=\"((?:.|\n)*?)\"(?:.|\n)*?alt\\=\"描述\\:\\s((?:.|\n)*?)\"(?:.|\n)*?>", Pattern.DOTALL | Pattern.MULTILINE);
+        StringBuffer sb = new StringBuffer();
+        Matcher mth = titleStylePtn.matcher(content);
+        while (mth.find()) {
+            String srcDesc = mth.group(1);
+            String picLink = mth.group(2);
+
+            if (StringUtils.isNotBlank(checkPic) && picLink.contains(checkPic)) {
+                Log.v(TAG, "!!!!!!  <<<_step3_imageProc_WordMode>>> Find Pic : " + checkPic);
+            }
+
+            filterImageDir(srcDesc);
+
+            String repStr = "{{img src:" + srcDesc + ",alt:" + picLink + "}}";
+            if (isPure) {
+                repStr = "";
+            }
+
+            mth.appendReplacement(sb, repStr);
+        }
+        mth.appendTail(sb);
+        return sb.toString();
+    }
+
+    protected String _step3_imageProc_WordMode2(String content, boolean isPure, String checkPic) {
+        Pattern titleStylePtn = Pattern.compile("\\<img(?:.|\n)*?src\\=\"((?:.|\n)*?)\"(?:.|\n)*?alt\\=\"((?:.|\n)*?)\"(?:.|\n)*?>", Pattern.DOTALL | Pattern.MULTILINE);
         StringBuffer sb = new StringBuffer();
         Matcher mth = titleStylePtn.matcher(content);
         while (mth.find()) {
