@@ -168,7 +168,7 @@ public class FastDBQueryUI extends JFrame {
         System.setProperty("db2.jcc.charsetDecoderEncoder", "3");
     }
 
-    private static final File sqlIdListFile = new File(JAR_PATH_FILE, "sqlList.properties");
+    private static File sqlIdListFile = new File(JAR_PATH_FILE, "sqlList.properties");
     private static final File sqlIdListDSMappingFile = new File(JAR_PATH_FILE, "sqlList_DS_Mapping.properties");
     private SqlIdConfigBeanHandler sqlIdConfigBeanHandler;
     private SqlIdListDSMappingHandler sqlIdListDSMappingHandler;
@@ -242,6 +242,8 @@ public class FastDBQueryUI extends JFrame {
     private JButton distinctQueryBtn;
     private JLabel queryResultCountLabel;
     private JButton deleteParameterBtn;
+    private JButton saveParameterTableBtn;
+    private JButton importYamlConfigBtn;
 
     private static AtomicReference<ExternalJDBCDriverJarLoader> externalJDBCDriverJarLoader = new AtomicReference<ExternalJDBCDriverJarLoader>();
     private static AtomicReference<JFrameRGBColorPanel> jFrameRGBColorPanel = new AtomicReference<JFrameRGBColorPanel>();
@@ -1498,6 +1500,24 @@ public class FastDBQueryUI extends JFrame {
         });
         panel_23.add(setFontSizeBtn);
         panel_23.add(exportYamlConfigBtn);
+
+        importYamlConfigBtn = new JButton("匯入yaml設定");
+        importYamlConfigBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    File yamlFile = JCommonUtil._jFileChooser_selectFileOnly();
+                    if (!(yamlFile != null && yamlFile.exists() && yamlFile.getName().endsWith("yml"))) {
+                        JCommonUtil._jOptionPane_showMessageDialog_error("請選擇yml檔");
+                        return;
+                    }
+                    sqlIdConfigBeanHandler.saveYamlToProp(yamlFile, true);
+                    JCommonUtil._jOptionPane_showMessageDialog_info("匯入成功!");
+                } catch (Exception ex) {
+                    JCommonUtil.handleException(ex);
+                }
+            }
+        });
+        panel_23.add(importYamlConfigBtn);
         panel_23.add(saveEtcConfigBtn);
 
         deleteParameterBtn = new JButton("刪除當前參數");
@@ -3713,6 +3733,23 @@ public class FastDBQueryUI extends JFrame {
             init(b.category);
         }
 
+        private void saveYamlToProp(File yamlFile, boolean replaceCurrentConfigFile) {
+            Map<String, Class<?>> classMap = new HashMap<String, Class<?>>();
+            List<SqlIdConfigBean> lst = YamlMapUtil.getInstance().loadFromFile(yamlFile, SqlIdConfigBean.class, classMap);
+
+            File propFile = new File(FileUtil.DESKTOP_DIR, FastDBQueryUI.class.getSimpleName() + "_FromYaml_" + DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMdd_HHmmss") + ".properties");
+            Properties prop = new Properties();
+            for (SqlIdConfigBean bean : lst) {
+                prop.setProperty(bean.getKey(), bean.getValue());
+            }
+            PropertiesUtil.storeProperties(prop, propFile, "");
+            if (replaceCurrentConfigFile) {
+                sqlIdListFile = propFile;
+                sqlIdListProp = prop;
+                init("");
+            }
+        }
+
         private void store() {
             sqlIdListProp.clear();
             for (SqlIdConfigBean bean : lst) {
@@ -3875,6 +3912,35 @@ public class FastDBQueryUI extends JFrame {
                         StringUtils.trimToEmpty(color).equalsIgnoreCase("YELLOW") ? fixStyle : ""//
                 );
             }
+        }
+
+        //getter & setter ----------------------------------------------
+        public void setColor(String color) {
+            this.color = color;
+        }
+
+        public String getColor() {
+            return color;
+        }
+
+        public String getSqlComment() {
+            return sqlComment;
+        }
+
+        public void setCategory(String category) {
+            this.category = category;
+        }
+
+        public void setSqlId(String sqlId) {
+            this.sqlId = sqlId;
+        }
+
+        public void setSql(String sql) {
+            this.sql = sql;
+        }
+
+        public void setSqlComment(String sqlComment) {
+            this.sqlComment = sqlComment;
         }
     }
 
@@ -5307,5 +5373,4 @@ public class FastDBQueryUI extends JFrame {
             }
         }
     };
-    private JButton saveParameterTableBtn;
 }

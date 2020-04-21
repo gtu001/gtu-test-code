@@ -1,11 +1,13 @@
 #!/bin/bash
 
+BASEDIR=$(dirname "$0")
+
 prog_home="./"
-prog_home="/media/gtu001/OLD_D/my_tool/FastDBQueryUI"
+prog_home=${BASEDIR}
 
 cd ${prog_home} 
 
-for lib_path in `ls ${prog_home}/*.exe`
+for lib_path in `find  ${BASEDIR}  -maxdepth  1  -regex  '.*\.(?:exe|jar)' `
 do 
   prog_lib=${prog_lib}:${lib_path}
 done

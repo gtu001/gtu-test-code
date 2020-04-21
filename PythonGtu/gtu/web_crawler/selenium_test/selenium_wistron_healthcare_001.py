@@ -45,9 +45,11 @@ form_one_submit_css_selector = ''
 acct_id_data = 'tp1806005'
 phone_num_data = '0954006788' #0905137990
 
-login_url = "https://wits-rms.wistronits.cn/healthy-tp/login";
-login_url_2 = "https://wits-rms.wistronits.cn/healthy-tp/im011a";
+login_url = "https://wits-rms.wistronits.cn/healthy-tp/login"
+login_url_2 = "https://wits-rms.wistronits.cn/healthy-tp/im011a"
+
 driver = seleniumUtil.getDriver()
+
 work_country_id = 'workProvince'
 work_city_id = 'workCity'
 temperature_id = 'temperatureType0'
@@ -71,23 +73,34 @@ async def login():
 async def login2():
     team_project = driver.find_element_by_id("projectTeam")
     team_project.clear()
-    team_project.send_keys("變數寶典")
+    team_project.send_keys("台灣人壽")
+
     Select(driver.find_element_by_id(work_country_id)).select_by_visible_text('台湾')
     Select(driver.find_element_by_id(work_city_id)).select_by_visible_text('台北')
+
     #溫度 預設通過紅外線
     driver.find_element_by_id(temperature_id).click()
+
     #症狀 預設無症狀
-    ele1 = driver.find_element_by_id(symptomList0_id)
+    # ele1 = driver.find_element_by_id(symptomList0_id)
+    # driver.execute_script("arguments[0].click();", ele1)
+    ele1 = driver.find_element_by_id("symptomList4")
     driver.execute_script("arguments[0].click();", ele1)
+    ele1 = driver.find_element_by_id("symptomList6")
+    driver.execute_script("arguments[0].click();", ele1)
+
     #如有以上症狀 是否就醫 預設否
     if_go_hospital = driver.find_element_by_id(attentionKb0_id)
     driver.execute_script("arguments[0].click();", if_go_hospital)
+
     #家屬是否有異常 預設無,test預設無
     family_status = driver.find_element_by_id(familyStatusKb0_id)
     driver.execute_script("arguments[0].click();", family_status)
+
     #button 提交
     submitBtn = driver.find_element_by_css_selector('div.col-12 > button')
     driver.execute_script("arguments[0].click();", submitBtn)
+
 
 async def main():
     await login()
