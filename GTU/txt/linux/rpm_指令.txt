@@ -10,3 +10,10 @@ rpm -Uvh <package name>
 
 #查詢已經安裝的JAVA與JRE環境
 rpm -qa | grep java
+
+
+---
+安裝 rpm 
+	sudo apt get install alien
+	
+	sudo alien dbeaver-ce-7.0.3-stable.x86_64.rpm 

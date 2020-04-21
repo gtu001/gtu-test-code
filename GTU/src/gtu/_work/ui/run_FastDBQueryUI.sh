@@ -2,14 +2,16 @@
 
 BASEDIR=$(dirname "$0")
 
-prog_home="./"
 prog_home=${BASEDIR}
 
-cd ${prog_home} 
+list=(`find  ${BASEDIR}  -regextype posix-egrep -regex  '.*\.(exe|jar)$'`)
 
-for lib_path in `find  ${BASEDIR}  -maxdepth  1  -regex  '.*\.(?:exe|jar)' `
+printf "list_size = %s\n" "${#list[@]}"
+
+for lib_path in ${list[@]}
 do 
-  prog_lib=${prog_lib}:${lib_path}
+	printf "jar = %s\n" "${lib_path}"
+	prog_lib=${prog_lib}:${lib_path}
 done
 
 java -cp .:${prog_lib}  gtu._work.ui.FastDBQueryUI  $1
