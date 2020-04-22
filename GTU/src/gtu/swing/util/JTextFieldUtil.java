@@ -12,6 +12,7 @@ import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.lang.reflect.Field;
 import java.util.List;
 
 import javax.swing.JTextField;
@@ -19,10 +20,13 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentListener;
+import javax.swing.event.EventListenerList;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
+
+import org.apache.commons.lang3.reflect.FieldUtils;
 
 public class JTextFieldUtil {
 
@@ -155,5 +159,9 @@ public class JTextFieldUtil {
         // text with some padding.
         Dimension size = new Dimension(adv + 2, hgt + 2);
         return size;
+    }
+
+    public static void setText_withoutTriggerChange(JTextComponent textArea, String text) {
+        JTextAreaUtil.setText_withoutTriggerChange(textArea, text);
     }
 }

@@ -11,6 +11,9 @@ import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.io.PrintStream;
 import java.io.StringReader;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.TreeMap;
 
 import javax.swing.JTextArea;
@@ -19,13 +22,17 @@ import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.event.EventListenerList;
+import javax.swing.text.AbstractDocument;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
 import gtu.log.Log;
@@ -296,5 +303,20 @@ public class JTextAreaUtil {
         // of the document by 1 so that text entered at the end of the
         // document uses the attributes.
         doc.setCharacterAttributes(0, doc.getLength() + 1, attrs, false);
+    }
+
+    public static void setText_withoutTriggerChange(JTextComponent textArea, String text) {
+        try {
+            Field field = FieldUtils.getDeclaredField(AbstractDocument.class, "listenerList", true);
+            EventListenerList listenerList = (EventListenerList) field.get(textArea.getDocument());
+            Field field2 = FieldUtils.getDeclaredField(EventListenerList.class, "listenerList", true);
+            Object[] arry = (Object[]) field2.get(listenerList);
+            Object[] emptyArry = new Object[0];
+            field2.set(listenerList, emptyArry);
+            textArea.setText(text);
+            field2.set(listenerList, arry);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

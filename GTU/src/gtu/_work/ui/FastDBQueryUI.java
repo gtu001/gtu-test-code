@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.StringReader;
+import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -69,10 +70,12 @@ import javax.swing.JToggleButton;
 import javax.swing.JToolTip;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
+import javax.swing.event.EventListenerList;
 import javax.swing.event.MenuKeyEvent;
 import javax.swing.event.MenuKeyListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
+import javax.swing.text.AbstractDocument;
 import javax.swing.text.JTextComponent;
 
 import org.apache.commons.collections.Predicate;
@@ -82,6 +85,7 @@ import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
+import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
@@ -2627,7 +2631,10 @@ public class FastDBQueryUI extends JFrame {
         System.out.println("sqlId : " + sqlBean.getUniqueKey());
 
         sqlIdText.setText(sqlBean.sqlId);
-        sqlTextArea.setText(sqlBean.sql);
+        // ---------------------------------------
+        // sqlTextArea.setText(sqlBean.sql);
+        JTextAreaUtil.setText_withoutTriggerChange(sqlTextArea, sqlBean.sql);
+        // ---------------------------------------
         sqlIdCategoryComboBox.setSelectedItem(sqlBean.category);
         sqlIdColorComboBox.setSelectedItem(RefSearchColor.valueFrom(sqlBean.color));
         sqlIdCommentArea.setText(sqlBean.sqlComment);
@@ -3734,10 +3741,14 @@ public class FastDBQueryUI extends JFrame {
         }
 
         private void saveYamlToProp(File yamlFile, boolean replaceCurrentConfigFile) {
+            File propFile = new File(FileUtil.DESKTOP_DIR, "sqlList.properties");
+            if (propFile.exists()) {
+                if (!JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("檔案已存在於桌面 sqlList.properties, 是否要覆蓋?", "是否要覆蓋?")) {
+                    return;
+                }
+            }
             Map<String, Class<?>> classMap = new HashMap<String, Class<?>>();
             List<SqlIdConfigBean> lst = YamlMapUtil.getInstance().loadFromFile(yamlFile, SqlIdConfigBean.class, classMap);
-
-            File propFile = new File(FileUtil.DESKTOP_DIR, FastDBQueryUI.class.getSimpleName() + "_FromYaml_" + DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMdd_HHmmss") + ".properties");
             Properties prop = new Properties();
             for (SqlIdConfigBean bean : lst) {
                 prop.setProperty(bean.getKey(), bean.getValue());
@@ -3914,7 +3925,7 @@ public class FastDBQueryUI extends JFrame {
             }
         }
 
-        //getter & setter ----------------------------------------------
+        // getter & setter ----------------------------------------------
         public void setColor(String color) {
             this.color = color;
         }
@@ -4981,12 +4992,16 @@ public class FastDBQueryUI extends JFrame {
             if (StringUtils.isBlank(tableName)) {
                 return;
             }
-            DbSqlCreater.TableInfo tab = querySchema(tableName);
-            if (tab != null) {
-                List<String> columnLst = getColumnLst(tab);
-                if (!columnLst.isEmpty()) {
-                    showPopup(columnLst);
+            try {
+                DbSqlCreater.TableInfo tab = querySchema(tableName);
+                if (tab != null) {
+                    List<String> columnLst = getColumnLst(tab);
+                    if (!columnLst.isEmpty()) {
+                        showPopup(columnLst);
+                    }
                 }
+            } catch (Exception ex) {
+                ex.printStackTrace();
             }
         }
 
