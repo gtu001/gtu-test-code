@@ -18,6 +18,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollBar;
 import javax.swing.MenuElement;
+import javax.swing.MenuSelectionManager;
 import javax.swing.event.MenuKeyEvent;
 import javax.swing.event.MenuKeyListener;
 

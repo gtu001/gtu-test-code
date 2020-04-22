@@ -162,4 +162,9 @@ public class JPopupMenuUtil {
         }
         return null;
     }
+
+    public void testXXXXXXXXXXXXX() {
+        MenuElement[] me2 = jPopupMenu1.getSubElements();
+        MenuSelectionManager.defaultManager().setSelectedPath(new MenuElement[] { me2[0] });
+    }
 }

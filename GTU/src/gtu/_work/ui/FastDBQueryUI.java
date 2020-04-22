@@ -67,9 +67,6 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.JToolTip;
-import javax.swing.MenuElement;
-import javax.swing.MenuSelectionManager;
-import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.MenuKeyEvent;
@@ -80,6 +77,7 @@ import javax.swing.text.JTextComponent;
 
 import org.apache.commons.collections.Predicate;
 import org.apache.commons.collections.Transformer;
+import org.apache.commons.collections4.map.LRUMap;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.ArrayUtils;
@@ -4921,7 +4919,8 @@ public class FastDBQueryUI extends JFrame {
         String queryText = "";
         String tableAlias = "";
         String columnPrefix = "";
-        Map<String, DbSqlCreater.TableInfo> tabMap = new HashMap<String, DbSqlCreater.TableInfo>();
+        LRUMap<String, DbSqlCreater.TableInfo> tabMap = new LRUMap<String, DbSqlCreater.TableInfo>(20);
+        LRUMap<String, Long> failMap = new LRUMap<String, Long>(100);
         Pair<Integer, Integer> columnIndex;
         int queryTextPos = -1;
         JPopupMenuUtil util;
@@ -4969,11 +4968,15 @@ public class FastDBQueryUI extends JFrame {
                 return false;
             }
             if (util.getJPopupMenu().isShowing() && !util.getMenuList().isEmpty()) {
+                JCommonUtil.focusComponent(util.getJPopupMenu(), false, null);
                 JScrollPopupMenu popup = (JScrollPopupMenu) util.getJPopupMenu();
                 Object select = popup.getCurrentItem();
                 if (select != null) {
                     JCommonUtil.triggerButtonActionPerformed((JMenuItem) select);
                 }
+                
+                util.testXXXXXXXXXXXXX();
+                
                 return true;
             }
             return false;
@@ -5002,16 +5005,18 @@ public class FastDBQueryUI extends JFrame {
             if (StringUtils.isBlank(tableName)) {
                 return;
             }
-            try {
-                DbSqlCreater.TableInfo tab = querySchema(tableName);
-                if (tab != null) {
-                    List<String> columnLst = getColumnLst(tab);
-                    if (!columnLst.isEmpty()) {
-                        showPopup(columnLst);
-                    }
+            if (failMap.containsKey(tableName)) {
+                if (System.currentTimeMillis() - failMap.get(tableName) < 3 * 60 * 1000) {
+                    System.out.println("前次失敗未滿3分鐘 : " + tableName);
+                    return;
                 }
-            } catch (Exception ex) {
-                ex.printStackTrace();
+            }
+            DbSqlCreater.TableInfo tab = querySchema(tableName);
+            if (tab != null) {
+                List<String> columnLst = getColumnLst(tab);
+                if (!columnLst.isEmpty()) {
+                    showPopup(columnLst);
+                }
             }
         }
 
@@ -5106,8 +5111,10 @@ public class FastDBQueryUI extends JFrame {
                 try {
                     tab.execute("select * from " + tableName + " where 1!=1 ", getDataSource().getConnection());
                     tabMap.put(tableName, tab);
-                } catch (Exception e) {
+                    failMap.remove(tableName);
+                } catch (Throwable e) {
                     e.printStackTrace();
+                    failMap.put(tableName, System.currentTimeMillis());
                 }
                 return tab;
             }
