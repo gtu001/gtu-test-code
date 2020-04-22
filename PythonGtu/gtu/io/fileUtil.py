@@ -177,7 +177,7 @@ def loadFileBytes(filePath):
 	return file.read() 
 
 
-def loadFile_asList(filePath, trim=False, distinct=False) :
+def loadFile_asList(filePath, trim=False, distinct=False, ignoreBlankLine=False) :
 	lst = list()
 	if distinct :
 		lst = collections.OrderedDict()
@@ -186,6 +186,8 @@ def loadFile_asList(filePath, trim=False, distinct=False) :
 		if trim :
 			line = line.strip()
 		line = re.sub(r"\n+$", "", line)
+		if ignoreBlankLine and stringUtil.isBlank(line) :
+			continue
 		if not distinct :
 			lst.append(line)
 		else:

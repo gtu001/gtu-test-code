@@ -1,0 +1,250 @@
+LCCont
+保單合同號 ContNo :保單合同流水號，新契約簽單完成時生成，簽單前為PrtNo
+印刷號 PrtNo :新契約錄入開始時生成流水號
+保單保額 Amnt :保單下所有險種保額(主約保額+附約保額)
+保單生效日 CValiDate :保單生效日，為保單周月日基準
+
+
+LCPol
+保單合同號 ContNo :對應LCCont的ContNo
+保單險種號 PolNo :保單險種流水號
+商品險種代碼 :對應LMRisk的RiskCode
+險種類型 RiskType :投資型商品時，區分甲型、乙型使用 甲型: 1，乙型: 2
+險種保額 Amnt :險種約定保額
+保單生效日 CValiDate :保單生效日，為保單周月日基準日
+被保人客戶號碼 InsuredNo :目前險種約定被保人，對應LCPerson的CustomerNo
+被保人生日 InsuredBirthday :由LCInsured帶入，影響投資型商品COI計算
+被保人性別 InsuredSex :由LCInsured帶入，影響投資型商品COI計算
+要保人客戶號碼 AppntNo :對應LCPerson的CustomerNo
+
+
+LCContState
+保單合同號 ContNo :對應LCCont的ContNo
+保單險種號 PolNo :對應LCPol的PolNo
+狀態類型 StateType :紀錄保單險種現在狀態
+狀態 State :表示目前狀態類型的狀態，根據狀態類型具不同定義
+起始日期 StartDate :目前狀態類型起始日期
+終止日期 EndDate :目前狀態類型結束日期
+
+
+LCPolFundBus
+保單合同號 ContNo :對應LCCont的ContNo
+保單險種號 PolNo :對應LCPol的PolNo
+業務類型 BusyType :批註的業務代碼
+業務金額 Money :業務影響金額，不影響為0
+生效狀態 State :批註生效狀態 0 :批註失效，1 :批註生效
+起始日期 StartDate :批註的起始生效日期
+終止日期 EndDate :批註的失效日期
+頻率 Frequency :批次作業的執行評率，執行後以此為根據更新TransDate
+下一執行日 TransDate :批次作業的啟動日期
+
+
+LCPolFundBusDetail
+保單合同號 ContNo :對應LCCont的ContNo
+保單險種號 PolNo :對應LCPol的PolNo
+業務類型 BusyType :批註業務類型
+帳戶代碼 InsuAccNo :基金代碼
+順序 PayOrder :批註業務順序
+
+
+LCPerInvestPlan
+保單合同號 ContNo :對應LCCont的ContNo
+保單險種號 PolNo :對應LCPol的PolNo
+帳戶代碼 InsuAccNo :基金代碼
+繳費責任代碼 PayPlanCode :對應LCPrem的PayPlanCode
+配置比例 InvestRate :基金投入比例
+
+
+LCInsureAcc
+保單合同號 ContNo :對應LCCont的ContNo
+保單險種號 PolNo :對應LCPol的PolNo
+帳戶代碼 InsuAccNo :基金代碼
+幣別 Currency :基金幣別
+單位數 UnitCount :帳戶目前所持單位數
+
+
+LCInsureAccClass
+保單合同號 ContNo :對應LCCont的ContNo
+保單險種號 PolNo :對應LCPol的PolNo
+帳戶分類 PayPlanCode :對應LMRiskAccFund的AccountCode
+帳戶代碼 InsuAccNo :基金代碼
+幣別 Currency :基金幣別
+單位數 UnitCount :帳戶目前所持單位數
+
+
+LCInsureAccTrace
+保單合同號 ContNo :對應LCCont的ContNo
+保單險種號 PolNo :對應LCPol的PolNo
+序列號 SerialNo :系統生成序列號
+帳戶分類 PayPlanCode :對應LMRiskAccFund的AccountCode
+帳戶代碼 InsuAccNo :基金代碼
+幣別 Currency :基金幣別
+單位數 UnitCount :本次交易影響單位數
+金額 Money :本次交易影響金額
+業務類型 BusyType :發生交易的業務類型
+新契約:NB，保全:保全代碼
+金額類型 MoneyType :發生交易類型
+BF:保費，TF:退費，GL:管理費
+業務日期 PayDate :發生交易業務的基準日(T日)
+價格日 ShouldValueDate :應使用的基金價格基準日
+交易狀態 State :表示交易執行狀態 0:未完成，1:已完成
+
+
+LCInsureAccFee
+保單合同號 ContNo :對應LCCont的ContNo
+保單險種號 PolNo :對應LCPol的PolNo
+帳戶代碼 InsuAccNo :基金代碼
+幣別 Currency :基金幣別
+費用金額 Fee :帳戶總計已收取金額
+
+
+
+LCInsureAccClassFee
+保單合同號 ContNo :對應LCCont的ContNo
+保單險種號 PolNo :對應LCPol的PolNo
+帳戶分類 PayPlanCode :對應LMRiskAccFund的AccountCode
+帳戶代碼 InsuAccNo :基金代碼
+幣別 Currency :基金幣別
+費用金額 Fee :帳戶分類總計已收取金額
+費用代碼 FeeCode :費用代碼，對應LMRiskFee的FeeCode
+
+
+
+LCInsureAccFeeTrace
+保單合同號 ContNo :對應LCCont的ContNo
+保單險種號 PolNo :對應LCPol的PolNo
+序列號 SerialNo :系統生成序列號
+帳戶分類 PayPlanCode :對應LMRiskAccFund的AccountCode
+帳戶代碼 InsuAccNo :基金代碼
+幣別 Currency :基金幣別
+費用金額 Fee :本次收取金額
+費用代碼 FeeCode :本次收取費用代碼
+
+
+
+LMRisk
+險種代碼 RiskCode :商品代碼
+險種名稱 RiskName :商品中文名稱
+
+
+
+LMRiskApp
+險種代碼 RiskCode :商品代碼，對應LMRisk的RiskCode
+險種名稱 RiskName :商品中文名稱
+險種分類3 RiskType3 :表示商品種類
+傳統型: 1、投資型 :3
+
+
+
+LMRiskFee
+險種代碼 RiskCode :商品代碼，對應LMRisk的RiskCode
+費用代碼 FeeCode :費用代碼
+費用名稱 FeeName :費用中文名稱
+費用計算代碼 FeeCalCode :對應計算引擎的計算代碼
+費用計算方式 FeeCalMode :表示費用計算方式
+費用收取位置 FeeTakePlace :表示費用收取時機點
+保單周月日: 10
+費用分類 FeeItemType :費用分類
+保費費用: 01、保單管理費: 02、ETF管理費: 04、保險成本: 05
+帳戶代碼 InsuAccNo :ETF管理費對應對應的基金代碼
+繳費責任代碼 PayPlanCode :對應LMDutyPay的PayPlanCode
+
+
+
+LMRiskToAcc
+險種代碼 RiskCode :商品代碼，對應LMRisk的RiskCode
+險種名稱 InsuAccNo :帳戶代碼，對應LMRiskInsuAcc的InsuAccNo
+
+
+
+LMRiskInsuAcc
+帳戶代碼 InsuAccNo :帳戶代碼
+帳戶類型 AccType :表示帳戶類型
+基金帳戶: 007
+帳戶名稱 InsuAccName :帳戶中文名稱
+基金狀態 FundState :表示基金狀態
+正常: 0、關閉: 3
+帳戶幣別 Currency :表示帳戶中金額的幣別
+
+
+
+LOAccUnitPrice
+帳戶代碼 InsuAccNo :對應LMInsuAccRisk的InsuAccNo
+價格日期 StartDate :基金價格對應的日期
+買入價 UnitPriceBuy :基金買入價
+賣出價 UnitPriceSell :基金賣出價
+
+
+
+LMRiskAccFund
+險種代碼 RiskCode :對應LMRiskInsuAcc的InsuAccNo
+繳費責任代碼 PayPlanCode :對應LMDutyPay中PayPlanCode
+帳戶分類代碼 AccountCode :根據帳戶類型定義
+基本帳戶: 000000
+帳戶類型 AccountType : 表示為基本或累積帳戶 基本帳戶: I、累積帳戶: A
+
+
+LMRiskAccPay
+險種代碼 RiskCode :對應LMRiskInsuAcc的InsuAccNo
+帳戶代碼 InsuAccNo :對應LMInsuAccRisk的InsuAccNo
+繳費責任代碼 PayPlanCode :對應LMDutyPay中PayPlanCode
+繳費責任名稱 PayPlanName :繳費責任中文名稱
+
+
+
+LMDutyPay
+繳費責任代碼 PayPlanCode :繳費責任代碼
+繳費責任名稱 PayPlanName :繳費責任中文名稱
+
+
+LMDutyPayRela
+繳費責任代碼 PayPlanCode :對應LMDutyPay的PayPlanCode
+責任代碼 DutyCode :對應LMDuty中的DutyCode
+
+
+
+LMRiskAccGet
+險種代碼 RiskCode :對應LMRiskInsuAcc的InsuAccNo
+帳戶代碼 InsuAccNo :對應LMInsuAccRisk的InsuAccNo
+給付責任代碼 GetDutyCode :對應LMDutyGet中GetDutyCode
+給付責任名稱 GetDutyName :給付責任中文名稱
+
+
+
+LMDutyGet
+給付責任代碼 GetDutyCode :給付責任代碼
+給付責任名稱 GetDutyName :給付責任中文名稱
+
+
+
+LMDutyGetRela
+給付責任代碼 GetDutyCode :對應LMDutyGet的GetDutyCode
+責任代碼 DutyCode :對應LMDuty中的DutyCode
+
+
+
+LMDuty
+責任代碼 DutyCode :責任代碼
+
+
+
+LDCurrency
+幣別代碼 CurrCode :NTD、USD……
+幣別名稱 CurrName :新台幣、美金……
+
+
+
+LDExRate
+外幣幣別 CurrCode :外幣幣別代碼，對應LDCurrency的CurrCode
+本幣幣別 DestCode :本幣幣別代碼，對應LDCurrency的CurrCode
+銀行代碼 BankCode :銀行代碼，表示為中信或三行庫(代碼需求未定)
+匯率類型 ExchType :表示為直接匯率或間接匯率
+買入價 ExchBid :銀行公布之買入價格
+賣出價 ExchOffer :銀行公布之賣出價格
+匯率日期 ExchDate :表示匯率日期
+匯率狀態 Status :表示生效、審核中、錄入(代碼需求未定)
+
+
+
+
+

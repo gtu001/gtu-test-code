@@ -6,15 +6,26 @@ import datetime
 
 '''
 from gtu.io import LogWriter
+
+| 操作模式 | 具体含义                         |
+| -------- | -------------------------------- |
+| `'r'`    | 读取 （默认）                    |
+| `'w'`    | 写入（会先截断之前的内容）       |
+| `'x'`    | 写入，如果文件已经存在会产生异常 |
+| `'a'`    | 追加，将内容写入到已有文件的末尾 |
+| `'b'`    | 二进制模式                       |
+| `'t'`    | 文本模式（默认）                 |
+| `'+'`    | 更新（既可以读又可以写）         |
+
 '''
 
 class LogWriter :
-    def __init__(self, file=None, filename="", mode="a") :
+    def __init__(self, file=None, filename="", mode="a", encoding="UTF8") :
         if stringUtil.isBlank(filename) :
             filename = "log_" + dateUtil.formatDatetimeByJavaFormat(datetime.datetime.now(), "yyyyMMdd_HHmmss") + ".txt"
         if file is None :
             file = fileUtil.getDesktopDir(filename)
-        self.fs = open(file, mode, encoding='UTF8', buffering=30)
+        self.fs = open(file, mode, encoding=encoding, buffering=30)
     def write(self, line):
         self.fs.write(str(line))
         self.fs.flush()
