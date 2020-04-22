@@ -13,6 +13,8 @@ import java.util.List;
 
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
+import javax.swing.MenuElement;
+import javax.swing.MenuSelectionManager;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -142,5 +144,22 @@ public class JPopupMenuUtil {
                 jPopupMenu1.setLocation(x, y);
             }
         }
+    }
+
+    public JMenuItem getCurrentSelectItem() {
+        MenuElement[] path = MenuSelectionManager.defaultManager().getSelectedPath();
+        if (path.length == 0) {
+            System.out.println("No menus are opened or menu items selected");
+        }
+        for (int i = 0; i < path.length; i++) {
+            Component c = path[i].getComponent();
+            if (c instanceof JMenuItem) {
+                JMenuItem mi = (JMenuItem) c;
+                String label = mi.getText();
+                System.out.println("-- select JMenuItem : " + label);
+                return mi;
+            }
+        }
+        return null;
     }
 }

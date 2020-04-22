@@ -25,7 +25,7 @@ public class JComboBoxUtil {
     public static <T> DefaultComboBoxModel createModel() {
         return new DefaultComboBoxModel();
     }
-    
+
     public static <T> DefaultComboBoxModel createModel(T... arry) {
         DefaultComboBoxModel<T> model = new DefaultComboBoxModel<T>();
         for (int ii = 0; ii < arry.length; ii++) {

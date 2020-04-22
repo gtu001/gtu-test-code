@@ -18,7 +18,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.StringReader;
-import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -68,14 +67,15 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.JToolTip;
+import javax.swing.MenuElement;
+import javax.swing.MenuSelectionManager;
+import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
-import javax.swing.event.EventListenerList;
 import javax.swing.event.MenuKeyEvent;
 import javax.swing.event.MenuKeyListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
-import javax.swing.text.AbstractDocument;
 import javax.swing.text.JTextComponent;
 
 import org.apache.commons.collections.Predicate;
@@ -85,7 +85,6 @@ import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
-import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
@@ -550,8 +549,9 @@ public class FastDBQueryUI extends JFrame {
                     isConsume = mSearchAndReplace.findNext(true);
                 } else if (KeyEventUtil.isMaskKeyPress(e, "c") && e.getKeyCode() == KeyEvent.VK_H && mSearchAndReplace != null) {
                     isConsume = mSearchAndReplace.replaceAll();
-                } else if (mSqlTextAreaPromptHandler != null) {
-                    isConsume = mSqlTextAreaPromptHandler.performUpdateLocation();
+                } else if (!isConsume && mSqlTextAreaPromptHandler != null) {
+                    mSqlTextAreaPromptHandler.performUpdateLocation();
+                    isConsume = mSqlTextAreaPromptHandler.checkPopupListFocus(e);
                 }
                 if (isConsume) {
                     e.consume();
@@ -690,6 +690,7 @@ public class FastDBQueryUI extends JFrame {
                 JCommonUtil.triggerButtonActionPerformed(dbNameIdText);
             }
         });
+
         sqlIdPanel.add(sqlPageDbConnCombox);
         sqlIdPanel.add(sqlIdFixNameBtn);
 
@@ -1980,6 +1981,10 @@ public class FastDBQueryUI extends JFrame {
             if (saveSqlIdConfig) {
                 bean = this.saveSqlListProp(bean);
             }
+            // 儲存DS設定
+            if (saveSqlIdConfig) {
+                sqlIdListDSMappingHandler.store(false);// sqlPageDbConnCombox
+            }
 
             // 載入參數設定
             sqlParameterConfigLoadHandler.init(bean.getUniqueKey());
@@ -2163,7 +2168,7 @@ public class FastDBQueryUI extends JFrame {
             saveParameterTableConfig(false);
 
             // 儲存sqlId mapping dataSource 設定
-            sqlIdListDSMappingHandler.store();
+            sqlIdListDSMappingHandler.store(true);
         } catch (Exception ex) {
             queryResultTable.setModel(JTableUtil.createModel(true, "ERROR"));
             String category = refSearchCategoryCombobox_Auto.getTextComponent().getText();
@@ -4617,8 +4622,13 @@ public class FastDBQueryUI extends JFrame {
             PropertiesUtil.storeProperties(sqlIdListDSMappingProp, sqlIdListDSMappingFile, DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMdd HHmmss"));
         }
 
-        private void store() throws IOException {
-            SqlIdConfigBean bean = (SqlIdConfigBean) sqlList.getSelectedValue();
+        private void store(boolean fromSqlLst) throws IOException {
+            SqlIdConfigBean bean = null;
+            if (!fromSqlLst) {
+                bean = (SqlIdConfigBean) sqlList.getSelectedValue();
+            } else {
+                bean = getCurrentEditSqlIdConfigBean();
+            }
             if (bean == null) {
                 return;
             }
@@ -5032,12 +5042,16 @@ public class FastDBQueryUI extends JFrame {
                 @Override
                 public void menuKeyPressed(MenuKeyEvent arg0) {
                     if (arg0.getKeyCode() == 38 || arg0.getKeyCode() == 40) {// 上下
-                    } else {
-                        sqlTextArea.grabFocus();
+                    } else if (arg0.getKeyCode() == KeyEvent.VK_ENTER || arg0.getKeyCode() == KeyEvent.VK_TAB) {
+                        JMenuItem item = null;
+                        if ((item = util.getCurrentSelectItem()) != null) {
+                            JCommonUtil.triggerButtonActionPerformed(item);
+                        }
                     }
                 }
             });
             util.show();
+            sqlTextArea.requestFocus();
         }
 
         private void replaceColumn(String column) {
@@ -5110,6 +5124,19 @@ public class FastDBQueryUI extends JFrame {
                 tableAlias = queryText.replaceAll("\\.+$", "");
                 columnIndex = null;
             }
+        }
+
+        private boolean checkPopupListFocus(KeyEvent arg0) {
+            if (arg0.getKeyCode() == 38 || arg0.getKeyCode() == 40) {// 上下
+                if (util.getJPopupMenu().isShowing()) {
+                    util.getJPopupMenu().dispatchEvent(arg0);
+                }
+                sqlTextArea.requestFocus();
+                return true;
+            } else if (!sqlTextArea.isFocusOwner()) {
+                sqlTextArea.requestFocus();
+            }
+            return false;
         }
     }
 
