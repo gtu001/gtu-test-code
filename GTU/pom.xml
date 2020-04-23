@@ -647,7 +647,7 @@
 			<!-- <systemPath>C:\Program Files\Java\jdk1.8.0_171\jre\lib\ext\jfxrt.jar</systemPath> -->
 			<!-- <systemPath>C:\Program Files\Java\jre1.8.0_211\lib\ext\jfxrt.jar</systemPath> -->
 			<!-- <systemPath>/usr/java/jdk1.8.0_221-amd64/jre/lib/ext/jfxrt.jar</systemPath> -->
-			<systemPath>/usr/java/jdk1.8.0_221-amd64/jre/lib/ext/jfxrt.jar</systemPath> 
+			<systemPath>/media/gtu001/OLD_D/my_tool/jfxrt.jar</systemPath>
 		</dependency>
 
 		<dependency>
@@ -860,8 +860,15 @@
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context</artifactId>
 		</dependency>
-	</dependencies>
 
+		<!-- sqlite -->
+		<dependency>
+			<groupId>org.xerial</groupId>
+			<artifactId>sqlite-jdbc</artifactId>
+			<version>RELEASE</version>
+		</dependency>
+
+	</dependencies>
 
 	<build>
 		<finalName>GTU</finalName>
