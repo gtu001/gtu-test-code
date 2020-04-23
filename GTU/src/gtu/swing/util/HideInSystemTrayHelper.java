@@ -338,18 +338,23 @@ public class HideInSystemTrayHelper {
         }).start();
     }
 
-    public void displayMessage(String caption, String text, MessageType messageType) {
+    public void displayMessage(final String caption, final String text, final MessageType messageType) {
         trayIconHandler.addIfNeed();
         System.out.println("displayMessage : " + caption + " - " + text + " - " + messageType);
 
         try {
             trayIcon.displayMessage(caption, text, messageType);
         } catch (Exception ex) {
-            try {
-                displayMessage4Linux(caption, text, messageType);
-            } catch (Exception ex2) {
-                ex2.printStackTrace();
-            }
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        displayMessage4Linux(caption, text, messageType);
+                    } catch (Exception ex2) {
+                        ex2.printStackTrace();
+                    }
+                }
+            }).start();
         }
         // trayIconHandler.removeIfExists();
     }
