@@ -77,7 +77,7 @@ import javax.swing.text.JTextComponent;
 
 import org.apache.commons.collections.Predicate;
 import org.apache.commons.collections.Transformer;
-import org.apache.commons.collections4.map.LRUMap;
+import org.apache.commons.collections.map.LRUMap;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.ArrayUtils;
@@ -97,6 +97,11 @@ import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
 
+import gtu._work.ui.FastDBQueryUI.EditColumnHistoryHandler;
+import gtu._work.ui.FastDBQueryUI.EtcConfigHandler;
+import gtu._work.ui.FastDBQueryUI.RefSearchListConfigBean;
+import gtu._work.ui.FastDBQueryUI.SqlIdConfigBean;
+import gtu._work.ui.FastDBQueryUI_CrudDlgUI.DataType;
 import gtu._work.ui.JMenuBarUtil.JMenuAppender;
 import gtu.binary.Base64JdkUtil;
 import gtu.clipboard.ClipboardUtil;
@@ -121,28 +126,27 @@ import gtu.spring.SimilarityUtil;
 import gtu.string.StringNumberUtil;
 import gtu.string.StringUtil_;
 import gtu.swing.util.AutoComboBox;
-import gtu.swing.util.AutoComboBox.MatchType;
 import gtu.swing.util.HideInSystemTrayHelper;
 import gtu.swing.util.JButtonGroupUtil;
 import gtu.swing.util.JComboBoxUtil;
 import gtu.swing.util.JCommonUtil;
-import gtu.swing.util.JCommonUtil.HandleDocumentEvent;
 import gtu.swing.util.JFrameRGBColorPanel;
 import gtu.swing.util.JListUtil;
 import gtu.swing.util.JMouseEventUtil;
 import gtu.swing.util.JPopupMenuUtil;
-import gtu.swing.util.JScrollPopupMenu;
 import gtu.swing.util.JTabbedPaneUtil;
 import gtu.swing.util.JTableUtil;
-import gtu.swing.util.JTableUtil.ColumnSearchFilter;
 import gtu.swing.util.JTextAreaUtil;
 import gtu.swing.util.JTextFieldUtil;
 import gtu.swing.util.JTextUndoUtil;
-import gtu.swing.util.JTextFieldUtil.JTextComponentSelectPositionHandler;
 import gtu.swing.util.JTooltipUtil;
 import gtu.swing.util.KeyEventExecuteHandler;
 import gtu.swing.util.KeyEventUtil;
 import gtu.swing.util.SwingTabTemplateUI;
+import gtu.swing.util.AutoComboBox.MatchType;
+import gtu.swing.util.JCommonUtil.HandleDocumentEvent;
+import gtu.swing.util.JTableUtil.ColumnSearchFilter;
+import gtu.swing.util.JTextFieldUtil.JTextComponentSelectPositionHandler;
 import gtu.swing.util.SwingTabTemplateUI.ChangeTabHandlerGtu001;
 import gtu.yaml.util.YamlMapUtil;
 import gtu.yaml.util.YamlUtilBean;
@@ -4933,8 +4937,8 @@ public class FastDBQueryUI extends JFrame {
         String queryText = "";
         String tableAlias = "";
         String columnPrefix = "";
-        LRUMap<String, DbSqlCreater.TableInfo> tabMap = new LRUMap<String, DbSqlCreater.TableInfo>(20);
-        LRUMap<String, Long> failMap = new LRUMap<String, Long>(100);
+        LRUMap tabMap = new LRUMap(20);
+        LRUMap failMap = new LRUMap(100);
         Pair<Integer, Integer> columnIndex;
         int queryTextPos = -1;
         JPopupMenuUtil util;
@@ -5016,7 +5020,7 @@ public class FastDBQueryUI extends JFrame {
             for (int ii = 0; ii < tables.size(); ii++) {
                 String tableName = tables.get(ii);
                 if (failMap.containsKey(tableName)) {
-                    if (System.currentTimeMillis() - failMap.get(tableName) < 3 * 60 * 1000) {
+                    if (System.currentTimeMillis() - (Long)failMap.get(tableName) < 3 * 60 * 1000) {
                         System.out.println("前次失敗未滿3分鐘 : " + tableName);
                         return;
                     }
@@ -5121,7 +5125,7 @@ public class FastDBQueryUI extends JFrame {
 
         private DbSqlCreater.TableInfo querySchema(String tableName) {
             if (tabMap.containsKey(tableName)) {
-                return tabMap.get(tableName);
+                return (DbSqlCreater.TableInfo)tabMap.get(tableName);
             } else {
                 DbSqlCreater.TableInfo tab = new DbSqlCreater.TableInfo();
                 try {

@@ -106,6 +106,7 @@ public class GenCustomSelectMethodUI extends JFrame {
         p33.add(btnClear);
 
         paramTable = new JTable();
+        paramTable.setToolTipText("查詢方法參數表");
         paramTable.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -137,6 +138,7 @@ public class GenCustomSelectMethodUI extends JFrame {
                         FormFactory.DEFAULT_ROWSPEC, }));
 
         methodNameText = new JTextField();
+        methodNameText.setToolTipText("查詢方法名稱");
         panel_1.add(methodNameText, "2, 2, left, center");
         methodNameText.setColumns(10);
 
@@ -148,6 +150,7 @@ public class GenCustomSelectMethodUI extends JFrame {
         sqlTypeRadioGroup = JButtonGroupUtil.createRadioButtonGroup(selectRadio, updateRadio);
 
         sqlArea = new JTextArea();
+        sqlArea.setToolTipText("SQL (PS : 參數表示方式為=>   :param)");
         sqlArea.setPreferredSize(new Dimension(0, 75));
         sqlArea.setBackground(Color.YELLOW);
         JScrollPane jScrollPane1 = new JScrollPane();
@@ -165,6 +168,7 @@ public class GenCustomSelectMethodUI extends JFrame {
 
         JCommonUtil.setJFrameCenter(this);
         JCommonUtil.setJFrameIcon(this, "resource/images/ico/dao.ico");
+        JCommonUtil.defaultToolTipDelay();
     }
 
     private void initModel() {
