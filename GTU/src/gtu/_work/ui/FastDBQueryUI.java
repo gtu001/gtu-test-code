@@ -5111,7 +5111,7 @@ public class FastDBQueryUI extends JFrame {
         private List<String> getTableName(String tableAlias) {
             List<String> tables = new ArrayList<String>();
             String tmpSql = StringUtils.trimToEmpty(sqlTextArea.getText());
-            Pattern ptn = Pattern.compile("[\\s\n]([\\.\\w\\_]+)\\s+" + tableAlias + "[,\\s\n]", Pattern.DOTALL | Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
+            Pattern ptn = Pattern.compile("[\\s\n\t]([\\.\\w\\_]+)\\s+" + tableAlias + "[,\\s\n\t]", Pattern.DOTALL | Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
             Matcher mth = ptn.matcher(tmpSql);
             while (mth.find()) {
                 tables.add(mth.group(1));
