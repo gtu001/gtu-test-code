@@ -168,104 +168,90 @@ public class JTextAreaUtil {
         jtext.setFont(font);
     }
 
-    public static void applyTabKey(final JTextComponent jTextComponent, ActionListener beforePerform) {
-        jTextComponent.addKeyListener(new KeyAdapter() {
+    public static void triggerTabKey(final JTextComponent jTextComponent, final KeyEvent e) {
+        int startPos = jTextComponent.getSelectionStart();
+        int endPos = jTextComponent.getSelectionEnd();
 
-            @Override
-            public void keyPressed(KeyEvent e) {
-                if (beforePerform == null) {
-                    tabKeyProcess(e);
-                } else {
-                    ActionEvent event = new ActionEvent(e, -1, "applyTabKey");
-                    beforePerform.actionPerformed(event);
-                    if (event.getSource() instanceof Boolean) {
-                        Boolean isConsume = (Boolean) event.getSource();
-                        if (isConsume) {
-                            e.consume();
-                        } else {
-                            tabKeyProcess(e);
-                        }
+        boolean isShiftPress = (e.getModifiers() & KeyEvent.SHIFT_MASK) != 0;
+
+        if (e.getKeyCode() == KeyEvent.VK_TAB) {
+
+            if (!isShiftPress) {
+                if (startPos == endPos) {
+                    try {
+                        jTextComponent.getDocument().insertString(startPos, "    ", null);
+                    } catch (BadLocationException e1) {
+                        e1.printStackTrace();
                     }
+                    e.consume();
+                    return;
                 }
             }
 
-            private void tabKeyProcess(KeyEvent e) {
-                int startPos = jTextComponent.getSelectionStart();
-                int endPos = jTextComponent.getSelectionEnd();
+            StringBuilder sb = new StringBuilder(jTextComponent.getText());
 
-                boolean isShiftPress = (e.getModifiers() & KeyEvent.SHIFT_MASK) != 0;
+            TreeMap<Integer, Pair<Integer, Integer>> linePosMap = StringLineNumberHandler.getLinePosMap(sb.toString());
 
-                if (e.getKeyCode() == KeyEvent.VK_TAB) {
+            int startLineNumber = StringLineNumberHandler.getLineNumber(startPos, linePosMap);
+            int endLineNumber = StringLineNumberHandler.getLineNumber(endPos, linePosMap);
+            Pair<Integer, Integer> selectionRange = Pair.of(-1, -1);
 
-                    if (!isShiftPress) {
-                        if (startPos == endPos) {
-                            try {
-                                jTextComponent.getDocument().insertString(startPos, "    ", null);
-                            } catch (BadLocationException e1) {
-                                e1.printStackTrace();
-                            }
-                            e.consume();
-                            return;
-                        }
-                    }
+            if ((startLineNumber != endLineNumber) || isShiftPress) {
+                LineNumberReader reader = null;
+                try {
+                    reader = new LineNumberReader(new StringReader(sb.toString()));
+                    sb.setLength(0);
+                    for (String line = null; (line = reader.readLine()) != null;) {
+                        String changeLine = reader.getLineNumber() == 1 ? "" : "\n";
 
-                    StringBuilder sb = new StringBuilder(jTextComponent.getText());
-
-                    TreeMap<Integer, Pair<Integer, Integer>> linePosMap = StringLineNumberHandler.getLinePosMap(sb.toString());
-
-                    int startLineNumber = StringLineNumberHandler.getLineNumber(startPos, linePosMap);
-                    int endLineNumber = StringLineNumberHandler.getLineNumber(endPos, linePosMap);
-                    Pair<Integer, Integer> selectionRange = Pair.of(-1, -1);
-
-                    if ((startLineNumber != endLineNumber) || isShiftPress) {
-                        LineNumberReader reader = null;
-                        try {
-                            reader = new LineNumberReader(new StringReader(sb.toString()));
-                            sb.setLength(0);
-                            for (String line = null; (line = reader.readLine()) != null;) {
-                                String changeLine = reader.getLineNumber() == 1 ? "" : "\n";
-
-                                if (reader.getLineNumber() >= startLineNumber && reader.getLineNumber() <= endLineNumber) {
-                                    if (!isShiftPress) {
-                                        // 單純按TAB
-                                        sb.append(changeLine + "    ");
-                                        if (selectionRange.getLeft() == -1) {
-                                            selectionRange = Pair.of(sb.length() - 1, -1);
-                                        }
-                                        sb.append(line);
-                                        if (selectionRange.getLeft() != -1) {
-                                            selectionRange = Pair.of(selectionRange.getLeft(), sb.length());
-                                        }
-                                    } else {
-                                        // 按Shift+TAB
-                                        sb.append(changeLine);
-                                        if (selectionRange.getLeft() == -1) {
-                                            selectionRange = Pair.of(sb.length(), -1);
-                                        }
-                                        sb.append(line.replaceAll("^(\\s{0,4}|\t)", ""));
-                                        if (selectionRange.getLeft() != -1) {
-                                            selectionRange = Pair.of(selectionRange.getLeft(), sb.length());
-                                        }
-                                    }
-                                } else {
-                                    sb.append(changeLine + line);
+                        if (reader.getLineNumber() >= startLineNumber && reader.getLineNumber() <= endLineNumber) {
+                            if (!isShiftPress) {
+                                // 單純按TAB
+                                sb.append(changeLine + "    ");
+                                if (selectionRange.getLeft() == -1) {
+                                    selectionRange = Pair.of(sb.length() - 1, -1);
+                                }
+                                sb.append(line);
+                                if (selectionRange.getLeft() != -1) {
+                                    selectionRange = Pair.of(selectionRange.getLeft(), sb.length());
+                                }
+                            } else {
+                                // 按Shift+TAB
+                                sb.append(changeLine);
+                                if (selectionRange.getLeft() == -1) {
+                                    selectionRange = Pair.of(sb.length(), -1);
+                                }
+                                sb.append(line.replaceAll("^(\\s{0,4}|\t)", ""));
+                                if (selectionRange.getLeft() != -1) {
+                                    selectionRange = Pair.of(selectionRange.getLeft(), sb.length());
                                 }
                             }
-                            jTextComponent.setText(sb.toString());
-                            jTextComponent.setSelectionStart(selectionRange.getLeft());
-                            jTextComponent.setSelectionEnd(selectionRange.getRight());
-                            e.consume();
-                        } catch (Exception ex) {
-                            ex.printStackTrace();
-                        } finally {
-                            try {
-                                reader.close();
-                            } catch (IOException e1) {
-                                e1.printStackTrace();
-                            }
+                        } else {
+                            sb.append(changeLine + line);
                         }
                     }
+                    jTextComponent.setText(sb.toString());
+                    jTextComponent.setSelectionStart(selectionRange.getLeft());
+                    jTextComponent.setSelectionEnd(selectionRange.getRight());
+                    e.consume();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                } finally {
+                    try {
+                        reader.close();
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
                 }
+            }
+        }
+    }
+
+    public static void applyTabKey(final JTextComponent jTextComponent) {
+        jTextComponent.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                triggerTabKey(jTextComponent, e);
             }
         });
     }
@@ -283,7 +269,7 @@ public class JTextAreaUtil {
         } catch (Exception ex) {
             JTextUndoUtil.applyUndoProcess2(jTextComponent);
         }
-        JTextAreaUtil.applyTabKey(jTextComponent, null);
+        JTextAreaUtil.applyTabKey(jTextComponent);
     }
 
     /**

@@ -533,21 +533,6 @@ public class FastDBQueryUI extends JFrame {
             } catch (Exception ex) {
                 JTextUndoUtil.applyUndoProcess2(sqlTextArea);
             }
-            JTextAreaUtil.applyTabKey(sqlTextArea, new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e1) {
-                    boolean isConsume = false;
-                    KeyEvent e = (KeyEvent) e1.getSource();
-                    if (e.getKeyCode() == KeyEvent.VK_TAB || e.getKeyCode() == KeyEvent.VK_ENTER && mSqlTextAreaPromptHandler != null) {
-                        isConsume = mSqlTextAreaPromptHandler.performSelectTopColumn();
-                    }
-                    e1.setSource(isConsume);// false = 可正常按 tab, true = 消費掉
-                    if (isConsume) {
-                        e.consume();
-                        System.out.println("-----Consume Tab");
-                    }
-                }
-            });
         }
 
         sqlTextArea.addMouseListener(new MouseAdapter() {
@@ -563,7 +548,10 @@ public class FastDBQueryUI extends JFrame {
                 if (KeyEventUtil.isMaskKeyPress(e, "c") && e.getKeyCode() == KeyEvent.VK_S) {
                     JCommonUtil.triggerButtonActionPerformed(sqlSaveButton);
                 } else if (e.getKeyCode() == KeyEvent.VK_TAB || e.getKeyCode() == KeyEvent.VK_ENTER && mSqlTextAreaPromptHandler != null) {
-                    isConsume = true;
+                    isConsume = mSqlTextAreaPromptHandler.performSelectTopColumn(e);
+                    if (!isConsume) {
+                        JTextAreaUtil.triggerTabKey(sqlTextArea, e);
+                    }
                 } else if (e.getKeyCode() == KeyEvent.VK_ESCAPE && mSqlTextAreaPromptHandler != null) {
                     isConsume = mSqlTextAreaPromptHandler.performSelectClose();
                 } else if (e.getKeyCode() == KeyEvent.VK_UP || e.getKeyCode() == KeyEvent.VK_DOWN && mSqlTextAreaPromptHandler != null) {
@@ -946,7 +934,7 @@ public class FastDBQueryUI extends JFrame {
                 System.out.println(e.getKeyCode() + "..." + KeyEvent.VK_ENTER);
                 if (e.getKeyCode() == KeyEvent.VK_ENTER && queryResultTable.getSelectedRowCount() > 0) {
                     Component source = queryResultTable;
-                    int id = -1;
+                    int id = KeyEvent.KEY_PRESSED;
                     long when = System.currentTimeMillis();
                     int modifiers = 0;
                     int x = 0;
@@ -4984,17 +4972,19 @@ public class FastDBQueryUI extends JFrame {
             }
             if (util.getJPopupMenu().isShowing() && !util.getJPopupMenu().isFocusOwner()) {
                 JCommonUtil.focusComponent(util.getJPopupMenu(), false, null);
+                util.getJPopupMenu().dispatchEvent(e);
                 return true;
             }
             return false;
         }
 
-        public boolean performSelectTopColumn() {
+        public boolean performSelectTopColumn(KeyEvent e2) {
             if (util == null) {
                 return false;
             }
             if (util.getJPopupMenu().isShowing() && !util.getJPopupMenu().isFocusOwner() && !util.getMenuList().isEmpty()) {
                 JCommonUtil.focusComponent(util.getJPopupMenu(), false, null);
+                util.getJPopupMenu().dispatchEvent(e2);// 原生的event才會正確
                 return true;
             }
             return false;
@@ -5019,21 +5009,25 @@ public class FastDBQueryUI extends JFrame {
             } else {
                 return;
             }
-            String tableName = getTableName(tableAlias);
-            if (StringUtils.isBlank(tableName)) {
+            List<String> tables = getTableName(tableAlias);
+            if (tables.isEmpty()) {
                 return;
             }
-            if (failMap.containsKey(tableName)) {
-                if (System.currentTimeMillis() - failMap.get(tableName) < 3 * 60 * 1000) {
-                    System.out.println("前次失敗未滿3分鐘 : " + tableName);
-                    return;
+            for (int ii = 0; ii < tables.size(); ii++) {
+                String tableName = tables.get(ii);
+                if (failMap.containsKey(tableName)) {
+                    if (System.currentTimeMillis() - failMap.get(tableName) < 3 * 60 * 1000) {
+                        System.out.println("前次失敗未滿3分鐘 : " + tableName);
+                        return;
+                    }
                 }
-            }
-            DbSqlCreater.TableInfo tab = querySchema(tableName);
-            if (tab != null) {
-                List<String> columnLst = getColumnLst(tab);
-                if (!columnLst.isEmpty()) {
-                    showPopup(columnLst);
+                DbSqlCreater.TableInfo tab = querySchema(tableName);
+                if (tab != null) {
+                    List<String> columnLst = getColumnLst(tab);
+                    if (!columnLst.isEmpty()) {
+                        showPopup(columnLst);
+                        break;
+                    }
                 }
             }
         }
@@ -5066,9 +5060,12 @@ public class FastDBQueryUI extends JFrame {
                 public void menuKeyPressed(MenuKeyEvent arg0) {
                     if (arg0.getKeyCode() == 38 || arg0.getKeyCode() == 40) {// 上下
                     } else if (arg0.getKeyCode() == KeyEvent.VK_ENTER || arg0.getKeyCode() == KeyEvent.VK_TAB) {
-                        JPopupMenuUtil.setCurrentSelectItem(util.getJPopupMenu(), 0, null);
                         JMenuItem item = null;
                         if ((item = JPopupMenuUtil.getCurrentSelectItem()) != null) {
+                            JCommonUtil.triggerButtonActionPerformed(item);
+                        } else {
+                            JPopupMenuUtil.setCurrentSelectItem(util.getJPopupMenu(), 0, null);
+                            item = JPopupMenuUtil.getCurrentSelectItem();
                             JCommonUtil.triggerButtonActionPerformed(item);
                         }
                     }
@@ -5111,15 +5108,15 @@ public class FastDBQueryUI extends JFrame {
             return columnLst;
         }
 
-        private String getTableName(String tableAlias) {
+        private List<String> getTableName(String tableAlias) {
+            List<String> tables = new ArrayList<String>();
             String tmpSql = StringUtils.trimToEmpty(sqlTextArea.getText());
-            Pattern ptn = Pattern.compile("[\\s\n]([\\.\\w\\_]+)\\s+" + tableAlias + "[\\s\n]", Pattern.DOTALL | Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
+            Pattern ptn = Pattern.compile("[\\s\n]([\\.\\w\\_]+)\\s+" + tableAlias + "[,\\s\n]", Pattern.DOTALL | Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
             Matcher mth = ptn.matcher(tmpSql);
-            String finalTableName = "";
             while (mth.find()) {
-                finalTableName = mth.group(1);
+                tables.add(mth.group(1));
             }
-            return finalTableName;
+            return tables;
         }
 
         private DbSqlCreater.TableInfo querySchema(String tableName) {
