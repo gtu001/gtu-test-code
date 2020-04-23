@@ -12,6 +12,7 @@ import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.Insets;
+import java.awt.KeyboardFocusManager;
 import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -1312,6 +1313,10 @@ public class JCommonUtil {
         }
         // We could not find a device that contains the given point.
         return false;
+    }
+
+    public void focusNext() {
+        KeyboardFocusManager.getCurrentKeyboardFocusManager().focusNextComponent();
     }
 
     public static void main(String[] args) {

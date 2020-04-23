@@ -146,7 +146,9 @@ public class JPopupMenuUtil {
         }
     }
 
-    public JMenuItem getCurrentSelectItem() {
+    // ===============================================================================================================
+
+    public static JMenuItem getCurrentSelectItem() {
         MenuElement[] path = MenuSelectionManager.defaultManager().getSelectedPath();
         if (path.length == 0) {
             System.out.println("No menus are opened or menu items selected");
@@ -163,8 +165,23 @@ public class JPopupMenuUtil {
         return null;
     }
 
-    public void testXXXXXXXXXXXXX() {
+    public static void setCurrentSelectItem(JPopupMenu jPopupMenu1, Integer index, String text) {
         MenuElement[] me2 = jPopupMenu1.getSubElements();
-        MenuSelectionManager.defaultManager().setSelectedPath(new MenuElement[] { me2[0] });
+        MenuElement selectItem = null;
+        for (int ii = 0; ii < me2.length; ii++) {
+            JMenuItem item = (JMenuItem) me2[ii].getComponent();
+            if (index != null && index == ii) {
+                selectItem = me2[ii];
+                break;
+            } else if (text != null && StringUtils.equalsIgnoreCase(text, item.getText())) {
+                selectItem = me2[ii];
+                break;
+            }
+        }
+        if (selectItem != null) {
+            MenuSelectionManager.defaultManager().setSelectedPath(new MenuElement[] { selectItem });
+        } else {
+            System.out.println("無法match所設定項目 : " + index + " / " + text);
+        }
     }
 }

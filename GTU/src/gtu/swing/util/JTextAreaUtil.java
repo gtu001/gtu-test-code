@@ -2,6 +2,8 @@ package gtu.swing.util;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
@@ -12,14 +14,10 @@ import java.io.PipedOutputStream;
 import java.io.PrintStream;
 import java.io.StringReader;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.TreeMap;
 
 import javax.swing.JTextArea;
 import javax.swing.JTextPane;
-import javax.swing.border.Border;
-import javax.swing.border.LineBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.EventListenerList;
@@ -30,7 +28,6 @@ import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -171,11 +168,28 @@ public class JTextAreaUtil {
         jtext.setFont(font);
     }
 
-    public static void applyTabKey(final JTextComponent jTextComponent) {
+    public static void applyTabKey(final JTextComponent jTextComponent, ActionListener beforePerform) {
         jTextComponent.addKeyListener(new KeyAdapter() {
 
             @Override
             public void keyPressed(KeyEvent e) {
+                if (beforePerform == null) {
+                    tabKeyProcess(e);
+                } else {
+                    ActionEvent event = new ActionEvent(e, -1, "applyTabKey");
+                    beforePerform.actionPerformed(event);
+                    if (event.getSource() instanceof Boolean) {
+                        Boolean isConsume = (Boolean) event.getSource();
+                        if (isConsume) {
+                            e.consume();
+                        } else {
+                            tabKeyProcess(e);
+                        }
+                    }
+                }
+            }
+
+            private void tabKeyProcess(KeyEvent e) {
                 int startPos = jTextComponent.getSelectionStart();
                 int endPos = jTextComponent.getSelectionEnd();
 
@@ -269,7 +283,7 @@ public class JTextAreaUtil {
         } catch (Exception ex) {
             JTextUndoUtil.applyUndoProcess2(jTextComponent);
         }
-        JTextAreaUtil.applyTabKey(jTextComponent);
+        JTextAreaUtil.applyTabKey(jTextComponent, null);
     }
 
     /**

@@ -137,6 +137,7 @@ import gtu.swing.util.JTableUtil;
 import gtu.swing.util.JTableUtil.ColumnSearchFilter;
 import gtu.swing.util.JTextAreaUtil;
 import gtu.swing.util.JTextFieldUtil;
+import gtu.swing.util.JTextUndoUtil;
 import gtu.swing.util.JTextFieldUtil.JTextComponentSelectPositionHandler;
 import gtu.swing.util.JTooltipUtil;
 import gtu.swing.util.KeyEventExecuteHandler;
@@ -520,7 +521,35 @@ public class FastDBQueryUI extends JFrame {
         panel_2.setLayout(new BorderLayout(0, 0));
 
         sqlTextArea = new JTextArea();
-        JTextAreaUtil.applyCommonSetting(sqlTextArea, false);
+        sqlTextArea.setFocusTraversalKeysEnabled(false);
+
+        // JTextAreaUtil.applyCommonSetting(sqlTextArea, false);
+        {
+            if (true) {
+                JTextAreaUtil.applyFont(sqlTextArea);
+            }
+            try {
+                JTextUndoUtil.applyUndoProcess1(sqlTextArea);
+            } catch (Exception ex) {
+                JTextUndoUtil.applyUndoProcess2(sqlTextArea);
+            }
+            JTextAreaUtil.applyTabKey(sqlTextArea, new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e1) {
+                    boolean isConsume = false;
+                    KeyEvent e = (KeyEvent) e1.getSource();
+                    if (e.getKeyCode() == KeyEvent.VK_TAB || e.getKeyCode() == KeyEvent.VK_ENTER && mSqlTextAreaPromptHandler != null) {
+                        isConsume = mSqlTextAreaPromptHandler.performSelectTopColumn();
+                    }
+                    e1.setSource(isConsume);// false = 可正常按 tab, true = 消費掉
+                    if (isConsume) {
+                        e.consume();
+                        System.out.println("-----Consume Tab");
+                    }
+                }
+            });
+        }
+
         sqlTextArea.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -534,7 +563,7 @@ public class FastDBQueryUI extends JFrame {
                 if (KeyEventUtil.isMaskKeyPress(e, "c") && e.getKeyCode() == KeyEvent.VK_S) {
                     JCommonUtil.triggerButtonActionPerformed(sqlSaveButton);
                 } else if (e.getKeyCode() == KeyEvent.VK_TAB || e.getKeyCode() == KeyEvent.VK_ENTER && mSqlTextAreaPromptHandler != null) {
-                    isConsume = mSqlTextAreaPromptHandler.performSelectTopColumn();
+                    isConsume = true;
                 } else if (e.getKeyCode() == KeyEvent.VK_ESCAPE && mSqlTextAreaPromptHandler != null) {
                     isConsume = mSqlTextAreaPromptHandler.performSelectClose();
                 } else if (e.getKeyCode() == KeyEvent.VK_UP || e.getKeyCode() == KeyEvent.VK_DOWN && mSqlTextAreaPromptHandler != null) {
@@ -553,11 +582,8 @@ public class FastDBQueryUI extends JFrame {
                 }
                 if (isConsume) {
                     e.consume();
+                    System.out.println("-----Consume");
                 }
-            }
-
-            @Override
-            public void keyReleased(KeyEvent e) {
             }
         });
         sqlTextArea.getDocument().addDocumentListener(JCommonUtil.getDocumentListener(new HandleDocumentEvent() {
@@ -4967,16 +4993,8 @@ public class FastDBQueryUI extends JFrame {
             if (util == null) {
                 return false;
             }
-            if (util.getJPopupMenu().isShowing() && !util.getMenuList().isEmpty()) {
+            if (util.getJPopupMenu().isShowing() && !util.getJPopupMenu().isFocusOwner() && !util.getMenuList().isEmpty()) {
                 JCommonUtil.focusComponent(util.getJPopupMenu(), false, null);
-                JScrollPopupMenu popup = (JScrollPopupMenu) util.getJPopupMenu();
-                Object select = popup.getCurrentItem();
-                if (select != null) {
-                    JCommonUtil.triggerButtonActionPerformed((JMenuItem) select);
-                }
-                
-                util.testXXXXXXXXXXXXX();
-                
                 return true;
             }
             return false;
@@ -5048,8 +5066,9 @@ public class FastDBQueryUI extends JFrame {
                 public void menuKeyPressed(MenuKeyEvent arg0) {
                     if (arg0.getKeyCode() == 38 || arg0.getKeyCode() == 40) {// 上下
                     } else if (arg0.getKeyCode() == KeyEvent.VK_ENTER || arg0.getKeyCode() == KeyEvent.VK_TAB) {
+                        JPopupMenuUtil.setCurrentSelectItem(util.getJPopupMenu(), 0, null);
                         JMenuItem item = null;
-                        if ((item = util.getCurrentSelectItem()) != null) {
+                        if ((item = JPopupMenuUtil.getCurrentSelectItem()) != null) {
                             JCommonUtil.triggerButtonActionPerformed(item);
                         }
                     }
@@ -5141,6 +5160,9 @@ public class FastDBQueryUI extends JFrame {
                 sqlTextArea.requestFocus();
                 return true;
             } else if (!sqlTextArea.isFocusOwner()) {
+                if (util.getJPopupMenu().isShowing()) {
+                    util.getJPopupMenu().dispatchEvent(arg0);
+                }
                 sqlTextArea.requestFocus();
             }
             return false;
