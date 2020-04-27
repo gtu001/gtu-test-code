@@ -3,6 +3,11 @@
 	Ctrl + R
 	
 
-	
+排版
+---
+	alt + shift + F
+
+
+
 	
 

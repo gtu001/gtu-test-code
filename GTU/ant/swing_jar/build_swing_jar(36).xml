@@ -91,6 +91,7 @@
 			<packagename mode="small">org.apache.poi.xssf.usermodel.XSSFWorkbook</packagename>
 
 			<packagename mode="exact" name="snakeyaml-1.21.jar">org.yaml.snakeyaml.DumperOptions</packagename>
+			
 		</jarfinder>
 
 		<!-- 特別指定要使用的jar檔 -->
