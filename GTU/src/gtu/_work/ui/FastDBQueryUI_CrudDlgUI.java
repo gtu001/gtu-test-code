@@ -732,10 +732,17 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                     df.isPk = false;
                 }
 
-                for (String columnName : tableInfo.getColumnInfo().keySet()) {
-                    FieldInfo4DbSqlCreater info = tableInfo.getColumnInfo().get(columnName);
-                    if (rowMap.get().containsKey(columnName)) {
-                        rowMap.get().get(columnName).maxLength = info.getColumnDisplaySize();
+                for (String rowColumnName : rowMap.get().keySet()) {
+                    boolean findOk = false;
+                    for (String columnName : tableInfo.getColumnInfo().keySet()) {
+                        if (StringUtils.equals(rowColumnName, columnName)) {
+                            FieldInfo4DbSqlCreater info = tableInfo.getColumnInfo().get(columnName);
+                            rowMap.get().get(rowColumnName).maxLength = info.getColumnDisplaySize();
+                            findOk = true;
+                        }
+                    }
+                    if (!findOk) {
+                        rowMap.get().get(rowColumnName).maxLength = null;
                     }
                 }
 
