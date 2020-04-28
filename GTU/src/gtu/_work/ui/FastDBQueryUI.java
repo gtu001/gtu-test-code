@@ -529,11 +529,7 @@ public class FastDBQueryUI extends JFrame {
             if (true) {
                 JTextAreaUtil.applyFont(sqlTextArea);
             }
-            try {
-                JTextUndoUtil.applyUndoProcess1(sqlTextArea);
-            } catch (Exception ex) {
-                JTextUndoUtil.applyUndoProcess2(sqlTextArea);
-            }
+            JTextUndoUtil.applyUndoProcess2(sqlTextArea);
         }
 
         sqlTextArea.addMouseListener(new MouseAdapter() {
