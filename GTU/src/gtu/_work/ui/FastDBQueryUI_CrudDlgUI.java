@@ -237,7 +237,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
     }
 
     public static FastDBQueryUI_CrudDlgUI newInstance(final List<Map<String, Object>> rowMapLst, final String tableNSchema, final Triple<List<String>, List<Class<?>>, List<Object[]>> queryList,
-            ActionListener onCloseListener, final FastDBQueryUI _parent) {
+            final ActionListener onCloseListener, final FastDBQueryUI _parent) {
         try {
             final FastDBQueryUI_CrudDlgUI dialog = new FastDBQueryUI_CrudDlgUI(_parent);
             dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);

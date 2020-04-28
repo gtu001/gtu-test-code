@@ -52,8 +52,8 @@ public class FastDBQueryUI_UpdateSqlArea extends JDialog {
         });
     }
 
-    public static FastDBQueryUI_UpdateSqlArea newInstance(String title, List<String> sqlText, boolean jFrameRGBColorPanel_isStop, ActionListener onCloseListener) {
-        FastDBQueryUI_UpdateSqlArea dialog = new FastDBQueryUI_UpdateSqlArea();
+    public static FastDBQueryUI_UpdateSqlArea newInstance(String title, List<String> sqlText, boolean jFrameRGBColorPanel_isStop, final ActionListener onCloseListener) {
+        final FastDBQueryUI_UpdateSqlArea dialog = new FastDBQueryUI_UpdateSqlArea();
         dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         dialog.setVisible(true);
 

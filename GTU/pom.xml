@@ -305,12 +305,6 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.xhtmlrenderer</groupId>
-			<artifactId>flying-saucer-pdf-itext5</artifactId>
-			<version>9.0.1</version>
-		</dependency>
-
-		<dependency>
 			<!-- javax.ws.rs-api-2.0.jar -->
 			<groupId>javax.ws.rs</groupId>
 			<artifactId>javax.ws.rs-api</artifactId>
@@ -348,6 +342,18 @@
 			<groupId>com.itextpdf</groupId>
 			<artifactId>itextpdf</artifactId>
 			<version>5.1.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.itextpdf</groupId>
+			<artifactId>itext-asian</artifactId>
+			<version>5.2.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.itextpdf</groupId>
+			<artifactId>html2pdf</artifactId>
+			<version>2.1.4</version>
 		</dependency>
 
 		<dependency>
@@ -653,7 +659,7 @@
 			<!-- <systemPath>C:\Program Files\Java\jdk1.8.0_171\jre\lib\ext\jfxrt.jar</systemPath> -->
 			<!-- <systemPath>C:\Program Files\Java\jre1.8.0_211\lib\ext\jfxrt.jar</systemPath> -->
 			<!-- <systemPath>/usr/java/jdk1.8.0_221-amd64/jre/lib/ext/jfxrt.jar</systemPath> -->
-			<systemPath>/media/gtu001/OLD_D/my_tool/jfxrt.jar</systemPath>
+			<systemPath>C:\Program Files\Java\jdk1.8.0_171\jre\lib\ext\jfxrt.jar</systemPath>
 		</dependency>
 
 		<dependency>

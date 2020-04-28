@@ -72,9 +72,9 @@ public class FastDBQueryUI_RowCompareDlg extends JDialog {
         }
     }
 
-    public static FastDBQueryUI_RowCompareDlg newInstance(String schemaTable, int selectRowIndex, Pair<List<String>, List<Object[]>> excelImportLst, ActionListener onCloseListener,
+    public static FastDBQueryUI_RowCompareDlg newInstance(String schemaTable, int selectRowIndex, Pair<List<String>, List<Object[]>> excelImportLst, final ActionListener onCloseListener,
             FastDBQueryUI _parent) {
-        FastDBQueryUI_RowCompareDlg dialog = new FastDBQueryUI_RowCompareDlg();
+        final FastDBQueryUI_RowCompareDlg dialog = new FastDBQueryUI_RowCompareDlg();
         try {
             dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
             dialog.setVisible(true);

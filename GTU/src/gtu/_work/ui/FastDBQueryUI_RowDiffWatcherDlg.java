@@ -47,9 +47,9 @@ public class FastDBQueryUI_RowDiffWatcherDlg extends JDialog {
         });
     }
 
-    public static FastDBQueryUI_RowDiffWatcherDlg newInstance(List<String> titleLst, ActionListener okButtonAction, ActionListener onCloseListener) {
+    public static FastDBQueryUI_RowDiffWatcherDlg newInstance(List<String> titleLst, ActionListener okButtonAction, final ActionListener onCloseListener) {
         try {
-            FastDBQueryUI_RowDiffWatcherDlg dialog = new FastDBQueryUI_RowDiffWatcherDlg(titleLst);
+            final FastDBQueryUI_RowDiffWatcherDlg dialog = new FastDBQueryUI_RowDiffWatcherDlg(titleLst);
             dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
             dialog.setVisible(true);
             dialog.okButtonAction = okButtonAction;

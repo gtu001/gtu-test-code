@@ -5487,7 +5487,7 @@ public class FastDBQueryUI extends JFrame {
                 if (map.isEmpty()) {
                     break;
                 }
-                JDialog dlg = (JDialog) map.get(map.firstKey());
+                final JDialog dlg = (JDialog) map.get(map.firstKey());
                 if (!dlg.isVisible()) {
                     map.remove(map.firstKey());
                 }
