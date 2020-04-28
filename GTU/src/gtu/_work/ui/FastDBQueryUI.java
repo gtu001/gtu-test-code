@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.EventQueue;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -97,11 +98,6 @@ import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
 
-import gtu._work.ui.FastDBQueryUI.EditColumnHistoryHandler;
-import gtu._work.ui.FastDBQueryUI.EtcConfigHandler;
-import gtu._work.ui.FastDBQueryUI.RefSearchListConfigBean;
-import gtu._work.ui.FastDBQueryUI.SqlIdConfigBean;
-import gtu._work.ui.FastDBQueryUI_CrudDlgUI.DataType;
 import gtu._work.ui.JMenuBarUtil.JMenuAppender;
 import gtu.binary.Base64JdkUtil;
 import gtu.clipboard.ClipboardUtil;
@@ -126,27 +122,27 @@ import gtu.spring.SimilarityUtil;
 import gtu.string.StringNumberUtil;
 import gtu.string.StringUtil_;
 import gtu.swing.util.AutoComboBox;
+import gtu.swing.util.AutoComboBox.MatchType;
 import gtu.swing.util.HideInSystemTrayHelper;
 import gtu.swing.util.JButtonGroupUtil;
 import gtu.swing.util.JComboBoxUtil;
 import gtu.swing.util.JCommonUtil;
+import gtu.swing.util.JCommonUtil.HandleDocumentEvent;
 import gtu.swing.util.JFrameRGBColorPanel;
 import gtu.swing.util.JListUtil;
 import gtu.swing.util.JMouseEventUtil;
 import gtu.swing.util.JPopupMenuUtil;
 import gtu.swing.util.JTabbedPaneUtil;
 import gtu.swing.util.JTableUtil;
+import gtu.swing.util.JTableUtil.ColumnSearchFilter;
 import gtu.swing.util.JTextAreaUtil;
 import gtu.swing.util.JTextFieldUtil;
+import gtu.swing.util.JTextFieldUtil.JTextComponentSelectPositionHandler;
 import gtu.swing.util.JTextUndoUtil;
 import gtu.swing.util.JTooltipUtil;
 import gtu.swing.util.KeyEventExecuteHandler;
 import gtu.swing.util.KeyEventUtil;
 import gtu.swing.util.SwingTabTemplateUI;
-import gtu.swing.util.AutoComboBox.MatchType;
-import gtu.swing.util.JCommonUtil.HandleDocumentEvent;
-import gtu.swing.util.JTableUtil.ColumnSearchFilter;
-import gtu.swing.util.JTextFieldUtil.JTextComponentSelectPositionHandler;
 import gtu.swing.util.SwingTabTemplateUI.ChangeTabHandlerGtu001;
 import gtu.yaml.util.YamlMapUtil;
 import gtu.yaml.util.YamlUtilBean;
@@ -337,6 +333,7 @@ public class FastDBQueryUI extends JFrame {
     private JToggleButton recordWatcherToggleBtn;
     private JCheckBox rowFilterTextKeepMatchChk;
     private JButton resetQueryBtn;
+    private JDlgHolderBringToFrontHandler mJDlgHolderBringToFrontHandler;
 
     /**
      * Launch the application.
@@ -1597,11 +1594,21 @@ public class FastDBQueryUI extends JFrame {
             }
         });
 
+        queryResultTable.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                if (mJDlgHolderBringToFrontHandler != null) {
+                    mJDlgHolderBringToFrontHandler.bringToFront();
+                }
+            }
+        });
+
         // -----------------------------------------------------------------------------------------------
         // -----------------------------------------------------------------------------------------------
         {
             sqlIdConfigBeanHandler = new SqlIdConfigBeanHandler();
             sqlIdListDSMappingHandler = new SqlIdListDSMappingHandler();
+            mJDlgHolderBringToFrontHandler = new JDlgHolderBringToFrontHandler();
 
             // 初始化datasource
             this.initDataSourceProperties(null);
@@ -2851,7 +2858,13 @@ public class FastDBQueryUI extends JFrame {
                         allRows = queryList;
                     }
 
-                    fastDBQueryUI_CrudDlgUI = FastDBQueryUI_CrudDlgUI.newInstance(rowMapLst, getRandom_TableNSchema(), allRows, FastDBQueryUI.this);
+                    fastDBQueryUI_CrudDlgUI = FastDBQueryUI_CrudDlgUI.newInstance(rowMapLst, getRandom_TableNSchema(), allRows, new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            mJDlgHolderBringToFrontHandler.remove((JDialog) e.getSource());
+                        }
+                    }, FastDBQueryUI.this);
+                    mJDlgHolderBringToFrontHandler.add(fastDBQueryUI_CrudDlgUI);
                 }
 
                 void openXLS_COMPARE() throws SQLException, Exception {
@@ -2869,7 +2882,13 @@ public class FastDBQueryUI extends JFrame {
 
                     int selectRowIndex = queryResultTable.getSelectedRow();
 
-                    fastDBQueryUI_RowCompareDlg = FastDBQueryUI_RowCompareDlg.newInstance(shemaTable, selectRowIndex, excelImportLst, FastDBQueryUI.this);
+                    fastDBQueryUI_RowCompareDlg = FastDBQueryUI_RowCompareDlg.newInstance(shemaTable, selectRowIndex, excelImportLst, new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            mJDlgHolderBringToFrontHandler.remove((JDialog) e.getSource());
+                        }
+                    }, FastDBQueryUI.this);
+                    mJDlgHolderBringToFrontHandler.add(fastDBQueryUI_RowCompareDlg);
                 }
 
                 void start() throws Exception {
@@ -5020,7 +5039,7 @@ public class FastDBQueryUI extends JFrame {
             for (int ii = 0; ii < tables.size(); ii++) {
                 String tableName = tables.get(ii);
                 if (failMap.containsKey(tableName)) {
-                    if (System.currentTimeMillis() - (Long)failMap.get(tableName) < 3 * 60 * 1000) {
+                    if (System.currentTimeMillis() - (Long) failMap.get(tableName) < 3 * 60 * 1000) {
                         System.out.println("前次失敗未滿3分鐘 : " + tableName);
                         return;
                     }
@@ -5125,7 +5144,7 @@ public class FastDBQueryUI extends JFrame {
 
         private DbSqlCreater.TableInfo querySchema(String tableName) {
             if (tabMap.containsKey(tableName)) {
-                return (DbSqlCreater.TableInfo)tabMap.get(tableName);
+                return (DbSqlCreater.TableInfo) tabMap.get(tableName);
             } else {
                 DbSqlCreater.TableInfo tab = new DbSqlCreater.TableInfo();
                 try {
@@ -5317,7 +5336,7 @@ public class FastDBQueryUI extends JFrame {
                 if (mRecordWatcher.get() != null && //
                         (mRecordWatcher.get().getState() == Thread.State.NEW)) {
                     allOk = true;
-                    FastDBQueryUI_RowDiffWatcherDlg.newInstance(this.queryList.getLeft(), new ActionListener() {
+                    FastDBQueryUI_RowDiffWatcherDlg mFastDBQueryUI_RowDiffWatcherDlg = FastDBQueryUI_RowDiffWatcherDlg.newInstance(this.queryList.getLeft(), new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
                             FastDBQueryUI_RowDiffWatcherDlg dlg = (FastDBQueryUI_RowDiffWatcherDlg) e.getSource();
@@ -5338,7 +5357,13 @@ public class FastDBQueryUI extends JFrame {
                                 recordWatcherToggleBtn.setText("監聽on");
                             }
                         }
+                    }, new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            mJDlgHolderBringToFrontHandler.remove((JDialog) e.getSource());
+                        }
                     });
+                    mJDlgHolderBringToFrontHandler.add(mFastDBQueryUI_RowDiffWatcherDlg);
                 }
             }
             if (!allOk) {
@@ -5445,4 +5470,34 @@ public class FastDBQueryUI extends JFrame {
             }
         }
     };
+
+    private class JDlgHolderBringToFrontHandler {
+        LRUMap map = new LRUMap(10);
+
+        public void add(JDialog dlg) {
+            map.put(dlg.getClass(), dlg);
+        }
+
+        public void remove(JDialog dlg) {
+            map.remove(dlg.getClass());
+        }
+
+        public void bringToFront() {
+            for (;;) {
+                if (map.isEmpty()) {
+                    break;
+                }
+                JDialog dlg = (JDialog) map.get(map.firstKey());
+                if (!dlg.isVisible()) {
+                    map.remove(map.firstKey());
+                }
+                EventQueue.invokeLater(new Runnable() {
+                    public void run() {
+                        JCommonUtil.setFrameAtop(dlg, false);
+                    }
+                });
+                break;
+            }
+        }
+    }
 }

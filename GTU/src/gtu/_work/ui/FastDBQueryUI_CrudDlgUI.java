@@ -237,7 +237,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
     }
 
     public static FastDBQueryUI_CrudDlgUI newInstance(final List<Map<String, Object>> rowMapLst, final String tableNSchema, final Triple<List<String>, List<Class<?>>, List<Object[]>> queryList,
-            final FastDBQueryUI _parent) {
+            ActionListener onCloseListener, final FastDBQueryUI _parent) {
         try {
             final FastDBQueryUI_CrudDlgUI dialog = new FastDBQueryUI_CrudDlgUI(_parent);
             dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -466,7 +466,13 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                             if (updateSqlLst.isEmpty()) {
                                 return;
                             }
-                            final FastDBQueryUI_UpdateSqlArea updateDlg = FastDBQueryUI_UpdateSqlArea.newInstance("確定執行以下SQL:", updateSqlLst, _parent.getjFrameRGBColorPanel().isStop());
+                            final FastDBQueryUI_UpdateSqlArea updateDlg = FastDBQueryUI_UpdateSqlArea.newInstance("確定執行以下SQL:", updateSqlLst, _parent.getjFrameRGBColorPanel().isStop(),
+                                    new ActionListener() {
+                                        @Override
+                                        public void actionPerformed(ActionEvent e) {
+                                            System.out.println("## FastDBQueryUI_UpdateSqlArea close !!");
+                                        }
+                                    });
                             updateDlg.setConfirmDo(new ActionListener() {
                                 @Override
                                 public void actionPerformed(ActionEvent e) {
@@ -585,6 +591,17 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                 dialog.tableAndSchemaText.setText(StringUtils.trimToEmpty(tableNSchema));
                 dialog.tableAndSchemaText_focusLost_action(dialog.tableAndSchemaText);
             }
+
+            dialog.addWindowListener(new WindowAdapter() {
+                public void windowClosed(WindowEvent e) {
+                    if (onCloseListener != null) {
+                        onCloseListener.actionPerformed(new ActionEvent(dialog, -1, "close"));
+                    }
+                }
+
+                public void windowClosing(WindowEvent e) {
+                }
+            });
 
             return dialog;
         } catch (Exception e) {

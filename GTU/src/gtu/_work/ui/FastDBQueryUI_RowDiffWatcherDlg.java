@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -37,15 +39,31 @@ public class FastDBQueryUI_RowDiffWatcherDlg extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 System.out.println(((FastDBQueryUI_RowDiffWatcherDlg) e.getSource()).getPkLst());
             }
+        }, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.out.println(((FastDBQueryUI_RowDiffWatcherDlg) e.getSource()).getPkLst());
+            }
         });
     }
 
-    public static FastDBQueryUI_RowDiffWatcherDlg newInstance(List<String> titleLst, ActionListener okButtonAction) {
+    public static FastDBQueryUI_RowDiffWatcherDlg newInstance(List<String> titleLst, ActionListener okButtonAction, ActionListener onCloseListener) {
         try {
             FastDBQueryUI_RowDiffWatcherDlg dialog = new FastDBQueryUI_RowDiffWatcherDlg(titleLst);
             dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
             dialog.setVisible(true);
             dialog.okButtonAction = okButtonAction;
+
+            dialog.addWindowListener(new WindowAdapter() {
+                public void windowClosed(WindowEvent e) {
+                    if (onCloseListener != null) {
+                        onCloseListener.actionPerformed(new ActionEvent(dialog, -1, "close"));
+                    }
+                }
+
+                public void windowClosing(WindowEvent e) {
+                }
+            });
             JCommonUtil.setFrameAtop(dialog, true);
             return dialog;
         } catch (Exception e) {

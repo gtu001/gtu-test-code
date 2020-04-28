@@ -5,6 +5,8 @@ import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -42,10 +44,15 @@ public class FastDBQueryUI_UpdateSqlArea extends JDialog {
      * Launch the application.
      */
     public static void main(String[] args) {
-        FastDBQueryUI_UpdateSqlArea.newInstance("XXXX", Arrays.asList("1111", "eeeee"), false);
+        FastDBQueryUI_UpdateSqlArea.newInstance("XXXX", Arrays.asList("1111", "eeeee"), false, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.out.println(((FastDBQueryUI_RowDiffWatcherDlg) e.getSource()).getPkLst());
+            }
+        });
     }
 
-    public static FastDBQueryUI_UpdateSqlArea newInstance(String title, List<String> sqlText, boolean jFrameRGBColorPanel_isStop) {
+    public static FastDBQueryUI_UpdateSqlArea newInstance(String title, List<String> sqlText, boolean jFrameRGBColorPanel_isStop, ActionListener onCloseListener) {
         FastDBQueryUI_UpdateSqlArea dialog = new FastDBQueryUI_UpdateSqlArea();
         dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         dialog.setVisible(true);
@@ -53,6 +60,17 @@ public class FastDBQueryUI_UpdateSqlArea extends JDialog {
         dialog.lblForMessage.setText(title);
         dialog.updateSqlArea.setText(dialog.sqlAreaHandler.convert(sqlText));
         dialog.jFrameRGBColorPanel_isStop = jFrameRGBColorPanel_isStop;
+
+        dialog.addWindowListener(new WindowAdapter() {
+            public void windowClosed(WindowEvent e) {
+                if (onCloseListener != null) {
+                    onCloseListener.actionPerformed(new ActionEvent(dialog, -1, "close"));
+                }
+            }
+
+            public void windowClosing(WindowEvent e) {
+            }
+        });
         return dialog;
     }
 

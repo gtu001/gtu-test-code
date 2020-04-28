@@ -8,6 +8,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -70,12 +72,24 @@ public class FastDBQueryUI_RowCompareDlg extends JDialog {
         }
     }
 
-    public static FastDBQueryUI_RowCompareDlg newInstance(String schemaTable, int selectRowIndex, Pair<List<String>, List<Object[]>> excelImportLst, FastDBQueryUI _parent) {
+    public static FastDBQueryUI_RowCompareDlg newInstance(String schemaTable, int selectRowIndex, Pair<List<String>, List<Object[]>> excelImportLst, ActionListener onCloseListener,
+            FastDBQueryUI _parent) {
         FastDBQueryUI_RowCompareDlg dialog = new FastDBQueryUI_RowCompareDlg();
         try {
             dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
             dialog.setVisible(true);
             dialog.initTab1(schemaTable, selectRowIndex, excelImportLst, _parent);
+
+            dialog.addWindowListener(new WindowAdapter() {
+                public void windowClosed(WindowEvent e) {
+                    if (onCloseListener != null) {
+                        onCloseListener.actionPerformed(new ActionEvent(dialog, -1, "close"));
+                    }
+                }
+
+                public void windowClosing(WindowEvent e) {
+                }
+            });
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -388,7 +402,7 @@ public class FastDBQueryUI_RowCompareDlg extends JDialog {
 
             model.addRow(df.toArry());
         }
-        
+
         JTableUtil.newInstance(importRowTable).setRowHeightByFontSize();
         System.out.println("-------------init size : " + rowMap.get().size());
     }
