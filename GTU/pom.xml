@@ -305,6 +305,12 @@
 		</dependency>
 
 		<dependency>
+			<groupId>org.xhtmlrenderer</groupId>
+			<artifactId>flying-saucer-pdf-itext5</artifactId>
+			<version>9.0.1</version>
+		</dependency>
+
+		<dependency>
 			<!-- javax.ws.rs-api-2.0.jar -->
 			<groupId>javax.ws.rs</groupId>
 			<artifactId>javax.ws.rs-api</artifactId>
