@@ -720,8 +720,9 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                 DBDateUtil.DBDateFormat dbDateDateFormat = (DBDateUtil.DBDateFormat) dbTypeComboBox.getSelectedItem();
                 tableInfo.setDbDateDateFormat(dbDateDateFormat);
                 tableInfo.execute(String.format(" select * from %s where 1!=1 ", tableAndSchema), _parent.getDataSource().getConnection());
-
-                tableInfo.getNoNullsCol();
+                if (StringUtils.isBlank(tableInfo.getTableName())) {
+                    tableInfo.setTableName(tableAndSchema);
+                }
 
                 List<String> success = new ArrayList<String>();
                 List<String> failed = new ArrayList<String>();

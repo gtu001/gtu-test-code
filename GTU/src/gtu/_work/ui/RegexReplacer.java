@@ -959,9 +959,12 @@ public class RegexReplacer extends javax.swing.JFrame {
         }
 
         List<String> rtnLst = new ArrayList<String>();
-        for (String toFormat : toFormatLst) {
+        for (int iii = 0; iii < toFormatLst.size(); iii++) {
+            String toFormat = toFormatLst.get(iii);
             try {
                 int patternFlag = 0;
+                
+                boolean isNotOnlyMatch = !config.isOnlyMatch || config.splitFullLst.contains(iii);
 
                 // 多行判斷
                 if (isMultiLine) {
@@ -983,7 +986,7 @@ public class RegexReplacer extends javax.swing.JFrame {
                     for (; matcher.find();) {
                         tempStr = toFormat.toString();
 
-                        if (!config.isOnlyMatch) {
+                        if (isNotOnlyMatch) {
                             sb.append(replaceText.substring(startPos, matcher.start()));
                         }
 
@@ -1013,12 +1016,12 @@ public class RegexReplacer extends javax.swing.JFrame {
 
                         matchIndex++;
 
-                        if (config.isOnlyMatch) {
+                        if (!isNotOnlyMatch) {
                             sb.append("\r\n");
                         }
                     }
 
-                    if (!config.isOnlyMatch) {
+                    if (isNotOnlyMatch) {
                         sb.append(replaceText.substring(startPos));
                     }
 
@@ -1047,6 +1050,7 @@ public class RegexReplacer extends javax.swing.JFrame {
         boolean isOnlyMatch = false;
         JSONObject json;
         List<File> sourceFiles = new ArrayList<File>();
+        List<Integer> splitFullLst = new ArrayList<Integer>();
 
         TradeOffConfig(JSONObject json) {
             this.json = json;
@@ -1071,6 +1075,15 @@ public class RegexReplacer extends javax.swing.JFrame {
                     File file = new File(fileString.getString(ii));
                     if (file.exists()) {
                         sourceFiles.add(file);
+                    }
+                }
+            }
+            if (json.containsKey(SelectionObj.splitFull.key)) {
+                JSONArray splitFullString = json.getJSONArray(SelectionObj.splitFull.key);
+                for (int ii = 0; ii < splitFullString.size(); ii++) {
+                    int idx = Integer.parseInt(splitFullString.getString(ii));
+                    if (!splitFullLst.contains(idx)) {
+                        splitFullLst.add(idx);
                     }
                 }
             }
@@ -1465,6 +1478,7 @@ public class RegexReplacer extends javax.swing.JFrame {
         prefix("prefix", "prefix (前置文字)", "strKey"), //
         suffix("suffix", "suffix (後置文字)", "strKey"), //
         split("split", "split (分頁)", "strKey"), //
+        splitFull("splitFull", "splitFull (分頁完整Index)", "arryKey"), //
         sourceFiles("sourceFiles", "sourceFiles (固定來源檔)", "arryKey"),//
         ;
 
