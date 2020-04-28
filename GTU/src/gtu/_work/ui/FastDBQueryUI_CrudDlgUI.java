@@ -308,7 +308,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                         if (StringUtils.isNotBlank(tableAndSchema)) {
                             tableInfo.execute(String.format(" select * from %s where 1!=1 ", tableAndSchema), _parent.getDataSource().getConnection());
                             if (StringUtils.isBlank(tableInfo.getTableAndSchema())) {
-                                tableInfo.setTableName(tableNSchema);
+                                tableInfo.setTableName(tableAndSchema);
                             }
                         }
                     }
