@@ -2060,6 +2060,14 @@ public class FastDBQueryUI extends JFrame {
             this.idx = idx;
         }
     }
+    
+    private String getCurrentSQL() {
+        String sql = sqlTextArea.getText().toString();
+        if (StringUtils.isNotBlank(sqlTextArea.getSelectedText())) {
+            sql = sqlTextArea.getSelectedText();
+        }
+        return sql;
+    }
 
     /**
      * 執行sql
@@ -2113,10 +2121,7 @@ public class FastDBQueryUI extends JFrame {
                 }
             }
 
-            String sql = sqlTextArea.getText().toString();
-            if (StringUtils.isNotBlank(sqlTextArea.getSelectedText())) {
-                sql = sqlTextArea.getSelectedText();
-            }
+            String sql = getCurrentSQL();
 
             JCommonUtil.isBlankErrorMsg(sql, "請輸入sql");
 
@@ -3124,7 +3129,7 @@ public class FastDBQueryUI extends JFrame {
 
     private String getRandom_TableNSchema() {
         Pattern ptn = Pattern.compile("from\\s+(\\w+[\\.\\w]+|\\w+)", Pattern.CASE_INSENSITIVE | Pattern.DOTALL | Pattern.MULTILINE);
-        String sql = StringUtils.trimToEmpty(sqlTextArea.getText());
+        String sql = StringUtils.trimToEmpty(getCurrentSQL());
         Matcher mth = ptn.matcher(sql);
         if (mth.find()) {
             return mth.group(1);
@@ -5486,6 +5491,7 @@ public class FastDBQueryUI extends JFrame {
                 final JDialog dlg = (JDialog) map.get(map.firstKey());
                 if (!dlg.isVisible()) {
                     map.remove(map.firstKey());
+                    continue;
                 }
                 EventQueue.invokeLater(new Runnable() {
                     public void run() {
