@@ -134,6 +134,8 @@ public class GitConflictDetectUI extends JFrame {
     private JList gitHistoryList;
     private JButton gitHistoryClearBtn;
     private JButton gitHistorySearchBtn;
+    
+    private static SwingTabTemplateUI tabUI;
 
     /**
      * Launch the application.
@@ -152,7 +154,7 @@ public class GitConflictDetectUI extends JFrame {
         // }
         // }
         // });
-        SwingTabTemplateUI tabUI = SwingTabTemplateUI.newInstance(null, "git.ico", GitConflictDetectUI.class, true, new SwingTabTemplateUI.SwingTabTemplateUI_Callback() {
+        tabUI = SwingTabTemplateUI.newInstance(null, "git.ico", GitConflictDetectUI.class, true, new SwingTabTemplateUI.SwingTabTemplateUI_Callback() {
             @Override
             public void beforeInit(SwingTabTemplateUI self) {
             }
@@ -715,6 +717,7 @@ public class GitConflictDetectUI extends JFrame {
                 JCommonUtil._jOptionPane_showMessageDialog_InvokeLater_Html(resultString);
                 String title = getFinalMessage(result[1]);
                 setTitle(title);
+                tabUI.setTabTitle(null, title);
             }
 
             private String getFinalMessage(String resultString) {

@@ -7,6 +7,8 @@ unity_log.md
 	Editor Logs:
 	‪	C:\Users\username\AppData\Local\Unity\Editor\Editor.log
 
+		Ex : C:\Users\wistronits\AppData\Local\Unity\Editor\
+
 	WebPlayer Logs:
 		C:\Users\username\AppData\LocalLow\CompanyName\ProductName\Player.log
 
