@@ -19,11 +19,11 @@ public class TapController : MonoBehaviour {
     Quaternion forwardRotation;
 
     public TapController () {
-        Log.debug ("------------" + "TapController");
+        Log.debug("##------------" + "TapController");
     }
 
     void Start () {
-        debug ("------------" + "Start");
+        Log.debug("##------------" + "Start");
         rigidbody2 = GetComponent<Rigidbody2D> ();
         downRotation = Quaternion.Euler (0, 0, -90);
         forwardRotation = Quaternion.Euler (0, 0, 35);
@@ -31,7 +31,7 @@ public class TapController : MonoBehaviour {
     }
 
     void Update () {
-        Log.debug ("------------" + "Update");
+        Log.debug("##------------" + "Update");
         if (Input.GetMouseButtonDown (0)) {
             transform.rotation = forwardRotation; //逆時鐘旋轉
             rigidbody2.velocity = Vector3.zero; //設定重力加速度為0
@@ -42,7 +42,7 @@ public class TapController : MonoBehaviour {
     }
 
     void OnTriggerEnter2D (Collider2D col) {
-        Log.debug ("------------" + "OnTriggerEnter2D");
+        Log.debug("##------------" + "OnTriggerEnter2D");
         if (col.gameObject.tag == "SocreZone") {
             // register a score event
             OnPlayerScored (); // event send to GameManager

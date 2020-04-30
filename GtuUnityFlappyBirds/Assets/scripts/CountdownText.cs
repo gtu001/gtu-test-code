@@ -13,14 +13,14 @@ public class CountdownText : MonoBehaviour {
     Text countdown;
      
     void OnEnable() {
-        Log.debug("----------------" + "OnEnable");
+        Log.debug("##----------------" + "OnEnable");
         countdown = GetComponent<Text>();
         countdown.text = "3";
         StartCoroutine("Countdown");
     }
 
     IEnumerator Countdown() {
-        Log.debug("----------------" + "Countdown");
+        Log.debug("##----------------" + "Countdown");
         int count = 3;
         for( int ii = 0 ; ii < count ; ii ++) {
             countdown.text = (count - 1).ToString();

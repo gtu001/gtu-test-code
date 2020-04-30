@@ -30,26 +30,26 @@ public class GameManager : MonoBehaviour {
     public bool GameOver { get { return gameOver; } }
 
     void Awake () {
-        Log.debug("----------------" + "Awake");
+        Log.debug("##----------------" + "Awake");
         Instance = this;
     }
 
     void OnEnable() {
-        Log.debug("----------------" + "OnEnable");
+        Log.debug("##----------------" + "OnEnable");
         CountdownText.OnCountdownFinished += OnCountdownFinished;
         TapController.OnPlayerDied += OnPlayerDied;
         TapController.OnPlayerScored += OnPlayerScored;
     }
 
     void OnDisable() {
-        Log.debug("----------------" + "OnDisable");
+        Log.debug("##----------------" + "OnDisable");
         CountdownText.OnCountdownFinished -= OnCountdownFinished;
         TapController.OnPlayerDied -= OnPlayerDied;
         TapController.OnPlayerScored -= OnPlayerScored;
     }
 
     void OnCountdownFinished() {
-        Log.debug("----------------" + "OnCountdownFinished");
+        Log.debug("##----------------" + "OnCountdownFinished");
         SetPageState(PageState.None);
         // OnGameStarted(); XXXXXXXXXXXXXXXXXXXXXXX
         score = 0;
@@ -57,7 +57,7 @@ public class GameManager : MonoBehaviour {
     }
 
     void OnPlayerDied() {
-        Log.debug("----------------" + "OnPlayerDied");
+        Log.debug("##----------------" + "OnPlayerDied");
         gameOver = true;
         int savedScore = PlayerPrefs.GetInt("HighScore");
         if (score > savedScore) {
@@ -67,13 +67,13 @@ public class GameManager : MonoBehaviour {
     }
 
     void OnPlayerScored() {
-        Log.debug("----------------" + "OnPlayerScored");
+        Log.debug("##----------------" + "OnPlayerScored");
         score ++;
         scoreText.text = score.ToString();
     }
 
     void SetPageState (PageState state) {
-        Log.debug("----------------" + "SetPageState");
+        Log.debug("##----------------" + "SetPageState");
         switch (state) {
             case PageState.None:
                 startPage.SetActive(false);
@@ -99,7 +99,7 @@ public class GameManager : MonoBehaviour {
     }
 
     public void ConfirmGameOver() {
-        Log.debug("----------------" + "ConfirmGameOver");
+        Log.debug("##----------------" + "ConfirmGameOver");
         //activated when replay button is hit
         // OnGameOverConfirmed(); //event XXXXXXXXXXXXXXXXXX
         scoreText.text = "0";
@@ -107,7 +107,7 @@ public class GameManager : MonoBehaviour {
     }
 
     public void StartGame() {
-        Log.debug("----------------" + "StartGame");
+        Log.debug("##----------------" + "StartGame");
         //activated when play button is hit
         SetPageState(PageState.Countdown);
     }

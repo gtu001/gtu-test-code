@@ -357,6 +357,7 @@ GameObject:
   - component: {fileID: 519420032}
   - component: {fileID: 519420031}
   - component: {fileID: 519420029}
+  - component: {fileID: 519420030}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -372,6 +373,22 @@ AudioListener:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 519420028}
   m_Enabled: 1
+--- !u!114 &519420030
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 519420028}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8d191b5e40b17254c870a85206404a9e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  startPage: {fileID: 1614115656}
+  gameOverPage: {fileID: 150127431}
+  countdownPage: {fileID: 1706719993}
+  scoreText: {fileID: 966266288}
 --- !u!20 &519420031
 Camera:
   m_ObjectHideFlags: 0
@@ -645,7 +662,18 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 820476455}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 519420030}
+        m_MethodName: StartGame
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &820476455
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1136,6 +1164,7 @@ GameObject:
   - component: {fileID: 2028710383}
   - component: {fileID: 2028710385}
   - component: {fileID: 2028710384}
+  - component: {fileID: 2028710386}
   m_Layer: 5
   m_Name: CountdownText
   m_TagString: Untagged
@@ -1202,6 +1231,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2028710382}
   m_CullTransparentMesh: 0
+--- !u!114 &2028710386
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2028710382}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 51edc8f119e55e24ba395e4b8d5d4460, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2088094903
 GameObject:
   m_ObjectHideFlags: 0
@@ -1359,7 +1400,18 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 2088906035}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 519420030}
+        m_MethodName: ConfirmGameOver
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &2088906035
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1569,7 +1621,7 @@ PrefabInstance:
     - target: {fileID: 8253722888647508873, guid: ae1c900533ddd544e8480f70ba538b89,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: 1.5
       objectReference: {fileID: 0}
     - target: {fileID: 8253722888647508873, guid: ae1c900533ddd544e8480f70ba538b89,
         type: 3}
