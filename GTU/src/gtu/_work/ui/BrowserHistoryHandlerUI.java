@@ -2134,29 +2134,26 @@ public class BrowserHistoryHandlerUI extends JFrame {
             String remark = logWatcherTextArea.getText();
             JTextPaneUtil.newInstance(logWatcherTextArea).setTextReset(remark);
             if (StringUtils.isNotBlank(remark)) {
-                // Pattern ptn = Pattern.compile(Pattern.quote(findText),
-                // Pattern.CASE_INSENSITIVE | Pattern.DOTALL |
-                // Pattern.MULTILINE);
-                // Matcher mth = ptn.matcher(remark);
-                // while (mth.find()) {
-                // int start = mth.start(0);
-                // int end = mth.end(0);
-                // if (start > 0) {
-                // start--;
-                // }
-                // if (end > 0) {
-                // end--;
-                // }
-
-                int tempPos = 0;
-                while (true) {
-                    int startPos = StringUtils.indexOf(remark, findText, tempPos);
-                    if (startPos == -1) {
-                        break;
-                    }
-                    JTextPaneTextStyle.of(logWatcherTextArea).startEnd(tempPos + startPos, tempPos + startPos + findText.length()).backgroundColor(Color.YELLOW).italic(true).apply();
-                    tempPos += startPos + findText.length();
+                Pattern ptn = Pattern.compile(Pattern.quote(findText), Pattern.CASE_INSENSITIVE | Pattern.DOTALL | Pattern.MULTILINE);
+                Matcher mth = ptn.matcher(remark);
+                while (mth.find()) {
+                    int start = mth.start(0);
+                    int end = mth.end(0);
+                    JTextPaneTextStyle.of(logWatcherTextArea).startEnd(start, end).backgroundColor(Color.YELLOW).italic(true).apply();
                 }
+
+                // int tempPos = 0;
+                // while (true) {
+                // int startPos = StringUtils.indexOf(remark, findText,
+                // tempPos);
+                // if (startPos == -1) {
+                // break;
+                // }
+                // JTextPaneTextStyle.of(logWatcherTextArea).startEnd(startPos,
+                // startPos +
+                // findText.length()).backgroundColor(Color.YELLOW).italic(true).apply();
+                // tempPos = startPos + findText.length();
+                // }
             }
         }
     }
@@ -3073,31 +3070,39 @@ public class BrowserHistoryHandlerUI extends JFrame {
         }
 
         private LogWatcherPeriodTask(File logFile) {
-            this.logFile = logFile;
-            mTxtFileChecker = new LogWatcher(logFile, "UTF8") {
-                @Override
-                public void write(String line) {
-                    bringToFront();
-                    JTextPaneUtil.newInstance(logWatcherTextArea).append(line);
-                }
-            };
+            try {
+                this.logFile = logFile;
+                mTxtFileChecker = new LogWatcher(logFile, "UTF8") {
+                    @Override
+                    public void write(String line) {
+                        bringToFront();
+                        JTextPaneUtil.newInstance(logWatcherTextArea).append(line);
+                    }
+                };
+            } catch (Exception ex) {
+                JCommonUtil.handleException(ex);
+            }
         }
 
         @Override
         public void run() {
-            if (stop) {
-                this.cancel();
-                JCommonUtil._jOptionPane_showMessageDialog_error("停止監聽Log");
-                logWatcherBtn.setText("監聽off");
-                try {
-                    long beforeSize = Long.parseLong(logWatcherSizeChangeLbl.getText());
-                    logWatcherSizeChangeLbl.setText("差異 :" + String.valueOf(logFile.length() - beforeSize));
-                } catch (Exception ex) {
-                    ex.printStackTrace();
+            try {
+                if (stop) {
+                    this.cancel();
+                    JCommonUtil._jOptionPane_showMessageDialog_error("停止監聽Log");
+                    logWatcherBtn.setText("監聽off");
+                    try {
+                        long beforeSize = Long.parseLong(logWatcherSizeChangeLbl.getText());
+                        logWatcherSizeChangeLbl.setText("差異 :" + String.valueOf(logFile.length() - beforeSize));
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                    return;
                 }
-                return;
+                mTxtFileChecker.checkFiles();
+            } catch (Exception ex) {
+                JCommonUtil.handleException(ex);
             }
-            mTxtFileChecker.checkFiles();
         }
     };
 

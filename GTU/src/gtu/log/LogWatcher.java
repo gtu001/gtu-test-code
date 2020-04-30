@@ -4,19 +4,22 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
 public abstract class LogWatcher {
 
     public static void main(String[] args) {
-        File logFile = new File("c:/Users/wistronits/AppData/Local/Unity/Editor/Editor.log");
+        // File logFile = new
+        // File("c:/Users/wistronits/AppData/Local/Unity/Editor/Editor.log");
         // File logFile = new File("C:/Users/wistronits/Desktop/新文字文件.txt");
+        File logFile = new File("/home/gtu001/桌面/tttttt.txt");
         final LogWatcher mTxtFileChecker = new LogWatcher(logFile, "UTF8") {
             @Override
             public void write(String line) {
+                System.out.println(line);
             }
         };
         new Timer().schedule(new TimerTask() {
@@ -28,7 +31,7 @@ public abstract class LogWatcher {
         System.out.println("done..");
     }
 
-    List<Long> posLst = new ArrayList<Long>();
+    Map<Integer, Long> posLst = new HashMap<Integer, Long>();
     RandomAccessFile raf;
     String encoding;
     File file;
@@ -45,18 +48,22 @@ public abstract class LogWatcher {
         }
     }
 
+    private int getPosLstSize() {
+        return posLst.size();
+    }
+
     public void checkFiles() {
         long currentFileSize = -1;
         if (previousFileSize == -1) {
             // System.out.println("checkFiles --- A");
             previousFileSize = file.length();
             processLineNumber();
-            previousIndex = posLst.size();
+            previousIndex = getPosLstSize();
             return;
         } else if ((currentFileSize = file.length()) != previousFileSize) {
             // System.out.println("checkFiles --- B");
             processLineNumber();
-            int currentIndex = posLst.size();
+            int currentIndex = getPosLstSize();
             if (currentIndex != previousIndex) {
                 checkAddLines(previousIndex, currentIndex);
                 previousIndex = currentIndex;
@@ -70,7 +77,7 @@ public abstract class LogWatcher {
     private void checkAddLines(final int startLineNum, final int endLineNum) {
         for (int ii = startLineNum; ii < endLineNum; ii++) {
             String line = readLine(ii);
-//            System.out.print(line);
+            // System.out.print(line);
             write(line);
         }
     }
@@ -95,8 +102,8 @@ public abstract class LogWatcher {
                 byte[] bs = new byte[(int) (end - start)];
                 raf.readFully(bs);
                 String rtnVal = new String(bs, encoding);
-                // System.out.println("readLine " + start + " / " + end + "
-                // == " + rtnVal);
+                // System.out.println("readLine " + start + " / " + end + " == "
+                // + rtnVal);
                 return rtnVal;
             } catch (Exception e) {
                 throw new RuntimeException("readLine : " + index + " , Err:" + e.getMessage(), e);
@@ -107,8 +114,10 @@ public abstract class LogWatcher {
 
     private void processLineNumber() {
         try {
+            int index = getPosLstSize();
             while ((raf.readLine()) != null) {
-                posLst.add(raf.getFilePointer());
+                posLst.put(index, raf.getFilePointer());
+                index++;
             }
             // System.out.println("checkFiles size " + posLst.size());
         } catch (IOException e) {
