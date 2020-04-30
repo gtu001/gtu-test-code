@@ -2,8 +2,6 @@ package gtu.swing.util;
 
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
@@ -23,6 +21,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.event.EventListenerList;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultCaret;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.StyleConstants;
@@ -318,5 +317,17 @@ public class JTextAreaUtil {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public static void setScrollToPosition(JTextComponent textArea, Integer toPosition) {
+        if (toPosition == null) {
+            toPosition = textArea.getDocument().getLength();
+        }
+        textArea.setCaretPosition(toPosition);
+    }
+
+    public static void setScrollToBottomPloicy(JTextComponent textArea) {
+        DefaultCaret caret = (DefaultCaret) textArea.getCaret();
+        caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
     }
 }

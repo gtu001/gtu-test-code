@@ -33,7 +33,9 @@ public class JTabbedPaneUtil {
     public void setSelectedIndexByTitle(String title) {
         int index = this.getTitleIndex(title, true);
         if (index != -1) {
-            tabbedPane.setSelectedIndex(index);
+            if (tabbedPane.getSelectedIndex() != index) {
+                tabbedPane.setSelectedIndex(index);
+            }
         } else {
             throw new RuntimeException("找不到title:" + title);
         }

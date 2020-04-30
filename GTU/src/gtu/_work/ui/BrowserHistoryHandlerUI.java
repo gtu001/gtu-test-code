@@ -70,7 +70,9 @@ import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.JToggleButton;
 import javax.swing.WindowConstants;
+import javax.swing.event.DocumentEvent;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.text.SimpleAttributeSet;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringEscapeUtils;
@@ -106,6 +108,7 @@ import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
 
+import gtu._work.ui.FastDBQueryUI_ColumnSearchFilter.InnerMatch;
 import gtu.clipboard.ClipboardUtil;
 import gtu.collection.ListUtil;
 import gtu.constant.PatternCollection;
@@ -114,6 +117,7 @@ import gtu.file.FileUtil;
 import gtu.file.OsInfoUtil;
 import gtu.image.ImageUtil;
 import gtu.keyboard_mouse.JnativehookKeyboardMouseHelper;
+import gtu.log.LogWatcher;
 import gtu.net.https.SimpleHttpsUtil;
 import gtu.properties.PropertiesUtil;
 import gtu.properties.PropertiesUtilBean;
@@ -132,9 +136,13 @@ import gtu.swing.util.JFrameUtil;
 import gtu.swing.util.JMouseEventUtil;
 import gtu.swing.util.JPopupMenuUtil;
 import gtu.swing.util.JProgressBarHelper;
+import gtu.swing.util.JTabbedPaneUtil;
 import gtu.swing.util.JTableUtil;
 import gtu.swing.util.JTextAreaUtil;
 import gtu.swing.util.JTextPaneTextStyle;
+import gtu.swing.util.JTextPaneUtil;
+import gtu.swing.util.KeyEventUtil;
+import gtu.swing.util.JCommonUtil.HandleDocumentEvent;
 import gtu.thread.util.ThreadUtil;
 import taobe.tec.jcc.JChineseConvertor;
 
@@ -195,14 +203,20 @@ public class BrowserHistoryHandlerUI extends JFrame {
     private JButton dropboxMergeBtn;
     private JTextArea batLogArea;
     private JTextField batWaittingTimeText;
-
     private JFrameRGBColorPanel jFrameRGBColorPanel;
     private JToggleButton toggleChangeColorBtn;
     private HyperlinkJTextPaneHandler mHyperlinkJTextPaneHandler;
     private ImageIconConst mImageIconConst;
     private LastestUpdateKeeper mLastestUpdateKeeper;
-
     private Map<String, PeriodThread> periodSecHolder = new HashMap<String, PeriodThread>();
+    private AtomicBoolean searchBool = new AtomicBoolean(false);
+    private JComboBox orderMarkComboBox;
+    private JComboBox bootstartCombobox;
+    private JTextField periodSecText;
+    private JButton openUrlBtn;
+    private JTextPane logWatcherTextArea;
+    private JToggleButton logWatcherBtn;
+    private JTextField logWatcherPeriodText;
 
     /**
      * Launch the application.
@@ -588,6 +602,75 @@ public class BrowserHistoryHandlerUI extends JFrame {
             JTextAreaUtil.applyCommonSetting(batLogArea);
             panel_6.add(JCommonUtil.createScrollComponent(batLogArea), BorderLayout.CENTER);
 
+            JPanel panel_12 = new JPanel();
+            tabbedPane.addTab("LogWatcher", null, panel_12, null);
+            panel_12.setLayout(new BorderLayout(0, 0));
+
+            JPanel panel_13 = new JPanel();
+            panel_12.add(panel_13, BorderLayout.NORTH);
+
+            logWatcherBtn = new JToggleButton("監聽");
+            logWatcherBtn.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    logWatcherBtnToggleAction();
+                }
+            });
+
+            logWatcherCustomFileText = new JTextField();
+            panel_13.add(logWatcherCustomFileText);
+            logWatcherCustomFileText.setColumns(10);
+            logWatcherCustomFileText.setToolTipText("自訂檔案");
+            JCommonUtil.jTextFieldSetFilePathMouseEvent(logWatcherCustomFileText, false);
+
+            logWatcherFrontChk = new JCheckBox("提前");
+            panel_13.add(logWatcherFrontChk);
+
+            JLabel lblNewLabel_6 = new JLabel("監聽間隔");
+            panel_13.add(lblNewLabel_6);
+
+            logWatcherPeriodText = new JTextField();
+            logWatcherPeriodText.setText("500");
+            panel_13.add(logWatcherPeriodText);
+            logWatcherPeriodText.setColumns(10);
+            panel_13.add(logWatcherBtn);
+
+            logWatcherClearBtn = new JButton("清除");
+            logWatcherClearBtn.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    logWatcherTextArea.setText("");
+                }
+            });
+
+            panel_13.add(logWatcherClearBtn);
+
+            logWatcherSizeChangeLbl = new JLabel("");
+            panel_13.add(logWatcherSizeChangeLbl);
+
+            JPanel panel_14 = new JPanel();
+            panel_12.add(panel_14, BorderLayout.WEST);
+
+            JPanel panel_15 = new JPanel();
+            panel_12.add(panel_15, BorderLayout.EAST);
+
+            JPanel panel_16 = new JPanel();
+            panel_12.add(panel_16, BorderLayout.SOUTH);
+
+            logWatcherTextArea = new JTextPane();
+            JTextAreaUtil.applyCommonSetting(logWatcherTextArea);
+            JTextAreaUtil.setScrollToBottomPloicy(logWatcherTextArea);
+            logWatcherTextArea.getDocument().addDocumentListener(JCommonUtil.getDocumentListener(new HandleDocumentEvent() {
+                @Override
+                public void process(DocumentEvent event) {
+                    logWatcherTextAreaLogCacheClean();
+                }
+            }));
+            logWatcherTextArea.addKeyListener(new KeyAdapter() {
+                public void keyPressed(KeyEvent e) {
+                    logWatcherTextAreaKeyEventAction(e);
+                }
+            });
+            panel_12.add(JCommonUtil.createScrollComponent(logWatcherTextArea), BorderLayout.CENTER);
+
             pack();
             this.setSize(900, 500);// XXX <---------- 設寬高度
 
@@ -623,7 +706,6 @@ public class BrowserHistoryHandlerUI extends JFrame {
             initAddSaveShortcutKeyEvent();
             jFrameRGBColorPanel = new JFrameRGBColorPanel(this.getContentPane());
             jFrameRGBColorPanel.setIgnoreLst(this);
-
             panel_3.add(jFrameRGBColorPanel.getToggleButton(false), "8, 4");
 
             // final do
@@ -1202,12 +1284,6 @@ public class BrowserHistoryHandlerUI extends JFrame {
         nonWorkChk.setSelected(false);
         initLoading(null);
     }
-
-    private AtomicBoolean searchBool = new AtomicBoolean(false);
-    private JComboBox orderMarkComboBox;
-    private JComboBox bootstartCombobox;
-    private JTextField periodSecText;
-    private JButton openUrlBtn;
 
     private void initLoading(final JProgressBarHelper progressBarHelper) {
         try {
@@ -2045,6 +2121,46 @@ public class BrowserHistoryHandlerUI extends JFrame {
         }
     }
 
+    private class YellowMarkJTextPaneHandler {
+        JTextPane logWatcherTextArea;
+        String findText;
+
+        private YellowMarkJTextPaneHandler(JTextPane logWatcherTextArea, String findText) {
+            this.logWatcherTextArea = logWatcherTextArea;
+            this.findText = findText;
+        }
+
+        private void process() {
+            String remark = logWatcherTextArea.getText();
+            JTextPaneUtil.newInstance(logWatcherTextArea).setTextReset(remark);
+            if (StringUtils.isNotBlank(remark)) {
+                // Pattern ptn = Pattern.compile(Pattern.quote(findText),
+                // Pattern.CASE_INSENSITIVE | Pattern.DOTALL |
+                // Pattern.MULTILINE);
+                // Matcher mth = ptn.matcher(remark);
+                // while (mth.find()) {
+                // int start = mth.start(0);
+                // int end = mth.end(0);
+                // if (start > 0) {
+                // start--;
+                // }
+                // if (end > 0) {
+                // end--;
+                // }
+
+                int tempPos = 0;
+                while (true) {
+                    int startPos = StringUtils.indexOf(remark, findText, tempPos);
+                    if (startPos == -1) {
+                        break;
+                    }
+                    JTextPaneTextStyle.of(logWatcherTextArea).startEnd(tempPos + startPos, tempPos + startPos + findText.length()).backgroundColor(Color.YELLOW).italic(true).apply();
+                    tempPos += startPos + findText.length();
+                }
+            }
+        }
+    }
+
     private class CommandTypeSetting {
         private void setValue(String commandType) {
             commandTypComboBox.setSelectedItem(CommandTypeEnum.valueOfFrom(commandType));
@@ -2421,13 +2537,13 @@ public class BrowserHistoryHandlerUI extends JFrame {
                 watcher.processAsyncCallback(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
+                        batLogArea.setText("");
+                        batLogArea.append("產生時間 : " + DateFormatUtils.format(System.currentTimeMillis(), "yyyy/MM/dd HH:mm:ss.SSS") + "\n");
                         ProcessWatcher p = (ProcessWatcher) e.getSource();
-                        StringBuilder sb = new StringBuilder();
-                        sb.append("[ERR]  \n");
-                        sb.append(p.getErrorStreamToString());
-                        sb.append("\n\n[INFO] \n");
-                        sb.append(p.getInputStreamToString());
-                        batLogArea.setText(sb.toString());
+                        batLogArea.append("[ERR]  \n");
+                        batLogArea.append(p.getErrorStreamToString());
+                        batLogArea.append("\n\n[INFO] \n");
+                        batLogArea.append(p.getInputStreamToString());
                     }
                 }, waittingTime * 1000L);
                 watcher.getStreamAsync();
@@ -2929,4 +3045,120 @@ public class BrowserHistoryHandlerUI extends JFrame {
             }
         }
     }
+
+    // LogWatcher ↓↓↓↓↓↓
+    // ====================================================================================================================
+    private LogWatcherPeriodTask mLogWatcherPeriodTask = null;
+    private JButton logWatcherClearBtn;
+    private JCheckBox logWatcherFrontChk;
+    private JLabel logWatcherSizeChangeLbl;
+    private JTextField logWatcherCustomFileText;
+
+    private class LogWatcherPeriodTask extends TimerTask {
+        boolean stop = false;
+        LogWatcher mTxtFileChecker;
+        long bringToFrontTime = -1;
+        long bringToFrontPeriod = 1500;
+        File logFile;
+
+        private void bringToFront() {
+            if (bringToFrontTime == -1 || (System.currentTimeMillis() - bringToFrontTime) > bringToFrontPeriod) {
+                JTabbedPaneUtil.newInst(tabbedPane).setSelectedIndexByTitle("LogWatcher");
+                if (logWatcherFrontChk.isSelected() && !logWatcherTextArea.isFocusOwner()) {
+                    JCommonUtil.setFrameAtop(BrowserHistoryHandlerUI.this, false);
+                    bringToFrontTime = System.currentTimeMillis();
+                    JTextAreaUtil.setScrollToPosition(logWatcherTextArea, null);
+                }
+            }
+        }
+
+        private LogWatcherPeriodTask(File logFile) {
+            this.logFile = logFile;
+            mTxtFileChecker = new LogWatcher(logFile, "UTF8") {
+                @Override
+                public void write(String line) {
+                    bringToFront();
+                    JTextPaneUtil.newInstance(logWatcherTextArea).append(line);
+                }
+            };
+        }
+
+        @Override
+        public void run() {
+            if (stop) {
+                this.cancel();
+                JCommonUtil._jOptionPane_showMessageDialog_error("停止監聽Log");
+                logWatcherBtn.setText("監聽off");
+                try {
+                    long beforeSize = Long.parseLong(logWatcherSizeChangeLbl.getText());
+                    logWatcherSizeChangeLbl.setText("差異 :" + String.valueOf(logFile.length() - beforeSize));
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+                return;
+            }
+            mTxtFileChecker.checkFiles();
+        }
+    };
+
+    private void logWatcherBtnToggleAction() {
+        try {
+            if (logWatcherBtn.isSelected()) {
+                if (logWatcherBtn.getText().contains("監聽closing")) {
+                    return;
+                }
+                File logFile = null;
+                if (StringUtils.isNotBlank(logWatcherCustomFileText.getText())) {
+                    logFile = DesktopUtil.getFile(logWatcherCustomFileText.getText());
+                }
+                if (logFile == null) {
+                    try {
+                        logFile = DesktopUtil.getFile(urlText.getText());
+                    } catch (Exception ex) {
+                        JCommonUtil._jOptionPane_showMessageDialog_error("檔案路徑有誤!");
+                        return;
+                    }
+                }
+                int period = 500;
+                try {
+                    period = Integer.parseInt(logWatcherPeriodText.getText());
+                } catch (Exception ex) {
+                    logWatcherPeriodText.setText(String.valueOf(period));
+                }
+                logWatcherTextArea.setText("## 監聽開始 : " + DateFormatUtils.format(System.currentTimeMillis(), "yyyy/MM/dd HH:mm:ss.SSS") + "\n");
+                mLogWatcherPeriodTask = new LogWatcherPeriodTask(logFile);
+                new Timer().schedule(mLogWatcherPeriodTask, 0, period);
+                logWatcherBtn.setText("監聽start");
+                logWatcherSizeChangeLbl.setText(String.valueOf(logFile.length()));
+            } else if (mLogWatcherPeriodTask != null) {
+                mLogWatcherPeriodTask.stop = true;
+                logWatcherBtn.setText("監聽closing");
+            }
+        } catch (Exception ex) {
+            JCommonUtil.handleException(ex);
+        }
+    }
+
+    private void logWatcherTextAreaLogCacheClean() {
+        if (logWatcherTextArea.getText().length() > 200000) {
+            String text = StringUtils.substring(logWatcherTextArea.getText(), 100000);
+            logWatcherTextArea.setText("");
+            StringBuilder sb = new StringBuilder();
+            sb.append("已清除部分log(" + DateFormatUtils.format(System.currentTimeMillis(), "yyyy/MM/dd HH:mm:ss.SSS") + ")...\n");
+            sb.append(text);
+            logWatcherTextArea.setText(sb.toString());
+        }
+    }
+
+    private void logWatcherTextAreaKeyEventAction(KeyEvent e) {
+        if (KeyEventUtil.isMaskKeyPress(e, "c") && e.getKeyCode() == KeyEvent.VK_F) {
+            String findText = JCommonUtil._jOptionPane_showInputDialog("搜尋text!");
+            if (StringUtils.isNotEmpty(findText)) {
+                YellowMarkJTextPaneHandler mYellowMarkJTextPaneHandler = new YellowMarkJTextPaneHandler(logWatcherTextArea, findText);
+                mYellowMarkJTextPaneHandler.process();
+            }
+        }
+    }
+    // LogWatcher ↑↑↑↑↑↑
+    // ====================================================================================================================
 }

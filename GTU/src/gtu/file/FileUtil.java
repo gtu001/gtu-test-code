@@ -1409,6 +1409,10 @@ public class FileUtil {
         }
     }
 
+    public void writeBOM(FileOutputStream writer) throws IOException {
+        writer.write(new byte[] { (byte) 0xEF, (byte) 0xBB, (byte) 0xBF });
+    }
+
     public static class FileZ {
         File entity;
 

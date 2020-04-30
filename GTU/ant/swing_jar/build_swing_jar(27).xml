@@ -114,15 +114,15 @@
 	<target name="main">
 		<antcall target="clean">
 			<!--清除-->
-			<param name="enable" value="true" />
+			<param name="enable" value="false" /><!-- false -->
 		</antcall>
 
 		<antcall target="buildClassSet">
-			<param name="enable" value="true" />
+			<param name="enable" value="false" /><!-- false -->
 		</antcall>
 
 		<antcall target="copyReference">
-			<param name="enable" value="true" />
+			<param name="enable" value="false" /><!-- false -->
 		</antcall>
 
 		<antcall target="compiler" />
@@ -149,7 +149,7 @@
 
 		<antcall target="clean">
 			<!--清除-->
-			<param name="enable" value="true" />
+			<param name="enable" value="false" /><!-- false -->
 		</antcall>
 
 		<antcall target="jarToExe">
