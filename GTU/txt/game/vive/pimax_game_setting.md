@@ -1,3 +1,5 @@
+https://docs.google.com/spreadsheets/d/11ljKyF0eMgY3qqZWjVVBvI0brfv9IxocXjroYtJyTlY/edit#gid=0
+
 ======
 * 平行投影on
 	ss = 1.5
@@ -27,6 +29,13 @@
 	steamVR game 100%
 
 #american truck simulator
+---
+	平行投影on
+	ss = 1.5
+	steamVR custom 20%
+	steamVR game 200%
+
+#alien isolation
 ---
 	平行投影on
 	ss = 1.5
