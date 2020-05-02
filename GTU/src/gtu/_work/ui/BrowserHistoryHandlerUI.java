@@ -646,6 +646,9 @@ public class BrowserHistoryHandlerUI extends JFrame {
             logWatcherSizeChangeLbl = new JLabel("");
             panel_13.add(logWatcherSizeChangeLbl);
 
+            logWatcherFindSizeLbl = new JLabel("");
+            panel_13.add(logWatcherFindSizeLbl);
+
             JPanel panel_14 = new JPanel();
             panel_12.add(panel_14, BorderLayout.WEST);
 
@@ -2079,6 +2082,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
             hiddenChk.setSelected("Y".equals(d.isHidden));
             bootstartCombobox.setSelectedItem(StringUtils.trimToEmpty(d.bootStart));
             periodSecText.setText(StringUtils.trimToEmpty(d.periodSec));
+            logWatcherCustomFileText.setText(d.url);
         } catch (Exception ex) {
             if (throwEx) {
                 throw new RuntimeException(ex);
@@ -2124,6 +2128,46 @@ public class BrowserHistoryHandlerUI extends JFrame {
     private class YellowMarkJTextPaneHandler {
         JTextPane logWatcherTextArea;
         String findText;
+        List<Long> findPosLst;
+
+        private int __findCheck(int textareaPos, boolean bigger) {
+            if (findPosLst == null || findPosLst.isEmpty()) {
+                JCommonUtil._jOptionPane_showMessageDialog_error("沒有找到匹配");
+                return -1;
+            }
+            if (bigger) {
+                for (int ii = 0; ii < findPosLst.size(); ii++) {
+                    if (textareaPos < findPosLst.get(ii)) {
+                        return ii;
+                    }
+                }
+            } else {
+                for (int ii = findPosLst.size() - 1; ii >= 0; ii--) {
+                    if (textareaPos > findPosLst.get(ii)) {
+                        return ii;
+                    }
+                }
+            }
+            return 0;
+        }
+
+        private Long findPrevious(int textareaPos) {
+            int findPosIndex = __findCheck(textareaPos, false);
+            if (findPosIndex != -1) {
+                Long pos = findPosLst.get(findPosIndex);
+                return pos;
+            }
+            return 0L;
+        }
+
+        private Long findNext(int textareaPos) {
+            int findPosIndex = __findCheck(textareaPos, true);
+            if (findPosIndex != -1) {
+                Long pos = findPosLst.get(findPosIndex);
+                return pos;
+            }
+            return 0L;
+        }
 
         private YellowMarkJTextPaneHandler(JTextPane logWatcherTextArea, String findText) {
             this.logWatcherTextArea = logWatcherTextArea;
@@ -2134,13 +2178,16 @@ public class BrowserHistoryHandlerUI extends JFrame {
             String remark = logWatcherTextArea.getText();
             JTextPaneUtil.newInstance(logWatcherTextArea).setTextReset(remark);
             if (StringUtils.isNotBlank(remark)) {
+                findPosLst = new ArrayList<Long>();
                 Pattern ptn = Pattern.compile(Pattern.quote(findText), Pattern.CASE_INSENSITIVE | Pattern.DOTALL | Pattern.MULTILINE);
                 Matcher mth = ptn.matcher(remark);
                 while (mth.find()) {
                     int start = mth.start(0);
                     int end = mth.end(0);
                     JTextPaneTextStyle.of(logWatcherTextArea).startEnd(start, end).backgroundColor(Color.YELLOW).italic(true).apply();
+                    findPosLst.add(Long.valueOf(String.valueOf(start)));
                 }
+                logWatcherFindSizeLbl.setText("找到:" + findPosLst.size());
 
                 // int tempPos = 0;
                 // while (true) {
@@ -2170,21 +2217,21 @@ public class BrowserHistoryHandlerUI extends JFrame {
             }
             return commandType;
         }
-    }
 
-    private void allOpenBtnAction() {
-        try {
-            JTableUtil jtab = JTableUtil.newInstance(urlTable);
-            for (int ii = 0; ii < jtab.getModel().getRowCount(); ii++) {
-                boolean isChk = (Boolean) jtab.getRealValueAt(ii, UrlTableConfigEnum.開啟.ordinal());
-                UrlConfig vo = (UrlConfig) jtab.getRealValueAt(ii, UrlTableConfigEnum.VO.ordinal());
-                if (isChk) {
-                    CommandTypeEnum e = CommandTypeEnum.valueOfFrom(vo.commandType);
-                    e.doOpen(vo.url, BrowserHistoryHandlerUI.this);
+        private void allOpenBtnAction() {
+            try {
+                JTableUtil jtab = JTableUtil.newInstance(urlTable);
+                for (int ii = 0; ii < jtab.getModel().getRowCount(); ii++) {
+                    boolean isChk = (Boolean) jtab.getRealValueAt(ii, UrlTableConfigEnum.開啟.ordinal());
+                    UrlConfig vo = (UrlConfig) jtab.getRealValueAt(ii, UrlTableConfigEnum.VO.ordinal());
+                    if (isChk) {
+                        CommandTypeEnum e = CommandTypeEnum.valueOfFrom(vo.commandType);
+                        e.doOpen(vo.url, BrowserHistoryHandlerUI.this);
+                    }
                 }
+            } catch (Exception ex) {
+                JCommonUtil.handleException(ex);
             }
-        } catch (Exception ex) {
-            JCommonUtil.handleException(ex);
         }
     }
 
@@ -2387,12 +2434,9 @@ public class BrowserHistoryHandlerUI extends JFrame {
                             })//
                     ;
                 }
-
                 popupUtil.applyEvent(e).show();
             }
-        } catch (
-
-        Exception ex) {
+        } catch (Exception ex) {
             JCommonUtil.handleException(ex);
         }
     }
@@ -3049,7 +3093,9 @@ public class BrowserHistoryHandlerUI extends JFrame {
     private JButton logWatcherClearBtn;
     private JCheckBox logWatcherFrontChk;
     private JLabel logWatcherSizeChangeLbl;
+    private JLabel logWatcherFindSizeLbl;
     private JTextField logWatcherCustomFileText;
+    private YellowMarkJTextPaneHandler mYellowMarkJTextPaneHandler;
 
     private class LogWatcherPeriodTask extends TimerTask {
         boolean stop = false;
@@ -3101,6 +3147,8 @@ public class BrowserHistoryHandlerUI extends JFrame {
                 }
                 mTxtFileChecker.checkFiles();
             } catch (Exception ex) {
+                this.cancel();
+                stop = true;
                 JCommonUtil.handleException(ex);
             }
         }
@@ -3159,9 +3207,15 @@ public class BrowserHistoryHandlerUI extends JFrame {
         if (KeyEventUtil.isMaskKeyPress(e, "c") && e.getKeyCode() == KeyEvent.VK_F) {
             String findText = JCommonUtil._jOptionPane_showInputDialog("搜尋text!");
             if (StringUtils.isNotEmpty(findText)) {
-                YellowMarkJTextPaneHandler mYellowMarkJTextPaneHandler = new YellowMarkJTextPaneHandler(logWatcherTextArea, findText);
+                mYellowMarkJTextPaneHandler = new YellowMarkJTextPaneHandler(logWatcherTextArea, findText);
                 mYellowMarkJTextPaneHandler.process();
             }
+        }
+        if (e.getKeyCode() == KeyEvent.VK_F3 || (KeyEventUtil.isMaskKeyPress(e, "c") && e.getKeyCode() == KeyEvent.VK_K)) {
+            logWatcherTextArea.setCaretPosition(Integer.valueOf(String.valueOf(mYellowMarkJTextPaneHandler.findNext(logWatcherTextArea.getCaretPosition()))));
+        }
+        if ((KeyEventUtil.isMaskKeyPress(e, "s") && e.getKeyCode() == KeyEvent.VK_F3) || (KeyEventUtil.isMaskKeyPress(e, "cs") && e.getKeyCode() == KeyEvent.VK_K)) {
+            logWatcherTextArea.setCaretPosition(Integer.valueOf(String.valueOf(mYellowMarkJTextPaneHandler.findPrevious(logWatcherTextArea.getCaretPosition()))));
         }
     }
     // LogWatcher ↑↑↑↑↑↑

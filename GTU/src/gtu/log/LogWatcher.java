@@ -43,7 +43,8 @@ public abstract class LogWatcher {
         this.file = file;
         try {
             raf = new RandomAccessFile(file, "r");
-        } catch (FileNotFoundException e) {
+            raf.seek(file.length() - 1);
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
@@ -115,10 +116,17 @@ public abstract class LogWatcher {
     private void processLineNumber() {
         try {
             int index = getPosLstSize();
+            long startTime = System.currentTimeMillis();
+            System.out.println("processLineNumber--------start　: " + index);
             while ((raf.readLine()) != null) {
                 posLst.put(index, raf.getFilePointer());
                 index++;
+                if (index % 10000 == 0) {
+                    System.out.println("\tprocessLineNumber--------step　: " + index);
+                }
             }
+            System.out.println("processLineNumber--------end　: " + index);
+            System.out.println("processLineNumber during : " + ((System.currentTimeMillis() - startTime) / 1000) + "sec");
             // System.out.println("checkFiles size " + posLst.size());
         } catch (IOException e) {
             throw new RuntimeException(e);

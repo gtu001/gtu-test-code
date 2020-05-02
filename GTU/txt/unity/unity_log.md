@@ -8,9 +8,11 @@ unity_log.md
 	‪	C:\Users\username\AppData\Local\Unity\Editor\Editor.log
 
 		Ex : C:\Users\wistronits\AppData\Local\Unity\Editor\
+			 C:/Users/gtu00/AppData/Local/Unity/Editor/Editor.log
 
 	WebPlayer Logs:
 		C:\Users\username\AppData\LocalLow\CompanyName\ProductName\Player.log
+
 
 
 	====

@@ -73,7 +73,7 @@ public class GameManager : MonoBehaviour {
     }
 
     void SetPageState (PageState state) {
-        Log.debug("##----------------" + "SetPageState");
+        Log.debug("##----------------" + "SetPageState : " + state);
         switch (state) {
             case PageState.None:
                 startPage.SetActive(false);
