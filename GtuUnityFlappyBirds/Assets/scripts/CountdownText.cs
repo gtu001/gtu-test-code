@@ -23,7 +23,7 @@ public class CountdownText : MonoBehaviour {
         Log.debug("##----------------" + "Countdown");
         int count = 3;
         for( int ii = 0 ; ii < count ; ii ++) {
-            countdown.text = (count - 1).ToString();
+            countdown.text = (count - ii).ToString();
             yield return new WaitForSeconds(1);
         }
 

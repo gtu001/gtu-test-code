@@ -32,8 +32,19 @@ public class Log {
 
     public static void debug (System.Object message) {
         StackTrace st = new StackTrace (true);
-        if (st.FrameCount > 0) {
-            int i = st.FrameCount - 1;
+        int showPos = -1;
+        for(int i = 0 ; i < st.FrameCount; i ++) {
+            StackFrame sf = st.GetFrame (i);
+            int lineNumber = sf.GetFileLineNumber ();
+            String className2 = Instance.getClassName (sf.GetFileName ());
+            String methodName2 = sf.GetMethod ().Name;
+            if(className2 == typeof(Log).Name) {
+                showPos = i + 1;
+            }
+            //Console.WriteLine (i + "-" + className2 + "." + methodName2 + "(" + lineNumber + ") : " + message);
+        }
+        if(showPos != -1) {
+            int i = showPos;
             StackFrame sf = st.GetFrame (i);
             int lineNumber = sf.GetFileLineNumber ();
             String className2 = Instance.getClassName (sf.GetFileName ());

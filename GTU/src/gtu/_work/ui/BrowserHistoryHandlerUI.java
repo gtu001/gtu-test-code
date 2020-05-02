@@ -2217,21 +2217,21 @@ public class BrowserHistoryHandlerUI extends JFrame {
             }
             return commandType;
         }
+    }
 
-        private void allOpenBtnAction() {
-            try {
-                JTableUtil jtab = JTableUtil.newInstance(urlTable);
-                for (int ii = 0; ii < jtab.getModel().getRowCount(); ii++) {
-                    boolean isChk = (Boolean) jtab.getRealValueAt(ii, UrlTableConfigEnum.開啟.ordinal());
-                    UrlConfig vo = (UrlConfig) jtab.getRealValueAt(ii, UrlTableConfigEnum.VO.ordinal());
-                    if (isChk) {
-                        CommandTypeEnum e = CommandTypeEnum.valueOfFrom(vo.commandType);
-                        e.doOpen(vo.url, BrowserHistoryHandlerUI.this);
-                    }
+    private void allOpenBtnAction() {
+        try {
+            JTableUtil jtab = JTableUtil.newInstance(urlTable);
+            for (int ii = 0; ii < jtab.getModel().getRowCount(); ii++) {
+                boolean isChk = (Boolean) jtab.getRealValueAt(ii, UrlTableConfigEnum.開啟.ordinal());
+                UrlConfig vo = (UrlConfig) jtab.getRealValueAt(ii, UrlTableConfigEnum.VO.ordinal());
+                if (isChk) {
+                    CommandTypeEnum e = CommandTypeEnum.valueOfFrom(vo.commandType);
+                    e.doOpen(vo.url, BrowserHistoryHandlerUI.this);
                 }
-            } catch (Exception ex) {
-                JCommonUtil.handleException(ex);
             }
+        } catch (Exception ex) {
+            JCommonUtil.handleException(ex);
         }
     }
 
@@ -3195,7 +3195,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
     private void logWatcherTextAreaLogCacheClean() {
         if (logWatcherTextArea.getText().length() > 200000) {
             String text = StringUtils.substring(logWatcherTextArea.getText(), 100000);
-            logWatcherTextArea.setText("");
+            JTextPaneUtil.newInstance(logWatcherTextArea).setTextReset("");//TODO XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
             StringBuilder sb = new StringBuilder();
             sb.append("已清除部分log(" + DateFormatUtils.format(System.currentTimeMillis(), "yyyy/MM/dd HH:mm:ss.SSS") + ")...\n");
             sb.append(text);

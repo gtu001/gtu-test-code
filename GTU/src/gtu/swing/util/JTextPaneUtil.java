@@ -33,9 +33,9 @@ public class JTextPaneUtil {
             }
         };
 //        if (OsInfoUtil.isWindows()) {
-            runnable.run();
+//            runnable.run();
 //        } else {
-//            EventQueue.invokeLater(runnable);
+            EventQueue.invokeLater(runnable);
 //        }
     }
 
