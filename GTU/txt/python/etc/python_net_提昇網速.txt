@@ -1,0 +1,32 @@
+原文有測試與介紹，原理大概就是丟封包到Speedtest，遠_就會幫你加速惹，本文主要是補充在Android執行的方法。
+
+首先在Play商店安裝Termux https://bit.ly/2SulXt7
+
+完成後依序輸入指令
+pkg upgrade (輸入y)
+pkg install python (輸入y)
+pkg install git (輸入y)
+git clone https://github.com/orz811017/boost_bandwidth_via_speedtest.git
+
+輸入ls檢查一下
+
+$ls
+boost_bandwidth_via_speedtest 
+
+這樣就是有順利下載軟體包了
+
+輸入cd boost_bandwidth_via_speedtest
+
+就會到boost_bandwidth_via_speedtest資料夾裡，然後
+python setup.py install
+
+最後輸入 speedtest-cli
+
+$ speedtest-cli
+Retrieving speedtest.net configuration... Testing from HiNet (1.165.87.171)... Retrieving speedtest.net server list... Selecting best server based on ping... Hosted by Chief Telecom (Changhua) [15.33 km]: 14.907 ms
+
+可以執行表示安裝成功，Termux會在背景執行，遠_以為你在Speedtest測速，就可以持續跑滿速了。
+
+下次執行只需要打開Termux，輸入 speedtest-cli
+
+原文作者用的是遠_399電銷方案，發現有限速，大家可以用用看，測試自己的方案有沒有限速，應該適用任何有測速白名單的電信。 https://bit.ly/3fa6mJ1
