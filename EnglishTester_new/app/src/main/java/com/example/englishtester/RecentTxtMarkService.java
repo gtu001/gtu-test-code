@@ -33,6 +33,33 @@ public class RecentTxtMarkService {
         return recentTxtMarkDAO.queryBookmarkLikeLst(fileName, bookmarkType);
     }
 
+    public RecentTxtMark addOpenBookMark(final String fileName) {
+        long currentTime = System.currentTimeMillis();
+        RecentTxtMark bo = new RecentTxtMark();
+        bo.fileName = fileName;
+        bo.insertDate = currentTime;
+        bo.markEnglish = "";
+        bo.markIndex = -1;
+        bo.bookmarkType = RecentTxtMarkDAO.BookmarkTypeEnum.FILE_OPEN.getType();
+        bo.pageIndex = -1;
+
+        List<RecentTxtMark> list = recentTxtMarkDAO.query(//
+                RecentTxtMarkSchmea.FILE_NAME + "=? and " + //
+                        RecentTxtMarkSchmea.BOOKMARK_TYPE + "=? ", //
+                new String[]{fileName, String.valueOf(RecentTxtMarkDAO.BookmarkTypeEnum.FILE_OPEN.getType())});
+
+        if (list.isEmpty()) {
+            long result = recentTxtMarkDAO.insertWord(bo);
+            Log.v(TAG, "insert [" + result + "]" + ReflectionToStringBuilder.toString(bo));
+        } else {
+            bo = list.get(0);
+            bo.insertDate = currentTime;
+            int result = recentTxtMarkDAO.updateByVO(bo);
+            Log.v(TAG, "update [" + result + "]" + ReflectionToStringBuilder.toString(bo));
+        }
+        return bo;
+    }
+
     /**
      * 新增查詢單字
      */

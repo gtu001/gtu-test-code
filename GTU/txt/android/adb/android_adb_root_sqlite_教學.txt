@@ -1,0 +1,13 @@
+$ sudo apt-get install adb
+
+$ cd /home/gtu001/Android/Sdk/platform-tools
+
+下載一鍵Root -> https://zh.kingoapp.com/
+
+$ adb root
+
+$ adb devices
+
+$ adb -s 4754381f0204 shell
+
+https://www.simplifiedcoding.net/access-sqlite-database/

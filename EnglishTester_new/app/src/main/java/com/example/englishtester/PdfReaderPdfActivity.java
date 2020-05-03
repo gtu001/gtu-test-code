@@ -51,6 +51,7 @@ import com.example.englishtester.common.TxtReaderAppenderSpanClass;
 import com.example.englishtester.common.ViewPagerHelper;
 import com.example.englishtester.common.interf.ITxtReaderActivity;
 import com.example.englishtester.common.interf.PdfActivityInterface;
+import com.example.englishtester.common.mobi.base.MobiViewerMainHandler;
 import com.example.englishtester.common.pdf.base.PdfViewerMainHandler;
 
 import org.apache.commons.lang3.StringUtils;
@@ -461,6 +462,10 @@ public class PdfReaderPdfActivity extends FragmentActivity implements FloatViewS
 
                         //設定書籍 及 初始化
                         epubViewerMainHandler.initBook(file, PdfReaderPdfActivity.this);
+
+                        //註冊開啟檔案
+                        String fileName = PdfViewerMainHandler.PdfPageTitleHandler.fixNameToTitle(file.getName());
+                        recentTxtMarkService.addOpenBookMark(fileName);
 
                         handler.post(new Runnable() {
                             @Override

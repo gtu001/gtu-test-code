@@ -463,6 +463,10 @@ public class MobiReaderMobiActivity extends FragmentActivity implements FloatVie
                         //設定書籍 及 初始化
                         epubViewerMainHandler.initBook(file);
 
+                        //註冊開啟檔案
+                        String fileName = MobiViewerMainHandler.MobiPageTitleHandler.fixNameToTitle(file.getName());
+                        recentTxtMarkService.addOpenBookMark(fileName);
+
                         handler.post(new Runnable() {
                             @Override
                             public void run() {

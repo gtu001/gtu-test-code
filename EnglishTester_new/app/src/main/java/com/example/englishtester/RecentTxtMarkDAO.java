@@ -338,6 +338,7 @@ public class RecentTxtMarkDAO {
         BOOKMARK(1, "書籤"),//
         SCROLL_Y_POS(2, "最後瀏覽位置"),//
         SCROLLVIEW_HEIGHT(3, "卷軸高度"),//
+        FILE_OPEN(4, "開啟文件注記"),//
         ;
         final int type;
         final String label;
