@@ -17,6 +17,7 @@ import com.example.englishtester.common.Log;
 import com.example.englishtester.common.MainAdViewHelper;
 import com.example.englishtester.common.PermissionUtil;
 import com.example.englishtester.common.ServiceUtil;
+import com.example.englishtester.common.WindowTomatoDialog;
 import com.google.android.gms.ads.NativeExpressAdView;
 
 import org.apache.commons.lang3.ArrayUtils;

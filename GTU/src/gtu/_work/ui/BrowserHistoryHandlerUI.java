@@ -72,7 +72,6 @@ import javax.swing.JToggleButton;
 import javax.swing.WindowConstants;
 import javax.swing.event.DocumentEvent;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.text.SimpleAttributeSet;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringEscapeUtils;
@@ -108,7 +107,6 @@ import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
 
-import gtu._work.ui.FastDBQueryUI_ColumnSearchFilter.InnerMatch;
 import gtu.clipboard.ClipboardUtil;
 import gtu.collection.ListUtil;
 import gtu.constant.PatternCollection;
@@ -131,6 +129,7 @@ import gtu.swing.util.JChangeInputMethodUtil;
 import gtu.swing.util.JColorUtil;
 import gtu.swing.util.JComboBoxUtil;
 import gtu.swing.util.JCommonUtil;
+import gtu.swing.util.JCommonUtil.HandleDocumentEvent;
 import gtu.swing.util.JFrameRGBColorPanel;
 import gtu.swing.util.JFrameUtil;
 import gtu.swing.util.JMouseEventUtil;
@@ -142,7 +141,6 @@ import gtu.swing.util.JTextAreaUtil;
 import gtu.swing.util.JTextPaneTextStyle;
 import gtu.swing.util.JTextPaneUtil;
 import gtu.swing.util.KeyEventUtil;
-import gtu.swing.util.JCommonUtil.HandleDocumentEvent;
 import gtu.thread.util.ThreadUtil;
 import taobe.tec.jcc.JChineseConvertor;
 
@@ -215,7 +213,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
     private JTextField periodSecText;
     private JButton openUrlBtn;
     private JTextPane logWatcherTextArea;
-    private JToggleButton logWatcherBtn;
+    private JButton logWatcherBtn;
     private JTextField logWatcherPeriodText;
 
     /**
@@ -589,6 +587,14 @@ public class BrowserHistoryHandlerUI extends JFrame {
             panel_7.add(batWaittingTimeText);
             batWaittingTimeText.setColumns(10);
 
+            periodTaskChkBtn = new JButton("週期批次檢視");
+            periodTaskChkBtn.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    periodTaskChkBtnAction();
+                }
+            });
+            panel_7.add(periodTaskChkBtn);
+
             JPanel panel_8 = new JPanel();
             panel_6.add(panel_8, BorderLayout.WEST);
 
@@ -609,7 +615,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
             JPanel panel_13 = new JPanel();
             panel_12.add(panel_13, BorderLayout.NORTH);
 
-            logWatcherBtn = new JToggleButton("監聽");
+            logWatcherBtn = new JButton("監聽");
             logWatcherBtn.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     logWatcherBtnToggleAction();
@@ -722,6 +728,15 @@ public class BrowserHistoryHandlerUI extends JFrame {
         }
     }
 
+    private void checkOpenUrlButtonText(String url) {
+        if (periodSecHolder.containsKey(url)) {
+            String lbl = periodSecHolder.get(url).stop ? "結束" : "進行中";
+            openUrlBtn.setText("週期執行(" + lbl + ")");
+        } else {
+            openUrlBtn.setText("開啟");
+        }
+    }
+
     private void doOpenUrlMaster(String url) {
         boolean isPeriodProc = false;
         if (StringUtils.isNotBlank(periodSecText.getText()) && StringUtils.isNumericSpace(periodSecText.getText())) {
@@ -739,12 +754,6 @@ public class BrowserHistoryHandlerUI extends JFrame {
         }
         if (!isPeriodProc) {
             commandTypeSetting.getValue().doOpen(url, BrowserHistoryHandlerUI.this);
-        }
-        if (periodSecHolder.containsKey(url)) {
-            String lbl = periodSecHolder.get(url).stop ? "結束" : "進行中";
-            openUrlBtn.setText("週期執行(" + lbl + ")");
-        } else {
-            openUrlBtn.setText("開啟");
         }
     }
 
@@ -1968,6 +1977,10 @@ public class BrowserHistoryHandlerUI extends JFrame {
                 return text.replaceAll(Pattern.quote(REP_STR), "^");
             }
         }
+
+        public String toString() {
+            return title;
+        }
     }
 
     private String getHtmlTitle(String url) throws IOException {
@@ -2056,6 +2069,10 @@ public class BrowserHistoryHandlerUI extends JFrame {
             this.setUrlConfigToUI(d, true);
 
             System.out.println("[open]<<<" + d.title + " = " + d.url);
+
+            if (JMouseEventUtil.buttonLeftClick(1, e)) {
+                checkOpenUrlButtonText(d.url);
+            }
 
             if (JMouseEventUtil.buttonLeftClick(2, e)) {
                 // commandTypeSetting.getValue().doOpen(d.url,
@@ -3044,6 +3061,31 @@ public class BrowserHistoryHandlerUI extends JFrame {
         }
     }
 
+    private void periodTaskChkBtnAction() {
+        List<UrlConfig> allLst = getUrlConfigList(false);
+        List<UrlConfig> lst = new ArrayList<UrlConfig>();
+        for (String url : periodSecHolder.keySet()) {
+            if (periodSecHolder.get(url).stop == false) {
+                B: for (UrlConfig d : allLst) {
+                    if (StringUtils.equals(d.url, url)) {
+                        lst.add(d);
+                        break B;
+                    }
+                }
+            }
+        }
+        UrlConfig choice = (UrlConfig) JCommonUtil._JOptionPane_showInputDialog("選擇執行中的批次 : " + lst.size(), "選擇執行中的批次", lst.toArray(), null);
+        if (choice != null) {
+            boolean stopConfirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("停掉他 : " + choice.title, "停止批次");
+            if (stopConfirm) {
+                periodSecHolder.get(choice.url).stop = true;
+                JCommonUtil._jOptionPane_showMessageDialog_info("停止中!");
+            } else {
+                JCommonUtil._jOptionPane_showMessageDialog_info("操作取消");
+            }
+        }
+    }
+
     private class PeriodThread extends TimerTask {
         private boolean stop = false;
         private Map<String, PeriodThread> periodSecHolder;
@@ -3096,6 +3138,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
     private JLabel logWatcherFindSizeLbl;
     private JTextField logWatcherCustomFileText;
     private YellowMarkJTextPaneHandler mYellowMarkJTextPaneHandler;
+    private JButton periodTaskChkBtn;
 
     private class LogWatcherPeriodTask extends TimerTask {
         boolean stop = false;
@@ -3195,7 +3238,8 @@ public class BrowserHistoryHandlerUI extends JFrame {
     private void logWatcherTextAreaLogCacheClean() {
         if (logWatcherTextArea.getText().length() > 200000) {
             String text = StringUtils.substring(logWatcherTextArea.getText(), 100000);
-            JTextPaneUtil.newInstance(logWatcherTextArea).setTextReset("");//TODO XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+            JTextPaneUtil.newInstance(logWatcherTextArea).setTextReset("");// TODO
+                                                                           // XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
             StringBuilder sb = new StringBuilder();
             sb.append("已清除部分log(" + DateFormatUtils.format(System.currentTimeMillis(), "yyyy/MM/dd HH:mm:ss.SSS") + ")...\n");
             sb.append(text);

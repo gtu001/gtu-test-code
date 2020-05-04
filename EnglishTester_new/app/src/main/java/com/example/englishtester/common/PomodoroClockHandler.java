@@ -2,13 +2,16 @@ package com.example.englishtester.common;
 
 import android.app.Service;
 import android.content.Context;
+import android.media.Ringtone;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Vibrator;
+import android.view.View;
 import android.widget.Toast;
 
 import com.example.englishtester.MainActivity;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 
 import java.util.Calendar;
@@ -46,6 +49,10 @@ public class PomodoroClockHandler {
     }
 
     private void showMessage(final String message) {
+        showMessage(message, null, null);
+    }
+
+    private void showMessage(final String message, String endDialogBtnText, Long during) {
         LineAppNotifiyHelper_Simple.getInstance().send(message);
 
         this.notificationHelper.notifyNow(1, "番茄鐘", message, false, MainActivity.class);
@@ -56,6 +63,30 @@ public class PomodoroClockHandler {
                 Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
             }
         });
+
+        if (StringUtils.isNotBlank(endDialogBtnText)) {
+            showEndDialog(endDialogBtnText, during, context);
+        }
+    }
+
+    private void showEndDialog(String btnText, Long during, Context context) {
+        final Ringtone ringtone = RingNotificationHelper.getInstance().ring(context, 0.3f, null);
+        final WindowTomatoDialog dlg2 = new WindowTomatoDialog(context);
+        dlg2.setCloseTomatoBtnListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ringtone.stop();
+                dlg2.dismiss();
+            }
+        });
+        dlg2.showDialog(btnText);
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                ringtone.stop();
+                dlg2.dismiss();
+            }
+        }, during);
     }
 
     private void showFinishTimeNotify() {
@@ -83,14 +114,14 @@ public class PomodoroClockHandler {
             @Override
             public void run() {
                 customVibratePatternNoRepeat();
-                showMessage("工作時間到!..");
+                showMessage("工作時間到!..", "番茄鐘工作完成", 20000L);
             }
         }, 25 * 60 * 1000);
         TIMER.get().schedule(new TimerTask() {
             @Override
             public void run() {
                 customVibratePatternNoRepeat();
-                showMessage("休息時間到!..");
+                showMessage("休息時間到!..", "番茄鐘休息結束", 10000L);
                 //設定為初始狀態
                 isStarting.set(false);
             }

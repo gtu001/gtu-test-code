@@ -7,4 +7,5 @@
     <color name="transparent">#00000000</color>
 
     <color name="semitransparent_white">#77ffffff</color>
+    <color name="translucent_black">#80000000</color>
 </resources>
