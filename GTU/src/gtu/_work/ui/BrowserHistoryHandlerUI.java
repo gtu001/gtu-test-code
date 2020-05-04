@@ -720,6 +720,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
             // final do
             initLoading();
 
+            // 啟動自動執行
             bootstartStarting();
 
             otherOpenPath = new OtherOpenPath(configSelf);
@@ -807,8 +808,16 @@ public class BrowserHistoryHandlerUI extends JFrame {
         StringBuilder sb = new StringBuilder();
         for (UrlConfig d : bootLst) {
             CommandTypeEnum e = CommandTypeEnum.valueOfFrom(d.commandType);
-            e.doOpen(d.url, this);
-            sb.append("bootstart -> ").append(d.url).append("\r\n");
+            String errMsg = "";
+            try {
+                e.doOpen(d.url, this, false);
+            } catch (Exception ex) {
+                errMsg = ex.getMessage();
+            }
+            if (StringUtils.isNotBlank(errMsg)) {
+                errMsg = ", ERR : " + errMsg;
+            }
+            sb.append("bootstart -> ").append(d.url).append(errMsg).append("\r\n");
         }
         batLogArea.setText(sb.toString());
     }
@@ -856,7 +865,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
     private enum CommandTypeEnum {
         DEFAULT("預設") {
             @Override
-            void _doOpen(String url, BrowserHistoryHandlerUI _this) {
+            void _doOpen(String url, BrowserHistoryHandlerUI _this, boolean showErrorDlg) {
                 try {
                     String dValue = _this.bookmarkConfig.getConfigProp().getProperty(url);
                     String fixUrl = fixWindowUrl(url);
@@ -871,13 +880,17 @@ public class BrowserHistoryHandlerUI extends JFrame {
                         DesktopUtil.browse(fixUrl);
                     }
                 } catch (Exception e1) {
-                    JCommonUtil.handleException(e1);
+                    if (showErrorDlg) {
+                        JCommonUtil.handleException(e1);
+                    } else {
+                        throw new RuntimeException(e1);
+                    }
                 }
             }
         }, //
         IE_EAGE("Microsoft Edge") {
             @Override
-            void _doOpen(String url, BrowserHistoryHandlerUI _this) {
+            void _doOpen(String url, BrowserHistoryHandlerUI _this, boolean showErrorDlg) {
                 try {
                     if (OsInfoUtil.isWindows()) {
                         if (System.getProperty("os.name").equals("Windows 10")) {
@@ -891,16 +904,20 @@ public class BrowserHistoryHandlerUI extends JFrame {
                         String command = String.format("cmd /c call \"%s\" \"%s\" ", exePath, url);
                         Runtime.getRuntime().exec(command);
                     } else {
-                        CommandTypeEnum.DEFAULT.doOpen(title, _this);
+                        CommandTypeEnum.DEFAULT.doOpen(title, _this, showErrorDlg);
                     }
                 } catch (Exception e1) {
-                    JCommonUtil.handleException(e1);
+                    if (showErrorDlg) {
+                        JCommonUtil.handleException(e1);
+                    } else {
+                        throw new RuntimeException(e1);
+                    }
                 }
             }
         }, //
         FIREFOX("Mozilla Firefox") {
             @Override
-            void _doOpen(String url, BrowserHistoryHandlerUI _this) {
+            void _doOpen(String url, BrowserHistoryHandlerUI _this, boolean showErrorDlg) {
                 try {
                     String exePath = "C:/Program Files/Mozilla Firefox/firefox.exe";
                     String commandFormat = "cmd /c call \"%s\" \"%s\" ";
@@ -915,13 +932,17 @@ public class BrowserHistoryHandlerUI extends JFrame {
                     System.out.println(finalCommand);
                     Runtime.getRuntime().exec(finalCommand);
                 } catch (Exception e1) {
-                    JCommonUtil.handleException(e1);
+                    if (showErrorDlg) {
+                        JCommonUtil.handleException(e1);
+                    } else {
+                        throw new RuntimeException(e1);
+                    }
                 }
             }
         }, //
         CHROME("Google Chrome") {
             @Override
-            void _doOpen(String url, BrowserHistoryHandlerUI _this) {
+            void _doOpen(String url, BrowserHistoryHandlerUI _this, boolean showErrorDlg) {
                 try {
                     String exePath = "C:/Program Files (x86)/Google/Chrome/Application/chrome.exe";
                     String commandFormat = "cmd /c call \"%s\" \"%s\" ";
@@ -936,7 +957,11 @@ public class BrowserHistoryHandlerUI extends JFrame {
                     System.out.println(finalCommand);
                     Runtime.getRuntime().exec(finalCommand);
                 } catch (Exception e1) {
-                    JCommonUtil.handleException(e1);
+                    if (showErrorDlg) {
+                        JCommonUtil.handleException(e1);
+                    } else {
+                        throw new RuntimeException(e1);
+                    }
                 }
             }
         },//
@@ -948,9 +973,13 @@ public class BrowserHistoryHandlerUI extends JFrame {
             this.title = title;
         }
 
-        abstract void _doOpen(String url, BrowserHistoryHandlerUI _this);
+        abstract void _doOpen(String url, BrowserHistoryHandlerUI _this, boolean showErrorDlg);
 
         public void doOpen(String url, BrowserHistoryHandlerUI _this) {
+            this.doOpen(url, _this, true);
+        }
+
+        public void doOpen(String url, BrowserHistoryHandlerUI _this, boolean showErrorDlg) {
             url = StringUtils.trimToEmpty(url);
 
             if (StringUtils.isBlank(url)) {
@@ -973,7 +1002,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
                     _this.doOpenWithRemark(d, false);
                 } else {
                     // if (OsInfoUtil.isWindows()) {
-                    _doOpen(url, _this);
+                    _doOpen(url, _this, showErrorDlg);
                     // } else {
                     // CommandTypeEnum.DEFAULT._doOpen(url, _this);
                     // }

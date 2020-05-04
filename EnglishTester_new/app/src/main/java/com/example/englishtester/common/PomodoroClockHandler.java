@@ -69,7 +69,7 @@ public class PomodoroClockHandler {
         }
     }
 
-    private void showEndDialog(String btnText, Long during, Context context) {
+    private void showEndDialog(final String btnText, Long during, Context context) {
         final Ringtone ringtone = RingNotificationHelper.getInstance().ring(context, 0.3f, null);
         final WindowTomatoDialog dlg2 = new WindowTomatoDialog(context);
         dlg2.setCloseTomatoBtnListener(new View.OnClickListener() {
@@ -79,8 +79,13 @@ public class PomodoroClockHandler {
                 dlg2.dismiss();
             }
         });
-        dlg2.showDialog(btnText);
-        new Handler().postDelayed(new Runnable() {
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+            @Override
+            public void run() {
+                dlg2.showDialog(btnText);
+            }
+        });
+        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
             @Override
             public void run() {
                 ringtone.stop();

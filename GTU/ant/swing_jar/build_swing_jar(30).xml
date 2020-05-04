@@ -28,6 +28,7 @@
 			<filename name="**/*.jar" />
 		</fileset>
 	</path>
+
 	<typedef name="jarfinder" classname="gtu.ant.AntJarFinder" classpathref="my_test_classpath" />
 	<!--<typedef name="classLoader" classname="gtu.ant.AntClassLoader" classpathref="my_test_classpath" />-->
 	<typedef name="antDebug" classname="gtu.ant.AntDebug" classpathref="my_test_classpath" />
@@ -39,6 +40,12 @@
 		<fileset dir="${jar_repsitory}">
 			<filename name="**/*.jar" />
 		</fileset>
+	</path>
+	<path id="javafx_class_path">
+		<fileset dir="/media/gtu001/OLD_D/my_tool/jfxrt">
+			<filename name="**/*.jar" />
+		</fileset>
+		<pathelement path="${build.dir}" />
 	</path>
 
 	<!--
@@ -103,14 +110,17 @@
 		<antcall target="clean">
 			<!--清除-->
 			<param name="enable" value="true" />
+			<!-- false -->
 		</antcall>
 
 		<antcall target="buildClassSet">
 			<param name="enable" value="true" />
+			<!-- false -->
 		</antcall>
 
 		<antcall target="copyReference">
 			<param name="enable" value="true" />
+			<!-- false -->
 		</antcall>
 
 		<antcall target="compiler" />
@@ -137,7 +147,8 @@
 
 		<antcall target="clean">
 			<!--清除-->
-			<param name="enable" value="true" />
+			<param name="enable" value="false" />
+			<!-- false -->
 		</antcall>
 
 		<antcall target="jarToExe">
@@ -166,6 +177,7 @@
 			<classpath>
 				<path location="${build_dir}" />
 			</classpath>
+			<classpath refid="javafx_class_path" />
 		</javac>
 	</target>
 
