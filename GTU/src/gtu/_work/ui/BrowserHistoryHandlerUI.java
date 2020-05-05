@@ -102,6 +102,7 @@ import org.jnativehook.NativeInputEvent;
 import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
 
+import com.itextpdf.io.util.ArrayUtil;
 import com.jgoodies.forms.factories.FormFactory;
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormLayout;
@@ -3228,10 +3229,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
 
     private void logWatcherBtnToggleAction() {
         try {
-            if (logWatcherBtn.isSelected()) {
-                if (logWatcherBtn.getText().contains("監聽closing")) {
-                    return;
-                }
+            if (!ArrayUtils.contains(new String[] { "監聽closing", "監聽start" }, logWatcherBtn.getText())) {
                 File logFile = null;
                 if (StringUtils.isNotBlank(logWatcherCustomFileText.getText())) {
                     logFile = DesktopUtil.getFile(logWatcherCustomFileText.getText());
@@ -3255,7 +3253,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
                 new Timer().schedule(mLogWatcherPeriodTask, 0, period);
                 logWatcherBtn.setText("監聽start");
                 logWatcherSizeChangeLbl.setText(String.valueOf(logFile.length()));
-            } else if (mLogWatcherPeriodTask != null) {
+            } else if (ArrayUtils.contains(new String[] { "監聽start" }, logWatcherBtn.getText())) {
                 mLogWatcherPeriodTask.stop = true;
                 logWatcherBtn.setText("監聽closing");
             }
