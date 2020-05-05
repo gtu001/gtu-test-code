@@ -51,7 +51,7 @@ public class GameManager : MonoBehaviour {
     void OnCountdownFinished() {
         Log.debug("##----------------" + "OnCountdownFinished");
         SetPageState(PageState.None);
-        // OnGameStarted(); XXXXXXXXXXXXXXXXXXXXXXX
+        OnGameStarted(); //XXXXXXXXXXXXXXXXXXXXXXX
         score = 0;
         gameOver = false;
     }
@@ -101,7 +101,7 @@ public class GameManager : MonoBehaviour {
     public void ConfirmGameOver() {
         Log.debug("##----------------" + "ConfirmGameOver");
         //activated when replay button is hit
-        // OnGameOverConfirmed(); //event XXXXXXXXXXXXXXXXXX
+        OnGameOverConfirmed(); //event XXXXXXXXXXXXXXXXXX
         scoreText.text = "0";
         SetPageState(PageState.Start);
     }

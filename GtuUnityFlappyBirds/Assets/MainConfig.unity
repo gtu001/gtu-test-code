@@ -580,7 +580,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tapForce: 200
-  tiltSmooth: 1
+  tiltSmooth: 5
   startPos: {x: 0, y: 0, z: 0}
 --- !u!1 &820476452
 GameObject:

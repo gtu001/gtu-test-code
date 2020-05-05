@@ -30,6 +30,30 @@ public class TapController : MonoBehaviour {
         //rigidbody2.simulated = false;
     }
 
+    void OnEnable() {
+        Log.debug("##------------" + "OnEnable");
+        GameManager.OnGameStarted += OnGameStarted;
+        GameManager.OnGameOverConfirmed += OnGameOverConfirmed;
+    }
+
+    void OnDisable() {
+        Log.debug("##------------" + "OnDisable");
+        GameManager.OnGameStarted -= OnGameStarted;
+        GameManager.OnGameOverConfirmed -= OnGameOverConfirmed;
+    }
+
+    void OnGameStarted() {
+        Log.debug("##------------" + "OnGameStarted");
+        rigidbody2.velocity = Vector3.zero;
+        rigidbody2.simulated = true;
+    }
+
+    void OnGameOverConfirmed() {
+        Log.debug("##------------" + "OnGameOverConfirmed");
+        transform.localPosition = startPos;
+        transform.rotation = Quaternion.identity;// freeze
+    }
+
     void Update () {
         Log.debug("##------------" + "Update");
         if (Input.GetMouseButtonDown (0)) {
@@ -45,14 +69,14 @@ public class TapController : MonoBehaviour {
         Log.debug("##------------" + "OnTriggerEnter2D");
         if (col.gameObject.tag == "SocreZone") {
             // register a score event
-            OnPlayerScored (); // event send to GameManager
+            OnPlayerScored (); // event sent to GameManager
             // play a sound
         }
 
         if (col.gameObject.tag == "DeadZone") {
             rigidbody2.simulated = false;
             // register a dead event
-            OnPlayerDied (); // event send to GameManager
+            OnPlayerDied (); // event sent to GameManager
             // play a sound
         }
     }
