@@ -43,6 +43,7 @@
     <!-- 關掉其他程序 ↑↑↑↑↑↑↑↑↑↑ -->
 
     <application
+        android:process=":location"
         android:name="com.example.englishtester.common.MyApplication"
         android:icon="@drawable/janna_icon1"
         android:label="@string/app_name"
@@ -88,7 +89,7 @@
             android:process=":pomodoroClockHandlerService"
             android:stopWithTask="false" />
 
-        <!--<receiver android:name="com.example.englishtester.common.FloatServiceHolderBroadcastReceiver">
+        <receiver android:name="com.example.englishtester.common.FloatServiceHolderBroadcastReceiver" android:enabled="false">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.USER_PRESENT" />
@@ -100,7 +101,13 @@
                 <action android:name="android.intent.action.TIME_TICK" />
                 <action android:name="com.example.englishtester.common.FloatServiceHolderBroadcastReceiver" />
             </intent-filter>
-        </receiver>會有關不掉的問題-->
+        </receiver>
+
+        <receiver android:name="com.example.englishtester.common.AlarmReceiver" android:enabled="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"></action>
+            </intent-filter>
+        </receiver>
 
         <activity
             android:name=".MainActivity"
