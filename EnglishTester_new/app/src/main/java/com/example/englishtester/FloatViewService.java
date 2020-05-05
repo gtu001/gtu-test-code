@@ -64,7 +64,7 @@ import com.example.englishtester.common.LockScreenHelper;
 import com.example.englishtester.common.Log;
 import com.example.englishtester.common.MagnifierPosEnum;
 import com.example.englishtester.common.OOMHandler;
-import com.example.englishtester.common.PomodoroClockHandler;
+import com.example.englishtester.common.PomodoroClockHandlerService;
 import com.example.englishtester.common.ProcessHandler;
 import com.example.englishtester.common.ReaderCommonHelper;
 import com.example.englishtester.common.RepeatMoveListener;
@@ -884,12 +884,8 @@ public class FloatViewService extends Service {
         POMODORO_CLOCK("番茄鐘", R.drawable.icon_pomodoro_clock, false) {
             @Override
             void process(FloatViewService self) {
-                PomodoroClockHandler p = new PomodoroClockHandler(self);
-                if (!p.isStart()) {
-                    p.start();
-                } else {
-                    p.cancel();
-                }
+                Intent intent = new Intent(self, PomodoroClockHandlerService.class);
+                self.startService(intent);
             }
         },//
         EXIT_PROGRAM("關閉懸浮字典", R.drawable.icon_close_app, false) {
