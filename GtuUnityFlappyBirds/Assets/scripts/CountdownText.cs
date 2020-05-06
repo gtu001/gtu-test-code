@@ -11,6 +11,10 @@ public class CountdownText : MonoBehaviour {
     public static event CountdownFinished OnCountdownFinished;
 
     Text countdown;
+
+    public CountdownText () {
+        Log.debug("##------------" + "CountdownText");
+    }
      
     void OnEnable() {
         Log.debug("##----------------" + "OnEnable");

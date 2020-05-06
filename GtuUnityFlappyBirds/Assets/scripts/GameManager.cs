@@ -27,6 +27,10 @@ public class GameManager : MonoBehaviour {
     int score = 0;
     bool gameOver = false;
 
+    public GameManager () {
+        Log.debug("##------------" + "GameManager");
+    }
+
     public bool GameOver { get { return gameOver; } }
 
     void Awake () {
@@ -51,7 +55,7 @@ public class GameManager : MonoBehaviour {
     void OnCountdownFinished() {
         Log.debug("##----------------" + "OnCountdownFinished");
         SetPageState(PageState.None);
-        OnGameStarted(); //XXXXXXXXXXXXXXXXXXXXXXX
+        OnGameStarted(); 
         score = 0;
         gameOver = false;
     }
@@ -101,7 +105,7 @@ public class GameManager : MonoBehaviour {
     public void ConfirmGameOver() {
         Log.debug("##----------------" + "ConfirmGameOver");
         //activated when replay button is hit
-        OnGameOverConfirmed(); //event XXXXXXXXXXXXXXXXXX
+        OnGameOverConfirmed(); //event
         scoreText.text = "0";
         SetPageState(PageState.Start);
     }
@@ -111,4 +115,5 @@ public class GameManager : MonoBehaviour {
         //activated when play button is hit
         SetPageState(PageState.Countdown);
     }
+
 }

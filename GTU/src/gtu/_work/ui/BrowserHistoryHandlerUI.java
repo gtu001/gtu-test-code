@@ -628,7 +628,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
             logWatcherCustomFileText = new JTextField();
             panel_13.add(logWatcherCustomFileText);
             logWatcherCustomFileText.setColumns(10);
-            logWatcherCustomFileText.setToolTipText("自訂檔案");
+            logWatcherCustomFileText.setToolTipText("Log檔案路徑");
             JCommonUtil.jTextFieldSetFilePathMouseEvent(logWatcherCustomFileText, false);
 
             logWatcherFrontChk = new JCheckBox("提前");
@@ -656,8 +656,13 @@ public class BrowserHistoryHandlerUI extends JFrame {
             panel_13.add(lblNewLabel_8);
 
             logWatcherBufferSizeText = new JTextField();
+            logWatcherBufferSizeText.setToolTipText("Buffer大小");
             panel_13.add(logWatcherBufferSizeText);
-            logWatcherBufferSizeText.setColumns(10);
+            logWatcherBufferSizeText.setColumns(5);
+
+            logWatcherScorllLockChk = new JCheckBox("滾輪");
+            logWatcherScorllLockChk.setSelected(true);
+            panel_13.add(logWatcherScorllLockChk);
 
             logWatcherSizeChangeLbl = new JLabel("");
             panel_13.add(logWatcherSizeChangeLbl);
@@ -3201,6 +3206,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
     private YellowMarkJTextPaneHandler mYellowMarkJTextPaneHandler;
     private JButton periodTaskChkBtn;
     private JTextField logWatcherBufferSizeText;
+    private JCheckBox logWatcherScorllLockChk;
 
     private class LogWatcherPeriodTask extends TimerTask {
         boolean stop = false;
@@ -3228,6 +3234,9 @@ public class BrowserHistoryHandlerUI extends JFrame {
                     public void write(String line) {
                         bringToFront();
                         JTextPaneUtil.newInstance(logWatcherTextArea).append(line);
+                        if (logWatcherScorllLockChk.isSelected()) {
+                            JTextAreaUtil.setScrollToPosition(logWatcherTextArea, null);
+                        }
                     }
                 };
             } catch (Exception ex) {
@@ -3254,6 +3263,8 @@ public class BrowserHistoryHandlerUI extends JFrame {
             } catch (Exception ex) {
                 this.cancel();
                 stop = true;
+                mTxtFileChecker.close();
+                logWatcherBtn.setText("監聽off");
                 JCommonUtil.handleException(ex);
             }
         }
@@ -3290,6 +3301,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
                 logWatcherBtn.setText("監聽closing");
             }
         } catch (Exception ex) {
+            logWatcherBtn.setText("監聽off");
             JCommonUtil.handleException(ex);
         }
     }

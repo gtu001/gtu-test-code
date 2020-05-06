@@ -8,7 +8,7 @@ public class Log {
     private static Log Instance = new Log ();
     private static Regex CLASS_NAME_REGEX = new Regex (@".*?(?<clzName>\w+)\.cs", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
-    void showPublicMethods (System.Object obj) {
+    public static void showPublicMethods (System.Object obj, System.String label = null) {
         Console.WriteLine ("-----------------------------------------------");
         Type myType = obj.GetType (); //(typeof(obj));
         MethodInfo[] mths = myType.GetMethods (BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
