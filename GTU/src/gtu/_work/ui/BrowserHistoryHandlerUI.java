@@ -102,7 +102,6 @@ import org.jnativehook.NativeInputEvent;
 import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
 
-import com.itextpdf.io.util.ArrayUtil;
 import com.jgoodies.forms.factories.FormFactory;
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormLayout;
@@ -623,6 +622,9 @@ public class BrowserHistoryHandlerUI extends JFrame {
                 }
             });
 
+            JLabel lblNewLabel_7 = new JLabel("log");
+            panel_13.add(lblNewLabel_7);
+
             logWatcherCustomFileText = new JTextField();
             panel_13.add(logWatcherCustomFileText);
             logWatcherCustomFileText.setColumns(10);
@@ -644,11 +646,18 @@ public class BrowserHistoryHandlerUI extends JFrame {
             logWatcherClearBtn = new JButton("清除");
             logWatcherClearBtn.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    logWatcherTextArea.setText("");
+                    JTextPaneUtil.newInstance(logWatcherTextArea).clear();
                 }
             });
 
             panel_13.add(logWatcherClearBtn);
+
+            JLabel lblNewLabel_8 = new JLabel("buffer");
+            panel_13.add(lblNewLabel_8);
+
+            logWatcherBufferSizeText = new JTextField();
+            panel_13.add(logWatcherBufferSizeText);
+            logWatcherBufferSizeText.setColumns(10);
 
             logWatcherSizeChangeLbl = new JLabel("");
             panel_13.add(logWatcherSizeChangeLbl);
@@ -669,9 +678,29 @@ public class BrowserHistoryHandlerUI extends JFrame {
             JTextAreaUtil.applyCommonSetting(logWatcherTextArea);
             JTextAreaUtil.setScrollToBottomPloicy(logWatcherTextArea);
             logWatcherTextArea.getDocument().addDocumentListener(JCommonUtil.getDocumentListener(new HandleDocumentEvent() {
+                AtomicBoolean doClearCacheSuccess = null;
+
+                private int getBufferSize() {
+                    int rtnSize = 100000;
+                    try {
+                        rtnSize = Integer.parseInt(logWatcherBufferSizeText.getText());
+                    } catch (Exception e) {
+                        logWatcherBufferSizeText.setText(String.valueOf(rtnSize));
+                    }
+                    return rtnSize;
+                }
+
                 @Override
                 public void process(DocumentEvent event) {
-                    logWatcherTextAreaLogCacheClean();
+                    int bufferSize = getBufferSize();
+                    if (logWatcherTextArea.getText().length() > bufferSize) {
+                        if (doClearCacheSuccess == null || (doClearCacheSuccess != null && doClearCacheSuccess.get())) {
+                            System.out.println("######################################################");
+                            System.out.println("###  CLEAR BUFFER                       GO        ####");
+                            System.out.println("######################################################");
+                            doClearCacheSuccess = JTextPaneUtil.newInstance(logWatcherTextArea).remove(0, bufferSize / 2);
+                        }
+                    }
                 }
             }));
             logWatcherTextArea.addKeyListener(new KeyAdapter() {
@@ -2483,7 +2512,9 @@ public class BrowserHistoryHandlerUI extends JFrame {
                 }
                 popupUtil.applyEvent(e).show();
             }
-        } catch (Exception ex) {
+        } catch (
+
+        Exception ex) {
             JCommonUtil.handleException(ex);
         }
     }
@@ -3169,6 +3200,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
     private JTextField logWatcherCustomFileText;
     private YellowMarkJTextPaneHandler mYellowMarkJTextPaneHandler;
     private JButton periodTaskChkBtn;
+    private JTextField logWatcherBufferSizeText;
 
     private class LogWatcherPeriodTask extends TimerTask {
         boolean stop = false;
@@ -3259,18 +3291,6 @@ public class BrowserHistoryHandlerUI extends JFrame {
             }
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
-        }
-    }
-
-    private void logWatcherTextAreaLogCacheClean() {
-        if (logWatcherTextArea.getText().length() > 200000) {
-            String text = StringUtils.substring(logWatcherTextArea.getText(), 100000);
-            JTextPaneUtil.newInstance(logWatcherTextArea).setTextReset("");// TODO
-                                                                           // XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-            StringBuilder sb = new StringBuilder();
-            sb.append("已清除部分log(" + DateFormatUtils.format(System.currentTimeMillis(), "yyyy/MM/dd HH:mm:ss.SSS") + ")...\n");
-            sb.append(text);
-            logWatcherTextArea.setText(sb.toString());
         }
     }
 

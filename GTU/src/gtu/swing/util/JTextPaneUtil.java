@@ -1,13 +1,15 @@
 package gtu.swing.util;
 
 import java.awt.EventQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.JTextPane;
+import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.SimpleAttributeSet;
 
-import gtu.file.OsInfoUtil;
+import org.apache.commons.lang.StringUtils;
 
 public class JTextPaneUtil {
     private JTextPane textArea;
@@ -20,58 +22,81 @@ public class JTextPaneUtil {
         this.textArea = textArea;
     }
 
-    public void setTextReset(final String text) {
+    public AtomicBoolean setTextReset(final String text) {
+        AtomicBoolean success = new AtomicBoolean(false);
         Runnable runnable = new Runnable() {
             public void run() {
                 SimpleAttributeSet keyWord = new SimpleAttributeSet();
-                textArea.setText("");
                 try {
-                    textArea.getDocument().insertString(0, text, keyWord);
+                    Document doc = textArea.getDocument();
+                    doc.remove(0, StringUtils.length(textArea.getText()));
+                    doc.insertString(0, text, keyWord);
+                    success.set(true);
                 } catch (BadLocationException e) {
+                    success.set(true);
                     e.printStackTrace();
                 }
             }
         };
-//        if (OsInfoUtil.isWindows()) {
-//            runnable.run();
-//        } else {
-            EventQueue.invokeLater(runnable);
-//        }
+        EventQueue.invokeLater(runnable);
+        return success;
     }
 
-    public void insertStart(final String text) {
+    public AtomicBoolean insertStart(final String text) {
+        AtomicBoolean success = new AtomicBoolean(false);
         Runnable runnable = new Runnable() {
             public void run() {
                 try {
                     Document doc = textArea.getDocument();
                     doc.insertString(0, text, null);
+                    success.set(true);
                 } catch (Exception e) {
+                    success.set(true);
                     e.printStackTrace();
                 }
             }
         };
-        if (OsInfoUtil.isWindows()) {
-            runnable.run();
-        } else {
-            EventQueue.invokeLater(runnable);
-        }
+        EventQueue.invokeLater(runnable);
+        return success;
     }
 
-    public void append(final String text) {
+    public AtomicBoolean append(final String text) {
+        AtomicBoolean success = new AtomicBoolean(false);
         Runnable runnable = new Runnable() {
             public void run() {
                 try {
                     Document doc = textArea.getDocument();
                     doc.insertString(doc.getLength(), text, null);
+                    success.set(true);
                 } catch (Exception e) {
+                    success.set(true);
                     e.printStackTrace();
                 }
             }
         };
-        if (OsInfoUtil.isWindows()) {
-            runnable.run();
-        } else {
-            EventQueue.invokeLater(runnable);
-        }
+        EventQueue.invokeLater(runnable);
+        return success;
+    }
+
+    public AtomicBoolean remove(final int start, int length) {
+        AtomicBoolean success = new AtomicBoolean(false);
+        Runnable runnable = new Runnable() {
+            public void run() {
+                try {
+                    Document doc = textArea.getDocument();
+                    doc.remove(start, length);
+                    success.set(true);
+                } catch (Exception e) {
+                    success.set(true);
+                    e.printStackTrace();
+                }
+            }
+        };
+        SwingUtilities.invokeLater(runnable);
+        return success;
+    }
+
+    public AtomicBoolean clear() {
+        return remove(0, StringUtils.length(textArea.getText()));
     }
 }
