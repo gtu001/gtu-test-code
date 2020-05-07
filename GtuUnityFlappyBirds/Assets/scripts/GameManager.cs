@@ -67,6 +67,7 @@ public class GameManager : MonoBehaviour {
         if (score > savedScore) {
             PlayerPrefs.SetInt("HighScore", score);
         }
+        PlayerPrefs.SetInt("LatestScore", score);
         SetPageState(PageState.GameOver);
     }
 
@@ -115,5 +116,4 @@ public class GameManager : MonoBehaviour {
         //activated when play button is hit
         SetPageState(PageState.Countdown);
     }
-
 }

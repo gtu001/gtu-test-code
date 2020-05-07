@@ -2257,7 +2257,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
 
         private void process() {
             String remark = logWatcherTextArea.getText();
-            JTextPaneUtil.newInstance(logWatcherTextArea).setTextReset(remark);
+            JTextPaneUtil.newInstance(logWatcherTextArea).removeStyles();
             if (StringUtils.isNotBlank(remark)) {
                 findPosLst = new ArrayList<Long>();
                 Pattern ptn = Pattern.compile(Pattern.quote(findText), Pattern.CASE_INSENSITIVE | Pattern.DOTALL | Pattern.MULTILINE);

@@ -5,12 +5,12 @@ using UnityEngine.UI;
 using static Log;
 
 [RequireComponent(typeof(Text))]
-public class HighscoreText : MonoBehaviour {
+public class GameOverScoreText : MonoBehaviour {
     
-    Text highscore;
+    Text gameOverScoreText;
 
-    public HighscoreText () {
-        Log.debug("##------------" + "HighscoreText");
+    public GameOverScoreText () {
+        Log.debug("##------------" + "GameOverScoreText");
     }
 
     void Start() {
@@ -19,7 +19,7 @@ public class HighscoreText : MonoBehaviour {
 
     void OnEnable() {
         Log.debug("##----------------" + "OnEnable");
-        highscore = GetComponent<Text>();
-        highscore.text = "High Score : " + PlayerPrefs.GetInt("HighScore").ToString();
+        gameOverScoreText = GetComponent<Text>();
+        gameOverScoreText.text = "Score : " + PlayerPrefs.GetInt("LatestScore").ToString();
     }
 }

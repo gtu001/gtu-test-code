@@ -7,6 +7,7 @@ import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
+import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.SimpleAttributeSet;
 
 import org.apache.commons.lang.StringUtils;
@@ -22,24 +23,11 @@ public class JTextPaneUtil {
         this.textArea = textArea;
     }
 
-    public AtomicBoolean setTextReset(final String text) {
-        AtomicBoolean success = new AtomicBoolean(false);
-        Runnable runnable = new Runnable() {
-            public void run() {
-                SimpleAttributeSet keyWord = new SimpleAttributeSet();
-                try {
-                    Document doc = textArea.getDocument();
-                    doc.remove(0, StringUtils.length(textArea.getText()));
-                    doc.insertString(0, text, keyWord);
-                    success.set(true);
-                } catch (BadLocationException e) {
-                    success.set(true);
-                    e.printStackTrace();
-                }
-            }
-        };
-        EventQueue.invokeLater(runnable);
-        return success;
+    public void removeStyles() {
+        MutableAttributeSet mas = textArea.getInputAttributes();
+        System.out.println("before: " + mas);
+        mas.removeAttributes(mas);
+        System.out.println("after: " + mas);
     }
 
     public AtomicBoolean insertStart(final String text) {
