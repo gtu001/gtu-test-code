@@ -12,6 +12,7 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.BufferedReader;
@@ -135,6 +136,7 @@ import gtu.swing.util.JPopupMenuUtil;
 import gtu.swing.util.JTabbedPaneUtil;
 import gtu.swing.util.JTableUtil;
 import gtu.swing.util.JTableUtil.ColumnSearchFilter;
+import gtu.swing.util.JTableUtil.JTooltipTable;
 import gtu.swing.util.JTextAreaUtil;
 import gtu.swing.util.JTextFieldUtil;
 import gtu.swing.util.JTextFieldUtil.JTextComponentSelectPositionHandler;
@@ -189,7 +191,7 @@ public class FastDBQueryUI extends JFrame {
     private JScrollPane scrollPane_1;
     private JTable parametersTable;
     private JPanel panel_5;
-    private JTable queryResultTable;
+    private JTooltipTable queryResultTable;
     private JPanel panel_6;
     private JTextField dbUrlText;
     private JTextField dbUserText;
@@ -310,12 +312,17 @@ public class FastDBQueryUI extends JFrame {
     private JLabel lblNewLabel_13;
     private JTextComponentSelectPositionHandler mSqlTextAreaJTextAreaSelectPositionHandler;
     private SqlTextAreaPromptHandler mSqlTextAreaPromptHandler;
+    private JComboBox tableColumnDefText;
+    private AutoComboBox tableColumnDefText_Auto;
+    private JLabel lblNewLabel_14;
 
     private SearchAndReplace mSearchAndReplace = new SearchAndReplace();
     private JPanel panel_25;
     private static final String ICO_FILENAME = "big_boobs.ico";// "big_boobs.ico";//"Pig_SC.ico"
     private JButton setFontSizeBtn;
     private JComboBox sqlPageDbConnCombox;
+    protected TableColumnDefTextHandler mTableColumnDefTextHandler;
+
     private final Predicate IGNORE_PREDICT = new Predicate() {
         @Override
         public boolean evaluate(Object input) {
@@ -924,7 +931,7 @@ public class FastDBQueryUI extends JFrame {
         tabbedPane.addTab("查詢結果", null, panel_5, null);
         panel_5.setLayout(new BorderLayout(0, 0));
 
-        queryResultTable = new JTable();
+        queryResultTable = new JTooltipTable();
         queryResultTable.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
@@ -1006,6 +1013,28 @@ public class FastDBQueryUI extends JFrame {
         distinctQueryBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 distinctQueryBtnAction();
+            }
+        });
+
+        lblNewLabel_14 = new JLabel();
+        panel_13.add(lblNewLabel_14);
+
+        tableColumnDefText = new JComboBox();
+        tableColumnDefText_Auto = AutoComboBox.applyAutoComboBox(tableColumnDefText);
+        panel_13.add(tableColumnDefText);
+
+        mTableColumnDefTextHandler = new TableColumnDefTextHandler();
+        tableColumnDefText_Auto.getTextComponent().addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                mTableColumnDefTextHandler.action();
+            }
+        });
+
+        tableColumnDefText.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                mTableColumnDefTextHandler.action();
             }
         });
 
@@ -2060,7 +2089,7 @@ public class FastDBQueryUI extends JFrame {
             this.idx = idx;
         }
     }
-    
+
     private String getCurrentSQL() {
         String sql = sqlTextArea.getText().toString();
         if (StringUtils.isNotBlank(sqlTextArea.getSelectedText())) {
@@ -2188,6 +2217,9 @@ public class FastDBQueryUI extends JFrame {
                 JCommonUtil._jOptionPane_showMessageDialog_info("update : " + modifyResult);
             }
 
+            // 設定欄位解釋定義
+            setupCustomColumnDefExcelChinese();
+
             // 儲存參數設定
             saveParameterTableConfig(false);
 
@@ -2209,6 +2241,17 @@ public class FastDBQueryUI extends JFrame {
             queryResultTimeLbl.setText("查詢耗時:  " + duringTime + " 秒");
             JTableUtil.newInstance(queryResultTable).setRowHeightByFontSize();
         }
+    }
+
+    private void setupCustomColumnDefExcelChinese() {
+        List<String> tabLst = new ArrayList<String>();
+        tabLst.add(getRandom_TableNSchema());
+        if (mSqlTextAreaPromptHandler != null && mSqlTextAreaPromptHandler.tabMap != null) {
+            for (Object tab : mSqlTextAreaPromptHandler.tabMap.keySet()) {
+                tabLst.add(String.valueOf(tab));
+            }
+        }
+        tableColumnDefText_Auto.applyComboxBoxList(tabLst);
     }
 
     // 儲存參數設定
@@ -5500,6 +5543,55 @@ public class FastDBQueryUI extends JFrame {
                 });
                 break;
             }
+        }
+    }
+
+    class TableColumnDefTextHandler {
+        FastDBQueryUI_XlsColumnDefLoader xlsLoader = null;
+        int fromIndex = -1;
+        int toIndex = -1;
+
+        private boolean init() {
+            File dir = new File(FileUtil.DESKTOP_DIR, "FastColumnDef");
+            if (!dir.exists()) {
+                dir.mkdirs();
+            }
+            if (xlsLoader == null) {
+                xlsLoader = new FastDBQueryUI_XlsColumnDefLoader(null);
+                xlsLoader.execute();
+            }
+            if (tableColumnDefText.getSelectedItem() != null && StringUtils.isNotBlank((String) tableColumnDefText.getSelectedItem())) {
+                if (fromIndex == -1 || toIndex == -1) {
+                    fromIndex = Integer.parseInt(JCommonUtil._jOptionPane_showInputDialog("請輸入Excel cell index (英文欄位)", "0"));
+                    toIndex = Integer.parseInt(JCommonUtil._jOptionPane_showInputDialog("請輸入Excel cell index (中文說明)", "1"));
+                }
+                xlsLoader.setMappingIndex(fromIndex, toIndex);
+                return true;
+            }
+            return false;
+        }
+
+        public void action() {
+            try {
+                if (init()) {
+                    String table = String.valueOf(tableColumnDefText.getSelectedItem());
+                    queryResultTable.setTitleTooltipTransformer(xlsLoader.getTableTitleTransformer(table));
+                }
+            } catch (Exception ex) {
+                JCommonUtil.handleException(ex);
+            }
+        }
+
+        public String getChinese(String column) {
+            try {
+                if (init()) {
+                    String table = String.valueOf(tableColumnDefText.getSelectedItem());
+                    return xlsLoader.getDBColumnChinese(column, table);
+                }
+            } catch (Exception ex) {
+                JCommonUtil.handleException(ex);
+            }
+            return null;
         }
     }
 }

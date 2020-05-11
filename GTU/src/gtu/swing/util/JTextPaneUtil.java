@@ -31,7 +31,7 @@ public class JTextPaneUtil {
     }
 
     public AtomicBoolean insertStart(final String text) {
-        AtomicBoolean success = new AtomicBoolean(false);
+        final AtomicBoolean success = new AtomicBoolean(false);
         Runnable runnable = new Runnable() {
             public void run() {
                 try {
@@ -49,7 +49,7 @@ public class JTextPaneUtil {
     }
 
     public AtomicBoolean append(final String text) {
-        AtomicBoolean success = new AtomicBoolean(false);
+        final AtomicBoolean success = new AtomicBoolean(false);
         Runnable runnable = new Runnable() {
             public void run() {
                 try {
@@ -66,8 +66,8 @@ public class JTextPaneUtil {
         return success;
     }
 
-    public AtomicBoolean remove(final int start, int length) {
-        AtomicBoolean success = new AtomicBoolean(false);
+    public AtomicBoolean remove(final int start, final int length) {
+        final AtomicBoolean success = new AtomicBoolean(false);
         Runnable runnable = new Runnable() {
             public void run() {
                 try {

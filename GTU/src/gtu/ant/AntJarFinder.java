@@ -54,6 +54,11 @@ public class AntJarFinder extends Task {
     /** <searchdir></searchdir> */
     private Set<PomConfig> pomConfigs = new LinkedHashSet<PomConfig>();
 
+    // 所有的jar黨
+    private List<File> allJarLst;
+    // 定義輸出forDebug
+    private List<String> _packagenamesDebugLst = new ArrayList<String>();
+
     @Override
     public void execute() throws BuildException {
         boolean doExecute = true;
@@ -103,14 +108,40 @@ public class AntJarFinder extends Task {
             }
         }
 
+        // 所有jar來源都在這
+        allJarLst = getAllJars();
+
         if (packagenames == null || packagenames.isEmpty()) {
             info("!!無須尋找的Jar檔 , (packagename) 未設定");
             doExecute = false;
         }
 
         if (doExecute) {
-            this.execute(scanDir, copyToDir);
+            for (PackageName pk : packagenames) {
+                this.execute(pk, scanDir, copyToDir);
+            }
         }
+
+        info("###### 設定輸出如下  ######==================");
+        for (String jarInfo : _packagenamesDebugLst) {
+            info(jarInfo);
+        }
+        info("###### 設定輸出如上  ######==================");
+    }
+
+    private List<File> getAllJars() {
+        List<File> jarsLst = new ArrayList<File>();
+        for (SearchDir s : searchdirs) {
+            String filePath = helper.getParseAfterValue(s.text);
+            File file = new File(filePath);
+            if (file.exists()) {
+                FileUtil.searchFilefind(file, ".*\\.jar", jarsLst);
+            }
+        }
+        if (pomJarLst != null) {
+            jarsLst.addAll(pomJarLst);
+        }
+        return jarsLst;
     }
 
     private SearchDir createSearchDir(String text) {
@@ -119,56 +150,80 @@ public class AntJarFinder extends Task {
         return dir;
     }
 
-    private void execute(Set<File> scanDir, File copyToDir) {
+    private void appendDebugPackageDef(PackageName pk, File jarFile) {
+        String mode = pk.mode;
+        String classPath = pk.text;
+        String jarName = jarFile.getName();
+        _packagenamesDebugLst.add(String.format("<packagename mode=\"%s\" name=\"%s\">%s</packagename>", mode, jarName, classPath));
+    }
+
+    private void execute(PackageName pk, Set<File> scanDir, File copyToDir) {
         try {
             JarFinder finder = JarFinder.newInstance();
-            for (PackageName pk : packagenames) {
-                final List<File> sameJarList = new ArrayList<File>();
-                info("搜尋 :" + pk.text);
-                finder.pattern(pk.text);
 
-                for (File search : scanDir) {
-                    finder.setDir(search);
-                    debug("搜尋來源目錄 : " + search);
-                    finder.ifMatchEvent(new IfMatch() {
-                        public void apply(String jarFile, String targetName, Map<String, Collection<String>> matchMap) {
-                            File realFile = new File(jarFile);
-                            if (!sameJarList.contains(realFile)) {
-                                // debug("找到 : " + realFile);
-                                sameJarList.add(realFile);
-                            }
-                        }
-                    }).execute();
+            final List<File> sameJarList = new ArrayList<File>();
+            info("搜尋 :" + pk.text);
+            finder.pattern(pk.text);
+
+            // for exact jar files ↓↓↓↓↓↓↓
+            if (StringUtils.isNotBlank(pk.name) && allJarLst != null) {
+                debug("直接比對檔名 : " + pk.name);
+                File findIndicateJar = null;
+                for (File file : allJarLst) {
+                    if (StringUtils.equalsIgnoreCase(file.getName(), pk.name)) {
+                        debug("直接找到檔案 : " + file);
+                        findIndicateJar = file;
+                        break;
+                    }
                 }
-
-                if (sameJarList.size() == 0) {
-                    info("!!找不到符合的Jar檔 : " + pk.text);
-                    // continue;
-                    System.err.println("找不到符合jar檔 : " + pk.text);
-                    throw new BuildException("找不到符合jar檔 : " + pk.text);
-                }
-
-                SearchMode searchMode = null;
-                if (StringUtils.isNotEmpty(pk.mode)) {
-                    searchMode = SearchMode.matchMode(pk.mode);
-                    debug("尋找模式 : " + searchMode);
-                }
-                if (searchMode == null) {
-                    System.err.println("尋找模式設定錯誤 : " + pk.text + " / " + pk.mode);
-                    throw new BuildException("尋找模式設定錯誤 : " + pk.text + " / " + pk.mode);
-                }
-
-                File jar = searchMode.apply(sameJarList, pk, this);
-
-                if (jar == null) {
-                    System.err.println("找不到符合jar檔 : " + pk.text);
-                    throw new BuildException("找不到符合jar檔 : " + pk.text);
-                }
-
-                // 複製jar
-                this.copyFile(jar, copyToDir);
-                finder.clear();
+                this.copyFile(findIndicateJar, copyToDir);
+                appendDebugPackageDef(pk, findIndicateJar);
+                return;
             }
+            // for exact jar files ↑↑↑↑↑↑↑
+
+            for (File search : scanDir) {
+                finder.setDir(search);
+                debug("搜尋來源目錄 : " + search);
+                finder.ifMatchEvent(new IfMatch() {
+                    public void apply(String jarFile, String targetName, Map<String, Collection<String>> matchMap) {
+                        File realFile = new File(jarFile);
+                        if (!sameJarList.contains(realFile)) {
+                            // debug("找到 : " + realFile);
+                            sameJarList.add(realFile);
+                        }
+                    }
+                }).execute();
+            }
+
+            if (sameJarList.size() == 0) {
+                info("!!找不到符合的Jar檔 : " + pk.text);
+                // continue;
+                System.err.println("找不到符合jar檔 : " + pk.text);
+                throw new BuildException("找不到符合jar檔 : " + pk.text);
+            }
+
+            SearchMode searchMode = null;
+            if (StringUtils.isNotEmpty(pk.mode)) {
+                searchMode = SearchMode.matchMode(pk.mode);
+                debug("尋找模式 : " + searchMode);
+            }
+            if (searchMode == null) {
+                System.err.println("尋找模式設定錯誤 : " + pk.text + " / " + pk.mode);
+                throw new BuildException("尋找模式設定錯誤 : " + pk.text + " / " + pk.mode);
+            }
+
+            File jar = searchMode.apply(sameJarList, pk, this);
+
+            if (jar == null) {
+                System.err.println("找不到符合jar檔 : " + pk.text);
+                throw new BuildException("找不到符合jar檔 : " + pk.text);
+            }
+
+            // 複製jar
+            this.copyFile(jar, copyToDir);
+            appendDebugPackageDef(pk, jar);
+            finder.clear();
         } catch (Exception ex) {
             System.err.println("執行失敗!!");
             throw new BuildException("執行失敗!!", ex);
@@ -304,6 +359,7 @@ public class AntJarFinder extends Task {
                 return "與POM一致";
             }
         },;
+
         final String mode;
 
         SearchMode(String mode) {
@@ -320,6 +376,7 @@ public class AntJarFinder extends Task {
         }
 
         abstract File apply(List<File> fileList, PackageName pk, AntJarFinder _this);
+
     }
 
     private void copyFile(File src, File copyToDir) throws IOException {

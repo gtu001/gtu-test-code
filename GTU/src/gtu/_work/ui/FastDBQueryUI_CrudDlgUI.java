@@ -78,6 +78,7 @@ import gtu.swing.util.JFrameRGBColorPanel;
 import gtu.swing.util.JMouseEventUtil;
 import gtu.swing.util.JPopupMenuUtil;
 import gtu.swing.util.JTableUtil;
+import gtu.swing.util.JTableUtil.OnBlurCellEditor;
 import gtu.swing.util.JTextUndoUtil;
 import gtu.swing.util.KeyEventExecuteHandler;
 
@@ -156,6 +157,9 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
             int currentLength = 0;
             if (value != null) {
                 currentLength = StringUtils.defaultString(String.valueOf(value)).length();
+                if (dtype == DataType.NULL && StringUtils.equals((String) value, "null")) {
+                    currentLength = 0;
+                }
             }
             String maxLengthStr = "";
             if (maxLength != null) {
@@ -189,6 +193,10 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
         number(Number.class) {
         }, //
         NULL(void.class) {
+            protected void applyDataChange(Object value, JTable table, int row, FastDBQueryUI_CrudDlgUI self) {
+                System.out.println("-------" + value + " -> " + value.getClass());
+                table.setValueAt("null", row, ColumnOrderDef.value.ordinal());
+            }
         }, //
         UNKNOW(void.class) {
         },//
@@ -652,7 +660,17 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
         for (DataType e : DataType.values()) {
             comboBox.addItem(e);
         }
-        sportColumn.setCellEditor(new DefaultCellEditor(comboBox));
+        sportColumn.setCellEditor(new JTableUtil.OnBlurCellEditor(comboBox, false) {
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public void onblur(int row, int col, Object value) {
+                if (value == DataType.NULL) {
+                    System.out.println("lastestRow----" + row);
+                    JTableUtil.newInstance(rowTable).setValueAt(false, "null", row, ColumnOrderDef.value.ordinal());
+                }
+            }
+        });
 
         // column = "where condition"
         TableColumn sportColumn4 = rowTable.getColumnModel().getColumn(ColumnOrderDef.isPk.ordinal());
@@ -696,7 +714,12 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
             private void updateCurrentValueLength(Object currentOrignValue, int row, int col) {
                 if (col == ColumnOrderDef.value.ordinal()) {
                     String valueStr = currentOrignValue == null ? "" : String.valueOf(currentOrignValue);
-                    int currentLength = StringUtil4FullChar.length(valueStr);
+                    int currentLength = 0;
+                    if ("null".equals(valueStr)) {
+                        currentLength = 0;
+                    } else {
+                        currentLength = StringUtil4FullChar.length(valueStr);
+                    }
                     System.out.println(" currentLength : " + valueStr + " -> " + currentLength);
                     JTableUtil.newInstance(rowTable).setValueAt(false, currentLength, row, ColumnOrderDef.currentLength.ordinal());
                 }
@@ -1331,6 +1354,22 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
         }
         {
             rowTable = new JTable();
+            JTableUtil.newInstance(rowTable).applyOnHoverEvent(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    if (e.getSource() != null) {
+                        Pair<Integer, Integer> pair = (Pair<Integer, Integer>) e.getSource();
+                        int row = pair.getLeft();
+                        int col = pair.getRight();
+                        if (col == ColumnOrderDef.columnName.ordinal()) {
+                            String column = (String) JTableUtil.newInstance(rowTable).getValueAt(false, row, ColumnOrderDef.columnName.ordinal());
+                            rowTable.setToolTipText(_parent.mTableColumnDefTextHandler.getChinese(column));
+                            return;
+                        }
+                    }
+                    rowTable.setToolTipText(null);
+                }
+            });
             JTableUtil.defaultSetting(rowTable);
             contentPanel.add(JCommonUtil.createScrollComponent(rowTable), BorderLayout.CENTER);
             rowTable.addMouseListener(new MouseAdapter() {

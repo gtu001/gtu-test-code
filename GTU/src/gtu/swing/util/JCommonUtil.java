@@ -244,6 +244,44 @@ public class JCommonUtil {
                 height - frame.getHeight() - taskBarSize);
     }
 
+    public static void setLocationToRightBottomCorner(Component frame, int screen) {
+        // height of the task bar
+        int taskBarSize = 0;
+        try {
+            Insets scnMax = Toolkit.getDefaultToolkit().getScreenInsets(frame.getGraphicsConfiguration());
+            taskBarSize = scnMax.bottom;
+        } catch (Exception ex) {
+        }
+
+        Rectangle rect = null;
+        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        GraphicsDevice[] gd = ge.getScreenDevices();
+        if (screen > -1 && screen < gd.length) {
+            rect = gd[screen].getDefaultConfiguration().getBounds();
+        } else if (gd.length > 0) {
+            rect = gd[0].getDefaultConfiguration().getBounds();
+        } else {
+            throw new RuntimeException("No Screens Found");
+        }
+
+        int width = rect.x + rect.width;
+        int height = rect.height;
+        frame.setLocation(width - frame.getWidth(), //
+                height - frame.getHeight() - taskBarSize);
+    }
+
+    public static void showOnScreen(int screen, Window frame) {
+        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        GraphicsDevice[] gd = ge.getScreenDevices();
+        if (screen > -1 && screen < gd.length) {
+            frame.setLocation(gd[screen].getDefaultConfiguration().getBounds().x, frame.getY());
+        } else if (gd.length > 0) {
+            frame.setLocation(gd[0].getDefaultConfiguration().getBounds().x, frame.getY());
+        } else {
+            throw new RuntimeException("No Screens Found");
+        }
+    }
+
     /**
      * 設定視窗icon
      */

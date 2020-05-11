@@ -6,6 +6,8 @@ import java.awt.Color;
 import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
 import java.awt.Robot;
 import java.awt.TrayIcon.MessageType;
 import java.awt.event.ActionEvent;
@@ -47,7 +49,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -70,8 +71,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.event.PopupMenuEvent;
-import javax.swing.event.PopupMenuListener;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.SimpleAttributeSet;
@@ -116,6 +115,7 @@ import gtu.properties.PropertiesUtilBean;
 import gtu.runtime.DesktopUtil;
 import gtu.swing.util.AutoComboBox;
 import gtu.swing.util.HideInSystemTrayHelper;
+import gtu.swing.util.JComboBoxUtil;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JFontChooserHelper;
 import gtu.swing.util.JFrameRGBColorPanel;
@@ -1027,6 +1027,11 @@ public class EnglishSearchUI extends JFrame {
         });
         panel_4.add(reviewMemoryMergeBtn);
 
+        screenSelectComboBox = new JComboBox();
+        screenSelectComboBox.setToolTipText("選擇螢幕");
+        panel_4.add(screenSelectComboBox);
+        JComboBoxUtil.setShowOnScreenSelectActionListener(screenSelectComboBox, this, true);
+
         panel_10 = new JPanel();
         panel.add(panel_10, "4, 32, fill, fill");
 
@@ -1327,6 +1332,7 @@ public class EnglishSearchUI extends JFrame {
     }
 
     private ReentrantLock brinToTopLock = new ReentrantLock();
+    private JComboBox screenSelectComboBox;
 
     private void bringToTop() {
         if (searchEnglishIdTextController.isFocusOwner()) {
@@ -1346,7 +1352,7 @@ public class EnglishSearchUI extends JFrame {
 
                 // 判斷是否鎖定右下角
                 if (rightBottomCornerChk.isSelected()) {
-                    JCommonUtil.setLocationToRightBottomCorner(this);
+                    JCommonUtil.setLocationToRightBottomCorner(this, (Integer) screenSelectComboBox.getSelectedItem());
                 }
 
                 searchEnglishIdTextController.focusSearchEnglishIdText();
@@ -1719,7 +1725,7 @@ public class EnglishSearchUI extends JFrame {
                 @Override
                 public void run() {
                     // =================================================
-                    if(!searchEnglishIdTextController.isFocusOwner()) {
+                    if (!searchEnglishIdTextController.isFocusOwner()) {
                         boolean isRobotFocus = JCommonUtil.focusComponent(searchEnglishIdTextController.get(), robotFocusChk.isSelected(), new ActionListener() {
                             @Override
                             public void actionPerformed(ActionEvent paramActionEvent) {
@@ -2111,7 +2117,7 @@ public class EnglishSearchUI extends JFrame {
     private void reviewMemResumeBtnAction() {
         try {
             setBounds(100, 100, 540, 347);
-            JCommonUtil.setLocationToRightBottomCorner(this);
+            JCommonUtil.setLocationToRightBottomCorner(this, (Integer) screenSelectComboBox.getSelectedItem());
             memory.resume();
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);

@@ -532,17 +532,54 @@ public class BrowserHistoryHandlerUI extends JFrame {
 
             JPanel panel_3 = new JPanel();
             tabbedPane.addTab("設定", null, panel_3, null);
-            panel_3.setLayout(new FormLayout(
-                    new ColumnSpec[] { FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow"),
-                            FormFactory.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow"), FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC,
-                            FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC,
-                            FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC,
-                            FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC,
-                            FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC,
-                            FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, },
-                    new RowSpec[] { FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
-                            FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
-                            FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, }));
+            panel_3.setLayout(new FormLayout(new ColumnSpec[] {
+                    FormFactory.RELATED_GAP_COLSPEC,
+                    FormFactory.DEFAULT_COLSPEC,
+                    FormFactory.RELATED_GAP_COLSPEC,
+                    ColumnSpec.decode("default:grow"),
+                    FormFactory.RELATED_GAP_COLSPEC,
+                    ColumnSpec.decode("default:grow"),
+                    FormFactory.RELATED_GAP_COLSPEC,
+                    FormFactory.DEFAULT_COLSPEC,
+                    FormFactory.RELATED_GAP_COLSPEC,
+                    ColumnSpec.decode("default:grow"),
+                    FormFactory.RELATED_GAP_COLSPEC,
+                    FormFactory.DEFAULT_COLSPEC,
+                    FormFactory.RELATED_GAP_COLSPEC,
+                    FormFactory.DEFAULT_COLSPEC,
+                    FormFactory.RELATED_GAP_COLSPEC,
+                    FormFactory.DEFAULT_COLSPEC,
+                    FormFactory.RELATED_GAP_COLSPEC,
+                    FormFactory.DEFAULT_COLSPEC,
+                    FormFactory.RELATED_GAP_COLSPEC,
+                    FormFactory.DEFAULT_COLSPEC,
+                    FormFactory.RELATED_GAP_COLSPEC,
+                    FormFactory.DEFAULT_COLSPEC,
+                    FormFactory.RELATED_GAP_COLSPEC,
+                    FormFactory.DEFAULT_COLSPEC,
+                    FormFactory.RELATED_GAP_COLSPEC,
+                    FormFactory.DEFAULT_COLSPEC,
+                    FormFactory.RELATED_GAP_COLSPEC,
+                    FormFactory.DEFAULT_COLSPEC,
+                    FormFactory.RELATED_GAP_COLSPEC,
+                    FormFactory.DEFAULT_COLSPEC,
+                    FormFactory.RELATED_GAP_COLSPEC,
+                    FormFactory.DEFAULT_COLSPEC,},
+                new RowSpec[] {
+                    FormFactory.RELATED_GAP_ROWSPEC,
+                    FormFactory.DEFAULT_ROWSPEC,
+                    FormFactory.RELATED_GAP_ROWSPEC,
+                    FormFactory.DEFAULT_ROWSPEC,
+                    FormFactory.RELATED_GAP_ROWSPEC,
+                    FormFactory.DEFAULT_ROWSPEC,
+                    FormFactory.RELATED_GAP_ROWSPEC,
+                    FormFactory.DEFAULT_ROWSPEC,
+                    FormFactory.RELATED_GAP_ROWSPEC,
+                    FormFactory.DEFAULT_ROWSPEC,
+                    FormFactory.RELATED_GAP_ROWSPEC,
+                    FormFactory.DEFAULT_ROWSPEC,
+                    FormFactory.RELATED_GAP_ROWSPEC,
+                    FormFactory.DEFAULT_ROWSPEC,}));
 
             JLabel lblNewLabel = new JLabel("bookmark config");
             panel_3.add(lblNewLabel, "2, 2, right, default");
@@ -714,6 +751,10 @@ public class BrowserHistoryHandlerUI extends JFrame {
                 }
             });
             panel_12.add(JCommonUtil.createScrollComponent(logWatcherTextArea), BorderLayout.CENTER);
+            
+            screenSelectComboBox = new JComboBox();
+            JComboBoxUtil.setShowOnScreenSelectActionListener(screenSelectComboBox, this, true);
+            panel_3.add(screenSelectComboBox, "10, 4, fill, default");
 
             pack();
             this.setSize(900, 500);// XXX <---------- 設寬高度
@@ -740,7 +781,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
 
             JCommonUtil.defaultToolTipDelay();
             JCommonUtil.setJFrameDefaultSetting(this);
-            JCommonUtil.setLocationToRightBottomCorner(this);
+            JCommonUtil.setLocationToRightBottomCorner(this, (Integer) screenSelectComboBox.getSelectedItem());
             JCommonUtil.setJFrameIcon(this, "resource/images/ico/file-manager.ico");
             commandTypeSetting = new CommandTypeSetting();
             sysUtil.apply(this);
@@ -2602,7 +2643,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
             }
         }
 
-        JCommonUtil.setLocationToRightBottomCorner(this);
+        JCommonUtil.setLocationToRightBottomCorner(this, (Integer) screenSelectComboBox.getSelectedItem());
 
         JCommonUtil.focusComponent(searchComboBoxUtil.getTextComponent(), true, new ActionListener() {
             @Override
@@ -3207,6 +3248,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
     private JButton periodTaskChkBtn;
     private JTextField logWatcherBufferSizeText;
     private JCheckBox logWatcherScorllLockChk;
+    private JComboBox screenSelectComboBox;
 
     private class LogWatcherPeriodTask extends TimerTask {
         boolean stop = false;

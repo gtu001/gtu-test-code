@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using static Log;
+using static ScreenUtil;
 
 public class GameManager : MonoBehaviour {
 
@@ -36,6 +37,8 @@ public class GameManager : MonoBehaviour {
     void Awake () {
         Log.debug("##----------------" + "Awake");
         Instance = this;
+
+        ScreenUtil.SetResolution(768, 1024, false, 60);
     }
 
     void OnEnable() {

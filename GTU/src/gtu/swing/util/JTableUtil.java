@@ -1810,4 +1810,80 @@ public class JTableUtil {
         table.setRowSelectionInterval(minPos, maxPos);
         table.setColumnSelectionInterval(0, table.getColumnCount() - 1);
     }
+
+    public static class JTooltipTable extends JTable {
+        private static final long serialVersionUID = 1L;
+        private Transformer titleTooltipTransformer;
+
+        public void setTitleTooltipTransformer(Transformer titleTooltipTransformer) {
+            this.titleTooltipTransformer = titleTooltipTransformer;
+        }
+
+        public String getColumnTooltips(int index, Object headerValue) {
+            if (titleTooltipTransformer != null) {
+                return (String) titleTooltipTransformer.transform(Pair.of(index, headerValue));
+            }
+            return null;
+        }
+
+        // Implement table header tool tips.
+        protected JTableHeader createDefaultTableHeader() {
+            return new JTableHeader(columnModel) {
+                public String getToolTipText(MouseEvent e) {
+                    String tip = null;
+                    java.awt.Point p = e.getPoint();
+                    int index = columnModel.getColumnIndexAtX(p.x);
+                    int realIndex = columnModel.getColumn(index).getModelIndex();
+                    Object headerValue = columnModel.getColumn(index).getHeaderValue();
+                    return getColumnTooltips(realIndex, headerValue);
+                }
+            };
+        }
+    }
+
+    public static abstract class OnBlurCellEditor extends DefaultCellEditor {
+        private static final long serialVersionUID = 1L;
+
+        public OnBlurCellEditor(JCheckBox checkBox, boolean true_is_onblur_false_is_onchange) {
+            super(checkBox);
+            this.true_is_onblur_false_is_onchange = true_is_onblur_false_is_onchange;
+        }
+
+        public OnBlurCellEditor(JComboBox comboBox, boolean true_is_onblur_false_is_onchange) {
+            super(comboBox);
+            this.true_is_onblur_false_is_onchange = true_is_onblur_false_is_onchange;
+        }
+
+        public OnBlurCellEditor(JTextField textField, boolean true_is_onblur_false_is_onchange) {
+            super(textField);
+            this.true_is_onblur_false_is_onchange = true_is_onblur_false_is_onchange;
+        }
+
+        boolean true_is_onblur_false_is_onchange;
+        int lastestRow = -1;
+        int lastestCol = -1;
+        Object beforeValue = null;
+
+        @Override
+        public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
+            lastestRow = row;
+            lastestCol = column;
+            beforeValue = value;
+            return super.getTableCellEditorComponent(table, value, isSelected, row, column);
+        }
+
+        public abstract void onblur(int row, int col, Object value);
+
+        public boolean stopCellEditing() {
+            Object currentValue = this.getCellEditorValue();
+            if (true_is_onblur_false_is_onchange) {
+                onblur(lastestRow, lastestCol, currentValue);
+            } else {
+                if (currentValue != beforeValue) {
+                    onblur(lastestRow, lastestCol, currentValue);
+                }
+            }
+            return super.stopCellEditing();
+        }
+    }
 }
