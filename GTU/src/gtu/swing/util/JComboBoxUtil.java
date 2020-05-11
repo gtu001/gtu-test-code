@@ -92,14 +92,12 @@ public class JComboBoxUtil {
     }
 
     public static void setShowOnScreenSelectActionListener(final JComboBox comboBox, final Window window, final boolean isBottomRight) {
-        comboBox.setToolTipText("選擇螢幕");
         DefaultComboBoxModel model = new DefaultComboBoxModel();
-        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-        GraphicsDevice[] gd = ge.getScreenDevices();
-        for (int ii = 0; ii < gd.length; ii++) {
+        for (int ii = 0; ii < 10; ii++) {
             model.addElement(ii);
         }
         comboBox.setModel(model);
+        comboBox.setToolTipText("選擇螢幕");
         comboBox.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
