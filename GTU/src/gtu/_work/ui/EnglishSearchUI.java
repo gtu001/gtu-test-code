@@ -160,6 +160,7 @@ public class EnglishSearchUI extends JFrame {
     private JCheckBox offlineModeFirstChk;
     private JCheckBox simpleSentanceChk;
     private JCheckBox robotFocusChk;
+    private JComboBox screenSelectComboBox;
     private AutoComboBox searchEnglishIdText_auto;
     private List<String> englishLst;
     Integer tvModeDlgFontSize = null;
@@ -1332,7 +1333,6 @@ public class EnglishSearchUI extends JFrame {
     }
 
     private ReentrantLock brinToTopLock = new ReentrantLock();
-    private JComboBox screenSelectComboBox;
 
     private void bringToTop() {
         if (searchEnglishIdTextController.isFocusOwner()) {
