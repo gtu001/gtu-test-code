@@ -3,6 +3,7 @@ package gtu._work.ui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
@@ -13,6 +14,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -98,6 +100,8 @@ import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
 
+import gtu._work.ui.FastDBQueryUI_XlsColumnDefLoader.XlsColumnDefClz;
+import gtu._work.ui.FastDBQueryUI_XlsColumnDefLoader.XlsColumnDefType;
 import gtu._work.ui.JMenuBarUtil.JMenuAppender;
 import gtu.binary.Base64JdkUtil;
 import gtu.clipboard.ClipboardUtil;
@@ -314,6 +318,7 @@ public class FastDBQueryUI extends JFrame {
     private SqlTextAreaPromptHandler mSqlTextAreaPromptHandler;
     private JComboBox tableColumnDefText;
     private AutoComboBox tableColumnDefText_Auto;
+    private JButton tableColumnConfigBtn;
     private JLabel lblNewLabel_14;
 
     private SearchAndReplace mSearchAndReplace = new SearchAndReplace();
@@ -352,6 +357,7 @@ public class FastDBQueryUI extends JFrame {
     private JCheckBox rowFilterTextKeepMatchChk;
     private JButton resetQueryBtn;
     private JDlgHolderBringToFrontHandler mJDlgHolderBringToFrontHandler;
+    private XlsColumnDefDlg mXlsColumnDefDlg;
 
     /**
      * Launch the application.
@@ -1045,6 +1051,15 @@ public class FastDBQueryUI extends JFrame {
         tableColumnDefText = new JComboBox();
         tableColumnDefText_Auto = AutoComboBox.applyAutoComboBox(tableColumnDefText);
         panel_13.add(tableColumnDefText);
+
+        tableColumnConfigBtn = new JButton("設定");
+        panel_13.add(tableColumnConfigBtn);
+        tableColumnConfigBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                tableColumnConfigBtnAction();
+            }
+        });
 
         mTableColumnDefTextHandler = new TableColumnDefTextHandler();
         tableColumnDefText_Auto.getTextComponent().addKeyListener(new KeyAdapter() {
@@ -5583,13 +5598,10 @@ public class FastDBQueryUI extends JFrame {
                 xlsLoader.execute();
             }
             if (tableColumnDefText.getSelectedItem() != null && StringUtils.isNotBlank((String) tableColumnDefText.getSelectedItem())) {
-                if (fromIndex == -1 || toIndex == -1 || pkIndex == -1) {
-                    fromIndex = Integer.parseInt(JCommonUtil._jOptionPane_showInputDialog("請輸入Excel cell index (英文欄位)", "0"));
-                    toIndex = Integer.parseInt(JCommonUtil._jOptionPane_showInputDialog("請輸入Excel cell index (中文說明)", "1"));
-                    pkIndex = Integer.parseInt(JCommonUtil._jOptionPane_showInputDialog("請輸入Excel cell index (主鍵)", "-1"));
-                    fkIndex = Integer.parseInt(JCommonUtil._jOptionPane_showInputDialog("請輸入Excel cell index (外鍵)", "-1"));
+                if (mXlsColumnDefDlg == null || mXlsColumnDefDlg.getConfig() == null) {
+                    Validate.isTrue(false, "請先按設定");
                 }
-                xlsLoader.setMappingIndex(fromIndex, toIndex, pkIndex, fkIndex);
+                xlsLoader.setMappingConfig(mXlsColumnDefDlg.getConfig());
                 return true;
             }
             return false;
@@ -5697,6 +5709,151 @@ public class FastDBQueryUI extends JFrame {
             mJDlgHolderBringToFrontHandler.add(mFastDBQueryUI_RowDiffWatcherDlg);
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
+        }
+    }
+
+    // ==============================================================================================
+    private void tableColumnConfigBtnAction() {
+        if (mXlsColumnDefDlg == null) {
+            mXlsColumnDefDlg = new XlsColumnDefDlg();
+        }
+        mXlsColumnDefDlg.show();
+    }
+
+    private class XlsColumnDefDlg {
+        private PropertiesUtilBean config = new PropertiesUtilBean(JAR_PATH_FILE, FastDBQueryUI.class.getSimpleName() + "_XlsColumnDefDlg");
+        List<XlsColumnDefClz> lst;
+        final JDialog dlg;
+        final JLabel lbl;
+        final JButton btn;
+        JTable table;
+
+        private List<XlsColumnDefClz> getConfig() {
+            return lst;
+        }
+
+        private DefaultTableModel loadConfig() {
+            List<XlsColumnDefClz> lst = new ArrayList<XlsColumnDefClz>();
+            Properties prop = config.getConfigProp();
+            XlsColumnDefClz c1 = new XlsColumnDefClz();
+            XlsColumnDefClz c2 = new XlsColumnDefClz();
+            XlsColumnDefClz c3 = new XlsColumnDefClz();
+            if (prop.containsKey("column")) {
+                c1.fromConfig(prop.getProperty("column"));
+            } else {
+                c1 = XlsColumnDefType.COLUMN.getConfig();
+            }
+            if (prop.containsKey("chinese")) {
+                c2.fromConfig(prop.getProperty("chinese"));
+            } else {
+                c2 = XlsColumnDefType.CHINESE.getConfig();
+            }
+            if (prop.containsKey("pk")) {
+                c3.fromConfig(prop.getProperty("pk"));
+            } else {
+                c3 = XlsColumnDefType.PK.getConfig();
+            }
+            lst.add(c1);
+            lst.add(c2);
+            lst.add(c3);
+            for (Enumeration enu = prop.keys(); enu.hasMoreElements();) {
+                String key = (String) enu.nextElement();
+                if (key.contains("TAG")) {
+                    XlsColumnDefClz c4 = new XlsColumnDefClz();
+                    c4.fromConfig(prop.getProperty(key));
+                    lst.add(c4);
+                }
+            }
+            DefaultTableModel model = JTableUtil.createModel(false, "類型", "標籤字", "index", "含有文字", "顏色");
+            for (XlsColumnDefClz cx : lst) {
+                model.addRow(cx.toArray());
+            }
+            return model;
+        }
+
+        private List<XlsColumnDefClz> saveAction() {
+            Properties prop = config.getConfigProp();
+            prop.clear();
+            DefaultTableModel model = (DefaultTableModel) table.getModel();
+            List<XlsColumnDefClz> lst = new ArrayList<XlsColumnDefClz>();
+            for (int ii = 0; ii < model.getRowCount(); ii++) {
+                XlsColumnDefClz c1 = new XlsColumnDefClz();
+                c1.type = (XlsColumnDefType) model.getValueAt(ii, 0);
+                c1.label = (String) model.getValueAt(ii, 1);
+                c1.index = (Integer) model.getValueAt(ii, 2);
+                c1.containText = (String) model.getValueAt(ii, 3);
+                c1.color = (String) model.getValueAt(ii, 4);
+                if (c1.type == XlsColumnDefType.COLUMN) {
+                    prop.setProperty("column", c1.toConfig());
+                } else if (c1.type == XlsColumnDefType.CHINESE) {
+                    prop.setProperty("chinese", c1.toConfig());
+                } else if (c1.type == XlsColumnDefType.PK) {
+                    prop.setProperty("pk", c1.toConfig());
+                } else {
+                    prop.setProperty("TAG" + ii, c1.toConfig());
+                }
+                lst.add(c1);
+            }
+            config.store();
+            return lst;
+        }
+
+        private void initTable() {
+            TableColumn sportColumn = table.getColumnModel().getColumn(0);
+            JComboBox comboBox = new JComboBox();
+            for (XlsColumnDefType e : XlsColumnDefType.values()) {
+                comboBox.addItem(e);
+            }
+            sportColumn.setCellEditor(new DefaultCellEditor(comboBox));
+        }
+
+        public XlsColumnDefDlg() {
+            dlg = new JDialog() {
+                public Dimension getPreferredSize() {
+                    return new Dimension(600, 350);
+                }
+            };
+            dlg.setModal(true);
+            final JPanel pan = new JPanel();
+            pan.setLayout(new BorderLayout(0, 0));
+            lbl = new JLabel("");
+            lbl.setText("設定EXCEL欄位定義");
+            pan.add(lbl, BorderLayout.NORTH);
+            table = new JTable();
+            table.setModel(loadConfig());
+            table.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    if (JMouseEventUtil.buttonRightClick(1, e)) {
+                        JPopupMenuUtil.newInstance(table).addJMenuItem(JTableUtil.newInstance(table).getDefaultJMenuItems()).applyEvent(e).show();
+                    }
+                }
+            });
+            JTableUtil.defaultSetting(table);
+            initTable();
+            pan.add(JCommonUtil.createScrollComponent(table), BorderLayout.CENTER);
+            btn = new JButton("確定");
+            pan.add(btn, BorderLayout.SOUTH);
+            dlg.getContentPane().add(pan);
+            dlg.pack();
+            JCommonUtil.setJFrameCenter(dlg);
+
+            btn.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    lst = saveAction();
+                    dlg.dispose();
+
+                    // 重設
+                    if (mTableColumnDefTextHandler != null) {
+                        mTableColumnDefTextHandler.action();
+                    }
+                }
+            });
+        }
+
+        public void show() {
+            dlg.setVisible(true);
         }
     }
 }

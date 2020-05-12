@@ -18,11 +18,12 @@ import gtu.poi.hssf.ExcelUtil_Xls97;
 
 public class FastDBQueryUI_XlsColumnDefLoader {
 
-    int columnIdx;
-    int chineseIdx;
-    int pkIdx;
-    int fkIdx;
+    List<XlsColumnDefClz> configLst;
     File customDir;
+
+    XlsColumnDefClz columnDef;
+    XlsColumnDefClz chineseDef;
+    XlsColumnDefClz pkDef;
 
     public FastDBQueryUI_XlsColumnDefLoader(File customDir) {
         this.customDir = customDir;
@@ -36,19 +37,44 @@ public class FastDBQueryUI_XlsColumnDefLoader {
         }
         List<String> pkLst = new ArrayList<String>();
         for (Map<Integer, String> map : tb.columnLst) {
-            String isPk = StringUtils.trimToEmpty(map.get(pkIdx));
-            if (StringUtils.isNotBlank(isPk)) {
-                pkLst.add(StringUtils.trimToEmpty(map.get(columnIdx)));
+            String column = getPkColumn(map);
+            if (StringUtils.isNotBlank(column)) {
+                pkLst.add(column);
             }
         }
         return pkLst;
     }
 
-    public void setMappingIndex(int columnIdx, int chineseIdx, int pkIdx, int fkIdx) {
-        this.columnIdx = columnIdx;
-        this.chineseIdx = chineseIdx;
-        this.pkIdx = pkIdx;
-        this.fkIdx = fkIdx;
+    private String getPkColumn(Map<Integer, String> map) {
+        String pk = "";
+        if (pkDef != null && pkDef.index != -1) {
+            String pkText = StringUtils.trimToEmpty(map.get(pkDef.index));
+            String pkLabel = pkDef.label;
+            if (StringUtils.isBlank(pkLabel)) {
+                pkLabel = pkText;
+            }
+            if (StringUtils.isNotBlank(pkDef.containText)) {
+                if (pkText.toLowerCase().contains(StringUtils.trimToEmpty(pkDef.containText).toLowerCase())) {
+                    pk = map.get(columnDef.index);
+                }
+            } else {
+                pk = map.get(columnDef.index);
+            }
+        }
+        return pk;
+    }
+
+    public void setMappingConfig(List<XlsColumnDefClz> configLst) {
+        this.configLst = configLst;
+        for (XlsColumnDefClz c1 : this.configLst) {
+            if (c1.type == XlsColumnDefType.CHINESE) {
+                chineseDef = c1;
+            } else if (c1.type == XlsColumnDefType.COLUMN) {
+                columnDef = c1;
+            } else if (c1.type == XlsColumnDefType.PK) {
+                pkDef = c1;
+            }
+        }
     }
 
     public String getDBColumnChinese(final String column, final String tableName) {
@@ -58,24 +84,46 @@ public class FastDBQueryUI_XlsColumnDefLoader {
             return null;
         }
         for (Map<Integer, String> map : tb.columnLst) {
-            if (StringUtils.equalsIgnoreCase(StringUtils.trimToEmpty(map.get(columnIdx)), StringUtils.trimToEmpty(column))) {
-                return getTooltipFormat(map.get(chineseIdx), map.get(pkIdx), map.get(fkIdx));
+            if (StringUtils.equalsIgnoreCase(StringUtils.trimToEmpty(map.get(columnDef.index)), StringUtils.trimToEmpty(column))) {
+                return getTooltipFormat(map);
             }
         }
         System.out.println("查無資料表欄位定義 : " + tableName + "." + column);
         return null;
     }
 
-    private String getTooltipFormat(String chinese, String pk, String fk) {
-        pk = StringUtils.trimToEmpty(pk);
-        if (StringUtils.isNotBlank(pk)) {
-            pk = "　" + pk;
+    private String getTagString(XlsColumnDefClz pkDef, Map<Integer, String> map) {
+        String pk = "";
+        if (pkDef != null && pkDef.index != -1) {
+            String pkText = StringUtils.trimToEmpty(map.get(pkDef.index));
+            String pkLabel = pkDef.label;
+            if (StringUtils.isBlank(pkLabel)) {
+                pkLabel = pkText;
+            }
+            if (StringUtils.isNotBlank(pkDef.containText)) {
+                if (pkText.toLowerCase().contains(StringUtils.trimToEmpty(pkDef.containText).toLowerCase())) {
+                    pk = "<font color='" + pkDef.color + "'>　" + pkLabel + "</font>";
+                }
+            } else {
+                pk = "<font color='" + pkDef.color + "'>　" + pkLabel + "</font>";
+            }
         }
-        fk = StringUtils.trimToEmpty(fk);
-        if (StringUtils.isNotBlank(fk)) {
-            fk = "　" + fk;
+        return pk;
+    }
+
+    private String getTooltipFormat(Map<Integer, String> map) {
+        String chinese = map.get(chineseDef.index);
+        if (StringUtils.isBlank(chinese)) {
+            return null;
         }
-        return String.format("<html>%s<font color='red'>%s</font><font color='blue'>%s</font></html>", chinese, pk, fk);
+        String pk = getTagString(pkDef, map);
+        StringBuffer sb = new StringBuffer();
+        for (XlsColumnDefClz c1 : configLst) {
+            if (c1.type == XlsColumnDefType.LABEL) {
+                sb.append(getTagString(c1, map));
+            }
+        }
+        return String.format("<html>%s</html>", chinese + pk + sb);
     }
 
     public Transformer getTableTitleTransformer(final String tableName) {
@@ -90,8 +138,8 @@ public class FastDBQueryUI_XlsColumnDefLoader {
                 Pair<Integer, Object> p = (Pair<Integer, Object>) input;
                 String column = (String) p.getRight();
                 for (Map<Integer, String> map : tb.columnLst) {
-                    if (StringUtils.equalsIgnoreCase(StringUtils.trimToEmpty(map.get(columnIdx)), StringUtils.trimToEmpty(column))) {
-                        return getTooltipFormat(map.get(chineseIdx), map.get(pkIdx), map.get(fkIdx));
+                    if (StringUtils.equalsIgnoreCase(StringUtils.trimToEmpty(map.get(columnDef.index)), StringUtils.trimToEmpty(column))) {
+                        return getTooltipFormat(map);
                     }
                 }
                 System.out.println("查無資料表欄位定義 : " + tableName + "." + column);
@@ -160,5 +208,78 @@ public class FastDBQueryUI_XlsColumnDefLoader {
         File file;
         String table;
         List<Map<Integer, String>> columnLst = new ArrayList<Map<Integer, String>>();
+    }
+
+    public enum XlsColumnDefType {
+        COLUMN("", 0, "", "BLACK"), CHINESE("", 1, "", "BLACK"), PK("", -1, "", "RED"), LABEL("", -1, "", "BLACK");
+
+        String label;
+        int index;
+        String containText;
+        String color;
+
+        XlsColumnDefType(String label, int index, String containText, String color) {
+            this.label = label;
+            this.index = index;
+            this.containText = containText;
+            this.color = color;
+        }
+
+        public String toString() {
+            return name();
+        }
+
+        public XlsColumnDefClz getConfig() {
+            XlsColumnDefClz c1 = new XlsColumnDefClz();
+            c1.type = this;
+            c1.label = this.label;
+            c1.index = this.index;
+            c1.containText = this.containText;
+            c1.color = this.color;
+            return c1;
+        }
+    }
+
+    public static class XlsColumnDefClz {
+        XlsColumnDefType type;// 類型
+        String label = ""; // 標籤字
+        int index = -1;// index
+        String containText = "";// 含有文字
+        String color = "BLACK";// 顏色
+
+        public String toConfig() {
+            return type.name() + "^" + //
+                    StringUtils.trimToEmpty(label) + "^" + //
+                    String.valueOf(index) + "^" + //
+                    StringUtils.trimToEmpty(containText) + "^" + //
+                    StringUtils.trimToEmpty(color) + //
+                    "";
+        }
+
+        private String getArryStr(String[] arry, int index) {
+            if (index < arry.length) {
+                return StringUtils.trimToEmpty(arry[index]);
+            }
+            return "";
+        }
+
+        public Object[] toArray() {
+            return new Object[] { //
+                    type, //
+                    StringUtils.trimToEmpty(label), //
+                    index, //
+                    StringUtils.trimToEmpty(containText), //
+                    StringUtils.trimToEmpty(color) //
+            };
+        }
+
+        public void fromConfig(String value) {
+            String[] arry = StringUtils.trimToEmpty(value).split("\\^", -1);
+            type = XlsColumnDefType.valueOf(getArryStr(arry, 0));
+            label = getArryStr(arry, 1);
+            index = Integer.parseInt(getArryStr(arry, 2));
+            containText = getArryStr(arry, 3);
+            color = getArryStr(arry, 4);
+        }
     }
 }
