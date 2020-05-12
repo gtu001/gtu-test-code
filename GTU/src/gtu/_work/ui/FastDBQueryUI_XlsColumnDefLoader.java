@@ -28,6 +28,22 @@ public class FastDBQueryUI_XlsColumnDefLoader {
         this.customDir = customDir;
     }
 
+    public List<String> getPkList(final String tableName) {
+        final TableDef tb = getTable(tableName);
+        if (tb == null) {
+            System.out.println("查無資料表欄位定義Table : " + tableName);
+            return null;
+        }
+        List<String> pkLst = new ArrayList<String>();
+        for (Map<Integer, String> map : tb.columnLst) {
+            String isPk = StringUtils.trimToEmpty(map.get(pkIdx));
+            if (StringUtils.isNotBlank(isPk)) {
+                pkLst.add(StringUtils.trimToEmpty(map.get(columnIdx)));
+            }
+        }
+        return pkLst;
+    }
+
     public void setMappingIndex(int columnIdx, int chineseIdx, int pkIdx, int fkIdx) {
         this.columnIdx = columnIdx;
         this.chineseIdx = chineseIdx;
@@ -42,7 +58,7 @@ public class FastDBQueryUI_XlsColumnDefLoader {
             return null;
         }
         for (Map<Integer, String> map : tb.columnLst) {
-            if (StringUtils.equalsIgnoreCase(map.get(columnIdx), column)) {
+            if (StringUtils.equalsIgnoreCase(StringUtils.trimToEmpty(map.get(columnIdx)), StringUtils.trimToEmpty(column))) {
                 return getTooltipFormat(map.get(chineseIdx), map.get(pkIdx), map.get(fkIdx));
             }
         }
@@ -74,7 +90,7 @@ public class FastDBQueryUI_XlsColumnDefLoader {
                 Pair<Integer, Object> p = (Pair<Integer, Object>) input;
                 String column = (String) p.getRight();
                 for (Map<Integer, String> map : tb.columnLst) {
-                    if (StringUtils.equalsIgnoreCase(map.get(columnIdx), column)) {
+                    if (StringUtils.equalsIgnoreCase(StringUtils.trimToEmpty(map.get(columnIdx)), StringUtils.trimToEmpty(column))) {
                         return getTooltipFormat(map.get(chineseIdx), map.get(pkIdx), map.get(fkIdx));
                     }
                 }
@@ -85,8 +101,9 @@ public class FastDBQueryUI_XlsColumnDefLoader {
     }
 
     private TableDef getTable(String tableName) {
+        tableName = StringUtils.trimToEmpty(tableName);
         for (TableDef tb : tabLst) {
-            if (StringUtils.equalsIgnoreCase(tb.table, tableName)) {
+            if (StringUtils.equalsIgnoreCase(StringUtils.trimToEmpty(tb.table), tableName)) {
                 return tb;
             }
         }

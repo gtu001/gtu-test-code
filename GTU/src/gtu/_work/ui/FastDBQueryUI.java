@@ -3,7 +3,6 @@ package gtu._work.ui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
@@ -38,9 +37,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Callable;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -70,7 +67,6 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.JToolTip;
-import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.MenuKeyEvent;
@@ -79,6 +75,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.text.JTextComponent;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
 import org.apache.commons.collections.Transformer;
 import org.apache.commons.collections.map.LRUMap;
@@ -146,9 +143,9 @@ import gtu.swing.util.JTextUndoUtil;
 import gtu.swing.util.JTooltipUtil;
 import gtu.swing.util.KeyEventExecuteHandler;
 import gtu.swing.util.KeyEventUtil;
+import gtu.swing.util.SimpleTextDlg;
 import gtu.swing.util.SwingTabTemplateUI;
 import gtu.swing.util.SwingTabTemplateUI.ChangeTabHandlerGtu001;
-import gtu.thread.util.ThreadUtil;
 import gtu.yaml.util.YamlMapUtil;
 import gtu.yaml.util.YamlUtilBean;
 import net.sf.json.JSONArray;
@@ -979,38 +976,50 @@ public class FastDBQueryUI extends JFrame {
                 System.out.println("Column index selected " + col + " " + name);
 
                 if (JMouseEventUtil.buttonRightClick(1, e)) {
-                    JPopupMenuUtil.newInstance(queryResultTable)//
-                            .addJMenuItem("複製 : " + name, new ActionListener() {
+                    JPopupMenuUtil popUtil = JPopupMenuUtil.newInstance(queryResultTable);//
+                    popUtil.addJMenuItem("複製 : " + name, new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            ClipboardUtil.getInstance().setContents(name);
+                        }
+                    }).addJMenuItem("複製全部(逗號)", new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            JTableUtil tabUtil = JTableUtil.newInstance(queryResultTable);
+                            List<Object> lst = tabUtil.getColumnTitleArray();
+                            ClipboardUtil.getInstance().setContents(StringUtils.join(lst, " , "));
+                        }
+                    }).addJMenuItem("複製全部(多行)", new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            JTableUtil tabUtil = JTableUtil.newInstance(queryResultTable);
+                            List<Object> lst = tabUtil.getColumnTitleArray();
+                            ClipboardUtil.getInstance().setContents(StringUtils.join(lst, "\r\n"));
+                        }
+                    }).addJMenuItem("Sql Column IN (...)", new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            doSetColumnSqlInProcess(name, false);
+                        }
+                    }).addJMenuItem("Sql Column IN (...) [distinct]", new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            doSetColumnSqlInProcess(name, true);
+                        }
+                    });
+                    if (mTableColumnDefTextHandler != null) {
+                        List<String> pkLst = mTableColumnDefTextHandler.getPkLst();
+                        if (CollectionUtils.isNotEmpty(pkLst)) {
+                            popUtil.addJMenuItem("參考excel設定PK", new ActionListener() {
                                 @Override
                                 public void actionPerformed(ActionEvent e) {
-                                    ClipboardUtil.getInstance().setContents(name);
+                                    String pkMsg = StringUtils.join(mTableColumnDefTextHandler.getPkLst(), "\r\n");
+                                    new SimpleTextDlg(pkMsg, "", null).show();
                                 }
-                            }).addJMenuItem("複製全部(逗號)", new ActionListener() {
-                                @Override
-                                public void actionPerformed(ActionEvent e) {
-                                    JTableUtil tabUtil = JTableUtil.newInstance(queryResultTable);
-                                    List<Object> lst = tabUtil.getColumnTitleArray();
-                                    ClipboardUtil.getInstance().setContents(StringUtils.join(lst, " , "));
-                                }
-                            }).addJMenuItem("複製全部(多行)", new ActionListener() {
-                                @Override
-                                public void actionPerformed(ActionEvent e) {
-                                    JTableUtil tabUtil = JTableUtil.newInstance(queryResultTable);
-                                    List<Object> lst = tabUtil.getColumnTitleArray();
-                                    ClipboardUtil.getInstance().setContents(StringUtils.join(lst, "\r\n"));
-                                }
-                            }).addJMenuItem("Sql Column IN (...)", new ActionListener() {
-                                @Override
-                                public void actionPerformed(ActionEvent e) {
-                                    doSetColumnSqlInProcess(name, false);
-                                }
-                            }).addJMenuItem("Sql Column IN (...) [distinct]", new ActionListener() {
-                                @Override
-                                public void actionPerformed(ActionEvent e) {
-                                    doSetColumnSqlInProcess(name, true);
-                                }
-                            }).applyEvent(e)//
-                            .show();
+                            });
+                        }
+                    }
+                    popUtil.applyEvent(e).show();
                 }
             }
         });
@@ -3127,74 +3136,18 @@ public class FastDBQueryUI extends JFrame {
     }
 
     private class JMenuItem_BasicMenu {
+        SimpleTextDlg mSimpleTextDlg = null;
         JMenuItem item;
-        final JDialog dlg;
-        final JTextArea text;
-        final AtomicReference<String> strVal = new AtomicReference<String>("");
 
         JMenuItem_BasicMenu() {
-            Object val = JTableUtil.newInstance(queryResultTable).getSelectedValue();
-
-            dlg = new JDialog() {
-                public Dimension getPreferredSize() {
-                    return new Dimension(450, 250);
-                }
-            };
-            dlg.setModal(true);
-            final JPanel pan = new JPanel();
-            pan.setLayout(new BorderLayout(0, 0));
-            final JLabel lbl = new JLabel("");
-            pan.add(lbl, BorderLayout.NORTH);
-            text = new JTextArea();
-            JTextAreaUtil.applyCommonSetting(text, false);
-            pan.add(JCommonUtil.createScrollComponent(text), BorderLayout.CENTER);
-            final JButton btn = new JButton("確定");
-            pan.add(btn, BorderLayout.SOUTH);
-            dlg.getContentPane().add(pan);
-            dlg.pack();
-
-            JCommonUtil.setJFrameCenter(dlg);
-            btn.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    dlg.dispose();
-                }
-            });
-            final Runnable runner = new Runnable() {
-                @Override
-                public void run() {
-                    String strVal = StringUtils.defaultString(text.getSelectedText());
-                    lbl.setText("選擇長度:" + strVal.length() + "/位元長度:" + strVal.getBytes().length);
-                }
-            };
-            text.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseReleased(MouseEvent e) {
-                    runner.run();
-                }
-            });
-            text.addKeyListener(new KeyAdapter() {
-                @Override
-                public void keyReleased(KeyEvent e) {
-                    runner.run();
-                }
-            });
-
-            if (val != null) {
-                strVal.set(String.valueOf(val));
-            } else {
-                strVal.set("");
-            }
-
-            item = new JMenuItem("此資料長度 : " + strVal.get().getBytes().length);
+            mSimpleTextDlg = new SimpleTextDlg(JTableUtil.newInstance(queryResultTable).getSelectedValue(), "", null);
+            item = new JMenuItem("此資料長度 : " + mSimpleTextDlg.getMessage().getBytes().length);
             item.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     run();
                 }
             });
-
-            lbl.setText("選擇長度:" + strVal.get().length() + "/位元長度:" + strVal.get().getBytes().length);
         }
 
         JMenuItem getItem() {
@@ -3202,8 +3155,7 @@ public class FastDBQueryUI extends JFrame {
         }
 
         void run() {
-            text.setText(strVal.get());
-            dlg.setVisible(true);
+            mSimpleTextDlg.show();
         }
     }
 
@@ -5664,6 +5616,18 @@ public class FastDBQueryUI extends JFrame {
                 JCommonUtil.handleException(ex);
             }
             return null;
+        }
+
+        public List<String> getPkLst() {
+            try {
+                if (init()) {
+                    String table = String.valueOf(tableColumnDefText.getSelectedItem());
+                    return xlsLoader.getPkList(table);
+                }
+            } catch (Exception ex) {
+                JCommonUtil.handleException(ex);
+            }
+            return Collections.emptyList();
         }
     }
 
