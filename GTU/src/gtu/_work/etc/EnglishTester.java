@@ -368,6 +368,7 @@ public class EnglishTester extends javax.swing.JFrame {
                     jPanel2.setPreferredSize(new java.awt.Dimension(420, 211));
                     {
                         showEnglishText = new JTextField();
+                        showEnglishText.setFont(new java.awt.Font("Microsoft JhengHei", 0, 22));
                         jPanel2.add(showEnglishText, BorderLayout.NORTH);
                         showEnglishText.setEditable(false);
                     }

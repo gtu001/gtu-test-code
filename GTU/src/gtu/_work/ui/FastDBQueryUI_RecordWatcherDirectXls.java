@@ -1,22 +1,14 @@
 package gtu._work.ui;
 
-import java.awt.Desktop;
-import java.awt.TrayIcon;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.IOException;
-import java.sql.Connection;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Callable;
+import java.util.TreeMap;
 
-import org.apache.commons.collections.Transformer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
@@ -24,63 +16,32 @@ import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.hssf.util.HSSFColor;
+import org.apache.poi.ss.usermodel.Row;
 
-import gtu.db.JdbcDBUtil;
 import gtu.file.FileUtil;
-import gtu.javafx.traynotification.NotificationType;
-import gtu.javafx.traynotification.TrayNotificationHelper;
-import gtu.javafx.traynotification.animations.AnimationType;
 import gtu.poi.hssf.ExcelUtil_Xls97;
 import gtu.poi.hssf.ExcelWriter;
 import gtu.poi.hssf.ExcelWriter.CellStyleHandler;
-import gtu.swing.util.SysTrayUtil;
 
-public class FastDBQueryUI_RecordWatcher extends Thread {
-    Triple<List<String>, List<Class<?>>, List<Object[]>> orignQueryResult;
-    String sql;
-    Object[] params;
-    int maxRowsLimit;
-    boolean doStop = false;
-    Callable<Connection> fetchConnCallable;
-    long skipTime;
-    SysTrayUtil sysTray;
+public class FastDBQueryUI_RecordWatcherDirectXls {
+
     String fileMiddleName;
-    Transformer finalDo;
-    boolean isShowStopMessage;
 
     List<Integer> pkIndexLst = new ArrayList<Integer>();
     SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmssSSS");
     NewNameHandler mNewNameHandler;
 
-    public FastDBQueryUI_RecordWatcher(Triple<List<String>, List<Class<?>>, List<Object[]>> orignQueryResult, String sql, Object[] params, int maxRowsLimit, Callable<Connection> fetchConnCallable,
-            long skipTime, String fileMiddleName, SysTrayUtil sysTray, Transformer finalDo) {
-        this.orignQueryResult = orignQueryResult;
-        this.sql = sql;
-        this.params = params;
-        this.maxRowsLimit = maxRowsLimit;
-        this.fetchConnCallable = fetchConnCallable;
-        this.skipTime = skipTime;
-        this.sysTray = sysTray;
+    public FastDBQueryUI_RecordWatcherDirectXls(String fileMiddleName, List<Integer> pkIndexLst) {
         this.fileMiddleName = fileMiddleName;
-        this.finalDo = finalDo;
+        this.pkIndexLst = pkIndexLst;
     }
 
-    private void finalDoSomething(String message, Throwable ex) {
-        if (finalDo != null) {
-            Map<String, Object> map = new HashMap<String, Object>();
-            map.put("msg", message);
-            map.put("ex", ex);
-            finalDo.transform(map);
-        }
-    }
-
-    private long compareOldAndNew(List<Object[]> oldLst, List<Object[]> newLst, List<String> titleLst, long startTime, long queryEndTime) {
+    private File compareOldAndNew(List<Object[]> oldLst, List<Object[]> newLst, List<String> titleLst, long queryEndTime) {
         Map<String, Object[]> oArry = new LinkedHashMap<String, Object[]>();
         Map<String, Object[]> nArry = new LinkedHashMap<String, Object[]>();
 
         if (pkIndexLst.isEmpty()) {
-            finalDoSomething("請先設定欄位比對PK!", null);
-            return -1;
+            throw new RuntimeException("請先設定欄位比對PK!");
         }
 
         this.appendAllRecords(oldLst, oArry);
@@ -108,44 +69,15 @@ public class FastDBQueryUI_RecordWatcher extends Thread {
             }
         }
 
+        File xlsFile = null;
         if (!delArry.isEmpty() || !newArry.isEmpty() || !updArry.isEmpty()) {
             if (mNewNameHandler == null) {
                 mNewNameHandler = new NewNameHandler(fileMiddleName, queryEndTime);
             }
-            File xlsFile = this.writeExcel(titleLst, delArry, newArry, updArry);
-            showModificationMessage(xlsFile);
+            xlsFile = this.writeExcel(titleLst, delArry, newArry, updArry);
+            System.out.println("寫入比對檔 : " + xlsFile);
         }
-
-        long duringTime = System.currentTimeMillis() - startTime;
-        return duringTime;
-    }
-
-    private void showModificationMessage(final File xlsFile) {
-        try {
-            TrayNotificationHelper.newInstance()//
-                    .title("FastDBQueryUI - 資料發生異動")//
-                    .message(xlsFile.getName())//
-                    .notificationType(NotificationType.INFORMATION)//
-                    .rectangleFill(TrayNotificationHelper.RandomColorFill.getInstance().get())//
-                    .animationType(AnimationType.FADE)//
-                    .onPanelClickCallback(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            try {
-                                Desktop.getDesktop().open(xlsFile);
-                            } catch (IOException e1) {
-                                e1.printStackTrace();
-                            }
-                        }
-                    }).show(1500);
-        } catch (Throwable ex) {
-            System.err.println(ex.getMessage());
-            try {
-                sysTray.displayMessage("FastDBQueryUI - 資料發生異動", xlsFile.getName(), TrayIcon.MessageType.INFO);
-                System.out.println("FastDBQueryUI - 資料發生異動 : " + xlsFile.getName());
-            } catch (Throwable ex2) {
-            }
-        }
+        return xlsFile;
     }
 
     private File writeExcel(List<String> titleLst, List<Object[]> delArry, List<Object[]> newArry, List<Pair<Object[], Object[]>> updArry) {
@@ -280,69 +212,68 @@ public class FastDBQueryUI_RecordWatcher extends Thread {
         }
     }
 
-    private Connection getConnection() {
-        try {
-            return (Connection) (this.fetchConnCallable.call());
-        } catch (Exception e) {
-            throw new RuntimeException("取得連線錯誤!", e);
+    public Triple<List<String>, List<Class<?>>, List<Object[]>> convertXlsToQueryResult(File xlsFile) {
+        ExcelUtil_Xls97 xlsUtil = ExcelUtil_Xls97.getInstance();
+        HSSFWorkbook wb = xlsUtil.readExcel(xlsFile);
+        HSSFSheet sheet = wb.getSheetAt(0);
+        if (wb.getNumberOfSheets() == 2) {
+            sheet = wb.getSheetAt(1);
         }
-    }
 
-    public void run() {
-        try {
-            System.out.println("--------RecordWatcher start");
-            while (!doStop) {
-                if (this.orignQueryResult == null) {
-                    System.out.println("--------RecordWatcher start -- [init query]");
-                    try {
-                        this.orignQueryResult = JdbcDBUtil.queryForList_customColumns(sql, params, getConnection(), true, maxRowsLimit);
-                    } catch (Exception e) {
-                        // throw new RuntimeException("查詢錯誤!", e);
-                        Thread.sleep(100);
-                        continue;
-                    }
-                } else {
-                    System.out.println("--------RecordWatcher start -- [requery]");
-                    long startTime = System.currentTimeMillis();
-                    Triple<List<String>, List<Class<?>>, List<Object[]>> compareResult = null;
-                    try {
-                        compareResult = JdbcDBUtil.queryForList_customColumns(sql, params, getConnection(), true, maxRowsLimit);
-                    } catch (Exception e) {
-                        // throw new RuntimeException("查詢錯誤!", e);
-                        Thread.sleep(100);
-                        continue;
-                    }
-                    long endTime = System.currentTimeMillis();
-
-                    if (orignQueryResult != null && compareResult != null) {
-                        List<String> titleLst = orignQueryResult.getLeft();
-                        if (titleLst.size() != compareResult.getLeft().size()) {
-                            throw new RuntimeException("欄位數不同(old/new) : " + titleLst.size() + "/" + compareResult.getLeft().size());
-                        } else {
-                            // 真實比對 XXX
-                            // ==============================================================
-                            long sleepTime = compareOldAndNew(orignQueryResult.getRight(), compareResult.getRight(), titleLst, startTime, endTime);
-                            // 真實比對 XXX
-                            // ==============================================================
-                            orignQueryResult = compareResult;
-                            if (sleepTime > 0) {
-                                try {
-                                    Thread.sleep(sleepTime);
-                                } catch (InterruptedException e) {
-                                }
-                            }
-                        }
-                    }
+        List<Object[]> rowLst = new ArrayList<Object[]>();
+        List<String> columnLst = new ArrayList<String>();
+        for (int jj = 0; jj < sheet.getRow(0).getLastCellNum(); jj++) {
+            String value = ExcelUtil_Xls97.getInstance().readCell(sheet.getRow(0).getCell(jj));
+            columnLst.add(value);
+        }
+        int columnCount = columnLst.size();
+        TreeMap<Integer, Class<?>> typeClzMap = new TreeMap<Integer, Class<?>>();
+        for (int ii = 1; ii <= sheet.getLastRowNum(); ii++) {
+            Row row = sheet.getRow(ii);
+            if (row == null) {
+                continue;
+            }
+            List<Object> dataRow = new ArrayList<Object>();
+            for (int jj = 0; jj < row.getLastCellNum(); jj++) {
+                Object value = ExcelUtil_Xls97.getInstance().readCell2(row.getCell(jj));
+                dataRow.add(value);
+                if (value != null && !typeClzMap.containsKey(jj)) {
+                    typeClzMap.put(jj, value.getClass());
                 }
             }
-            System.out.println("--------RecordWatcher start -- [end]");
-            String stopMessage = "監聽結束!!";
-            if (!isShowStopMessage) {
-                stopMessage = null;
+            if (columnCount != dataRow.size()) {
+                throw new RuntimeException("Row " + ii + " 現實欄位數為 " + dataRow.size() + " , 要求為 " + columnCount);
             }
-            this.finalDoSomething(stopMessage, null);
+            rowLst.add(dataRow.toArray());
+        }
+        if (typeClzMap.size() != columnCount) {
+            throw new RuntimeException("classType 現實欄位數為 " + typeClzMap.size() + " , 要求為 " + columnCount);
+        }
+        List<Class<?>> typeLst = new ArrayList<Class<?>>(typeClzMap.values());
+        return Triple.of(columnLst, typeLst, rowLst);
+    }
+
+    public File run(File orignXls, File newXls) {
+        try {
+            Triple<List<String>, List<Class<?>>, List<Object[]>> orignQueryResult = convertXlsToQueryResult(orignXls);
+            Triple<List<String>, List<Class<?>>, List<Object[]>> compareResult = convertXlsToQueryResult(newXls);
+            File diffFile = null;
+
+            if (orignQueryResult != null && compareResult != null) {
+                List<String> titleLst = orignQueryResult.getLeft();
+                if (titleLst.size() != compareResult.getLeft().size()) {
+                    throw new RuntimeException("欄位數不同(old/new) : " + titleLst.size() + "/" + compareResult.getLeft().size());
+                } else {
+                    // 真實比對 XXX
+                    // ==============================================================
+                    diffFile = compareOldAndNew(orignQueryResult.getRight(), compareResult.getRight(), titleLst, System.currentTimeMillis());
+                    // 真實比對 XXX
+                    // ==============================================================
+                }
+            }
+            return diffFile;
         } catch (Throwable ex) {
-            this.finalDoSomething(ex.getMessage(), ex);
+            throw new RuntimeException(ex);
         }
     }
 
@@ -364,12 +295,20 @@ public class FastDBQueryUI_RecordWatcher extends Thread {
         }
     }
 
-    public void doStop(boolean isShowStopMessage) {
-        this.isShowStopMessage = isShowStopMessage;
-        this.doStop = true;
-    }
-
     public void setPkIndexLst(List<Integer> pkIndexLst) {
         this.pkIndexLst = pkIndexLst;
+    }
+
+    public static void main(String[] args) {
+        String fileMiddleName = "test";
+        List<Integer> pkIndexLst = new ArrayList<Integer>();
+        pkIndexLst.add(0);
+        pkIndexLst.add(1);
+        pkIndexLst.add(2);
+        File beforeFile = new File("C:/Users/wistronits/Desktop/執行前後/執行前後/1A.LCInsureAcc.xls");
+        File afterFile = new File("C:/Users/wistronits/Desktop/執行前後/執行前後/1B.LCInsureAcc.xls");
+        FastDBQueryUI_RecordWatcherDirectXls mFastDBQueryUI_RecordWatcherDirectXls = new FastDBQueryUI_RecordWatcherDirectXls(fileMiddleName, pkIndexLst);
+        mFastDBQueryUI_RecordWatcherDirectXls.run(beforeFile, afterFile);
+        System.out.println("done..");
     }
 }

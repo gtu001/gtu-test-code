@@ -20,17 +20,21 @@ public class FastDBQueryUI_XlsColumnDefLoader {
 
     int columnIdx;
     int chineseIdx;
+    int pkIdx;
+    int fkIdx;
     File customDir;
 
     public FastDBQueryUI_XlsColumnDefLoader(File customDir) {
         this.customDir = customDir;
     }
 
-    public void setMappingIndex(int columnIdx, int chineseIdx) {
+    public void setMappingIndex(int columnIdx, int chineseIdx, int pkIdx, int fkIdx) {
         this.columnIdx = columnIdx;
         this.chineseIdx = chineseIdx;
+        this.pkIdx = pkIdx;
+        this.fkIdx = fkIdx;
     }
-    
+
     public String getDBColumnChinese(final String column, final String tableName) {
         final TableDef tb = getTable(tableName);
         if (tb == null) {
@@ -39,11 +43,23 @@ public class FastDBQueryUI_XlsColumnDefLoader {
         }
         for (Map<Integer, String> map : tb.columnLst) {
             if (StringUtils.equalsIgnoreCase(map.get(columnIdx), column)) {
-                return map.get(chineseIdx);
+                return getTooltipFormat(map.get(chineseIdx), map.get(pkIdx), map.get(fkIdx));
             }
         }
         System.out.println("查無資料表欄位定義 : " + tableName + "." + column);
         return null;
+    }
+
+    private String getTooltipFormat(String chinese, String pk, String fk) {
+        pk = StringUtils.trimToEmpty(pk);
+        if (StringUtils.isNotBlank(pk)) {
+            pk = "　" + pk;
+        }
+        fk = StringUtils.trimToEmpty(fk);
+        if (StringUtils.isNotBlank(fk)) {
+            fk = "　" + fk;
+        }
+        return String.format("<html>%s<font color='red'>%s</font><font color='blue'>%s</font></html>", chinese, pk, fk);
     }
 
     public Transformer getTableTitleTransformer(final String tableName) {
@@ -59,7 +75,7 @@ public class FastDBQueryUI_XlsColumnDefLoader {
                 String column = (String) p.getRight();
                 for (Map<Integer, String> map : tb.columnLst) {
                     if (StringUtils.equalsIgnoreCase(map.get(columnIdx), column)) {
-                        return map.get(chineseIdx);
+                        return getTooltipFormat(map.get(chineseIdx), map.get(pkIdx), map.get(fkIdx));
                     }
                 }
                 System.out.println("查無資料表欄位定義 : " + tableName + "." + column);

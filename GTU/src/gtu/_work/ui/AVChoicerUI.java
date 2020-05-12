@@ -81,6 +81,7 @@ import gtu.swing.util.JFrameUtil;
 import gtu.swing.util.JListUtil;
 import gtu.swing.util.JMouseEventUtil;
 import gtu.swing.util.JTabbedPaneUtil;
+import taobe.tec.jcc.JChineseConvertor;
 
 public class AVChoicerUI extends JFrame {
 
@@ -205,6 +206,14 @@ public class AVChoicerUI extends JFrame {
                 currentFileHandler.replay();
             }
         });
+        
+                JButton renameBtn = new JButton("改名");
+                renameBtn.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        currentFileHandler.rename();
+                    }
+                });
+                panel_7.add(renameBtn);
         panel_7.add(replayBtn);
 
         JPanel panel_8 = new JPanel();
@@ -1056,6 +1065,36 @@ public class AVChoicerUI extends JFrame {
                     return tempFile.get();
                 }
             }));
+        }
+
+        private void rename() {
+            try {
+                if (tempFile == null) {
+                    JCommonUtil._jOptionPane_showMessageDialog_error("檔案不存在!");
+                    return;
+                }
+                File file = tempFile.get();
+                if (file == null || !file.exists()) {
+                    JCommonUtil._jOptionPane_showMessageDialog_error("檔案不存在!");
+                    return;
+                }
+                String name = FileUtil.getNameNoSubName(file);
+                String subName = FileUtil.getSubName(file);
+                name = JCommonUtil._jOptionPane_showInputDialog("改名", name);
+                if (StringUtils.isNotBlank(name)) {
+                    name = JChineseConvertor.getInstance().s2t(name);
+                    File renmaeToFile = new File(file.getParentFile(), name + "." + subName);
+                    if (JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("確定改名為\n" + renmaeToFile.getAbsolutePath(), renmaeToFile.getName())) {
+                        boolean result = file.renameTo(renmaeToFile);
+                        JCommonUtil._jOptionPane_showMessageDialog_info("改名 " + (result ? "成功" : "失敗") + " : " + renmaeToFile);
+                        if (result) {
+                            tempFile.set(renmaeToFile);
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                JCommonUtil.handleException(e);
+            }
         }
     }
 

@@ -13,6 +13,9 @@
 	<property name="rename_jarname" value="${main_class}" />
 	<property name="icon_name" value="english_tester.ico" />
 	<!--<property name="launch4jExe" value="C:\Program Files (x86)\Launch4j\launch4j.exe" />-->
+	<!--<property name="mavenExe" value="I:/‪/apps/apache-maven-3.3.9/bin/mvn" />
+	<property name="gtu_pom_file" value="‪I://workstuff/workspace/gtu-test-code/GTU/pom.xml" />
+	-->
 	<!--${main_class}-->
 
 
@@ -37,6 +40,12 @@
 		<fileset dir="${jar_repsitory}">
 			<filename name="**/*.jar" />
 		</fileset>
+	</path>
+	<path id="javafx_class_path">
+		<fileset dir="/media/gtu001/OLD_D/my_tool/jfxrt">
+			<filename name="**/*.jar" />
+		</fileset>
+		<pathelement path="${build.dir}" />
 	</path>
 
 	<!--
@@ -101,14 +110,17 @@
 		<antcall target="clean">
 			<!--清除-->
 			<param name="enable" value="true" />
+			<!-- false -->
 		</antcall>
 
 		<antcall target="buildClassSet">
 			<param name="enable" value="true" />
+			<!-- false -->
 		</antcall>
 
 		<antcall target="copyReference">
 			<param name="enable" value="true" />
+			<!-- false -->
 		</antcall>
 
 		<antcall target="compiler">
@@ -138,6 +150,7 @@
 		<antcall target="clean">
 			<!--清除-->
 			<param name="enable" value="true" />
+			<!-- false -->
 		</antcall>
 
 		<antcall target="jarToExe">
@@ -152,10 +165,10 @@
 	<target name="notify">
 		<echo># notify ...</echo>
 		<!--
-		<exec executable="cmd">
-			<arg value="/c start echo create ${main_class}.jar complete!!" />
-		</exec>
-		-->
+			<exec executable="cmd">
+				<arg value="/c start echo create ${main_class}.jar complete!!" />
+			</exec>
+			-->
 		<notify type="info" title="build完成" message="create ${main_class}.jar complete!!" />
 	</target>
 
@@ -166,6 +179,7 @@
 			<classpath>
 				<path location="${build_dir}" />
 			</classpath>
+			<!-- <classpath refid="javafx_class_path" /> -->
 		</javac>
 	</target>
 

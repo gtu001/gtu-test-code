@@ -28,12 +28,12 @@
 			<filename name="**/*.jar" />
 		</fileset>
 	</path>
-
 	<typedef name="jarfinder" classname="gtu.ant.AntJarFinder" classpathref="my_test_classpath" />
 	<!--<typedef name="classLoader" classname="gtu.ant.AntClassLoader" classpathref="my_test_classpath" />-->
 	<typedef name="antDebug" classname="gtu.ant.AntDebug" classpathref="my_test_classpath" />
 	<typedef name="jarToExe" classname="gtu.ant.AntJarToExe" classpathref="my_test_classpath" />
 	<typedef name="notify" classname="gtu.ant.AntNotify" classpathref="my_test_classpath" />
+	<typedef name="obfuscator" classname="gtu.ant.AntObfuscator" classpathref="my_test_classpath" />
 
 	<!-- 參考的jar -->
 	<path id="class_path">
@@ -116,6 +116,9 @@
 	<path id="config">
 		<fileset dir="${src_dir}">
 			<exclude name="**/*.java" />
+			<exclude name="**/log4j.properties" />
+			<exclude name="**/logback.xml" />
+			<exclude name="**/velocity.properties" />
 		</fileset>
 	</path>
 
@@ -136,7 +139,9 @@
 			<!-- false -->
 		</antcall>
 
-		<antcall target="compiler" />
+		<antcall target="compiler">
+			<param name="enable" value="true" />
+		</antcall>
 
 		<antcall target="runClass">
 			<param name="enable" value="false" />
@@ -183,7 +188,7 @@
 		<notify type="info" title="build完成" message="create ${main_class}.jar complete!!" />
 	</target>
 
-	<target name="compiler">
+	<target name="compiler" if="${enable}">
 		<echo># compiler ...</echo>
 		<javac compiler="javac1.6" source="1.6" target="1.6" includeantruntime="true" srcdir="${src_dir}" destdir="${build_dir}" deprecation="no" nowarn="true" encoding="UTF-8" debug="on">
 			<include name="**/${main_class}.java" />
@@ -272,5 +277,10 @@
 				<include name="**/*.jar" />
 			</fileset>
 		</unjar>
+	</target>
+
+	<target name="obfuscator" if="${enable}">
+		<echo># obfuscator = ${enable}</echo>
+		<obfuscator jarDir="${obfuscator_dir}" inJar="${basedir}/${main_class}.jar" />
 	</target>
 </project>

@@ -1,5 +1,7 @@
 package gtu.properties;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -8,10 +10,14 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.util.Enumeration;
 import java.util.Properties;
+
+import org.apache.commons.lang.StringUtils;
 
 import gtu.log.Log;
 import gtu.swing.util.JCommonUtil;
@@ -235,6 +241,62 @@ public class PropertiesUtil {
             }
             try {
                 fis.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    // ========================================================================================
+
+    public static Properties loadFromEqualMarkTxt(Properties prop, File configFile) {
+        if (prop == null) {
+            prop = new Properties();
+        }
+        BufferedReader reader = null;
+        try {
+            reader = new BufferedReader(new InputStreamReader(new FileInputStream(configFile)));
+            for (String line = null; (line = reader.readLine()) != null;) {
+                int startPos = -1;
+                if (!StringUtils.isBlank(line) && (startPos = line.indexOf("=")) != -1) {
+                    String key = line.substring(0, startPos);
+                    String value = line.substring(startPos + 1);
+                    prop.setProperty(key, value);
+                }
+            }
+            return prop;
+        } catch (Exception ex) {
+            throw new RuntimeException("[loadFromEqualMarkTxt] 讀檔失敗 ,檔案 : " + configFile + " , ERR : " + ex.getMessage(), ex);
+        } finally {
+            try {
+                reader.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static void storeAsEqualMarkTxt(Properties prop, File configFile, String comment) {
+        BufferedWriter writer = null;
+        try {
+            writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(configFile)));
+            writer.write("#" + comment);
+            for (Enumeration enu = prop.keys(); enu.hasMoreElements();) {
+                String key = (String) enu.nextElement();
+                String value = prop.getProperty(key);
+                writer.write(key + "=" + value);
+                writer.newLine();
+            }
+            writer.flush();
+        } catch (Exception ex) {
+            throw new RuntimeException("[storeProperties] 存檔失敗 ,檔案 : " + configFile + " , ERR : " + ex.getMessage(), ex);
+        } finally {
+            try {
+                writer.flush();
+            } catch (Exception e) {
+            }
+            try {
+                writer.close();
             } catch (Exception e) {
                 e.printStackTrace();
             }

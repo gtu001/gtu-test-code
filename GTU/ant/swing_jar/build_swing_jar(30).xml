@@ -83,6 +83,8 @@
 			<packagename mode="small">com.sun.jna.platform.FileUtils</packagename>
 			<packagename mode="small">org.apache.commons.beanutils.ConvertUtils</packagename>
 
+			<packagename mode="small" name="jcc-bate-0.7.3.jar">taobe.tec.jcc.JChineseConvertor</packagename>
+
 		</jarfinder>
 
 		<!-- 特別指定要使用的jar檔 -->
@@ -147,7 +149,7 @@
 
 		<antcall target="clean">
 			<!--清除-->
-			<param name="enable" value="false" />
+			<param name="enable" value="true" />
 			<!-- false -->
 		</antcall>
 
@@ -177,7 +179,7 @@
 			<classpath>
 				<path location="${build_dir}" />
 			</classpath>
-			<classpath refid="javafx_class_path" />
+			<!-- <classpath refid="javafx_class_path" /> -->
 		</javac>
 	</target>
 

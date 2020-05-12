@@ -12,7 +12,6 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.BufferedReader;
@@ -39,7 +38,9 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -69,6 +70,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.JToolTip;
+import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.MenuKeyEvent;
@@ -146,6 +148,7 @@ import gtu.swing.util.KeyEventExecuteHandler;
 import gtu.swing.util.KeyEventUtil;
 import gtu.swing.util.SwingTabTemplateUI;
 import gtu.swing.util.SwingTabTemplateUI.ChangeTabHandlerGtu001;
+import gtu.thread.util.ThreadUtil;
 import gtu.yaml.util.YamlMapUtil;
 import gtu.yaml.util.YamlUtilBean;
 import net.sf.json.JSONArray;
@@ -321,6 +324,17 @@ public class FastDBQueryUI extends JFrame {
     private static final String ICO_FILENAME = "big_boobs.ico";// "big_boobs.ico";//"Pig_SC.ico"
     private JButton setFontSizeBtn;
     private JComboBox sqlPageDbConnCombox;
+    private JPanel panel_26;
+    private JLabel lblNewLabel_15;
+    private JLabel lblNewLabel_16;
+    private JTextField compareBeforeXlsText;
+    private JTextField compareAfterXlsText;
+    private JPanel panel_27;
+    private JButton compareXlsExecuteBtn;
+    private JButton compareXlsClearBtn;
+    private JLabel lblNewLabel_17;
+    private JTextField compareXlsMiddleNameText;
+
     protected TableColumnDefTextHandler mTableColumnDefTextHandler;
 
     private final Predicate IGNORE_PREDICT = new Predicate() {
@@ -1359,6 +1373,56 @@ public class FastDBQueryUI extends JFrame {
         });
 
         panel_18.add(JCommonUtil.createScrollComponent(refSearchList), BorderLayout.CENTER);
+
+        panel_26 = new JPanel();
+        tabbedPane.addTab("匯出檔比對", null, panel_26, null);
+        panel_26.setLayout(new FormLayout(new ColumnSpec[] { FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow"), },
+                new RowSpec[] { FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
+                        FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, }));
+
+        lblNewLabel_15 = new JLabel("初始匯出檔xls");
+        panel_26.add(lblNewLabel_15, "2, 2, right, default");
+
+        compareBeforeXlsText = new JTextField();
+        JCommonUtil.jTextFieldSetFilePathMouseEvent(compareBeforeXlsText, false);
+        panel_26.add(compareBeforeXlsText, "4, 2, fill, default");
+        compareBeforeXlsText.setColumns(10);
+
+        lblNewLabel_16 = new JLabel("結果匯出檔xls");
+        panel_26.add(lblNewLabel_16, "2, 4, right, default");
+
+        compareAfterXlsText = new JTextField();
+        JCommonUtil.jTextFieldSetFilePathMouseEvent(compareAfterXlsText, false);
+        panel_26.add(compareAfterXlsText, "4, 4, fill, default");
+        compareAfterXlsText.setColumns(10);
+
+        lblNewLabel_17 = new JLabel("產出檔中間名");
+        panel_26.add(lblNewLabel_17, "2, 6, right, default");
+
+        compareXlsMiddleNameText = new JTextField();
+        panel_26.add(compareXlsMiddleNameText, "4, 6, fill, default");
+        compareXlsMiddleNameText.setColumns(10);
+
+        panel_27 = new JPanel();
+        panel_26.add(panel_27, "4, 8, fill, fill");
+
+        compareXlsExecuteBtn = new JButton("比對");
+        compareXlsExecuteBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                compareXlsExecuteBtnAction();
+            }
+        });
+        panel_27.add(compareXlsExecuteBtn);
+
+        compareXlsClearBtn = new JButton("清除");
+        compareXlsClearBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                compareBeforeXlsText.setText("");
+                compareAfterXlsText.setText("");
+                compareXlsMiddleNameText.setText("");
+            }
+        });
+        panel_27.add(compareXlsClearBtn);
 
         panel_6 = new JPanel();
         tabbedPane.addTab("DB連線設定", null, panel_6, null);
@@ -5424,12 +5488,16 @@ public class FastDBQueryUI extends JFrame {
         if (mRecordWatcher.get() != null) {
             mRecordWatcher.get().doStop(false);
         }
+        String fileMiddleName = sqlIdText.getText();
+        if (StringUtils.isBlank(fileMiddleName)) {
+            fileMiddleName = getRandom_TableNSchema();
+        }
         mRecordWatcher.set(new FastDBQueryUI_RecordWatcher(orignQueryResult, sql, params, maxRowsLimit, new Callable<Connection>() {
             @Override
             public Connection call() throws Exception {
                 return getDataSource().getConnection();
             }
-        }, 1000, sqlIdText.getText(), TAB_UI1.getSysTrayUtil(), new Transformer() {
+        }, 1000, fileMiddleName, TAB_UI1.getSysTrayUtil(), new Transformer() {
             @Override
             public Object transform(Object input) {
                 recordWatcherToggleBtn.setSelected(false);
@@ -5550,6 +5618,8 @@ public class FastDBQueryUI extends JFrame {
         FastDBQueryUI_XlsColumnDefLoader xlsLoader = null;
         int fromIndex = -1;
         int toIndex = -1;
+        int pkIndex = -1;
+        int fkIndex = -1;
 
         private boolean init() {
             File dir = new File(FileUtil.DESKTOP_DIR, "FastColumnDef");
@@ -5561,11 +5631,13 @@ public class FastDBQueryUI extends JFrame {
                 xlsLoader.execute();
             }
             if (tableColumnDefText.getSelectedItem() != null && StringUtils.isNotBlank((String) tableColumnDefText.getSelectedItem())) {
-                if (fromIndex == -1 || toIndex == -1) {
+                if (fromIndex == -1 || toIndex == -1 || pkIndex == -1) {
                     fromIndex = Integer.parseInt(JCommonUtil._jOptionPane_showInputDialog("請輸入Excel cell index (英文欄位)", "0"));
                     toIndex = Integer.parseInt(JCommonUtil._jOptionPane_showInputDialog("請輸入Excel cell index (中文說明)", "1"));
+                    pkIndex = Integer.parseInt(JCommonUtil._jOptionPane_showInputDialog("請輸入Excel cell index (主鍵)", "-1"));
+                    fkIndex = Integer.parseInt(JCommonUtil._jOptionPane_showInputDialog("請輸入Excel cell index (外鍵)", "-1"));
                 }
-                xlsLoader.setMappingIndex(fromIndex, toIndex);
+                xlsLoader.setMappingIndex(fromIndex, toIndex, pkIndex, fkIndex);
                 return true;
             }
             return false;
@@ -5592,6 +5664,75 @@ public class FastDBQueryUI extends JFrame {
                 JCommonUtil.handleException(ex);
             }
             return null;
+        }
+    }
+
+    // ===========================================================================================================================
+
+    public List<String> getCompareXlsColumnLst(File xlsFile) {
+        ExcelUtil_Xls97 xlsUtil = ExcelUtil_Xls97.getInstance();
+        HSSFWorkbook wb = xlsUtil.readExcel(xlsFile);
+        HSSFSheet sheet = wb.getSheetAt(0);
+        if (wb.getNumberOfSheets() == 2) {
+            sheet = wb.getSheetAt(1);
+        }
+        List<String> columnLst = new ArrayList<String>();
+        for (int jj = 0; jj < sheet.getRow(0).getLastCellNum(); jj++) {
+            String value = ExcelUtil_Xls97.getInstance().readCell(sheet.getRow(0).getCell(jj));
+            columnLst.add(value);
+        }
+        return columnLst;
+    }
+
+    private void compareXlsExecuteBtnAction() {
+        try {
+            final String fileMiddleName = StringUtils.trimToEmpty(compareXlsMiddleNameText.getText());
+            final File beforeXlsFile = JCommonUtil.filePathCheck(compareBeforeXlsText.getText(), "初始XLS檔案錯誤", "xls");
+            final File afterXlsFile = JCommonUtil.filePathCheck(compareAfterXlsText.getText(), "結果XLS檔案錯誤", "xls");
+            JCommonUtil.isBlankErrorMsg(fileMiddleName, "中間檔名不可為空");
+            final List<String> columnLst = getCompareXlsColumnLst(beforeXlsFile);
+
+            final FastDBQueryUI_RowDiffWatcherDlg mFastDBQueryUI_RowDiffWatcherDlg = (FastDBQueryUI_RowDiffWatcherDlg.newInstance(columnLst, new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    FastDBQueryUI_RowDiffWatcherDlg dlg = (FastDBQueryUI_RowDiffWatcherDlg) e.getSource();
+                    final List<Integer> pkIndexLst = new ArrayList<Integer>();
+                    for (int ii = 0; ii < columnLst.size(); ii++) {
+                        String column = columnLst.get(ii);
+                        for (String mColumn : dlg.getPkLst()) {
+                            if (StringUtils.equals(column, mColumn)) {
+                                pkIndexLst.add(ii);
+                            }
+                        }
+                    }
+                    if (pkIndexLst.isEmpty()) {
+                        JCommonUtil._jOptionPane_showMessageDialog_error("請選擇主鍵!");
+                    } else {
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                // -------------------------------------------------↓↓↓↓↓↓
+
+                                FastDBQueryUI_RecordWatcherDirectXls mFastDBQueryUI_RecordWatcherDirectXls = new FastDBQueryUI_RecordWatcherDirectXls(fileMiddleName, pkIndexLst);
+                                File reulstFile = mFastDBQueryUI_RecordWatcherDirectXls.run(beforeXlsFile, afterXlsFile);
+                                if (reulstFile == null || !reulstFile.exists()) {
+                                    JCommonUtil._jOptionPane_showMessageDialog_error("檔案產生失敗");
+                                }
+                                JCommonUtil._jOptionPane_showMessageDialog_error("檔案產生成功\n" + reulstFile);
+                                // -------------------------------------------------↑↑↑↑↑↑
+                            }
+                        }).start();
+                    }
+                }
+            }, new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    mJDlgHolderBringToFrontHandler.remove((JDialog) e.getSource());
+                }
+            }));
+            mJDlgHolderBringToFrontHandler.add(mFastDBQueryUI_RowDiffWatcherDlg);
+        } catch (Exception ex) {
+            JCommonUtil.handleException(ex);
         }
     }
 }

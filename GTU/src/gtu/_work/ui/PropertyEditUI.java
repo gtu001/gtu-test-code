@@ -45,6 +45,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.commons.lang3.tuple.Triple;
 
 import com.jgoodies.forms.factories.FormFactory;
@@ -451,6 +452,54 @@ public class PropertyEditUI extends javax.swing.JFrame {
                             }
                         });
                     }
+
+                    {
+                        JMenuItem jMenuItem8 = new JMenuItem();
+                        jMenu1.add(jMenuItem8);
+                        jMenuItem8.setText("載入含等於txt檔");
+                        jMenuItem8.addActionListener(new ActionListener() {
+
+                            public void actionPerformed(ActionEvent evt) {
+                                File selectFile = JCommonUtil._jFileChooser_selectFileOnly();
+                                if (selectFile == null) {
+                                    JCommonUtil._jOptionPane_showMessageDialog_error("檔案錯誤!");
+                                    return;
+                                }
+                                File_ file2 = new File_(selectFile);
+                                Properties prop = PropertiesUtil.loadFromEqualMarkTxt(null, selectFile);
+                                file2.loadPropertiesToModel(prop, PropertyEditUI.this);
+                                JCommonUtil._jOptionPane_showMessageDialog_info("done!");
+                            }
+                        });
+                    }
+
+                    {
+                        JMenuItem jMenuItem8 = new JMenuItem();
+                        jMenu1.add(jMenuItem8);
+                        jMenuItem8.setText("另存含等於txt檔");
+                        jMenuItem8.addActionListener(new ActionListener() {
+
+                            public void actionPerformed(ActionEvent evt) {
+                                File file = JFileChooserUtil.newInstance().selectFileOnly().showSaveDialog().getApproveSelectedFile();
+                                if (file == null) {
+                                    JCommonUtil._jOptionPane_showMessageDialog_error("file name is not correct!");
+                                    return;
+                                }
+                                if (!file.getName().contains(".properties")) {
+                                    file = new File(file.getParent(), file.getName() + ".properties");
+                                }
+                                try {
+                                    Properties prop = new Properties();
+                                    loadModelToProperties(prop);
+                                    PropertiesUtil.storeAsEqualMarkTxt(prop, file, DateFormatUtils.format(System.currentTimeMillis(), "yyyy-MM-dd HH:mm:ss.SSS"));
+                                    JCommonUtil._jOptionPane_showMessageDialog_info("儲存成功!");
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                    JCommonUtil.handleException(e);
+                                }
+                            }
+                        });
+                    }
                 }
             }
             {
@@ -835,6 +884,21 @@ public class PropertyEditUI extends javax.swing.JFrame {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+
+            propertyEditUI.backupModel = new ArrayList<Triple<Integer, String, String>>();
+            String value = null;
+            int index = 0;
+            for (String key : prop.stringPropertyNames()) {
+                index++;
+                value = prop.getProperty(key);
+                propertyEditUI.backupModel.add(Triple.of(index, key, propertyEditUI.getChs2Big5(value)));
+            }
+            propertyEditUI.resetPropTable(null);
+        }
+
+        void loadPropertiesToModel(Properties prop, PropertyEditUI propertyEditUI) {
+            PropertyEditUI.currentFile = this.file;
+            propertyEditUI.setTitle(PropertyEditUI.currentFile.getName());
 
             propertyEditUI.backupModel = new ArrayList<Triple<Integer, String, String>>();
             String value = null;

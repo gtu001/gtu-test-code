@@ -13,6 +13,9 @@
 	<property name="rename_jarname" value="${main_class}" />
 	<property name="icon_name" value="english.ico" />
 	<!--<property name="launch4jExe" value="C:\Program Files (x86)\Launch4j\launch4j.exe" />-->
+	<!--<property name="mavenExe" value="I:/‪/apps/apache-maven-3.3.9/bin/mvn" />
+	<property name="gtu_pom_file" value="‪I://workstuff/workspace/gtu-test-code/GTU/pom.xml" />
+	-->
 	<!--${main_class}-->
 
 
@@ -25,6 +28,7 @@
 			<filename name="**/*.jar" />
 		</fileset>
 	</path>
+
 	<typedef name="jarfinder" classname="gtu.ant.AntJarFinder" classpathref="my_test_classpath" />
 	<!--<typedef name="classLoader" classname="gtu.ant.AntClassLoader" classpathref="my_test_classpath" />-->
 	<typedef name="antDebug" classname="gtu.ant.AntDebug" classpathref="my_test_classpath" />
@@ -36,6 +40,12 @@
 		<fileset dir="${jar_repsitory}">
 			<filename name="**/*.jar" />
 		</fileset>
+	</path>
+	<path id="javafx_class_path">
+		<fileset dir="/media/gtu001/OLD_D/my_tool/jfxrt">
+			<filename name="**/*.jar" />
+		</fileset>
+		<pathelement path="${build.dir}" />
 	</path>
 
 	<!--
@@ -61,7 +71,7 @@
 			<searchdir>${jar_repsitory}</searchdir>
 			<searchdir>${jar_repsitory_custom}</searchdir>
 			<searchdir>${jar_repsitory_gtu_lib}</searchdir>
-			
+
 			<pomconfig mavenExe="${mavenExe}">${gtu_pom_file}</pomconfig>
 
 			<packagename mode="exact" name="commons-lang-2.6.jar">org.apache.commons.lang.StringUtils</packagename>
@@ -104,14 +114,17 @@
 		<antcall target="clean">
 			<!--清除-->
 			<param name="enable" value="true" />
+			<!-- false -->
 		</antcall>
 
 		<antcall target="buildClassSet">
 			<param name="enable" value="true" />
+			<!-- false -->
 		</antcall>
 
 		<antcall target="copyReference">
 			<param name="enable" value="true" />
+			<!-- false -->
 		</antcall>
 
 		<antcall target="compiler" />
@@ -139,6 +152,7 @@
 		<antcall target="clean">
 			<!--清除-->
 			<param name="enable" value="true" />
+			<!-- false -->
 		</antcall>
 
 		<antcall target="jarToExe">
@@ -153,10 +167,10 @@
 	<target name="notify">
 		<echo># notify ...</echo>
 		<!--
-		<exec executable="cmd">
-			<arg value="/c start echo create ${main_class}.jar complete!!" />
-		</exec>
-		-->
+			<exec executable="cmd">
+				<arg value="/c start echo create ${main_class}.jar complete!!" />
+			</exec>
+			-->
 		<notify type="info" title="build完成" message="create ${main_class}.jar complete!!" />
 	</target>
 
@@ -167,6 +181,7 @@
 			<classpath>
 				<path location="${build_dir}" />
 			</classpath>
+			<!-- <classpath refid="javafx_class_path" /> -->
 		</javac>
 	</target>
 
@@ -182,12 +197,12 @@
 	<target name="createJar" if="${enable}">
 		<echo># create ${main_class}.jar</echo>
 		<!--
-				<jar destfile="${main_class}.jar" basedir="${build_dir}">
-					<manifest>
-						<attribute name="Main-Class" value="${main_class_full}" />
-					</manifest>
-				</jar>
-				-->
+			<jar destfile="${main_class}.jar" basedir="${build_dir}">
+				<manifest>
+					<attribute name="Main-Class" value="${main_class_full}" />
+				</manifest>
+			</jar>
+			-->
 		<jar destfile="${main_class}.jar">
 			<zipfileset dir="${build_dir}">
 				<exclude name="META-INF/**" />
