@@ -275,14 +275,18 @@ public class FastDBQueryUI_XlsColumnDefLoader {
         Pattern p1 = Pattern.compile("\\/(.*?)\\/");
 
         private boolean isRegexMatch(String target, String search) {
-            Matcher mth = p1.matcher(search);
-            if (mth.find()) {
-                String ptn = mth.group(1);
-                Pattern ptn2 = Pattern.compile(ptn, Pattern.CASE_INSENSITIVE);
-                Matcher mth2 = ptn2.matcher(target);
-                if (mth2.find()) {
-                    return true;
+            try {
+                Matcher mth = p1.matcher(search);
+                if (mth.find()) {
+                    String ptn = mth.group(1);
+                    Pattern ptn2 = Pattern.compile(ptn, Pattern.CASE_INSENSITIVE);
+                    Matcher mth2 = ptn2.matcher(target);
+                    if (mth2.find()) {
+                        return true;
+                    }
                 }
+            } catch (Exception ex) {
+                System.out.println("ERR(QueryHandler.isRegexMatch) : " + ex.getMessage());
             }
             return false;
         }
