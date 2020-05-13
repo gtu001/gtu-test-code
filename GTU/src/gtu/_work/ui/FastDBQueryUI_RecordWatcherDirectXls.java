@@ -30,6 +30,7 @@ public class FastDBQueryUI_RecordWatcherDirectXls {
     List<Integer> pkIndexLst = new ArrayList<Integer>();
     SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmssSSS");
     NewNameHandler mNewNameHandler;
+    StringBuffer errMsg = new StringBuffer();
 
     public FastDBQueryUI_RecordWatcherDirectXls(String fileMiddleName, List<Integer> pkIndexLst) {
         this.fileMiddleName = fileMiddleName;
@@ -76,6 +77,8 @@ public class FastDBQueryUI_RecordWatcherDirectXls {
             }
             xlsFile = this.writeExcel(titleLst, delArry, newArry, updArry);
             System.out.println("寫入比對檔 : " + xlsFile);
+        } else {
+            errMsg.append("前後資料沒有任何異動!");
         }
         return xlsFile;
     }
@@ -253,7 +256,7 @@ public class FastDBQueryUI_RecordWatcherDirectXls {
         return Triple.of(columnLst, typeLst, rowLst);
     }
 
-    public File run(File orignXls, File newXls) {
+    public Pair<File, String> run(File orignXls, File newXls) {
         try {
             Triple<List<String>, List<Class<?>>, List<Object[]>> orignQueryResult = convertXlsToQueryResult(orignXls);
             Triple<List<String>, List<Class<?>>, List<Object[]>> compareResult = convertXlsToQueryResult(newXls);
@@ -271,7 +274,7 @@ public class FastDBQueryUI_RecordWatcherDirectXls {
                     // ==============================================================
                 }
             }
-            return diffFile;
+            return Pair.of(diffFile, errMsg.toString());
         } catch (Throwable ex) {
             throw new RuntimeException(ex);
         }

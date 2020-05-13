@@ -14,7 +14,6 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -336,8 +335,28 @@ public class FastDBQueryUI extends JFrame {
     private JButton compareXlsClearBtn;
     private JLabel lblNewLabel_17;
     private JTextField compareXlsMiddleNameText;
-
     protected TableColumnDefTextHandler mTableColumnDefTextHandler;
+    private JPanel panel_28;
+    private JPanel panel_29;
+    private JPanel panel_30;
+    private JPanel panel_31;
+    private JPanel panel_32;
+    private JButton tableColumnConfigBtn2;
+    private JTextField columnXlsDefTableQryText;
+    private JLabel lblNewLabel_18;
+    private JTable columnXlsDefTableColumnQryTable;
+    private JButton clearParameterBtn;
+    private AtomicReference<FastDBQueryUI_RecordWatcher> mRecordWatcher = new AtomicReference<FastDBQueryUI_RecordWatcher>();
+    private JToggleButton recordWatcherToggleBtn;
+    private JCheckBox rowFilterTextKeepMatchChk;
+    private JButton resetQueryBtn;
+    private JDlgHolderBringToFrontHandler mJDlgHolderBringToFrontHandler;
+    private XlsColumnDefDlg mXlsColumnDefDlg;
+    private JTextField columnXlsDefColumnQryText;
+    private JTextField columnXlsDefOtherQryText;
+    private JLabel label_2;
+    private JLabel lblNewLabel_19;
+    private JLabel columnXlsDefFindRowCountLbl;
 
     private final Predicate IGNORE_PREDICT = new Predicate() {
         @Override
@@ -351,13 +370,6 @@ public class FastDBQueryUI extends JFrame {
             return false;
         }
     };
-    private JButton clearParameterBtn;
-    private AtomicReference<FastDBQueryUI_RecordWatcher> mRecordWatcher = new AtomicReference<FastDBQueryUI_RecordWatcher>();
-    private JToggleButton recordWatcherToggleBtn;
-    private JCheckBox rowFilterTextKeepMatchChk;
-    private JButton resetQueryBtn;
-    private JDlgHolderBringToFrontHandler mJDlgHolderBringToFrontHandler;
-    private XlsColumnDefDlg mXlsColumnDefDlg;
 
     /**
      * Launch the application.
@@ -1448,6 +1460,76 @@ public class FastDBQueryUI extends JFrame {
         });
         panel_27.add(compareXlsClearBtn);
 
+        panel_28 = new JPanel();
+        tabbedPane.addTab("Excel欄位定義", null, panel_28, null);
+        panel_28.setLayout(new BorderLayout(0, 0));
+
+        panel_29 = new JPanel();
+        panel_28.add(panel_29, BorderLayout.NORTH);
+
+        tableColumnConfigBtn2 = new JButton("設定");
+        tableColumnConfigBtn2.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                tableColumnConfigBtnAction();
+            }
+        });
+
+        columnXlsDefFindRowCountLbl = new JLabel("");
+        panel_29.add(columnXlsDefFindRowCountLbl);
+        panel_29.add(tableColumnConfigBtn2);
+
+        lblNewLabel_18 = new JLabel("表");
+        panel_29.add(lblNewLabel_18);
+
+        columnXlsDefTableQryText = new JTextField();
+        panel_29.add(columnXlsDefTableQryText);
+        columnXlsDefTableQryText.setColumns(20);
+        columnXlsDefTableQryText.getDocument().addDocumentListener(JCommonUtil.getDocumentListener(new HandleDocumentEvent() {
+            @Override
+            public void process(DocumentEvent event) {
+                initColumnXlsDefTableColumnQryTable();
+            }
+        }));
+
+        label_2 = new JLabel("欄位");
+        panel_29.add(label_2);
+
+        columnXlsDefColumnQryText = new JTextField();
+        columnXlsDefColumnQryText.setColumns(20);
+        panel_29.add(columnXlsDefColumnQryText);
+        columnXlsDefColumnQryText.getDocument().addDocumentListener(JCommonUtil.getDocumentListener(new HandleDocumentEvent() {
+            @Override
+            public void process(DocumentEvent event) {
+                initColumnXlsDefTableColumnQryTable();
+            }
+        }));
+
+        lblNewLabel_19 = new JLabel("其他");
+        panel_29.add(lblNewLabel_19);
+
+        columnXlsDefOtherQryText = new JTextField();
+        columnXlsDefOtherQryText.setColumns(20);
+        panel_29.add(columnXlsDefOtherQryText);
+        columnXlsDefOtherQryText.getDocument().addDocumentListener(JCommonUtil.getDocumentListener(new HandleDocumentEvent() {
+            @Override
+            public void process(DocumentEvent event) {
+                initColumnXlsDefTableColumnQryTable();
+            }
+        }));
+
+        panel_30 = new JPanel();
+        panel_28.add(panel_30, BorderLayout.WEST);
+
+        panel_31 = new JPanel();
+        panel_28.add(panel_31, BorderLayout.SOUTH);
+
+        panel_32 = new JPanel();
+        panel_28.add(panel_32, BorderLayout.EAST);
+
+        columnXlsDefTableColumnQryTable = new JTable();
+        panel_28.add(JCommonUtil.createScrollComponent(columnXlsDefTableColumnQryTable), BorderLayout.CENTER);
+        JTableUtil.defaultSetting(columnXlsDefTableColumnQryTable);
+
         panel_6 = new JPanel();
         tabbedPane.addTab("DB連線設定", null, panel_6, null);
         panel_6.setLayout(new FormLayout(
@@ -2336,7 +2418,17 @@ public class FastDBQueryUI extends JFrame {
         tabLst.add(getRandom_TableNSchema());
         if (mSqlTextAreaPromptHandler != null && mSqlTextAreaPromptHandler.tabMap != null) {
             for (Object tab : mSqlTextAreaPromptHandler.tabMap.keySet()) {
-                tabLst.add(String.valueOf(tab));
+                boolean findOk = false;
+                String newTabName = String.valueOf(tab);
+                A: for (String tabName : tabLst) {
+                    if (StringUtils.equalsIgnoreCase(tabName, newTabName)) {
+                        findOk = true;
+                        break A;
+                    }
+                }
+                if (!findOk) {
+                    tabLst.add(newTabName);
+                }
             }
         }
         tableColumnDefText_Auto.applyComboxBoxList(tabLst);
@@ -5607,6 +5699,21 @@ public class FastDBQueryUI extends JFrame {
             return false;
         }
 
+        private void init2() {
+            File dir = new File(FileUtil.DESKTOP_DIR, "FastColumnDef");
+            if (!dir.exists()) {
+                dir.mkdirs();
+            }
+            if (xlsLoader == null) {
+                xlsLoader = new FastDBQueryUI_XlsColumnDefLoader(null);
+                xlsLoader.execute();
+            }
+            if (mXlsColumnDefDlg == null || mXlsColumnDefDlg.getConfig() == null) {
+                Validate.isTrue(false, "請先按設定");
+            }
+            xlsLoader.setMappingConfig(mXlsColumnDefDlg.getConfig());
+        }
+
         public void action() {
             try {
                 if (init()) {
@@ -5640,6 +5747,11 @@ public class FastDBQueryUI extends JFrame {
                 JCommonUtil.handleException(ex);
             }
             return Collections.emptyList();
+        }
+
+        public Triple<DefaultTableModel, Integer, ActionListener> query(String tableQry, String columnQry, String otherQry, JTable jtable, JFrame jframe) {
+            init2();
+            return xlsLoader.query(tableQry, columnQry, otherQry, jtable, jframe);
         }
     }
 
@@ -5690,11 +5802,15 @@ public class FastDBQueryUI extends JFrame {
                                 // -------------------------------------------------↓↓↓↓↓↓
 
                                 FastDBQueryUI_RecordWatcherDirectXls mFastDBQueryUI_RecordWatcherDirectXls = new FastDBQueryUI_RecordWatcherDirectXls(fileMiddleName, pkIndexLst);
-                                File reulstFile = mFastDBQueryUI_RecordWatcherDirectXls.run(beforeXlsFile, afterXlsFile);
-                                if (reulstFile == null || !reulstFile.exists()) {
-                                    JCommonUtil._jOptionPane_showMessageDialog_error("檔案產生失敗");
+                                Pair<File, String> result = mFastDBQueryUI_RecordWatcherDirectXls.run(beforeXlsFile, afterXlsFile);
+                                File reulstFile = result.getLeft();
+                                String errMsg = result.getRight();
+                                if (StringUtils.isNotBlank(errMsg)) {
+                                    JCommonUtil._jOptionPane_showMessageDialog_error(errMsg);
                                 }
-                                JCommonUtil._jOptionPane_showMessageDialog_error("檔案產生成功\n" + reulstFile);
+                                if (reulstFile != null && reulstFile.exists()) {
+                                    JCommonUtil._jOptionPane_showMessageDialog_error("檔案產生成功\n" + reulstFile);
+                                }
                                 // -------------------------------------------------↑↑↑↑↑↑
                             }
                         }).start();
@@ -5854,6 +5970,26 @@ public class FastDBQueryUI extends JFrame {
 
         public void show() {
             dlg.setVisible(true);
+        }
+    }
+
+    // ======================================================================================================================
+    private void initColumnXlsDefTableColumnQryTable() {
+        try {
+            if (mTableColumnDefTextHandler == null) {
+                mTableColumnDefTextHandler.init();
+            }
+            String tableQry = columnXlsDefTableQryText.getText();
+            String columnQry = columnXlsDefColumnQryText.getText();
+            String otherQry = columnXlsDefOtherQryText.getText();
+
+            Triple<DefaultTableModel, Integer, ActionListener> result = mTableColumnDefTextHandler.query(tableQry, columnQry, otherQry, columnXlsDefTableColumnQryTable, this);
+            DefaultTableModel model = result.getLeft();
+            columnXlsDefFindRowCountLbl.setText(String.valueOf(result.getMiddle()));
+            columnXlsDefTableColumnQryTable.setModel(model);
+            result.getRight().actionPerformed(new ActionEvent("", -1, ""));
+        } catch (Exception ex) {
+            JCommonUtil.handleException(ex);
         }
     }
 }

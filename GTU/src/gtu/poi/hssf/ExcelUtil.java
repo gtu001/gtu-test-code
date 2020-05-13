@@ -11,6 +11,7 @@ import java.io.UnsupportedEncodingException;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -77,44 +78,40 @@ public class ExcelUtil {
     }
 
     /**
-     * 用英文欄位取得相對row的index
+     * 用英文欄位取得相對row的index (從1開始)
      */
-    public static String cellEnglishToPos(int column) {
-        column += 1;
-        Transformer c1 = new Transformer() {
-            @Override
-            public Object transform(Object input) {
-                int v = Integer.parseInt(String.valueOf(input));
-                for (int ii = 0;; ii++) {
-                    if (Math.pow(26, ii) > v) {
-                        return ii - 1;
-                    }
+    public static String cellEnglishToPos(int columnIndex) {
+        Map<Integer, Integer> m2 = new TreeMap<Integer, Integer>();
+        int tmpColumn = columnIndex;
+        while (true) {
+            int exponent = 0;
+            for (int i = 1; i < 1000; i++) {
+                if (Math.pow(26, i) >= tmpColumn) {
+                    exponent = i - 1;
+                    break;
                 }
             }
-        };
-        Map<Integer, Integer> m2 = new TreeMap<Integer, Integer>();
-        while (true) {
-            int exponent = (Integer) c1.transform(column);
-            column -= Math.pow(26, exponent);
-
+            tmpColumn = tmpColumn - (int) Math.pow(26, exponent);
             int value = 0;
+
             if (m2.containsKey(exponent)) {
                 value = m2.get(exponent);
             }
-            value++;
+            value += 1;
             m2.put(exponent, value);
 
-            if (exponent == 0) {
-                m2.put(exponent, column + 1);
+            if (exponent <= 0) {
+                m2.put(0, tmpColumn + 1);
                 break;
             }
         }
-        StringBuilder sb = new StringBuilder();
-        for (int k : m2.keySet()) {
-            char c = (char) (m2.get(k) + 64);
-            sb.insert(0, c);
+        String rtnVal = "";
+        List<Integer> keyLst = new ArrayList<Integer>(m2.keySet());
+        Collections.sort(keyLst);
+        for (int k : keyLst) {
+            rtnVal = (char) (m2.get(k) + 64) + rtnVal;
         }
-        return sb.toString();
+        return rtnVal;
     }
 
     public Row getRowChk(Sheet sheet, int rowPos) {
@@ -815,7 +812,7 @@ public class ExcelUtil {
     public void mergeCell(Sheet sheet, String rangeStr) {
         sheet.addMergedRegion(CellRangeAddress.valueOf(rangeStr));
     }
-    
+
     public void autoCellSize(Sheet sheet) {
         for (int jj = 0; jj < sheet.getRow(0).getLastCellNum(); jj++) {
             sheet.autoSizeColumn(jj);

@@ -142,5 +142,6 @@ def getCellDefine(cell):
 
     
 if __name__ == '__main__' :
-    print(cellEnglishToPos_toStr(3333))
+    for i in range(1, 2000) :
+        print(cellEnglishToPos_toStr(i))
     print("done...")

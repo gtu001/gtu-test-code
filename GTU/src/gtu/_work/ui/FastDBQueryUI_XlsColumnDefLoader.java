@@ -1,20 +1,36 @@
 package gtu._work.ui;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableModel;
 
 import org.apache.commons.collections.Transformer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.Triple;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Row;
 
 import gtu.file.FileUtil;
 import gtu.poi.hssf.ExcelUtil_Xls97;
+import gtu.runtime.DesktopUtil;
+import gtu.string.StringUtil_;
+import gtu.swing.util.JTableUtil;
 
 public class FastDBQueryUI_XlsColumnDefLoader {
 
@@ -178,7 +194,9 @@ public class FastDBQueryUI_XlsColumnDefLoader {
                         TableDef tb = new TableDef();
                         tb.file = f;
                         tb.table = table;
-                        tb.columnLst = getColumnDefMap(sheet);
+                        Object[] objs = getColumnDefMap(sheet);
+                        tb.columnLst = (List<Map<Integer, String>>) objs[0];
+                        tb.columnLstMappingToRowIndexMap = (Map<Map<Integer, String>, Integer>) objs[1];
                         tabLst.add(tb);
                     }
                 }
@@ -187,7 +205,8 @@ public class FastDBQueryUI_XlsColumnDefLoader {
         }
     }
 
-    private List<Map<Integer, String>> getColumnDefMap(HSSFSheet sheet) {
+    private Object[] getColumnDefMap(HSSFSheet sheet) {
+        Map<Map<Integer, String>, Integer> columnLstMappingToRowIndexMap = new HashMap<Map<Integer, String>, Integer>();
         List<Map<Integer, String>> colLst = new ArrayList<Map<Integer, String>>();
         for (int ii = 0; ii <= sheet.getLastRowNum(); ii++) {
             Row row = sheet.getRow(ii);
@@ -200,14 +219,18 @@ public class FastDBQueryUI_XlsColumnDefLoader {
                 map.put(jj, value);
             }
             colLst.add(map);
+            columnLstMappingToRowIndexMap.put(map, ii);
         }
-        return colLst;
+        return new Object[] { colLst, columnLstMappingToRowIndexMap };
     }
 
     private static class TableDef {
         File file;
         String table;
         List<Map<Integer, String>> columnLst = new ArrayList<Map<Integer, String>>();
+        Map<Map<Integer, String>, Integer> columnLstMappingToRowIndexMap = new HashMap<Map<Integer, String>, Integer>(); // 設定實際excel的第幾row
+                                                                                                                         // mapping
+        Set<Integer> qryMatchMarkLst = new TreeSet<Integer>();
     }
 
     public enum XlsColumnDefType {
@@ -238,6 +261,176 @@ public class FastDBQueryUI_XlsColumnDefLoader {
             c1.color = this.color;
             return c1;
         }
+    }
+
+    private class QueryHandler {
+        String[] tableQryText;
+        String[] columnQryText;
+        String[] otherText;
+
+        List<TableDef> findTabLst;
+        DefaultTableModel model;
+        int findRowCount = 0;
+
+        Pattern p1 = Pattern.compile("\\/(.*?)\\/");
+
+        private boolean isRegexMatch(String target, String search) {
+            Matcher mth = p1.matcher(search);
+            if (mth.find()) {
+                String ptn = mth.group(1);
+                Pattern ptn2 = Pattern.compile(ptn, Pattern.CASE_INSENSITIVE);
+                Matcher mth2 = ptn2.matcher(target);
+                if (mth2.find()) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private List<TableDef> filter() {
+            List<TableDef> tabLst2 = new ArrayList<TableDef>();
+            for (TableDef tab : tabLst) {
+                tab.qryMatchMarkLst = new TreeSet<Integer>();
+            }
+            if (tableQryText != null && tableQryText.length > 0) {
+                A: for (TableDef tab : tabLst) {
+                    for (String tabName : tableQryText) {
+                        if (tab.table.toLowerCase().contains(tabName.toLowerCase())) {
+                            tabLst2.add(tab);
+                            continue A;
+                        } else if (isRegexMatch(tab.table, tabName)) {
+                            tabLst2.add(tab);
+                            continue A;
+                        }
+                    }
+                }
+            } else {
+                tabLst2.addAll(tabLst);
+            }
+            boolean isChk = false;
+            if (columnQryText != null && columnQryText.length > 0) {
+                for (TableDef tab : tabLst2) {
+                    for (String columnText : columnQryText) {
+                        isChk = true;
+                        A: for (int ii = 0; ii < tab.columnLst.size(); ii++) {
+                            Map<Integer, String> map = tab.columnLst.get(ii);
+                            String column = StringUtils.trimToEmpty(map.get(columnDef.index));
+                            if (StringUtils.isNotBlank(column)) {
+                                if (column.toLowerCase().contains(columnText.toLowerCase())) {
+                                    tab.qryMatchMarkLst.add(ii);
+                                    continue A;
+                                } else if (isRegexMatch(column, columnText)) {
+                                    tab.qryMatchMarkLst.add(ii);
+                                    continue A;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            if (otherText != null && otherText.length > 0) {
+                for (TableDef tab : tabLst2) {
+                    for (String otherTxt : otherText) {
+                        isChk = true;
+                        A: for (int ii = 0; ii < tab.columnLst.size(); ii++) {
+                            Map<Integer, String> map = tab.columnLst.get(ii);
+                            for (Integer keyIdx : map.keySet()) {
+                                if (keyIdx != columnDef.index) {
+                                    String other = StringUtils.trimToEmpty(map.get(keyIdx));
+                                    if (StringUtils.isNotBlank(other)) {
+                                        if (other.toLowerCase().contains(otherTxt.toLowerCase())) {
+                                            tab.qryMatchMarkLst.add(ii);
+                                            continue A;
+                                        } else if (isRegexMatch(other, otherTxt)) {
+                                            tab.qryMatchMarkLst.add(ii);
+                                            continue A;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            if (!isChk) {
+                for (TableDef tab : tabLst2) {
+                    for (int ii = 0; ii < tab.columnLst.size(); ii++) {
+                        tab.qryMatchMarkLst.add(ii);
+                    }
+                }
+            }
+            return tabLst2;
+        }
+
+        private DefaultTableModel toModel() {
+            Object[] titles = new Object[150];
+            titles[0] = "file";
+            titles[1] = "sheet";
+            titles[2] = "row";
+            for (int ii = 3; ii < titles.length; ii++) {
+                titles[ii] = ExcelUtil_Xls97.getInstance().cellEnglishToPos(ii - 3 + 1);
+            }
+            DefaultTableModel model = JTableUtil.createModel(true, titles);
+            for (final TableDef tab : findTabLst) {
+                for (Integer colIdx : tab.qryMatchMarkLst) {
+                    Map<Integer, String> map = tab.columnLst.get(colIdx);
+                    LinkedList<Object> arry = new LinkedList<Object>(map.values());
+                    arry.addFirst(tab.columnLstMappingToRowIndexMap.get(map) + 1); // 設定實際excel的第幾row
+                                                                                   // mapping
+                    arry.addFirst(tab.table);
+                    JButton btn = new JButton(tab.file.getName());
+                    btn.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            DesktopUtil.browseFileDirectory(tab.file);
+                        }
+                    });
+                    arry.addFirst(btn);
+                    if (!StringUtil_.hasChineseWord2(tab.table) && //
+                            StringUtils.isNotBlank(map.get(columnDef.index)) && //
+                            StringUtils.isNotBlank(map.get(chineseDef.index))) {
+                        model.addRow(arry.toArray());
+                        findRowCount++;
+                    }
+                }
+            }
+            return model;
+        }
+
+        private void afterSetToModel(JTable jtable, JFrame jframe) {
+            JTableUtil.newInstance(jtable).columnIsButton("file");
+
+            Map<String, Object> preferences = new HashMap<String, Object>();
+            Map<Integer, Integer> presetColumns = new HashMap<Integer, Integer>();
+            presetColumns.put(0, 150);
+            preferences.put("presetColumns", presetColumns);
+            JTableUtil.setColumnWidths_ByDataContent(jtable, preferences, jframe.getInsets());
+        }
+
+        public QueryHandler(String tableQry, String columnQry, String otherQry, JTable jtable) {
+            if (StringUtils.isNotBlank(tableQry)) {
+                tableQryText = StringUtils.trimToEmpty(tableQry).split("\\^", -1);
+            }
+            if (StringUtils.isNotBlank(columnQry)) {
+                columnQryText = StringUtils.trimToEmpty(columnQry).split("\\^", -1);
+            }
+            if (StringUtils.isNotBlank(otherQry)) {
+                otherText = StringUtils.trimToEmpty(otherQry).split("\\^", -1);
+            }
+            findTabLst = filter();
+            model = toModel();
+        }
+    }
+
+    public Triple<DefaultTableModel, Integer, ActionListener> query(final String tableQry, final String columnQry, final String otherQry, final JTable jtable, final JFrame jframe) {
+        final QueryHandler mQueryHandler = new QueryHandler(tableQry, columnQry, otherQry, jtable);
+        final ActionListener listener = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                mQueryHandler.afterSetToModel(jtable, jframe);
+            }
+        };
+        return Triple.of(mQueryHandler.model, mQueryHandler.findRowCount, listener);
     }
 
     public static class XlsColumnDefClz {

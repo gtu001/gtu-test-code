@@ -176,9 +176,11 @@ public class AntJarFinder extends Task {
                         break;
                     }
                 }
-                this.copyFile(findIndicateJar, copyToDir);
-                appendDebugPackageDef(pk, findIndicateJar);
-                return;
+                if (findIndicateJar != null) {
+                    this.copyFile(findIndicateJar, copyToDir);
+                    appendDebugPackageDef(pk, findIndicateJar);
+                    return;
+                }
             }
             // for exact jar files ↑↑↑↑↑↑↑
 
