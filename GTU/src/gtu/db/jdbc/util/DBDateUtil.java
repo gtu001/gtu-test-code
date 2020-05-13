@@ -135,6 +135,32 @@ public class DBDateUtil {
             public String sysdate() {
                 return " GETDATE() ";
             }
+        },
+        Sqlite {
+            @Override
+            public String date2Varchar(String columnName) {
+                return String.format(" FORMAT(%s, 'yyyy/MM/dd') ", columnName);
+            }
+
+            @Override
+            public String timestamp2Varchar(String columnName) {
+                return String.format(" FORMAT(%s, 'yyyy/MM/dd h:mm:ss.tt') ", columnName);
+            }
+
+            @Override
+            public String varchar2Timestamp(String columnName) {
+                return String.format(" datetime(%s) ", columnName);
+            }
+
+            @Override
+            public String varchar2Date(String columnName) {
+                return String.format(" date(%s) ", columnName);
+            }
+
+            @Override
+            public String sysdate() {
+                return " date('now') ";
+            }
         };
 
         public abstract String date2Varchar(String columnName);

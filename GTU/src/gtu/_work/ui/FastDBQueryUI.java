@@ -1526,9 +1526,9 @@ public class FastDBQueryUI extends JFrame {
         panel_32 = new JPanel();
         panel_28.add(panel_32, BorderLayout.EAST);
 
-        columnXlsDefTableQryText.setToolTipText("分隔\"^\", 正則\\/...\\/");
-        columnXlsDefColumnQryText.setToolTipText("分隔\"^\", 正則\\/...\\/");
-        columnXlsDefOtherQryText.setToolTipText("分隔\"^\", 正則\\/...\\/");
+        columnXlsDefTableQryText.setToolTipText("分隔\"^\", 正則/.../");
+        columnXlsDefColumnQryText.setToolTipText("分隔\"^\", 正則/.../");
+        columnXlsDefOtherQryText.setToolTipText("分隔\"^\", 正則/.../");
 
         columnXlsDefTableColumnQryTable = new JTable();
         panel_28.add(JCommonUtil.createScrollComponent(columnXlsDefTableColumnQryTable), BorderLayout.CENTER);

@@ -265,8 +265,11 @@ public class FastDBQueryUI_XlsColumnDefLoader {
 
     private class QueryHandler {
         String[] tableQryText;
+        Pattern[] tableQryPtn;
         String[] columnQryText;
+        Pattern[] columnQryPtn;
         String[] otherText;
+        Pattern[] otherPtn;
 
         List<TableDef> findTabLst;
         DefaultTableModel model;
@@ -274,19 +277,23 @@ public class FastDBQueryUI_XlsColumnDefLoader {
 
         Pattern p1 = Pattern.compile("\\/(.*?)\\/");
 
-        private boolean isRegexMatch(String target, String search) {
-            try {
-                Matcher mth = p1.matcher(search);
-                if (mth.find()) {
-                    String ptn = mth.group(1);
-                    Pattern ptn2 = Pattern.compile(ptn, Pattern.CASE_INSENSITIVE);
-                    Matcher mth2 = ptn2.matcher(target);
-                    if (mth2.find()) {
+        private boolean isRegexMatch(String target, Pattern[] search) {
+            if (search != null && search.length > 0) {
+                for (Pattern ptn : search) {
+                    if (ptn.matcher(target).find()) {
                         return true;
                     }
                 }
-            } catch (Exception ex) {
-                System.out.println("ERR(QueryHandler.isRegexMatch) : " + ex.getMessage());
+            }
+            return false;
+        }
+
+        private boolean isConditionOk(String[] param, Pattern[] ptns) {
+            if (param != null && param.length > 0) {
+                return true;
+            }
+            if (ptns != null && ptns.length > 0) {
+                return true;
             }
             return false;
         }
@@ -302,7 +309,7 @@ public class FastDBQueryUI_XlsColumnDefLoader {
                         if (tab.table.toLowerCase().contains(tabName.toLowerCase())) {
                             tabLst2.add(tab);
                             continue A;
-                        } else if (isRegexMatch(tab.table, tabName)) {
+                        } else if (isRegexMatch(tab.table, tableQryPtn)) {
                             tabLst2.add(tab);
                             continue A;
                         }
@@ -311,51 +318,60 @@ public class FastDBQueryUI_XlsColumnDefLoader {
             } else {
                 tabLst2.addAll(tabLst);
             }
+
             boolean isChk = false;
-            if (columnQryText != null && columnQryText.length > 0) {
+
+            if (isConditionOk(columnQryText, columnQryPtn)) {
+                isChk = true;
                 for (TableDef tab : tabLst2) {
-                    for (String columnText : columnQryText) {
-                        isChk = true;
-                        A: for (int ii = 0; ii < tab.columnLst.size(); ii++) {
-                            Map<Integer, String> map = tab.columnLst.get(ii);
-                            String column = StringUtils.trimToEmpty(map.get(columnDef.index));
+                    A: for (int ii = 0; ii < tab.columnLst.size(); ii++) {
+                        Map<Integer, String> map = tab.columnLst.get(ii);
+                        String column = StringUtils.trimToEmpty(map.get(columnDef.index));
+
+                        for (String columnText : columnQryText) {
                             if (StringUtils.isNotBlank(column)) {
                                 if (column.toLowerCase().contains(columnText.toLowerCase())) {
-                                    tab.qryMatchMarkLst.add(ii);
-                                    continue A;
-                                } else if (isRegexMatch(column, columnText)) {
                                     tab.qryMatchMarkLst.add(ii);
                                     continue A;
                                 }
                             }
                         }
+                        if (isRegexMatch(column, columnQryPtn)) {
+                            tab.qryMatchMarkLst.add(ii);
+                            continue A;
+                        }
                     }
                 }
             }
-            if (otherText != null && otherText.length > 0) {
+
+            if (isConditionOk(otherText, otherPtn)) {
+                isChk = true;
                 for (TableDef tab : tabLst2) {
-                    for (String otherTxt : otherText) {
-                        isChk = true;
-                        A: for (int ii = 0; ii < tab.columnLst.size(); ii++) {
-                            Map<Integer, String> map = tab.columnLst.get(ii);
-                            for (Integer keyIdx : map.keySet()) {
-                                if (keyIdx != columnDef.index) {
-                                    String other = StringUtils.trimToEmpty(map.get(keyIdx));
+                    A: for (int ii = 0; ii < tab.columnLst.size(); ii++) {
+                        Map<Integer, String> map = tab.columnLst.get(ii);
+
+                        for (Integer keyIdx : map.keySet()) {
+                            if (keyIdx != columnDef.index) {
+                                String other = StringUtils.trimToEmpty(map.get(keyIdx));
+
+                                for (String otherTxt : otherText) {
                                     if (StringUtils.isNotBlank(other)) {
                                         if (other.toLowerCase().contains(otherTxt.toLowerCase())) {
-                                            tab.qryMatchMarkLst.add(ii);
-                                            continue A;
-                                        } else if (isRegexMatch(other, otherTxt)) {
                                             tab.qryMatchMarkLst.add(ii);
                                             continue A;
                                         }
                                     }
                                 }
+                                if (isRegexMatch(other, otherPtn)) {
+                                    tab.qryMatchMarkLst.add(ii);
+                                    continue A;
+                                }
                             }
                         }
                     }
                 }
             }
+
             if (!isChk) {
                 for (TableDef tab : tabLst2) {
                     for (int ii = 0; ii < tab.columnLst.size(); ii++) {
@@ -411,15 +427,43 @@ public class FastDBQueryUI_XlsColumnDefLoader {
             JTableUtil.setColumnWidths_ByDataContent(jtable, preferences, jframe.getInsets());
         }
 
+        private Pair<String[], Pattern[]> toSearchCondition(String text) {
+            Matcher mth = p1.matcher(text);
+            List<Pattern> ptnLst = new ArrayList<Pattern>();
+            List<String> paramLst = new ArrayList<String>();
+            StringBuffer sb = new StringBuffer();
+            while (mth.find()) {
+                try {
+                    ptnLst.add(Pattern.compile(mth.group(1), Pattern.CASE_INSENSITIVE));
+                    mth.appendReplacement(sb, "");
+                } catch (Exception ex) {
+                }
+            }
+            mth.appendTail(sb);
+            String[] parameters = sb.toString().split("\\^", -1);
+            for (int ii = 0; ii < parameters.length; ii++) {
+                if (StringUtils.isNotBlank(parameters[ii])) {
+                    paramLst.add(parameters[ii]);
+                }
+            }
+            return Pair.of(paramLst.toArray(new String[0]), ptnLst.toArray(new Pattern[0]));
+        }
+
         public QueryHandler(String tableQry, String columnQry, String otherQry, JTable jtable) {
             if (StringUtils.isNotBlank(tableQry)) {
-                tableQryText = StringUtils.trimToEmpty(tableQry).split("\\^", -1);
+                Pair<String[], Pattern[]> val = toSearchCondition(tableQry);
+                tableQryText = val.getLeft();
+                tableQryPtn = val.getRight();
             }
             if (StringUtils.isNotBlank(columnQry)) {
-                columnQryText = StringUtils.trimToEmpty(columnQry).split("\\^", -1);
+                Pair<String[], Pattern[]> val = toSearchCondition(columnQry);
+                columnQryText = val.getLeft();
+                columnQryPtn = val.getRight();
             }
             if (StringUtils.isNotBlank(otherQry)) {
-                otherText = StringUtils.trimToEmpty(otherQry).split("\\^", -1);
+                Pair<String[], Pattern[]> val = toSearchCondition(otherQry);
+                otherText = val.getLeft();
+                otherPtn = val.getRight();
             }
             findTabLst = filter();
             model = toModel();
