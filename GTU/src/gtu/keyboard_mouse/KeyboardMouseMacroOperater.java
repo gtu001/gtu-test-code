@@ -130,7 +130,7 @@ public class KeyboardMouseMacroOperater extends JFrame {
                             creater.startHook();
                         }
                     };
-                     gtu.swing.util.JFrameUtil.setVisible(true,frame);
+                    gtu.swing.util.JFrameUtil.setVisible(true, frame);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -168,6 +168,7 @@ public class KeyboardMouseMacroOperater extends JFrame {
         panel.setLayout(new BorderLayout(0, 0));
 
         list = new JList();
+        list.setToolTipText("<html>按Ctrl+Q開始/結束錄製巨集<br/>滑鼠點選項目開始撥放</html>");
         list.addMouseListener(new MouseAdapter() {
 
             private void sleep(long time) {
@@ -229,7 +230,7 @@ public class KeyboardMouseMacroOperater extends JFrame {
                                 for (int jj = 0; jj < defineList.size(); jj++) {
                                     totalTime += defineList.get(jj).duringTotalTime;
                                 }
-                                 gtu.swing.util.JFrameUtil.setVisible(true,KeyboardMouseMacroOperater.this);
+                                gtu.swing.util.JFrameUtil.setVisible(true, KeyboardMouseMacroOperater.this);
                                 KeyboardMouseMacroOperater.this.setExtendedState(JFrame.NORMAL);
                                 sysutil.displayMessage("Macro Operater", "[群組]操作結束! : " + totalTime, MessageType.WARNING);
                             }
@@ -334,6 +335,7 @@ public class KeyboardMouseMacroOperater extends JFrame {
         });
 
         JCommonUtil.setJFrameCenter(this);
+        JCommonUtil.defaultToolTipDelay();
     }
 
     static class ProgressInfo {
@@ -349,7 +351,7 @@ public class KeyboardMouseMacroOperater extends JFrame {
             // dialog.setSize(new Dimension(400, 75));
             // JCommonUtil.setFrameAtop(dialog, true);
             // JCommonUtil.setLocationToRightBottomCorner(dialog);
-             // gtu.swing.util.JFrameUtil.setVisible(false,dialog);
+            // gtu.swing.util.JFrameUtil.setVisible(false,dialog);
 
             dialog = new JDialog();
             dialog.setModalityType(ModalityType.MODELESS);
@@ -358,14 +360,14 @@ public class KeyboardMouseMacroOperater extends JFrame {
             dialog.setContentPane(textarea);
             dialog.setSize(new Dimension(400, 75));
             JCommonUtil.setLocationToRightBottomCorner(dialog);
-             gtu.swing.util.JFrameUtil.setVisible(false,dialog);
+            dialog.setVisible(false);
             dialog.pack();
             dialog.addFocusListener(new FocusListener() {
                 @Override
                 public void focusLost(FocusEvent e) {
                     dialog.toFront();
                 }
-                
+
                 @Override
                 public void focusGained(FocusEvent e) {
                 }
@@ -373,8 +375,7 @@ public class KeyboardMouseMacroOperater extends JFrame {
         }
 
         public void setVisible(boolean visible) {
-//             dialog.setVisible(visible);
-             gtu.swing.util.JFrameUtil.setVisible(false,dialog);
+            dialog.setVisible(visible);
         }
 
         public void setText(String text) {
@@ -554,7 +555,7 @@ public class KeyboardMouseMacroOperater extends JFrame {
                 }
             };
 
-             gtu.swing.util.JFrameUtil.setVisible(true,PROGRESS_INFO);
+            PROGRESS_INFO.setVisible(true);
             runner.run();
         }
 
@@ -901,10 +902,10 @@ public class KeyboardMouseMacroOperater extends JFrame {
     }
 
     private void bringToTop() {
-         gtu.swing.util.JFrameUtil.setVisible(false,PROGRESS_INFO);
+        PROGRESS_INFO.setVisible(false);
 
         this.initList();
-         gtu.swing.util.JFrameUtil.setVisible(true,this);
+        gtu.swing.util.JFrameUtil.setVisible(true, this);
         this.setState(java.awt.Frame.NORMAL);
         this.toFront();
         this.repaint();

@@ -282,6 +282,7 @@ public class KeyboardMouseMacroCreater implements NativeKeyListener, NativeMouse
     static class WheelInputType extends InputType {
         int scrollAmount;
         int wheelRotation;
+
         @Override
         public String toString() {
             return "WheelInputType [currentTime=" + currentTime + ", type=" + type + ", scrollAmount=" + scrollAmount + ", wheelRotation=" + wheelRotation + "]";
@@ -321,6 +322,7 @@ public class KeyboardMouseMacroCreater implements NativeKeyListener, NativeMouse
 
     static class CustomInputType extends InputType {
         Runnable run;
+
         @Override
         public String toString() {
             return "CustomInputType [currentTime=" + currentTime + ", type=" + type + "]";
@@ -331,6 +333,7 @@ public class KeyboardMouseMacroCreater implements NativeKeyListener, NativeMouse
         int x;
         int y;
         int btn;
+
         @Override
         public String toString() {
             return "MouseInputType [currentTime=" + currentTime + ", type=" + type + ", x=" + x + ", y=" + y + ", btn=" + btn + "]";
@@ -529,13 +532,14 @@ public class KeyboardMouseMacroCreater implements NativeKeyListener, NativeMouse
             System.out.println("啟動錄製");
             this.initialize();// 啟動錄製
             trayShowMessage("啟動錄製");
-             gtu.swing.util.JFrameUtil.setVisible(true,KeyboardMouseMacroOperater.PROGRESS_INFO);
+            KeyboardMouseMacroOperater.PROGRESS_INFO.setVisible(true);
+
             return;
         }
         System.out.println("結束錄製");
         startTime = -1;
         trayShowMessage("結束錄製");
-         gtu.swing.util.JFrameUtil.setVisible(false,KeyboardMouseMacroOperater.PROGRESS_INFO);
+        KeyboardMouseMacroOperater.PROGRESS_INFO.setVisible(false);
         this.writeMacroData();
 
         if (getAfterWriteMacroData() != null) {
@@ -567,7 +571,7 @@ public class KeyboardMouseMacroCreater implements NativeKeyListener, NativeMouse
         map.put(currentTimeKey, lst);
         KeyboardMouseMacroOperater.PROGRESS_INFO.setText(currentTimeKey + "\t" + String.valueOf(paramNativeKeyEvent));
     }
-    
+
     private final class LogFormatter extends Formatter {
         private LogFormatter() {
         }

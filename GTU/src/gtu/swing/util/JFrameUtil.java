@@ -15,6 +15,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 
 import gtu.file.FileUtil;
@@ -22,7 +23,7 @@ import gtu.file.OsInfoUtil;
 import gtu.properties.PropertiesUtil;
 
 public class JFrameUtil {
-
+    
     public static void setVisible(boolean isShow, JFrame frame) {
         if (OsInfoUtil.isWindows()) {
             frame.setVisible(isShow);
