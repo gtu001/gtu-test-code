@@ -1,4 +1,5 @@
 ctrl + shift + L  開啟快捷鍵清單
+
 ctrl + F10  開啟當前倒三角按鈕視窗
 
 alt + shift + W   快速開啟導覽視窗A
@@ -18,3 +19,4 @@ alt + shift + L  抽成變數
 alt + shift + M  抽成method
 
 ctrl + alt + B  所有中斷點(啟用/關閉)
+

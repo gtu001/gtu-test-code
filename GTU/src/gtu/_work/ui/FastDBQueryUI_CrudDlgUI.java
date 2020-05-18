@@ -16,6 +16,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
@@ -78,9 +79,9 @@ import gtu.swing.util.JFrameRGBColorPanel;
 import gtu.swing.util.JMouseEventUtil;
 import gtu.swing.util.JPopupMenuUtil;
 import gtu.swing.util.JTableUtil;
-import gtu.swing.util.JTableUtil.OnBlurCellEditor;
 import gtu.swing.util.JTextUndoUtil;
 import gtu.swing.util.KeyEventExecuteHandler;
+import taobe.tec.jcc.JChineseConvertor;
 
 public class FastDBQueryUI_CrudDlgUI extends JDialog {
 
@@ -1445,6 +1446,40 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                             });
                             inst.addJMenuItem(chdMenu.getMenu());
                         } // base64 --- end
+
+                        {// 簡繁體 --- start
+                            JMenuAppender chdMenu = JMenuAppender.newInstance("Base64");
+                            chdMenu.addMenuItem("繁轉簡", new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    Object val = JTableUtil.newInstance(rowTable).getSelectedValue();
+                                    if (val != null) {
+                                        String strVal = String.valueOf(val);
+                                        try {
+                                            rowTable.setValueAt(JChineseConvertor.getInstance().t2s(strVal), rowPos.get(), ColumnOrderDef.value.ordinal());
+                                        } catch (IOException e1) {
+                                            e1.printStackTrace();
+                                        }
+                                    }
+                                }
+                            });
+                            chdMenu.addMenuItem("簡轉繁", new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    Object val = JTableUtil.newInstance(rowTable).getSelectedValue();
+                                    if (val != null) {
+                                        String strVal = String.valueOf(val);
+                                        try {
+                                            rowTable.setValueAt(JChineseConvertor.getInstance().s2t(strVal), rowPos.get(), ColumnOrderDef.value.ordinal());
+                                        } catch (IOException e1) {
+                                            e1.printStackTrace();
+                                        }
+                                    }
+                                }
+                            });
+                            inst.addJMenuItem(chdMenu.getMenu());
+                        } // 簡繁體 --- end
+                        
                         inst.applyEvent(e).show();
                     }
                 }

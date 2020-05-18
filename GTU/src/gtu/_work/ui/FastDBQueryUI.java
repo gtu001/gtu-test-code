@@ -153,6 +153,7 @@ import gtu.yaml.util.YamlMapUtil;
 import gtu.yaml.util.YamlUtilBean;
 import net.sf.json.JSONArray;
 import net.sf.json.util.JSONUtils;
+import taobe.tec.jcc.JChineseConvertor;
 
 public class FastDBQueryUI extends JFrame {
 
@@ -1176,7 +1177,7 @@ public class FastDBQueryUI extends JFrame {
                 @Override
                 public void mouseReleased(MouseEvent e) {
                     if (JMouseEventUtil.buttonRightClick(1, e)) {
-                        JPopupMenuUtil.newInstance(f).addJMenuItem("空白換成\"^\"", new ActionListener() {
+                        JPopupMenuUtil util = JPopupMenuUtil.newInstance(f).addJMenuItem("空白換成\"^\"", new ActionListener() {
 
                             @Override
                             public void actionPerformed(ActionEvent e) {
@@ -1190,7 +1191,10 @@ public class FastDBQueryUI extends JFrame {
                                 }
                                 f.setText(StringUtils.join(arry, "^"));
                             }
-                        }).applyEvent(e).show();
+                        });
+                        util.addJMenuItem(new S2T_And_T2S_EventHandler(f).getMenuItem(false));
+                        util.addJMenuItem(new S2T_And_T2S_EventHandler(f).getMenuItem(true));
+                        util.applyEvent(e).show();
                     }
                 }
             });
@@ -1513,9 +1517,16 @@ public class FastDBQueryUI extends JFrame {
         columnXlsDefOtherQryText.getDocument().addDocumentListener(JCommonUtil.getDocumentListener(new HandleDocumentEvent() {
             @Override
             public void process(DocumentEvent event) {
-                initColumnXlsDefTableColumnQryTable();
+                // initColumnXlsDefTableColumnQryTable();
             }
         }));
+
+        columnXlsDefOtherQryText.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusLost(FocusEvent e) {
+                initColumnXlsDefTableColumnQryTable();
+            }
+        });
 
         panel_30 = new JPanel();
         panel_28.add(panel_30, BorderLayout.WEST);
@@ -1529,6 +1540,10 @@ public class FastDBQueryUI extends JFrame {
         columnXlsDefTableQryText.setToolTipText("分隔\"^\", 正則/.../");
         columnXlsDefColumnQryText.setToolTipText("分隔\"^\", 正則/.../");
         columnXlsDefOtherQryText.setToolTipText("分隔\"^\", 正則/.../");
+
+        columnXlsDefTableQryText.addMouseListener(new S2T_And_T2S_EventHandler(columnXlsDefTableQryText).getEvent());
+        columnXlsDefColumnQryText.addMouseListener(new S2T_And_T2S_EventHandler(columnXlsDefColumnQryText).getEvent());
+        columnXlsDefOtherQryText.addMouseListener(new S2T_And_T2S_EventHandler(columnXlsDefOtherQryText).getEvent());
 
         columnXlsDefTableColumnQryTable = new JTable();
         panel_28.add(JCommonUtil.createScrollComponent(columnXlsDefTableColumnQryTable), BorderLayout.CENTER);
@@ -5996,4 +6011,86 @@ public class FastDBQueryUI extends JFrame {
             JCommonUtil.handleException(ex);
         }
     }
+
+    // ======================================================================================================================
+
+    private class S2T_And_T2S_EventHandler {
+
+        JTextField input;
+
+        S2T_And_T2S_EventHandler(JTextField input) {
+            this.input = input;
+        }
+
+        final Transformer trans = new Transformer() {
+            public Object transform(Object _input) {
+                String text = input.getText();
+                try {
+                    boolean s2t = (Boolean) _input;
+                    if (StringUtils.isNotBlank(input.getSelectedText())) {
+                        String before = StringUtils.substring(text, 0, input.getSelectionStart());
+                        String middle = input.getSelectedText();
+                        if (s2t) {
+                            middle = JChineseConvertor.getInstance().s2t(middle);
+                        } else {
+                            middle = JChineseConvertor.getInstance().t2s(middle);
+                        }
+                        String after = StringUtils.substring(text, input.getSelectionEnd());
+                        return before + middle + after;
+                    } else {
+                        if (s2t) {
+                            text = JChineseConvertor.getInstance().s2t(text);
+                        } else {
+                            text = JChineseConvertor.getInstance().t2s(text);
+                        }
+                        return text;
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+                return text;
+            }
+        };
+
+        public JMenuItem getMenuItem(boolean isS2t) {
+            JMenuItem item = new JMenuItem(isS2t ? "簡轉繁" : "繁轉簡");
+            item.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    input.setText((String) trans.transform(isS2t));
+                }
+            });
+            return item;
+        }
+
+        public MouseAdapter getEvent() {
+            return new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    try {
+                        final JTextField input = (JTextField) e.getSource();
+                        if (JMouseEventUtil.buttonRightClick(1, e)) {
+
+                            JPopupMenuUtil.newInstance(input)//
+                                    .addJMenuItem("繁轉簡", new ActionListener() {
+                                        @Override
+                                        public void actionPerformed(ActionEvent e) {
+                                            input.setText((String) trans.transform(false));
+                                        }
+                                    }).addJMenuItem("簡轉繁", new ActionListener() {
+
+                                        @Override
+                                        public void actionPerformed(ActionEvent e) {
+                                            input.setText((String) trans.transform(true));
+                                        }
+                                    }).applyEvent(e).show();
+                        }
+                    } catch (Exception ex1) {
+                        JCommonUtil.handleException(ex1);
+                    }
+                }
+            };
+        }
+    }
+
 }
