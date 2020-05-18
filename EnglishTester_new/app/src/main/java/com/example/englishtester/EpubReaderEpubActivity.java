@@ -56,6 +56,7 @@ import com.example.englishtester.common.ViewPagerHelper;
 import com.example.englishtester.common.epub.base.EpubViewerMainHandler;
 import com.example.englishtester.common.interf.EpubActivityInterface;
 import com.example.englishtester.common.interf.ITxtReaderActivity;
+import com.example.englishtester.common.pdf.base.PdfViewerMainHandler;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
@@ -108,6 +109,7 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
     AutoScrollDownHandler autoScrollDownHandler;
     ReaderCommonHelper.LineSpacingAdjuster mLineSpacingAdjuster;
     ReaderCommonHelper.FloatViewServiceOpenStatusReceiverHelper floatViewServiceOpenStatusReceiverHelper;
+    ReaderCommonHelper.BookmarkShowWordListHandler mBookmarkShowWordListHandler;
 
     TextView txtReaderView;
     TextView translateView;
@@ -372,6 +374,7 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
         homeKeyWatcher.startWatch();
 
         mLineSpacingAdjuster = new ReaderCommonHelper.LineSpacingAdjuster(this);
+        mBookmarkShowWordListHandler = new ReaderCommonHelper.BookmarkShowWordListHandler(this, this, this);
 
         this.doOnoffService(true);
     }
@@ -587,9 +590,9 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
      * 移動到下個書籤
      */
     public void moveToBookmarkPage() {
-        MoveToNextBookmarkHandler moveHandler = new MoveToNextBookmarkHandler();
-        if (!moveHandler.validateInitOk()) {
-            Toast.makeText(EpubReaderEpubActivity.this, "請先開啟Epub!", Toast.LENGTH_SHORT).show();
+        ReaderCommonHelper.MoveToNextBookmarkHandler moveHandler = new ReaderCommonHelper.MoveToNextBookmarkHandler(this, this);
+        if (!(epubViewerMainHandler != null && epubViewerMainHandler.isInitDone())) {
+            Toast.makeText(this, "請先開啟Epub!", Toast.LENGTH_SHORT).show();
             return;
         }
         moveHandler.initReference();
@@ -616,120 +619,21 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
         ViewPagerHelper.triggerPageSelected(viewPager, position);
     }
 
-    private class MoveToNextBookmarkHandler implements DialogInterface.OnClickListener {
-
-        private List<Row> lst = new ArrayList<>();
-        private List<Map<String, Object>> lst4Adapter = new ArrayList<>();
-
-        private class Row {
-            String file_name;
-            int bookmark_type;
-            long insert_date;
-            int page_index;
-
-            private Row(Map<String, Object> map) {
-//                {file_name=Everybody Lies Big Data, New Data, and What the Internet - Seth Stephens-Davidowitz[4], bookmark_type=2, insert_date=496398149}
-                file_name = (String) map.get("file_name");
-                bookmark_type = (Integer) map.get("bookmark_type");
-                insert_date = (Integer) map.get("insert_date");
-                page_index = (Integer) map.get("page_index");
-            }
-
-            private Map<String, Object> toAdapterMap() {
-                Map<String, Object> map = new HashMap<>();
-                map.put("ItemTitle", file_name);
-                map.put("ItemDetail", "page " + (page_index + 1));
-                map.put("ItemDetailRight", DateFormatUtils.format(insert_date, "yyyy/MM/dd HH:mm:ss"));
-                map.put("ItemDetail2", "");
-                return map;
-            }
-        }
-
-        private boolean validateInitOk() {
-            if (epubViewerMainHandler != null && epubViewerMainHandler.isInitDone()) {
-                return true;
-            }
-            return false;
-        }
-
-        private void initReference() {
-            String fileName = EpubViewerMainHandler.EpubPageTitleHandler.fixNameToTitle(epubViewerMainHandler.getDto().getBookFile().getName());
-            fileName = fileName.replaceAll("'", "''");
-
-            StringBuilder sb = new StringBuilder();
-            sb.append(" select file_name , bookmark_type, max(insert_date) as insert_date, page_index      ");
-            sb.append(" from recent_txt_mark                                                              ");
-            sb.append(" where bookmark_type in (%s) and file_name like '%s%%'  and page_index != -1       ");
-            sb.append("  group by file_name                                                               ");
-            sb.append("  order by 3 desc                                                                  ");
-
-            String bookmarkTypeStr = StringUtils.join(Arrays.asList(RecentTxtMarkDAO.BookmarkTypeEnum.BOOKMARK.getType(), RecentTxtMarkDAO.BookmarkTypeEnum.SCROLL_Y_POS.getType()), ",");
-
-            String sql = String.format(sb.toString(), bookmarkTypeStr, fileName);
-            List<Map<String, Object>> lst = DBUtil.queryBySQL_realType(sql, new String[0], EpubReaderEpubActivity.this);
-            for (Map<String, Object> map : lst) {
-                Row row = new Row(map);
-                this.lst.add(row);
-                this.lst4Adapter.add(row.toAdapterMap());
-            }
-        }
-
-        private void showDlg() {
-            if (lst4Adapter.isEmpty()) {
-                Toast.makeText(EpubReaderEpubActivity.this, "尚無書籤紀錄", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            SimpleAdapter aryAdapter = new SimpleAdapter(EpubReaderEpubActivity.this, lst4Adapter,// 資料來源
-                    R.layout.subview_dropboxlist, //
-                    new String[]{"ItemTitle", "ItemDetail", "ItemDetailRight", "ItemDetail2"}, //
-                    new int[]{R.id.ItemTitle, R.id.ItemDetail, R.id.ItemDetailRight, R.id.ItemDetail2}//
-            );
-
-            AlertDialog.Builder builder = new AlertDialog.Builder(EpubReaderEpubActivity.this);
-            builder.setTitle("請選擇書籤");
-            builder.setAdapter(aryAdapter, this);
-            AlertDialog alert = builder.create();
-            alert.show();
-        }
-
-        @Override
-        public void onClick(DialogInterface dialog, int which) {
-            final Row row = lst.get(which);
-            Pattern ptn = Pattern.compile("^.*\\[(.*?)\\]$");
-            Matcher mth = ptn.matcher(row.file_name);
-
-            int pos = 0;
-            int dtlPos = 0;
-
-            if (mth.find()) {
-
-                String pageInfo = mth.group(1);
-
-                if (pageInfo.matches("\\d+")) {
-                    pos = Integer.parseInt(pageInfo);
-                } else {
-                    Matcher mth2 = Pattern.compile("(\\d+)\\s\\((\\d+)").matcher(pageInfo);
-                    if (mth2.find()) {
-                        pos = Integer.parseInt(mth2.group(1));
-                        dtlPos = Integer.parseInt(mth2.group(1));
-                    } else {
-                        throw new RuntimeException("無法取得 SpinePos : " + pageInfo);
-                    }
-                }
-            }
-
-            Toast.makeText(EpubReaderEpubActivity.this, "跳至章節 " + pos + " : " + dtlPos + " : Page : " + (row.page_index + 1), Toast.LENGTH_SHORT).show();
-            gotoViewPagerPosition(row.page_index);
-
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    setTitle(epubViewerMainHandler.getCurrentTitle(row.page_index));
-                }
-            }, 1000L);
-        }
+    @Override
+    public String getCurrentTitle(int page_index) {
+        return epubViewerMainHandler.getCurrentTitle(page_index);
     }
+
+    public String getFileName() {
+        String fileName = EpubViewerMainHandler.EpubPageTitleHandler.fixNameToTitle(this.epubViewerMainHandler.getDto().getBookFile().getName());
+        return fileName;
+    }
+
+    @Override
+    public String getDtoFileName() {
+        return epubViewerMainHandler.getDto().getFileName().toString();
+    }
+
 
     // --------------------------------------------------------------------
 
@@ -1151,6 +1055,14 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
     static int MENU_FIRST = Menu.FIRST;
 
     enum TaskInfo {
+        BOOKMARK_SHOWWORD_LIST("開啟書籤單字清單", MENU_FIRST++, REQUEST_CODE++, null) {
+            protected void onActivityResult(MobiReaderMobiActivity activity, Intent intent, Bundle bundle) {
+            }
+
+            protected void onOptionsItemSelected(MobiReaderMobiActivity activity, Intent intent, Bundle bundle) {
+                activity.mBookmarkShowWordListHandler.showMenu(false);//activity.epubViewerMainHandler.getDto().getFileName().toString()
+            }
+        }, //
         CHANGE_FONT_SIZE("改變字體大小", MENU_FIRST++, REQUEST_CODE++, null) {
             protected void onOptionsItemSelected(final EpubReaderEpubActivity activity, Intent intent, Bundle bundle) {
                 activity.openFontSizeDialog();

@@ -131,6 +131,16 @@ public class RecentTxtMarkService {
     }
 
     /**
+     * 取得檔案mark紀錄
+     */
+    public synchronized List<RecentTxtMark> getFileMarkLike(String fileName) {
+        List<RecentTxtMark> lst = recentTxtMarkDAO.query__NON_CLOSE(//
+                RecentTxtMarkSchmea.FILE_NAME + " like  ? || '%' ", //
+                new String[]{fileName});
+        return lst;
+    }
+
+    /**
      * 計算全部筆數
      */
     public int countAll() {

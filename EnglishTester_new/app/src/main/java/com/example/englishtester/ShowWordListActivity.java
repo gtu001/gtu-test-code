@@ -239,6 +239,9 @@ public class ShowWordListActivity extends Activity implements AdapterView.OnItem
                 return "空字串!";
             }
             EnglishWord word = this_.dto.englishProp.get(text);
+            if (word == null) {
+                return "";
+            }
             return word.englishDesc;
         }
 
@@ -1027,4 +1030,19 @@ public class ShowWordListActivity extends Activity implements AdapterView.OnItem
         return true;
     }
     // ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑ 功能選單
+
+    public static void startShowWordListActivitiy(Map<String, EnglishWord> englishProp, int requestCode, Activity activity) {
+        MainActivityDTO dto = new MainActivityDTO();
+        dto.wordsListCopy = new ArrayList<String>();
+        dto.englishProp = englishProp;
+        for (String word : englishProp.keySet()) {
+            dto.wordsListCopy.add(word);
+        }
+        Intent intent = new Intent();
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(ShowWordListActivity.ShowWordListActivity_DTO, dto);
+        intent.setClass(activity, ShowWordListActivity.class);
+        intent.putExtras(bundle);
+        activity.startActivityForResult(intent, requestCode);
+    }
 }

@@ -1,5 +1,6 @@
 package com.example.englishtester.common;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -20,24 +21,36 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ScrollView;
+import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.englishtester.EnglishwordInfoDAO;
+import com.example.englishtester.MobiReaderMobiActivity;
 import com.example.englishtester.R;
 import com.example.englishtester.RecentTxtMarkDAO;
+import com.example.englishtester.RecentTxtMarkService;
+import com.example.englishtester.ShowWordListActivity;
+import com.example.englishtester.common.interf.ITxtReaderActivity;
 import com.example.englishtester.common.interf.ITxtReaderActivityDTO;
+import com.example.englishtester.common.mobi.base.MobiViewerMainHandler;
 
 import org.apache.commons.collections.map.LRUMap;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang3.time.DateFormatUtils;
 import org.springframework.cglib.core.internal.Function;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
@@ -623,6 +636,157 @@ public class ReaderCommonHelper {
             if (broadcastReceiver != null) {
                 context.unregisterReceiver(broadcastReceiver);
             }
+        }
+    }
+
+    //========================================================================================================================
+
+    public static class BookmarkShowWordListHandler {
+        RecentTxtMarkService recentTxtMarkService;
+        EnglishwordInfoDAO mEnglishwordInfoDAO;
+        Activity activity;
+        ITxtReaderActivity mITxtReaderActivity;
+
+        public BookmarkShowWordListHandler(Context context, ITxtReaderActivity mITxtReaderActivity, Activity activity) {
+            recentTxtMarkService = new RecentTxtMarkService(context);
+            mEnglishwordInfoDAO = new EnglishwordInfoDAO(context);
+            this.mITxtReaderActivity = mITxtReaderActivity;
+            this.activity = activity;
+        }
+
+        public void showMenu( boolean isSinglePage) {
+            List<RecentTxtMarkDAO.RecentTxtMark> qList = Collections.emptyList();
+            if (isSinglePage) {
+                qList = recentTxtMarkService.getFileMark(mITxtReaderActivity.getDtoFileName());//
+            } else {
+                qList = recentTxtMarkService.getFileMarkLike(mITxtReaderActivity.getFileName());//
+            }
+            Map<String, EnglishwordInfoDAO.EnglishWord> englishProp = new LinkedHashMap<>();
+            for (RecentTxtMarkDAO.RecentTxtMark txt : qList) {
+                String word = txt.getMarkEnglish();
+                if (StringUtils.isNotBlank(word)) {
+                    EnglishwordInfoDAO.EnglishWord eng = mEnglishwordInfoDAO.queryOneWord(word);
+                    englishProp.put(word, eng);
+                }
+            }
+            ShowWordListActivity.startShowWordListActivitiy(englishProp, 9988, activity);
+        }
+    }
+
+
+    public static class MoveToNextBookmarkHandler implements DialogInterface.OnClickListener {
+
+        private List<Row> lst = new ArrayList<>();
+        private List<Map<String, Object>> lst4Adapter = new ArrayList<>();
+        private Context context;
+        private ITxtReaderActivity mITxtReaderActivity;
+        private Handler handler = new Handler();
+
+        public MoveToNextBookmarkHandler(ITxtReaderActivity mITxtReaderActivity, Context context) {
+            this.context = context;
+            this.mITxtReaderActivity = mITxtReaderActivity;
+        }
+
+        private class Row {
+            String file_name;
+            int bookmark_type;
+            long insert_date;
+            int page_index;
+
+            private Row(Map<String, Object> map) {
+//                {file_name=Everybody Lies Big Data, New Data, and What the Internet - Seth Stephens-Davidowitz[4], bookmark_type=2, insert_date=496398149}
+                file_name = (String) map.get("file_name");
+                bookmark_type = (Integer) map.get("bookmark_type");
+                insert_date = (Integer) map.get("insert_date");
+                page_index = (Integer) map.get("page_index");
+            }
+
+            private Map<String, Object> toAdapterMap() {
+                Map<String, Object> map = new HashMap<>();
+                map.put("ItemTitle", file_name);
+                map.put("ItemDetail", "page " + (page_index + 1));
+                map.put("ItemDetailRight", DateFormatUtils.format(insert_date, "yyyy/MM/dd HH:mm:ss"));
+                map.put("ItemDetail2", "");
+                return map;
+            }
+        }
+
+        public void initReference() {
+            String fileName = this.mITxtReaderActivity.getFileName();
+            fileName = fileName.replaceAll("'", "''");
+
+            StringBuilder sb = new StringBuilder();
+            sb.append(" select file_name , bookmark_type, max(insert_date) as insert_date, page_index      ");
+            sb.append(" from recent_txt_mark                                                              ");
+            sb.append(" where bookmark_type in (%s) and file_name like '%s%%'  and page_index != -1       ");
+            sb.append("  group by file_name                                                               ");
+            sb.append("  order by 3 desc                                                                  ");
+
+            String bookmarkTypeStr = StringUtils.join(Arrays.asList(RecentTxtMarkDAO.BookmarkTypeEnum.BOOKMARK.getType(), RecentTxtMarkDAO.BookmarkTypeEnum.SCROLL_Y_POS.getType()), ",");
+
+            String sql = String.format(sb.toString(), bookmarkTypeStr, fileName);
+            List<Map<String, Object>> lst = DBUtil.queryBySQL_realType(sql, new String[0], context);
+            for (Map<String, Object> map : lst) {
+                Row row = new Row(map);
+                this.lst.add(row);
+                this.lst4Adapter.add(row.toAdapterMap());
+            }
+        }
+
+        public void showDlg() {
+            if (lst4Adapter.isEmpty()) {
+                Toast.makeText(context, "尚無書籤紀錄", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            SimpleAdapter aryAdapter = new SimpleAdapter(context, lst4Adapter,// 資料來源
+                    R.layout.subview_dropboxlist, //
+                    new String[]{"ItemTitle", "ItemDetail", "ItemDetailRight", "ItemDetail2"}, //
+                    new int[]{R.id.ItemTitle, R.id.ItemDetail, R.id.ItemDetailRight, R.id.ItemDetail2}//
+            );
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+            builder.setTitle("請選擇書籤");
+            builder.setAdapter(aryAdapter, this);
+            AlertDialog alert = builder.create();
+            alert.show();
+        }
+
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            final Row row = lst.get(which);
+            Pattern ptn = Pattern.compile("^.*\\[(.*?)\\]$");
+            Matcher mth = ptn.matcher(row.file_name);
+
+            int pos = 0;
+            int dtlPos = 0;
+
+            if (mth.find()) {
+
+                String pageInfo = mth.group(1);
+
+                if (pageInfo.matches("\\d+")) {
+                    pos = Integer.parseInt(pageInfo);
+                } else {
+                    Matcher mth2 = Pattern.compile("(\\d+)\\s\\((\\d+)").matcher(pageInfo);
+                    if (mth2.find()) {
+                        pos = Integer.parseInt(mth2.group(1));
+                        dtlPos = Integer.parseInt(mth2.group(1));
+                    } else {
+                        throw new RuntimeException("無法取得 SpinePos : " + pageInfo);
+                    }
+                }
+            }
+
+            Toast.makeText(context, "跳至章節 " + pos + " : " + dtlPos + " : Page : " + (row.page_index + 1), Toast.LENGTH_SHORT).show();
+            mITxtReaderActivity.gotoViewPagerPosition(row.page_index);
+
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    mITxtReaderActivity.setTitle(mITxtReaderActivity.getCurrentTitle(row.page_index));
+                }
+            }, 1000L);
         }
     }
 }

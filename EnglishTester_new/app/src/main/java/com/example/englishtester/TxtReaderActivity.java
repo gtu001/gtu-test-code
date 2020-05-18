@@ -330,6 +330,33 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         }
     }
 
+    @Override
+    public void gotoViewPagerPosition(int page_index) {
+        Log.v(TAG, "unsupported methid : " + "gotoViewPagerPosition");
+    }
+
+    @Override
+    public String getCurrentTitle(int page_index) {
+        Log.v(TAG, "unsupported methid : " + "getCurrentTitle");
+        return null;
+    }
+
+    @Override
+    public void setTitle(String currentTitle) {
+        Log.v(TAG, "unsupported methid : " + "setTitle");
+    }
+
+    @Override
+    public String getFileName() {
+        Log.v(TAG, "unsupported methid : " + "getFileName");
+        return null;
+    }
+
+    @Override
+    public String getDtoFileName() {
+        return dto.getFileName().toString();
+    }
+
     /**
      * 紀錄卷軸位置
      */
@@ -1185,7 +1212,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         } finally {
             try {
                 writer.close();
-                  Log.line(TAG, writer.toString());
+                Log.line(TAG, writer.toString());
             } catch (Exception ex) {
             }
         }
