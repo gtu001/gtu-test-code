@@ -15,6 +15,10 @@ public class TapController : MonoBehaviour {
     public float tiltSmooth = 5;
     public Vector3 startPos;
 
+    public AudioSource tapAudio;
+    public AudioSource scoreAudio;
+    public AudioSource dieAudio;
+
     Rigidbody2D rigidbody2;
     Quaternion downRotation;
     Quaternion forwardRotation;
@@ -65,6 +69,7 @@ public class TapController : MonoBehaviour {
             return;
         }
         if (Input.GetMouseButtonDown (0)) {
+            tapAudio.Play();
             transform.rotation = forwardRotation; //逆時鐘旋轉
             rigidbody2.velocity = Vector3.zero; //設定重力加速度為0
             rigidbody2.AddForce (Vector2.up * tapForce, ForceMode2D.Force); //向上飛的力量
@@ -78,6 +83,7 @@ public class TapController : MonoBehaviour {
             // register a score event
             OnPlayerScored (); // event sent to GameManager
             // play a sound
+            scoreAudio.Play();
         }
 
         if (col.gameObject.tag == "DeadZone") {
@@ -85,6 +91,7 @@ public class TapController : MonoBehaviour {
             // register a dead event
             OnPlayerDied (); // event sent to GameManager
             // play a sound
+            dieAudio.Play();
         }
     }
 }
