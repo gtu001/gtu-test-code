@@ -113,6 +113,7 @@ import gtu.db.sqlMaker.DbSqlCreater.TableInfo;
 import gtu.file.FileUtil;
 import gtu.file.OsInfoUtil;
 import gtu.log.LoggerAppender;
+import gtu.number.RandomUtil;
 import gtu.poi.hssf.ExcelUtil_Xls97;
 import gtu.poi.hssf.ExcelWriter;
 import gtu.poi.hssf.ExcelWriter.CellStyleHandler;
@@ -3776,6 +3777,35 @@ public class FastDBQueryUI extends JFrame {
                             sqlTextArea.setText(prefix + sb + suffix);
                         }
                     })//
+                    .addJMenuItem("SQL 基礎 left join", new ActionListener() {
+
+                        private String getRandomAlias() {
+                            char a = (char) RandomUtil.rangeInteger((int) 'a', (int) 'z');
+                            int b = RandomUtil.rangeInteger(0, 9);
+                            return String.valueOf(a) + String.valueOf(b);
+                        }
+
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            String selection = sqlTextArea.getSelectedText();
+                            if (StringUtils.isBlank(selection)) {
+                                return;
+                            }
+                            StringBuilder sb = new StringBuilder();
+                            Pattern ptn = Pattern.compile("[\\w+\\.]+");
+                            Matcher mth = ptn.matcher(selection);
+                            while (mth.find()) {
+                                String cond = mth.group();
+                                String alais = getRandomAlias();
+                                sb.append("\t  left join " + cond + " " + alais + " on "+ alais + ".XXXXXXXX = t.XXXXXXXX "//
+                                        + " and "+ alais + ".YYYYYYYY = t.YYYYYYYY "//
+                                        + " \r\n");//
+                            }
+                            String prefix = StringUtils.substring(sqlTextArea.getText(), 0, sqlTextArea.getSelectionStart());
+                            String suffix = StringUtils.substring(sqlTextArea.getText(), sqlTextArea.getSelectionEnd());
+                            sqlTextArea.setText(prefix + sb + suffix);
+                        }
+                    })//
                     .addJMenuItem("SQL 基礎 Where[硬]", new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
@@ -3786,7 +3816,7 @@ public class FastDBQueryUI extends JFrame {
                             StringBuilder sb = new StringBuilder();
                             Pattern ptn = Pattern.compile("[\\w+\\.]+");
                             Matcher mth = ptn.matcher(selection);
-                            while(mth.find()) {
+                            while (mth.find()) {
                                 String cond = mth.group();
                                 sb.append("\t   and ").append(cond).append(" = 'XXXXXXXXXX'   \r\n");
                             }
@@ -3805,7 +3835,7 @@ public class FastDBQueryUI extends JFrame {
                             StringBuilder sb = new StringBuilder();
                             Pattern ptn = Pattern.compile("[\\w+\\.]+");
                             Matcher mth = ptn.matcher(selection);
-                            while(mth.find()) {
+                            while (mth.find()) {
                                 String cond = mth.group();
                                 sb.append("\t [  and ").append(cond).append(" = :").append(cond).append("  ] \r\n");
                             }
@@ -6061,7 +6091,7 @@ public class FastDBQueryUI extends JFrame {
         }
 
         final Transformer trans = new Transformer() {
-            public Object transform(Object _input) {
+            public Object transform(final Object _input) {
                 String text = input.getText();
                 try {
                     boolean s2t = (Boolean) _input;
@@ -6090,7 +6120,7 @@ public class FastDBQueryUI extends JFrame {
             }
         };
 
-        public JMenuItem getMenuItem(boolean isS2t) {
+        public JMenuItem getMenuItem(final boolean isS2t) {
             JMenuItem item = new JMenuItem(isS2t ? "簡轉繁" : "繁轉簡");
             item.addActionListener(new ActionListener() {
                 @Override
