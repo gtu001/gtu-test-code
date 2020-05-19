@@ -33,7 +33,7 @@ https://docs.google.com/spreadsheets/d/11ljKyF0eMgY3qqZWjVVBvI0brfv9IxocXjroYtJy
 	平行投影on
 	ss = 1.5
 	steamVR custom 20%
-	steamVR game 200%
+	steamVR game 100%
 
 #alien isolation
 ---
@@ -41,3 +41,10 @@ https://docs.google.com/spreadsheets/d/11ljKyF0eMgY3qqZWjVVBvI0brfv9IxocXjroYtJy
 	ss = 1.5
 	steamVR custom 20%
 	steamVR game 200%
+
+#Five Nights at Freddys Help Wanted
+---
+	平行投影on
+	ss = 1
+	steamVR custom 20%
+	steamVR game 100%

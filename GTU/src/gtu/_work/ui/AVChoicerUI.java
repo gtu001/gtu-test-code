@@ -206,14 +206,14 @@ public class AVChoicerUI extends JFrame {
                 currentFileHandler.replay();
             }
         });
-        
-                JButton renameBtn = new JButton("改名");
-                renameBtn.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {
-                        currentFileHandler.rename();
-                    }
-                });
-                panel_7.add(renameBtn);
+
+        JButton renameBtn = new JButton("改名");
+        renameBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                currentFileHandler.rename();
+            }
+        });
+        panel_7.add(renameBtn);
         panel_7.add(replayBtn);
 
         JPanel panel_8 = new JPanel();
@@ -557,6 +557,32 @@ public class AVChoicerUI extends JFrame {
         });
 
         panel_18.add(JCommonUtil.createScrollComponent(dirCheckList), BorderLayout.CENTER);
+
+        JPanel panel_23 = new JPanel();
+        tabbedPane.addTab("準備移動", null, panel_23, null);
+        panel_23.setLayout(new BorderLayout(0, 0));
+
+        JPanel panel_24 = new JPanel();
+        panel_23.add(panel_24, BorderLayout.NORTH);
+
+        JPanel panel_25 = new JPanel();
+        panel_23.add(panel_25, BorderLayout.WEST);
+
+        JPanel panel_26 = new JPanel();
+        panel_23.add(panel_26, BorderLayout.EAST);
+
+        JPanel panel_27 = new JPanel();
+        panel_23.add(panel_27, BorderLayout.SOUTH);
+
+        readyToMoveLst = new JList();
+        readyToMoveLst.setModel(JListUtil.createModel());
+        JCommonUtil.applyDropFiles(readyToMoveLst, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                DefaultListModel model = (DefaultListModel) readyToMoveLst.getModel();
+            }
+        });
+        panel_23.add(JCommonUtil.createScrollComponent(readyToMoveLst), BorderLayout.CENTER);
 
         JCommonUtil.applyDropFiles(this, new ActionListener() {
             @Override
@@ -1315,6 +1341,7 @@ public class AVChoicerUI extends JFrame {
     }
 
     private DropFileChecker mDropFileChecker = null;
+    private JList readyToMoveLst;
 
     private List<File> dirCheckTextActionPerformed(List<File> fileLst) {
         mDropFileChecker = new DropFileChecker(fileLst);
@@ -1365,6 +1392,19 @@ public class AVChoicerUI extends JFrame {
         File file;
         String name;
         boolean isMovie = true;
+        
+        FileZ(File file) {
+            this.file = file;
+            this.name = file.getName();
+            if(file.isFile()) {
+                Matcher mth1 = movPtn.matcher(name);
+                Matcher mth2 = jpgPtn.matcher(name);
+                if (mth1.find()) {
+                    this.isMovie = true;
+                } else if (mth2.find()) {
+                }
+            }
+        }
 
         FileZ(File file, boolean isMovie) {
             this.file = file;
@@ -1378,10 +1418,14 @@ public class AVChoicerUI extends JFrame {
             String fontColor = "black";
             Matcher mth1 = movPtn.matcher(name);
             Matcher mth2 = jpgPtn.matcher(name);
-            if (mth1.find()) {
-                bgColor = "#cce8cf";
-            } else if (mth2.find()) {
-                bgColor = "yellow";
+            if (file.isDirectory()) {
+                bgColor = "#112233";
+            } else {
+                if (mth1.find()) {
+                    bgColor = "#cce8cf";
+                } else if (mth2.find()) {
+                    bgColor = "yellow";
+                }
             }
             return String.format("<html><span style='color : %s ; background-color : %s;'>%s</span></html>", fontColor, bgColor, name);
         }
