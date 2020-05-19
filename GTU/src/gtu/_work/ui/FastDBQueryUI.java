@@ -3776,6 +3776,44 @@ public class FastDBQueryUI extends JFrame {
                             sqlTextArea.setText(prefix + sb + suffix);
                         }
                     })//
+                    .addJMenuItem("SQL 基礎 Where[硬]", new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            String selection = sqlTextArea.getSelectedText();
+                            if (StringUtils.isBlank(selection)) {
+                                return;
+                            }
+                            StringBuilder sb = new StringBuilder();
+                            Pattern ptn = Pattern.compile("[\\w+\\.]+");
+                            Matcher mth = ptn.matcher(selection);
+                            while(mth.find()) {
+                                String cond = mth.group();
+                                sb.append("\t   and ").append(cond).append(" = 'XXXXXXXXXX'   \r\n");
+                            }
+                            String prefix = StringUtils.substring(sqlTextArea.getText(), 0, sqlTextArea.getSelectionStart());
+                            String suffix = StringUtils.substring(sqlTextArea.getText(), sqlTextArea.getSelectionEnd());
+                            sqlTextArea.setText(prefix + sb + suffix);
+                        }
+                    })//
+                    .addJMenuItem("SQL 基礎 Where[代]", new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            String selection = sqlTextArea.getSelectedText();
+                            if (StringUtils.isBlank(selection)) {
+                                return;
+                            }
+                            StringBuilder sb = new StringBuilder();
+                            Pattern ptn = Pattern.compile("[\\w+\\.]+");
+                            Matcher mth = ptn.matcher(selection);
+                            while(mth.find()) {
+                                String cond = mth.group();
+                                sb.append("\t [  and ").append(cond).append(" = :").append(cond).append("  ] \r\n");
+                            }
+                            String prefix = StringUtils.substring(sqlTextArea.getText(), 0, sqlTextArea.getSelectionStart());
+                            String suffix = StringUtils.substring(sqlTextArea.getText(), sqlTextArea.getSelectionEnd());
+                            sqlTextArea.setText(prefix + sb + suffix);
+                        }
+                    })//
                     .addJMenuItem("插入系統日", new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
