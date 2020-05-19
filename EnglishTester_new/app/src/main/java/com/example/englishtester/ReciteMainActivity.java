@@ -13,6 +13,7 @@ import android.os.Handler;
 
 import com.example.englishtester.common.EnglishSearchRegexConf;
 import com.example.englishtester.common.Log;
+
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -60,6 +61,7 @@ import gtu.number.RandomUtil;
 public class ReciteMainActivity extends Activity {
 
     private static final String TAG = ReciteMainActivity.class.getSimpleName();
+    public static final String ReciteMainActivity_QUESTION_ARRAY_KEY = "ReciteMainActivity_QUESTION_ARRAY_KEY";
 
     // TextView englishLabel;
     EnglishBean englishBean;
@@ -421,6 +423,18 @@ public class ReciteMainActivity extends Activity {
         changeBackGround();
 
         Toast.makeText(this, "網路連接狀態:" + (NetWorkUtil.connectionTest(this) ? "開" : "關"), Toast.LENGTH_SHORT).show();
+
+        {//讀取外部題庫
+            Intent intent = getIntent();
+            Bundle extras = intent.getExtras();
+            Log.v(TAG, "extras -- " + extras);
+            if (extras != null) {
+                List<String> wordLst = extras.getStringArrayList(ReciteMainActivity_QUESTION_ARRAY_KEY);
+                if (wordLst != null && !wordLst.isEmpty()) {
+                    initExam(wordLst);
+                }
+            }
+        }
     }
 
     private void initSetupService() {
@@ -560,6 +574,58 @@ public class ReciteMainActivity extends Activity {
         answerBtn4 = (Button) findViewById(R.id.answerBtn4);
 
         deletePicBtn = (ImageButton) findViewById(R.id.deletePicBtn);
+    }
+
+    void initExam(final List<String> wordLst) {
+        final ProgressDialog myDialog = ProgressDialog.show(this, "載入題庫", "初始化...", true);
+        final Handler handler = new Handler();
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                final StringBuilder hasErrorSb = new StringBuilder();
+                final StringBuilder messageSb = new StringBuilder();
+
+                try {
+                    String message = englishwordInfoService.initExam(dto, wordLst);
+                    if (StringUtils.isNotBlank(message)) {
+                        messageSb.append(message);
+                    }
+
+                    // 載入圖片
+                    switchPictureService.loadAllPictureIfNeed();
+                } catch (Exception ex) {
+                    hasErrorSb.append(ex.getMessage());
+                }
+
+                myDialog.cancel();
+
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (hasErrorSb.length() > 0) {
+                            Toast.makeText(getApplicationContext(), hasErrorSb.toString(), Toast.LENGTH_LONG).show();
+                            return;
+                        }
+
+                        if (dto.wordsList != null && dto.englishProp != null) {
+                            // 取得第一題
+                            nextQuestion(false);
+
+                            // 隱藏問題
+                            answerBtnShowHide(false);
+
+                            // 隱藏答案
+                            answerLabelShow(false);
+
+                            if (messageSb.length() > 0) {
+                                Toast.makeText(getApplicationContext(), messageSb.toString(), Toast.LENGTH_LONG).show();
+                            }
+                        }
+                    }
+                });
+            }
+        });
+        thread.start();
     }
 
     void initExam(final File englishFile, final boolean doInitExam, final InitExamAction initExamAction) {
@@ -1519,5 +1585,14 @@ public class ReciteMainActivity extends Activity {
                 Toast.makeText(getApplicationContext(), "新增特選 : " + english, Toast.LENGTH_SHORT).show();
             }
         }
+    }
+
+    public static void startReciteMainActivity(List<String> wordLst, int requestCode, Activity activity) {
+        Intent intent = new Intent();
+        Bundle bundle = new Bundle();
+        bundle.putStringArrayList(ReciteMainActivity_QUESTION_ARRAY_KEY, new ArrayList<>(wordLst));
+        intent.setClass(activity, ReciteMainActivity.class);
+        intent.putExtras(bundle);
+        activity.startActivityForResult(intent, requestCode);
     }
 }

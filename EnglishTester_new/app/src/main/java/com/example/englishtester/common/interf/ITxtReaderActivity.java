@@ -8,7 +8,7 @@ import com.example.englishtester.common.mobi.base.MobiViewerMainHandler;
  * Created by wistronits on 2018/8/7.
  */
 
-public interface ITxtReaderActivity {
+public interface ITxtReaderActivity extends ITxtReaderFileName{
     void doOnoffService(boolean b);
 
     Context getApplicationContext();
@@ -20,8 +20,4 @@ public interface ITxtReaderActivity {
     String getCurrentTitle(int page_index);
 
     void setTitle(String currentTitle);
-
-    String getFileName();
-
-    String getDtoFileName();
 }

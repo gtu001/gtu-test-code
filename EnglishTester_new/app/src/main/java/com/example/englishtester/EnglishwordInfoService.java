@@ -149,6 +149,42 @@ public class EnglishwordInfoService {
     /**
      * 初始化測驗
      */
+    String initExam(final MainActivityDTO dto, final List<String> wordLst) {
+        InitExamInterface initExamInst = new InitExamInterface() {
+            @Override
+            public void appendQuestionToEnglishProp(Map<String, EnglishWord> englishProp) throws Exception {
+                Properties prop = new Properties();
+
+                for (String eng : wordLst) {
+                    String engQuery = StringUtils.trimToEmpty(eng).toLowerCase();
+                    EnglishWord word = dao.queryOneWord(engQuery);
+                    // if (word == null) {//如果沒有匯入就不加入此單字
+                    // word = new EnglishWord();
+                    // word.englishId = eng;
+                    // word.englishDesc = prop.getProperty(eng);
+                    // word.insertDate = System.currentTimeMillis();
+                    // }
+                    // 改成沒匯入也要顯示
+                    if (word != null) {
+                        dto.englishProp.put(eng, word);
+                    } else if (StringUtils.isNotBlank(prop.getProperty(eng))) {
+                        word = new EnglishWord();
+                        word.englishId = eng;
+                        word.englishDesc = prop.getProperty(eng) + "_(未建檔)";
+                        dto.englishProp.put(eng, word);
+                        Log.v(TAG, "未建檔單字 : [" + eng + "]");
+                    }
+                }
+            }
+        };
+
+        String messageStr = initExamInst.initExam(dto, null);
+        return messageStr;
+    }
+
+    /**
+     * 初始化測驗
+     */
     String initExam(final MainActivityDTO dto, final File file) {
         InitExamInterface initExamInst = new InitExamInterface() {
             @Override

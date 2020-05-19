@@ -62,6 +62,7 @@ import com.example.englishtester.common.html.parser.HtmlWordParser;
 import com.example.englishtester.common.interf.IDropboxFileLoadService;
 import com.example.englishtester.common.interf.ITxtReaderActivity;
 import com.example.englishtester.common.interf.ITxtReaderActivityDTO;
+import com.example.englishtester.common.interf.ITxtReaderFileName;
 import com.google.android.gms.ads.NativeExpressAdView;
 
 import org.apache.commons.lang3.StringUtils;
@@ -160,6 +161,10 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
      * 行距控制
      */
     ReaderCommonHelper.LineSpacingAdjuster mLineSpacingAdjuster;
+    /**
+     * 查詢單字處理
+     */
+    ReaderCommonHelper.BookmarkShowWordListHandler mBookmarkShowWordListHandler;
 
 
     EditText editText1;
@@ -348,8 +353,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
 
     @Override
     public String getFileName() {
-        Log.v(TAG, "unsupported methid : " + "getFileName");
-        return null;
+        return dto.getFileName().toString();
     }
 
     @Override
@@ -552,6 +556,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         homeKeyWatcher.startWatch();
 
         mLineSpacingAdjuster = new ReaderCommonHelper.LineSpacingAdjuster(this);
+        mBookmarkShowWordListHandler = new ReaderCommonHelper.BookmarkShowWordListHandler(this, this, this);
 
         doOnoffService(true);
     }
@@ -1282,6 +1287,22 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
     static int MENU_FIRST = Menu.FIRST;
 
     enum TaskInfo {
+        BOOKMARK_SHOWWORD_LIST("單字清單", MENU_FIRST++, REQUEST_CODE++, null) {
+            protected void onActivityResult(TxtReaderActivity activity, Intent intent, Bundle bundle) {
+            }
+
+            protected void onOptionsItemSelected(TxtReaderActivity activity, Intent intent, Bundle bundle) {
+                activity.mBookmarkShowWordListHandler.showMenu(false);//activity.epubViewerMainHandler.getDto().getFileName().toString()
+            }
+        }, //
+        BOOKMARK_SHOWWORD_LIST2("單字測驗", MENU_FIRST++, REQUEST_CODE++, null) {
+            protected void onActivityResult(TxtReaderActivity activity, Intent intent, Bundle bundle) {
+            }
+
+            protected void onOptionsItemSelected(TxtReaderActivity activity, Intent intent, Bundle bundle) {
+                activity.mBookmarkShowWordListHandler.showQuestions(false);//activity.epubViewerMainHandler.getDto().getFileName().toString()
+            }
+        }, //
         PASTE_TXT("從剪貼簿文件", MENU_FIRST++, REQUEST_CODE++, null) {
             protected void onOptionsItemSelected(final TxtReaderActivity activity, Intent intent, Bundle bundle) {
                 activity.pasteFromClipboard();
@@ -1566,7 +1587,7 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
 
         @Override
         public void setFileName(String title) {
-            fileName.delete(0, fileName.length());
+            fileName.setLength(0);
             fileName.append(title);
         }
 

@@ -30,9 +30,11 @@ import com.example.englishtester.MobiReaderMobiActivity;
 import com.example.englishtester.R;
 import com.example.englishtester.RecentTxtMarkDAO;
 import com.example.englishtester.RecentTxtMarkService;
+import com.example.englishtester.ReciteMainActivity;
 import com.example.englishtester.ShowWordListActivity;
 import com.example.englishtester.common.interf.ITxtReaderActivity;
 import com.example.englishtester.common.interf.ITxtReaderActivityDTO;
+import com.example.englishtester.common.interf.ITxtReaderFileName;
 import com.example.englishtester.common.mobi.base.MobiViewerMainHandler;
 
 import org.apache.commons.collections.map.LRUMap;
@@ -645,21 +647,21 @@ public class ReaderCommonHelper {
         RecentTxtMarkService recentTxtMarkService;
         EnglishwordInfoDAO mEnglishwordInfoDAO;
         Activity activity;
-        ITxtReaderActivity mITxtReaderActivity;
+        ITxtReaderFileName mITxtReaderFileName;
 
-        public BookmarkShowWordListHandler(Context context, ITxtReaderActivity mITxtReaderActivity, Activity activity) {
+        public BookmarkShowWordListHandler(Context context, ITxtReaderFileName mITxtReaderFileName, Activity activity) {
             recentTxtMarkService = new RecentTxtMarkService(context);
             mEnglishwordInfoDAO = new EnglishwordInfoDAO(context);
-            this.mITxtReaderActivity = mITxtReaderActivity;
+            this.mITxtReaderFileName = mITxtReaderFileName;
             this.activity = activity;
         }
 
-        public void showMenu( boolean isSinglePage) {
+        public void showMenu(boolean isSinglePage) {
             List<RecentTxtMarkDAO.RecentTxtMark> qList = Collections.emptyList();
             if (isSinglePage) {
-                qList = recentTxtMarkService.getFileMark(mITxtReaderActivity.getDtoFileName());//
+                qList = recentTxtMarkService.getFileMark(mITxtReaderFileName.getDtoFileName());//
             } else {
-                qList = recentTxtMarkService.getFileMarkLike(mITxtReaderActivity.getFileName());//
+                qList = recentTxtMarkService.getFileMarkLike(mITxtReaderFileName.getFileName());//
             }
             Map<String, EnglishwordInfoDAO.EnglishWord> englishProp = new LinkedHashMap<>();
             for (RecentTxtMarkDAO.RecentTxtMark txt : qList) {
@@ -670,6 +672,23 @@ public class ReaderCommonHelper {
                 }
             }
             ShowWordListActivity.startShowWordListActivitiy(englishProp, 9988, activity);
+        }
+
+        public void showQuestions(boolean isSinglePage) {
+            List<RecentTxtMarkDAO.RecentTxtMark> qList = Collections.emptyList();
+            if (isSinglePage) {
+                qList = recentTxtMarkService.getFileMark(mITxtReaderFileName.getDtoFileName());//
+            } else {
+                qList = recentTxtMarkService.getFileMarkLike(mITxtReaderFileName.getFileName());//
+            }
+            List<String> wordLst = new ArrayList<>();
+            for (RecentTxtMarkDAO.RecentTxtMark txt : qList) {
+                String word = txt.getMarkEnglish();
+                if (StringUtils.isNotBlank(word)) {
+                    wordLst.add(word);
+                }
+            }
+            ReciteMainActivity.startReciteMainActivity(wordLst, 9987, activity);
         }
     }
 
