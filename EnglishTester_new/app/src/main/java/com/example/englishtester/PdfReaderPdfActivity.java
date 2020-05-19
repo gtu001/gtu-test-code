@@ -1053,14 +1053,14 @@ public class PdfReaderPdfActivity extends FragmentActivity implements FloatViewS
     static int MENU_FIRST = Menu.FIRST;
 
     enum TaskInfo {
-        BOOKMARK_SHOWWORD_LIST("單字清單", MENU_FIRST++, REQUEST_CODE++, null) {
-            protected void onActivityResult(PdfReaderPdfActivity activity, Intent intent, Bundle bundle) {
-            }
-
-            protected void onOptionsItemSelected(PdfReaderPdfActivity activity, Intent intent, Bundle bundle) {
-                activity.mBookmarkShowWordListHandler.showMenu(false);//activity.epubViewerMainHandler.getDto().getFileName().toString()
-            }
-        }, //
+//        BOOKMARK_SHOWWORD_LIST("單字清單", MENU_FIRST++, REQUEST_CODE++, null) {
+//            protected void onActivityResult(PdfReaderPdfActivity activity, Intent intent, Bundle bundle) {
+//            }
+//
+//            protected void onOptionsItemSelected(PdfReaderPdfActivity activity, Intent intent, Bundle bundle) {
+//                activity.mBookmarkShowWordListHandler.showMenu(false);//activity.epubViewerMainHandler.getDto().getFileName().toString()
+//            }
+//        }, //
         BOOKMARK_SHOWWORD_LIST2("單字測驗", MENU_FIRST++, REQUEST_CODE++, null) {
             protected void onActivityResult(PdfReaderPdfActivity activity, Intent intent, Bundle bundle) {
             }

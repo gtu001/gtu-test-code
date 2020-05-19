@@ -1287,14 +1287,14 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
     static int MENU_FIRST = Menu.FIRST;
 
     enum TaskInfo {
-        BOOKMARK_SHOWWORD_LIST("單字清單", MENU_FIRST++, REQUEST_CODE++, null) {
-            protected void onActivityResult(TxtReaderActivity activity, Intent intent, Bundle bundle) {
-            }
-
-            protected void onOptionsItemSelected(TxtReaderActivity activity, Intent intent, Bundle bundle) {
-                activity.mBookmarkShowWordListHandler.showMenu(false);//activity.epubViewerMainHandler.getDto().getFileName().toString()
-            }
-        }, //
+//        BOOKMARK_SHOWWORD_LIST("單字清單", MENU_FIRST++, REQUEST_CODE++, null) {
+//            protected void onActivityResult(TxtReaderActivity activity, Intent intent, Bundle bundle) {
+//            }
+//
+//            protected void onOptionsItemSelected(TxtReaderActivity activity, Intent intent, Bundle bundle) {
+//                activity.mBookmarkShowWordListHandler.showMenu(false);//activity.epubViewerMainHandler.getDto().getFileName().toString()
+//            }
+//        }, //
         BOOKMARK_SHOWWORD_LIST2("單字測驗", MENU_FIRST++, REQUEST_CODE++, null) {
             protected void onActivityResult(TxtReaderActivity activity, Intent intent, Bundle bundle) {
             }
