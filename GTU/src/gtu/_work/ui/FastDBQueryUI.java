@@ -3170,6 +3170,7 @@ public class FastDBQueryUI extends JFrame {
                 });//
 
                 addKeepSelectionOnly(ppap);
+                addSelectionTitle(ppap);
 
                 ppap.addJMenuItem("進行CRUD操作", new ActionListener() {
                     @Override
@@ -3254,6 +3255,45 @@ public class FastDBQueryUI extends JFrame {
                         }
                     }
                     new SelectRowIdxProc().execute(ArrayUtils.toPrimitive(rowLst.toArray(new Integer[0])));
+                }
+            });
+            ppap.addJMenuItem(chdMenu.getMenu());
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    private void addSelectionTitle(JPopupMenuUtil ppap) {
+        try {
+            final int[] selectColIdxArry = JTableUtil.newInstance(queryResultTable).getSelectedColumns(true);
+            JMenuAppender chdMenu = JMenuAppender.newInstance("欄位Column複製");
+
+            chdMenu.addMenuItem("複製欄位逗號隔開", new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    String alias = StringUtils.trimToEmpty(JCommonUtil._jOptionPane_showInputDialog("請輸入alias", ""));
+                    if (StringUtils.isNotBlank(alias)) {
+                        alias = alias + ".";
+                    }
+                    List<Object> colLst = JTableUtil.newInstance(queryResultTable).getColumnTitleArray();
+                    List<String> strLst = new ArrayList<String>();
+                    for (int jj = 0; jj < selectColIdxArry.length; jj++) {
+                        String column = StringUtils.trimToEmpty(String.valueOf(colLst.get(selectColIdxArry[jj])));
+                        strLst.add(alias + column);
+                    }
+                    ClipboardUtil.getInstance().setContents(StringUtils.join(strLst, ", "));
+                }
+            });
+            chdMenu.addMenuItem("複製欄位換行", new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    List<Object> colLst = JTableUtil.newInstance(queryResultTable).getColumnTitleArray();
+                    List<String> strLst = new ArrayList<String>();
+                    for (int jj = 0; jj < selectColIdxArry.length; jj++) {
+                        String column = StringUtils.trimToEmpty(String.valueOf(colLst.get(selectColIdxArry[jj])));
+                        strLst.add(column);
+                    }
+                    ClipboardUtil.getInstance().setContents(StringUtils.join(strLst, "\r\n"));
                 }
             });
             ppap.addJMenuItem(chdMenu.getMenu());
@@ -3787,6 +3827,10 @@ public class FastDBQueryUI extends JFrame {
 
                         @Override
                         public void actionPerformed(ActionEvent e) {
+                            String fromAlias = StringUtils.trimToEmpty(JCommonUtil._jOptionPane_showInputDialog("輸入來源alias", "t"));
+                            if (StringUtils.isNotBlank(fromAlias)) {
+                                fromAlias = fromAlias + ".";
+                            }
                             String selection = sqlTextArea.getSelectedText();
                             if (StringUtils.isBlank(selection)) {
                                 return;
@@ -3794,13 +3838,19 @@ public class FastDBQueryUI extends JFrame {
                             StringBuilder sb = new StringBuilder();
                             Pattern ptn = Pattern.compile("[\\w+\\.]+");
                             Matcher mth = ptn.matcher(selection);
+                            boolean findFirst = true;
+                            String alais = getRandomAlias();
+                            List<String> condLst = new ArrayList<String>();
                             while (mth.find()) {
                                 String cond = mth.group();
-                                String alais = getRandomAlias();
-                                sb.append("\t  left join " + cond + " " + alais + " on "+ alais + ".XXXXXXXX = t.XXXXXXXX "//
-                                        + " and "+ alais + ".YYYYYYYY = t.YYYYYYYY "//
-                                        + " \r\n");//
+                                if (findFirst) {
+                                    findFirst = false;
+                                    sb.append("\t  left join " + cond + " " + alais + " on ");//
+                                } else {
+                                    condLst.add(" " + alais + "." + cond + " = " + fromAlias + cond);//
+                                }
                             }
+                            sb.append(StringUtils.join(condLst, " and ") + "\r\n");
                             String prefix = StringUtils.substring(sqlTextArea.getText(), 0, sqlTextArea.getSelectionStart());
                             String suffix = StringUtils.substring(sqlTextArea.getText(), sqlTextArea.getSelectionEnd());
                             sqlTextArea.setText(prefix + sb + suffix);
@@ -3839,6 +3889,40 @@ public class FastDBQueryUI extends JFrame {
                                 String cond = mth.group();
                                 sb.append("\t [  and ").append(cond).append(" = :").append(cond).append("  ] \r\n");
                             }
+                            String prefix = StringUtils.substring(sqlTextArea.getText(), 0, sqlTextArea.getSelectionStart());
+                            String suffix = StringUtils.substring(sqlTextArea.getText(), sqlTextArea.getSelectionEnd());
+                            sqlTextArea.setText(prefix + sb + suffix);
+                        }
+                    })//
+                    .addJMenuItem("SQL 基礎 where [加]", new ActionListener() {
+                        Pattern ptn = Pattern.compile("[\\w+\\.]+");
+
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            String text = StringUtils.trimToEmpty(JCommonUtil._jOptionPane_showInputDialog("輸入alias", "t a"));
+                            Matcher mth = ptn.matcher(text);
+                            String fromAlias = "";
+                            String toAlias = "";
+                            while (mth.find()) {
+                                if (StringUtils.isBlank(fromAlias)) {
+                                    fromAlias = mth.group();
+                                } else {
+                                    toAlias = mth.group();
+                                }
+                            }
+
+                            String selection = sqlTextArea.getSelectedText();
+                            if (StringUtils.isBlank(selection)) {
+                                return;
+                            }
+                            StringBuilder sb = new StringBuilder();
+                            mth = ptn.matcher(selection);
+                            List<String> condLst = new ArrayList<String>();
+                            while (mth.find()) {
+                                String cond = mth.group();
+                                condLst.add(" " + fromAlias + "." + cond + " = " + toAlias + "." + cond);//
+                            }
+                            sb.append(StringUtils.join(condLst, " and ") + "\r\n");
                             String prefix = StringUtils.substring(sqlTextArea.getText(), 0, sqlTextArea.getSelectionStart());
                             String suffix = StringUtils.substring(sqlTextArea.getText(), sqlTextArea.getSelectionEnd());
                             sqlTextArea.setText(prefix + sb + suffix);

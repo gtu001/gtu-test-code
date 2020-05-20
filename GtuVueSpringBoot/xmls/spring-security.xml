@@ -1,0 +1,27 @@
+<beans:beans xmlns="http://www.springframework.org/schema/security"
+	xmlns:beans="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans    
+		http://www.springframework.org/schema/beans/spring-beans.xsd    
+		http://www.springframework.org/schema/security    
+		http://www.springframework.org/schema/security/spring-security.xsd">
+
+	<!-- Enable Use-Expressions -->
+	<http auto-config="true" use-expressions="true">
+		<intercept-url pattern="/admin**" access="hasRole('ROLE_ADMIN')" />
+		<intercept-url pattern="/user**" access="hasRole('ROLE_USER')" />
+
+		<!-- Access Denied Page -->
+		<access-denied-handler error-page="/403" />
+		<form-login login-page="/login" authentication-failure-url="/login?error"
+			username-parameter="username" password-parameter="password" />
+		<logout logout-success-url="/login?logout" />
+		<!-- Enable Csrf Protection -->
+		<csrf />
+	</http>
+
+	<authentication-manager>
+		<authentication-provider user-service-ref="loginService" />
+	</authentication-manager>
+
+</beans:beans>  

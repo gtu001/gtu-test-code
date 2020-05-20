@@ -1,0 +1,27 @@
+.navbutton{
+    margin-left: 100px
+ }
+
+ #wrapper {
+      display: -webkit-box;
+      display: -ms-flexbox;
+      display: flex;
+}
+
+#wrapper #content-wrapper {
+      overflow-x: hidden;
+     width: 100%;
+      padding-top: 1rem;
+      padding-bottom: 80px;
+}
+
+.sidebar {
+     width: 200px !important;
+      background-color: #ccc4c4;
+      min-height: calc(100vh - 56px);
+}
+
+.navcolor{
+    background-color: red;
+    height: 100px;
+}

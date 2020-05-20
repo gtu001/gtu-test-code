@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns="http://www.springframework.org/schema/beans"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+  		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+  		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+  		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+  		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+		
+	<context:component-scan base-package="com.staffchannel" />
+	<mvc:resources mapping="/static/**" location="/static/" />
+	<mvc:annotation-driven />
+
+	<context:property-placeholder location="classpath:database.properties" />
+	<tx:annotation-driven transaction-manager="transactionManager"/>
+
+	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName" value="${database.driver}" />
+		<property name="url" value="${database.url}" />
+		<property name="username" value="${database.user}" />
+		<property name="password" value="${database.password}" />    
+	</bean> 
+
+	<bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="packagesToScan" value="com.staffchannel.model" />
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">${hibernate.dialect}</prop>
+				<prop key="hibernate.show_sql">${hibernate.show_sql}</prop>
+				<prop key="hibernate.format_sql">${hibernate.format_sql}</prop>
+			</props>
+		</property>
+	</bean>
+	
+	<bean id="transactionManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+	
+	<mvc:interceptors>
+		<mvc:interceptor>
+			<mvc:mapping path="/*" />
+			<mvc:exclude-mapping path="/static/**" />
+			<mvc:exclude-mapping path="/login" />
+			<mvc:exclude-mapping path="/logout" />
+	    	<bean id="WebInterceptor" class="com.staffchannel.interceptor.WebInterceptor"/>
+    	</mvc:interceptor>
+	</mvc:interceptors>
+
+	<aop:aspectj-autoproxy proxy-target-class="true" />
+	<bean id="AuditAspect" class="com.staffchannel.aspect.AuditAspect"/>
+	
+	<bean class="com.staffchannel.security.SecurityAuthenticationSuccessHandler"/> 
+	
+	<bean id="conversionService" class="org.springframework.context.support.ConversionServiceFactoryBean">
+	    <property name="converters">
+	        <list>
+	            <bean id="RoleToUserProfileConverter" class="com.staffchannel.converter.RoleToUserProfileConverter" />
+	       	</list>
+	   	</property>
+	</bean>
+	
+</beans>
