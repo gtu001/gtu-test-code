@@ -83,6 +83,8 @@
 			<packagename mode="small">com.sun.jna.platform.FileUtils</packagename>
 			<packagename mode="small">org.apache.commons.beanutils.ConvertUtils</packagename>
 
+			<packagename mode="small">org.apache.commons.io.FileUtils</packagename>
+			
 			<packagename mode="small" name="jcc-bate-0.7.3.jar">taobe.tec.jcc.JChineseConvertor</packagename>
 
 		</jarfinder>

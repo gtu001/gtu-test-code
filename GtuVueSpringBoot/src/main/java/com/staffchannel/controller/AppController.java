@@ -39,266 +39,318 @@ import com.staffchannel.service.UserService;
 @SessionAttributes("roles")
 public class AppController {
 
-	@Autowired
-	UserService userService;
-	
-	@Autowired
-	UserProfileService userProfileService;
-	
-	@Autowired
-	MenuService menuService;
-	
-	@Autowired
-	MessageSource messageSource;
+    @Autowired
+    UserService userService;
 
-	@Autowired
-	PersistentTokenBasedRememberMeServices persistentTokenBasedRememberMeServices;
-	
-	@Autowired
-	AuthenticationTrustResolver authenticationTrustResolver;
-	
-	@Autowired
-	CaseService caseService;
+    @Autowired
+    UserProfileService userProfileService;
 
-	@ModelAttribute("roles")
-	public List<UserProfile> initializeProfiles() {
-		return userProfileService.findAll();
-	}
-	
-	/**
-	 * 待審核案件
-	 */
-	@RequestMapping(value = "/reviewCase", method = RequestMethod.GET)
-	public String reviewCase(HttpServletRequest request, HttpServletResponse response) {
-		System.out.println("待審核案件");
-		return "reviewCase/ReviewCase";
-	}
-	
-	/**
-	 * 資料審核
-	 */
-	@RequestMapping(value = "/gotoDataReview", method = RequestMethod.GET)
-	public String gotoDataReview(HttpServletRequest request, HttpServletResponse response) {
-		System.out.println("資料審核");
-		return "reviewCase/DataReview";
-	}
-	
-	
-	/**
-	 * 登入頁面 如果以登入會導到首頁
-	 */
-	@RequestMapping(value = "/login", method = RequestMethod.GET)
-	public String loginPage() {
-		if (isCurrentAuthenticationAnonymous()) {
-			return "login";
-		} else {
-			return "redirect:/mainPage";
-		}
-	}
+    @Autowired
+    MenuService menuService;
 
-	/**
-	 * 登出
-	 */
-	@RequestMapping(value = "/logout", method = RequestMethod.GET)
-	public String logoutPage(HttpServletRequest request, HttpServletResponse response) {
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		if (auth != null) {
-			// new SecurityContextLogoutHandler().logout(request, response, auth);
-			persistentTokenBasedRememberMeServices.logout(request, response, auth);
-			SecurityContextHolder.getContext().setAuthentication(null);
-		}
-		return "redirect:/login?logout";
-	}
+    @Autowired
+    MessageSource messageSource;
 
-	/*
-	 * 首頁
-	 */
-	@RequestMapping(value = { "/", "/main" }, method = RequestMethod.GET)
-	public String mainPage(ModelMap model) {
-		return "mainPage";
-	}
+    @Autowired
+    PersistentTokenBasedRememberMeServices persistentTokenBasedRememberMeServices;
 
-	/*
-	 * 管理使用者列表
-	 */
-	@RequestMapping(value = { "/admin/usersList" }, method = RequestMethod.GET)
-	public String listUsers(ModelMap model) {
-		List<User> users = userService.findAllUsers();
-		model.addAttribute("users", users);
-		return "user/usersList";
-	}
+    @Autowired
+    AuthenticationTrustResolver authenticationTrustResolver;
 
-	/*
-	 * 新增使用者GET
-	 */
-	@RequestMapping(value = { "/admin/newUser" }, method = RequestMethod.GET)
-	public String newUser(ModelMap model) {
-		User user = new User();
-		model.addAttribute("user", user);
-		model.addAttribute("edit", false);
-		return "user/registration";
-	}
+    @Autowired
+    CaseService caseService;
 
-	/**
-	 * 新增使用者POST
-	 */
-	@RequestMapping(value = { "/admin/newUser" }, method = RequestMethod.POST)
-	public String saveUser(@Valid User user, BindingResult result, ModelMap model) {
+    @ModelAttribute("roles")
+    public List<UserProfile> initializeProfiles() {
+        return userProfileService.findAll();
+    }
 
-		if (result.hasErrors()) {
-			return "user/registration";
-		}
+    /**
+     * 待審核案件
+     */
+    @RequestMapping(value = "/reviewCase", method = RequestMethod.GET)
+    public String reviewCase(HttpServletRequest request, HttpServletResponse response) {
+        System.out.println("待審核案件");
+        return "reviewCase/ReviewCase";
+    }
 
-		// 檢查是否unique
-		if (!userService.isUserSSOUnique(user.getId(), user.getSsoId())) {
-			FieldError ssoError = new FieldError("user", "ssoId", messageSource.getMessage("non.unique.ssoId", new String[] { user.getSsoId() }, Locale.getDefault()));
-			result.addError(ssoError);
-			return "user/registration";
-		}
+    /**
+     * 資料審核
+     */
+    @RequestMapping(value = "/gotoDataReview", method = RequestMethod.GET)
+    public String gotoDataReview(HttpServletRequest request, HttpServletResponse response) {
+        System.out.println("資料審核");
+        return "reviewCase/DataReview";
+    }
 
-		userService.saveUser(user);
+    /**
+     * 登入頁面 如果以登入會導到首頁
+     */
+    @RequestMapping(value = "/login", method = RequestMethod.GET)
+    public String loginPage() {
+        if (isCurrentAuthenticationAnonymous()) {
+            return "login";
+        } else {
+            return "redirect:/mainPage";
+        }
+    }
 
-		model.addAttribute("success", "使用者 " + user.getName() + " 新增成功!");
-		// return "success";
-		return "user/registrationsuccess";
-	}
+    /**
+     * 登出
+     */
+    @RequestMapping(value = "/logout", method = RequestMethod.GET)
+    public String logoutPage(HttpServletRequest request, HttpServletResponse response) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null) {
+            // new SecurityContextLogoutHandler().logout(request, response,
+            // auth);
+            persistentTokenBasedRememberMeServices.logout(request, response, auth);
+            SecurityContextHolder.getContext().setAuthentication(null);
+        }
+        return "redirect:/login?logout";
+    }
 
-	/**
-	 * 修改使用者GET
-	 */
-	@RequestMapping(value = { "/edit-user-{ssoId}" }, method = RequestMethod.GET)
-	public String editUser(@PathVariable String ssoId, ModelMap model) {
-		
-		if (!ssoId.equals(getUserSSO())) {
-			if (!isAdmin()) {
-				return "accessDenied";
-			}
-		}
-		
-		User user = userService.findBySSO(ssoId);
-		model.addAttribute("user", user);
-		model.addAttribute("edit", true);
-		return "user/registration";
-	}
+    /*
+     * 首頁
+     */
+    @RequestMapping(value = { "/", "/main" }, method = RequestMethod.GET)
+    public String mainPage(ModelMap model) {
+        return "mainPage";
+    }
 
-	/**
-	 * 修改使用者POST
-	 */
-	@RequestMapping(value = { "/edit-user-{ssoId}" }, method = RequestMethod.POST)
-	public String updateUser(@Valid User user, BindingResult result, ModelMap model, @PathVariable String ssoId) {
+    // 使用者 ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+    // 使用者 ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
+    // 使用者 ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+    // 使用者 ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
+    // 使用者 ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+    // 使用者 ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
+    // 使用者 ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+    // 使用者 ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
+    // 使用者 ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+    // 使用者 ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
+    // 使用者 ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+    // 使用者 ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
 
-		if (!ssoId.equals(getUserSSO())) {
-			if (!isAdmin()) {
-				return "accessDenied";
-			}
-		}
-		
-		if (result.hasErrors()) {
-			return "user/registration";
-		}
+    // 使用者 ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+    /*
+     * 管理使用者列表
+     */
+    @RequestMapping(value = { "/admin/usersList" }, method = RequestMethod.GET)
+    public String listUsers(ModelMap model) {
+        List<User> users = userService.findAllUsers();
+        model.addAttribute("users", users);
+        return "user/usersList";
+    }
 
-		// 檢查是否unique
-		if (!userService.isUserSSOUnique(user.getId(), user.getSsoId())) {
-			FieldError ssoError = new FieldError("user", "ssoId", messageSource.getMessage("non.unique.ssoId", new String[] { user.getSsoId() }, Locale.getDefault()));
-			result.addError(ssoError);
-			return "user/registration";
-		}
+    /*
+     * 新增使用者GET
+     */
+    @RequestMapping(value = { "/admin/newUser" }, method = RequestMethod.GET)
+    public String newUser(ModelMap model) {
+        User user = new User();
+        model.addAttribute("user", user);
+        model.addAttribute("edit", false);
+        return "user/registration";
+    }
 
-		userService.updateUser(user);
+    /**
+     * 新增使用者POST
+     */
+    @RequestMapping(value = { "/admin/newUser" }, method = RequestMethod.POST)
+    public String saveUser(@Valid User user, BindingResult result, ModelMap model) {
 
-		model.addAttribute("success", "使用者 " + user.getName() + " 更新成功!");
-		return "user/registrationsuccess";
-	}
+        if (result.hasErrors()) {
+            return "user/registration";
+        }
 
-	/**
-	 * 刪除使用者
-	 */
-	@RequestMapping(value = { "/admin/delete-user-{ssoId}" }, method = RequestMethod.GET)
-	public String deleteUser(@PathVariable String ssoId) {
-		userService.deleteUserBySSO(ssoId);
-		return "redirect:/admin/usersList";
-	}
-	
-	
-	
-	
-	
-	/**
-	 * This method handles Access-Denied redirect.
-	 */
-	@RequestMapping(value = "/Access_Denied", method = RequestMethod.GET)
-	public String accessDeniedPage(ModelMap model) {
-		return "accessDenied";
-	}
+        // 檢查是否unique
+        if (!userService.isUserSSOUnique(user.getId(), user.getSsoId())) {
+            FieldError ssoError = new FieldError("user", "ssoId", messageSource.getMessage("non.unique.ssoId", new String[] { user.getSsoId() }, Locale.getDefault()));
+            result.addError(ssoError);
+            return "user/registration";
+        }
 
-	@RequestMapping(value="/managerEditMenu", method = RequestMethod.GET)
-	public String managerEditMenu(ModelMap model) {
-		List<Menu> menuexisting =  menuService.findAllMenus();
-		model.addAttribute("menuexisting", menuexisting);
-		return "ManagerEditMenu";
-	}
-	
-	@RequestMapping(value="/menulist", method = RequestMethod.GET)
-	public String menulist(ModelMap model) {
-		List<Menu> menuexisting =  menuService.findAllMenus();
-		model.addAttribute("menuexisting", menuexisting);
-		return "menulist";
-	}
-	
-	@RequestMapping(value="/testProfileMenu", method = RequestMethod.GET)
-	public String testProfileMenu(ModelMap model) {
-		Menu mm = menuService.findById(1);
-		UserProfile sss = userProfileService.findById(1);
+        userService.saveUser(user);
 
-		sss.getMenuList().add(mm);
-		mm.getUserProfile().add(sss);
-		
-		userProfileService.save(sss);
+        model.addAttribute("success", "使用者 " + user.getName() + " 新增成功!");
+        // return "success";
+        return "user/registrationsuccess";
+    }
 
-		return "Menulist";
-	}
-	
-	@RequestMapping(value="/edit-user-menu-{id}", method = RequestMethod.GET)
-	public String listedit(@PathVariable Integer id, ModelMap model) {
-		Menu menu = menuService.findById(id);
-		model.addAttribute("menu", menu);
-		model.addAttribute("edit", true);
-		return "EditMenu";
-	}
-	
-	@RequestMapping(value = { "/createmenu" }, method = RequestMethod.GET)
-	public String newmenu(ModelMap model) {
-		return "CreateMenu";
-	}
+    /**
+     * 修改使用者GET
+     */
+    @RequestMapping(value = { "/edit-user-{ssoId}" }, method = RequestMethod.GET)
+    public String editUser(@PathVariable String ssoId, ModelMap model) {
 
-	private boolean isCurrentAuthenticationAnonymous() {
-	    final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-	    return authenticationTrustResolver.isAnonymous(authentication);
-	}
+        if (!ssoId.equals(getUserSSO())) {
+            if (!isAdmin()) {
+                return "accessDenied";
+            }
+        }
 
-	private String getUserSSO() {
-		String userSSO = null;
-		Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = userService.findBySSO(ssoId);
+        model.addAttribute("user", user);
+        model.addAttribute("edit", true);
+        return "user/registration";
+    }
 
-		if (principal instanceof UserDetails) {
-			userSSO = ((UserDetails) principal).getUsername();
-		} else {
-			userSSO = principal.toString();
-		}
-		return userSSO;
-	}
-	
-	private boolean isAdmin() {
-		boolean isAdmin = false;
-		Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
-		for (GrantedAuthority grantedAuthority : authorities){
-	        if (grantedAuthority.getAuthority().equals("ROLE_ADMIN")) {
-	        	isAdmin = true;
-	            break;
-	        }
-	    }
-		return isAdmin;
-	}
-	
+    /**
+     * 修改使用者POST
+     */
+    @RequestMapping(value = { "/edit-user-{ssoId}" }, method = RequestMethod.POST)
+    public String updateUser(@Valid User user, BindingResult result, ModelMap model, @PathVariable String ssoId) {
+
+        if (!ssoId.equals(getUserSSO())) {
+            if (!isAdmin()) {
+                return "accessDenied";
+            }
+        }
+
+        if (result.hasErrors()) {
+            return "user/registration";
+        }
+
+        // 檢查是否unique
+        if (!userService.isUserSSOUnique(user.getId(), user.getSsoId())) {
+            FieldError ssoError = new FieldError("user", "ssoId", messageSource.getMessage("non.unique.ssoId", new String[] { user.getSsoId() }, Locale.getDefault()));
+            result.addError(ssoError);
+            return "user/registration";
+        }
+
+        userService.updateUser(user);
+
+        model.addAttribute("success", "使用者 " + user.getName() + " 更新成功!");
+        return "user/registrationsuccess";
+    }
+
+    /**
+     * 刪除使用者
+     */
+    @RequestMapping(value = { "/admin/delete-user-{ssoId}" }, method = RequestMethod.GET)
+    public String deleteUser(@PathVariable String ssoId) {
+        userService.deleteUserBySSO(ssoId);
+        return "redirect:/admin/usersList";
+    }
+    // 使用者 ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
+
+    // 菜單 ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+
+    @RequestMapping(value = "/menulist", method = RequestMethod.GET)
+    public String menulist(ModelMap model) {
+        List<Menu> menuexisting = menuService.findAllMenus();
+        model.addAttribute("menuexisting", menuexisting);
+        return "menu/Menulist";
+    }
+
+    @RequestMapping(value = "/edit-user-menu-{id}", method = RequestMethod.GET)
+    public String listedit(@PathVariable Integer id, ModelMap model) {
+        Menu menu = menuService.findById(id);
+        model.addAttribute("menu", menu);
+        model.addAttribute("edit", true);
+        return "menu/EditMenu";
+    }
+
+    @RequestMapping(value = { "/newMenu" }, method = RequestMethod.GET)
+    public String newMenu(ModelMap model) {
+        Menu menu = new Menu();
+        model.addAttribute("menu", menu);
+        model.addAttribute("edit", false);
+        return "menu/EditMenu";
+    }
+
+    @RequestMapping(value = "/delete-user-menu-{id}", method = RequestMethod.GET)
+    public String deleteMenu(@PathVariable String id) {
+        menuService.delete(Integer.parseInt(id));
+        return "redirect:/menulist";
+    }
+
+    @RequestMapping(value = "/managerEditMenu", method = RequestMethod.GET)
+    public String managerEditMenu(ModelMap model) {
+        List<Menu> menuexisting = menuService.findAllMenus();
+        model.addAttribute("menuexisting", menuexisting);
+        return "ManagerEditMenu";
+    }
+
+    @RequestMapping(value = "/testProfileMenu", method = RequestMethod.GET)
+    public String testProfileMenu(ModelMap model) {
+        Menu mm = menuService.findById(1);
+        UserProfile sss = userProfileService.findById(1);
+
+        sss.getMenuList().add(mm);
+        mm.getUserProfile().add(sss);
+
+        userProfileService.save(sss);
+
+        return "Menulist";
+    }
+    
+
+    /**
+     * 修改使用者POST
+     */
+    @RequestMapping(value = { "/newMenu" }, method = { RequestMethod.POST})
+    public String saveMenu(@Valid Menu menu, BindingResult result, ModelMap model) {
+//        if (!ssoId.equals(getUserSSO())) {
+//            if (!isAdmin()) {
+//                return "accessDenied";
+//            }
+//        }
+//
+//        if (result.hasErrors()) {
+//            return "user/registration";
+//        }
+//
+//        // 檢查是否unique
+//        if (!userService.isUserSSOUnique(user.getId(), user.getSsoId())) {
+//            FieldError ssoError = new FieldError("user", "ssoId", messageSource.getMessage("non.unique.ssoId", new String[] { user.getSsoId() }, Locale.getDefault()));
+//            result.addError(ssoError);
+//            return "user/registration";
+//        }
+
+        menuService.save(menu);
+        
+        model.addAttribute("success", "清單 :  " + menu.getMenuName() + " 更新成功!");
+        return "menu/menuSaveSuccess";
+    }
+    
+    // 菜單 ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
+
+    /**
+     * This method handles Access-Denied redirect.
+     */
+    @RequestMapping(value = "/Access_Denied", method = RequestMethod.GET)
+    public String accessDeniedPage(ModelMap model) {
+        return "accessDenied";
+    }
+
+    private boolean isCurrentAuthenticationAnonymous() {
+        final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return authenticationTrustResolver.isAnonymous(authentication);
+    }
+
+    private String getUserSSO() {
+        String userSSO = null;
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        if (principal instanceof UserDetails) {
+            userSSO = ((UserDetails) principal).getUsername();
+        } else {
+            userSSO = principal.toString();
+        }
+        return userSSO;
+    }
+
+    private boolean isAdmin() {
+        boolean isAdmin = false;
+        Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+        for (GrantedAuthority grantedAuthority : authorities) {
+            if (grantedAuthority.getAuthority().equals("ROLE_ADMIN")) {
+                isAdmin = true;
+                break;
+            }
+        }
+        return isAdmin;
+    }
 
 }

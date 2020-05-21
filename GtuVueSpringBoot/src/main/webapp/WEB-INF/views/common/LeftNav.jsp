@@ -14,7 +14,7 @@
 	<!-- Sidebar Holder -->
 	<nav id="sidebar">
 		<div class="sidebar-header">
-			<img src="<%=request.getContextPath()%>/static/jpg/logo_tw.png">
+			<img src="<%=request.getContextPath()%>/static/jpg/logo_tw.png" width="100%">
 			<ul class="list-unstyled components">
 				<li>
 	            	<a href="<c:url value='/main' />">首頁</a>

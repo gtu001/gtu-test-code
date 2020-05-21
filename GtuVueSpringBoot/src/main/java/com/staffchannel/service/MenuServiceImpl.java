@@ -82,5 +82,4 @@ public class MenuServiceImpl implements MenuService{
 			entity.setMenuUrl(menu.getMenuUrl());
 		}
 	}	
-	
 }

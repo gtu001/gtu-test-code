@@ -1489,12 +1489,6 @@ public class FastDBQueryUI extends JFrame {
         columnXlsDefTableQryText = new JTextField();
         panel_29.add(columnXlsDefTableQryText);
         columnXlsDefTableQryText.setColumns(20);
-        columnXlsDefTableQryText.getDocument().addDocumentListener(JCommonUtil.getDocumentListener(new HandleDocumentEvent() {
-            @Override
-            public void process(DocumentEvent event) {
-                initColumnXlsDefTableColumnQryTable();
-            }
-        }));
 
         label_2 = new JLabel("欄位");
         panel_29.add(label_2);
@@ -1502,12 +1496,6 @@ public class FastDBQueryUI extends JFrame {
         columnXlsDefColumnQryText = new JTextField();
         columnXlsDefColumnQryText.setColumns(20);
         panel_29.add(columnXlsDefColumnQryText);
-        columnXlsDefColumnQryText.getDocument().addDocumentListener(JCommonUtil.getDocumentListener(new HandleDocumentEvent() {
-            @Override
-            public void process(DocumentEvent event) {
-                initColumnXlsDefTableColumnQryTable();
-            }
-        }));
 
         lblNewLabel_19 = new JLabel("其他");
         panel_29.add(lblNewLabel_19);
@@ -1515,19 +1503,29 @@ public class FastDBQueryUI extends JFrame {
         columnXlsDefOtherQryText = new JTextField();
         columnXlsDefOtherQryText.setColumns(20);
         panel_29.add(columnXlsDefOtherQryText);
-        columnXlsDefOtherQryText.getDocument().addDocumentListener(JCommonUtil.getDocumentListener(new HandleDocumentEvent() {
-            @Override
-            public void process(DocumentEvent event) {
-                // initColumnXlsDefTableColumnQryTable();
-            }
-        }));
 
-        columnXlsDefOtherQryText.addFocusListener(new FocusAdapter() {
-            @Override
-            public void focusLost(FocusEvent e) {
-                initColumnXlsDefTableColumnQryTable();
-            }
-        });
+        for (final JTextField textField : new JTextField[] { columnXlsDefTableQryText, columnXlsDefColumnQryText, columnXlsDefOtherQryText }) {
+            textField.getDocument().addDocumentListener(JCommonUtil.getDocumentListener(new HandleDocumentEvent() {
+                @Override
+                public void process(DocumentEvent event) {
+                    if (columnXlsDefTableQryText == textField) {
+                        initColumnXlsDefTableColumnQryTable();
+                    }
+                }
+            }));
+            textField.addFocusListener(new FocusAdapter() {
+                @Override
+                public void focusLost(FocusEvent e) {
+                    initColumnXlsDefTableColumnQryTable();
+                }
+            });
+            textField.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    initColumnXlsDefTableColumnQryTable();
+                }
+            });
+        }
 
         panel_30 = new JPanel();
         panel_28.add(panel_30, BorderLayout.WEST);

@@ -12,7 +12,7 @@
             <div class="mx-auto mt-5 row">
                 <div class="col-md-4 offset-md-4">
                     <div class="account-wall">
-                        <img class="profile-img" src="<c:url value='/static/jpg/test.gif' />" style='height: 100%; width: 100%; object-fit: contain'>
+                        <img class="profile-img" src="<c:url value='/static/jpg/test.png' />" style='height: 100%; width: 100%; object-fit: contain'>
                         <form action="${loginUrl}" method="post" class="form-signin">
                         	<c:if test="${param.error != null}">
 								<div class="alert alert-danger">

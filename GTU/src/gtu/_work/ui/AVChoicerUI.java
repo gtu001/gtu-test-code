@@ -13,6 +13,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -565,6 +566,22 @@ public class AVChoicerUI extends JFrame {
         JPanel panel_24 = new JPanel();
         panel_23.add(panel_24, BorderLayout.NORTH);
 
+        JLabel lblNewLabel_5 = new JLabel("目的地");
+        panel_24.add(lblNewLabel_5);
+
+        readyMoveToDirText = new JTextField();
+        JCommonUtil.jTextFieldSetFilePathMouseEvent(readyMoveToDirText, true);
+        panel_24.add(readyMoveToDirText);
+        readyMoveToDirText.setColumns(20);
+
+        readyMoveBtn = new JButton("開始移動");
+        readyMoveBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                readyMoveBtnAction();
+            }
+        });
+        panel_24.add(readyMoveBtn);
+
         JPanel panel_25 = new JPanel();
         panel_23.add(panel_25, BorderLayout.WEST);
 
@@ -574,15 +591,41 @@ public class AVChoicerUI extends JFrame {
         JPanel panel_27 = new JPanel();
         panel_23.add(panel_27, BorderLayout.SOUTH);
 
-        readyToMoveLst = new JList();
-        readyToMoveLst.setModel(JListUtil.createModel());
-        JCommonUtil.applyDropFiles(readyToMoveLst, new ActionListener() {
+        readyMoveLst = new JList();
+        readyMoveLst.setModel(JListUtil.createModel());
+        JCommonUtil.applyDropFiles(readyMoveLst, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                DefaultListModel model = (DefaultListModel) readyToMoveLst.getModel();
+                DefaultListModel model = (DefaultListModel) readyMoveLst.getModel();
+                List<File> lst = (List<File>) e.getSource();
+                for (File f : lst) {
+                    model.addElement(new MoveFileZ(f));
+                }
             }
         });
-        panel_23.add(JCommonUtil.createScrollComponent(readyToMoveLst), BorderLayout.CENTER);
+        panel_23.add(JCommonUtil.createScrollComponent(readyMoveLst), BorderLayout.CENTER);
+        readyMoveLst.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                JListUtil.newInstance(readyMoveLst).defaultJListKeyPressed(e);
+            }
+        });
+        readyMoveLst.addMouseListener(new MouseAdapter() {
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (JMouseEventUtil.buttonLeftClick(2, e)) {
+                    MoveFileZ file = (MoveFileZ) JListUtil.getLeadSelectionObject(readyMoveLst);
+                    if (file != null) {
+                        File openToFile = file.file;
+                        if (file.moveToFile != null && file.moveToFile.exists()) {
+                            openToFile = file.moveToFile;
+                        }
+                        DesktopUtil.browseFileDirectory(openToFile);
+                    }
+                }
+            }
+        });
 
         JCommonUtil.applyDropFiles(this, new ActionListener() {
             @Override
@@ -1341,7 +1384,9 @@ public class AVChoicerUI extends JFrame {
     }
 
     private DropFileChecker mDropFileChecker = null;
-    private JList readyToMoveLst;
+    private JList readyMoveLst;
+    private JTextField readyMoveToDirText;
+    private JButton readyMoveBtn;
 
     private List<File> dirCheckTextActionPerformed(List<File> fileLst) {
         mDropFileChecker = new DropFileChecker(fileLst);
@@ -1385,6 +1430,77 @@ public class AVChoicerUI extends JFrame {
         }
     }
 
+    private void readyMoveBtnAction() {
+        final DefaultListModel model = (DefaultListModel) readyMoveLst.getModel();
+        File targetDir = JCommonUtil.filePathCheck(readyMoveToDirText.getText(), "移動到目錄為空", true);
+        if (model.getSize() == 0) {
+            return;
+        }
+        readyMoveBtn.setText("移動中");
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                for (int ii = 0; ii < model.getSize(); ii++) {
+                    MoveFileZ file = (MoveFileZ) model.getElementAt(ii);
+                    file.moveStateChs = "移動中...";
+                    file.moveStateColor = "BLUE";
+                    File moveTo = new File(targetDir, file.file.getName());
+                    file.moveToFile = moveTo;
+                    if (!file.file.exists()) {
+                        file.moveStateChs = "NotExists...";
+                        file.moveStateColor = "RED";
+                    } else {
+                        if (file.file.isDirectory()) {
+                            try {
+                                FileUtils.moveDirectory(file.file, moveTo);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                                file.moveStateChs = "Error...";
+                                file.moveStateColor = "RED";
+                            }
+                        } else if (file.file.isFile()) {
+                            try {
+                                FileUtils.moveFile(file.file, moveTo);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                                file.moveStateChs = "Error...";
+                                file.moveStateColor = "RED";
+                            }
+                        }
+                        file.moveStateChs = "Completed...";
+                        file.moveStateColor = "GREEN";
+                    }
+                    readyMoveLst.updateUI();
+                }
+                JCommonUtil._jOptionPane_showMessageDialog_info("全部完成!!");
+                readyMoveBtn.setText("開始移動");
+            }
+        }).start();
+    }
+
+    private static class MoveFileZ extends FileZ {
+        MoveFileZ(File file) {
+            super(file);
+        }
+
+        String moveStateColor = "Blue";
+        String moveStateChs = "";
+        File moveToFile;
+
+        public String toString() {
+            if (moveToFile != null && moveToFile.exists()) {
+                checkColor(moveToFile);
+            } else {
+                checkColor(file);
+            }
+            return String.format("<html>"//
+                    + "<font color='%1$s'>%2$s</font>"//
+                    + "<span style='color : %3$s ; background-color : %4$s;'>%5$s</span>"//
+                    + "</html>", ///
+                    moveStateColor, moveStateChs, "black", bgColor, name);//
+        }
+    }
+
     private static class FileZ {
         private static Pattern movPtn = Pattern.compile(PatternCollection.VIDEO_PATTERN, Pattern.CASE_INSENSITIVE);
         private static Pattern jpgPtn = Pattern.compile(PatternCollection.PICTURE_PATTERN, Pattern.CASE_INSENSITIVE);
@@ -1392,11 +1508,12 @@ public class AVChoicerUI extends JFrame {
         File file;
         String name;
         boolean isMovie = true;
-        
+        String bgColor;
+
         FileZ(File file) {
             this.file = file;
             this.name = file.getName();
-            if(file.isFile()) {
+            if (file.isFile()) {
                 Matcher mth1 = movPtn.matcher(name);
                 Matcher mth2 = jpgPtn.matcher(name);
                 if (mth1.find()) {
@@ -1412,14 +1529,12 @@ public class AVChoicerUI extends JFrame {
             this.isMovie = isMovie;
         }
 
-        @Override
-        public String toString() {
-            String bgColor = "write";
-            String fontColor = "black";
+        protected void checkColor(File file) {
+            bgColor = "write";
             Matcher mth1 = movPtn.matcher(name);
             Matcher mth2 = jpgPtn.matcher(name);
             if (file.isDirectory()) {
-                bgColor = "#112233";
+                bgColor = "#00b0f9";
             } else {
                 if (mth1.find()) {
                     bgColor = "#cce8cf";
@@ -1427,6 +1542,12 @@ public class AVChoicerUI extends JFrame {
                     bgColor = "yellow";
                 }
             }
+        }
+
+        @Override
+        public String toString() {
+            String fontColor = "black";
+            checkColor(file);
             return String.format("<html><span style='color : %s ; background-color : %s;'>%s</span></html>", fontColor, bgColor, name);
         }
     }
