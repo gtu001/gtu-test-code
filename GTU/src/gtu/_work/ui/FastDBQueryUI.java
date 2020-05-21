@@ -1079,14 +1079,14 @@ public class FastDBQueryUI extends JFrame {
         tableColumnDefText_Auto.getTextComponent().addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
-                mTableColumnDefTextHandler.action();
+                mTableColumnDefTextHandler.action(false);
             }
         });
 
         tableColumnDefText.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                mTableColumnDefTextHandler.action();
+                mTableColumnDefTextHandler.action(false);
             }
         });
 
@@ -5849,12 +5849,12 @@ public class FastDBQueryUI extends JFrame {
         int pkIndex = -1;
         int fkIndex = -1;
 
-        private boolean init() {
+        private boolean init(boolean reset) {
             File dir = new File(FileUtil.DESKTOP_DIR, "FastColumnDef");
             if (!dir.exists()) {
                 dir.mkdirs();
             }
-            if (xlsLoader == null) {
+            if (xlsLoader == null || reset) {
                 xlsLoader = new FastDBQueryUI_XlsColumnDefLoader(null);
                 xlsLoader.execute();
             }
@@ -5883,9 +5883,9 @@ public class FastDBQueryUI extends JFrame {
             xlsLoader.setMappingConfig(mXlsColumnDefDlg.getConfig());
         }
 
-        public void action() {
+        public void action(boolean reset) {
             try {
-                if (init()) {
+                if (init(reset)) {
                     String table = String.valueOf(tableColumnDefText.getSelectedItem());
                     queryResultTable.setTitleTooltipTransformer(xlsLoader.getTableTitleTransformer(table));
                 }
@@ -5896,7 +5896,7 @@ public class FastDBQueryUI extends JFrame {
 
         public String getChinese(String column) {
             try {
-                if (init()) {
+                if (init(false)) {
                     String table = String.valueOf(tableColumnDefText.getSelectedItem());
                     return xlsLoader.getDBColumnChinese(column, table);
                 }
@@ -5908,7 +5908,7 @@ public class FastDBQueryUI extends JFrame {
 
         public List<String> getPkLst() {
             try {
-                if (init()) {
+                if (init(false)) {
                     String table = String.valueOf(tableColumnDefText.getSelectedItem());
                     return xlsLoader.getPkList(table);
                 }
@@ -6131,7 +6131,7 @@ public class FastDBQueryUI extends JFrame {
 
                     // 重設
                     if (mTableColumnDefTextHandler != null) {
-                        mTableColumnDefTextHandler.action();
+                        mTableColumnDefTextHandler.action(true);
                     }
                 }
             });
@@ -6146,7 +6146,7 @@ public class FastDBQueryUI extends JFrame {
     private void initColumnXlsDefTableColumnQryTable() {
         try {
             if (mTableColumnDefTextHandler == null) {
-                mTableColumnDefTextHandler.init();
+                mTableColumnDefTextHandler.init(false);
             }
             String tableQry = columnXlsDefTableQryText.getText();
             String columnQry = columnXlsDefColumnQryText.getText();
