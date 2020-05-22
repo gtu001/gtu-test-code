@@ -6244,6 +6244,7 @@ public class FastDBQueryUI extends JFrame {
                 JCommonUtil.handleException(e);
                 throw new RuntimeException(e);
             }
+            GlobalScreen.removeNativeKeyListener(this);// 記得她媽先移除否則會多掛listener
             GlobalScreen.addNativeKeyListener(this);
             JnativehookKeyboardMouseHelper.getInstance().disableLogger();
         }
