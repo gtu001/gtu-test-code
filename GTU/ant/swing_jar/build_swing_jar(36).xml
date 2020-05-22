@@ -99,6 +99,8 @@
 
 			<packagename mode="exact" name="snakeyaml-1.21.jar">org.yaml.snakeyaml.DumperOptions</packagename>
 			<packagename mode="pom" name="jcc-bate-0.7.3.jar">taobe.tec.jcc.JChineseConvertor</packagename>
+
+			<packagename mode="pom" name="jnativehook-2.1.0.jar">org.jnativehook.keyboard.NativeKeyListener</packagename>
 			
 		</jarfinder>
 

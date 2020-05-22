@@ -93,6 +93,10 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.Row;
+import org.jnativehook.GlobalScreen;
+import org.jnativehook.NativeHookException;
+import org.jnativehook.keyboard.NativeKeyEvent;
+import org.jnativehook.keyboard.NativeKeyListener;
 
 import com.jgoodies.forms.factories.FormFactory;
 import com.jgoodies.forms.layout.ColumnSpec;
@@ -112,6 +116,7 @@ import gtu.db.sqlMaker.DbSqlCreater;
 import gtu.db.sqlMaker.DbSqlCreater.TableInfo;
 import gtu.file.FileUtil;
 import gtu.file.OsInfoUtil;
+import gtu.keyboard_mouse.JnativehookKeyboardMouseHelper;
 import gtu.log.LoggerAppender;
 import gtu.number.RandomUtil;
 import gtu.poi.hssf.ExcelUtil_Xls97;
@@ -133,6 +138,7 @@ import gtu.swing.util.JComboBoxUtil;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JCommonUtil.HandleDocumentEvent;
 import gtu.swing.util.JFrameRGBColorPanel;
+import gtu.swing.util.JFrameUtil;
 import gtu.swing.util.JListUtil;
 import gtu.swing.util.JMouseEventUtil;
 import gtu.swing.util.JPopupMenuUtil;
@@ -1850,40 +1856,6 @@ public class FastDBQueryUI extends JFrame {
                 }
             }, new Component[] {});
 
-            KeyEventExecuteHandler.newInstance(FastDBQueryUI.this, "", new Transformer() {
-                public Object transform(Object input) {
-                    KeyEvent e = (KeyEvent) input;
-                    if (e.getKeyCode() == KeyEvent.VK_LEFT) {
-                        return true;
-                    }
-                    return false;
-                }
-            }, new Runnable() {
-                @Override
-                public void run() {
-                    if (tabbedPane.getSelectedIndex() > 0) {
-                        tabbedPane.setSelectedIndex(tabbedPane.getSelectedIndex() - 1);
-                    }
-                }
-            }, IGNORE_PREDICT);
-
-            KeyEventExecuteHandler.newInstance(FastDBQueryUI.this, "", new Transformer() {
-                public Object transform(Object input) {
-                    KeyEvent e = (KeyEvent) input;
-                    if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
-                        return true;
-                    }
-                    return false;
-                }
-            }, new Runnable() {
-                @Override
-                public void run() {
-                    if (tabbedPane.getSelectedIndex() <= tabbedPane.getTabCount() - 1) {
-                        tabbedPane.setSelectedIndex(tabbedPane.getSelectedIndex() + 1);
-                    }
-                }
-            }, IGNORE_PREDICT);
-
             editColumnHistoryHandler = new EditColumnHistoryHandler();
 
             JCommonUtil.setJFrameCenter(this);
@@ -1902,6 +1874,8 @@ public class FastDBQueryUI extends JFrame {
                 hideInSystemTrayHelper.get().apply(this);
             }
             panel_17.add(hideInSystemTrayHelper.get().getToggleButton(false));
+
+            new AltNativeKeyListener();// alt + 左右切換頁籤工具
         }
     }
 
@@ -3740,10 +3714,21 @@ public class FastDBQueryUI extends JFrame {
                     .addJMenuItem("SQL 格式化", new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
-                            String sql = StringUtils.defaultString(sqlTextArea.getText());
+                            if (StringUtils.isNotBlank(sqlTextArea.getSelectedText())) {
+                                String selection = sqlTextArea.getSelectedText();
+                                String prefix = StringUtils.substring(sqlTextArea.getText(), 0, sqlTextArea.getSelectionStart());
+                                String suffix = StringUtils.substring(sqlTextArea.getText(), sqlTextArea.getSelectionEnd());
+                                sqlTextArea.setText(prefix + formatSQL(selection) + suffix);
+                            } else {
+                                sqlTextArea.setText(formatSQL(sqlTextArea.getText()));
+                            }
+                        }
+
+                        private String formatSQL(String sql) {
+                            sql = StringUtils.defaultString(sql);
                             sql = getSqlFormater(sql);
                             sql = getSelectColumnFormater(sql);
-                            sqlTextArea.setText(sql);
+                            return sql;
                         }
 
                         Pattern ptn = Pattern.compile("(\\[.*?\\]|\\swhere|\\sand|\\sor|\\sfrom|\\sunion|\\souter\\s+join|\\sinner\\s+join|\\sleft\\s+join|\\sright\\s+join|\\sjoin|\\son)",
@@ -6243,4 +6228,58 @@ public class FastDBQueryUI extends JFrame {
         }
     }
 
+    // ======================================================================================================================
+    // alt + 左右切換頁籤工具
+    private class AltNativeKeyListener implements NativeKeyListener {
+        AltNativeKeyListener() {
+            initialize();
+        }
+
+        private void initialize() {
+            try {
+                if (!GlobalScreen.isNativeHookRegistered()) {
+                    GlobalScreen.registerNativeHook();
+                }
+            } catch (NativeHookException e) {
+                JCommonUtil.handleException(e);
+                throw new RuntimeException(e);
+            }
+            GlobalScreen.addNativeKeyListener(this);
+            JnativehookKeyboardMouseHelper.getInstance().disableLogger();
+        }
+
+        public void close() {
+            if (!GlobalScreen.isNativeHookRegistered()) {
+                GlobalScreen.removeNativeKeyListener(this);
+            }
+        }
+
+        @Override
+        public void nativeKeyTyped(NativeKeyEvent paramNativeKeyEvent) {
+        }
+
+        @Override
+        public void nativeKeyPressed(NativeKeyEvent paramNativeKeyEvent) {
+        }
+
+        @Override
+        public void nativeKeyReleased(NativeKeyEvent e) {
+            if (TAB_UI1 != null && JFrameUtil.isVisible(TAB_UI1.getJframe())) {
+                boolean altClick = (e.getModifiers() & NativeKeyEvent.ALT_MASK) != 0;
+                if (altClick) {
+                    if (e.getKeyCode() == NativeKeyEvent.VC_LEFT) {
+                        System.out.println("tab --------LEFT");
+                        if (tabbedPane.getSelectedIndex() > 0) {
+                            tabbedPane.setSelectedIndex(tabbedPane.getSelectedIndex() - 1);
+                        }
+                    } else if (e.getKeyCode() == NativeKeyEvent.VC_RIGHT) {
+                        System.out.println("tab --------RIGHT");
+                        if (tabbedPane.getSelectedIndex() <= tabbedPane.getTabCount() - 1) {
+                            tabbedPane.setSelectedIndex(tabbedPane.getSelectedIndex() + 1);
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
