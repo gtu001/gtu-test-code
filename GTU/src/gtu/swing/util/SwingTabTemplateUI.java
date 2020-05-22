@@ -35,7 +35,7 @@ public class SwingTabTemplateUI {
     private List<JFrame> jframeKeeperLst = new ArrayList<JFrame>();
     private ChangeTabHandlerGtu001 changeTabHandlerGtu001;
     private FocusTabHandlerGtu001 focusTabHandlerGtu001;
-    private Map<String, Object> tempalteHoldingContainMap = new HashMap<String, Object>();
+    private Map<String, Object> resourcesPool = new HashMap<String, Object>();
     private SysTrayUtil sysTray = SysTrayUtil.newInstance();
 
     /**
@@ -264,8 +264,8 @@ public class SwingTabTemplateUI {
         return jframe;
     }
 
-    public Map<String, Object> getTempalteHoldingContainMap() {
-        return tempalteHoldingContainMap;
+    public Map<String, Object> getResourcesPool() {
+        return resourcesPool;
     }
 
     public int getSelectTabIndex() {

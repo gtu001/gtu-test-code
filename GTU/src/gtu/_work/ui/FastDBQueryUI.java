@@ -1875,7 +1875,11 @@ public class FastDBQueryUI extends JFrame {
             }
             panel_17.add(hideInSystemTrayHelper.get().getToggleButton(false));
 
-            new AltNativeKeyListener();// alt + 左右切換頁籤工具
+            new MoveTabsNativeKeyListener();// alt + 左右切換頁籤工具
+
+            tabbedPane.setSelectedIndex(1);// 預設為SQL頁籤
+
+            sqlTextArea.setText("\r\n\r\n\r\n        ");// 初始化輸入位置
         }
     }
 
@@ -5833,6 +5837,20 @@ public class FastDBQueryUI extends JFrame {
         int toIndex = -1;
         int pkIndex = -1;
         int fkIndex = -1;
+        String resourcePoolKey = TableColumnDefTextHandler.class.getName();
+
+        private void checkXlsLoader(boolean reset) {
+            if (TAB_UI1 != null) {
+                xlsLoader = (FastDBQueryUI_XlsColumnDefLoader) TAB_UI1.getResourcesPool().get(resourcePoolKey);
+            }
+            if (xlsLoader == null || reset) {
+                xlsLoader = new FastDBQueryUI_XlsColumnDefLoader(null);
+                xlsLoader.execute();
+                if (TAB_UI1 != null) {
+                    TAB_UI1.getResourcesPool().put(resourcePoolKey, xlsLoader);
+                }
+            }
+        }
 
         private boolean init(boolean reset) {
             File dir = new File(FileUtil.DESKTOP_DIR, "FastColumnDef");
@@ -5840,8 +5858,7 @@ public class FastDBQueryUI extends JFrame {
                 dir.mkdirs();
             }
             if (xlsLoader == null || reset) {
-                xlsLoader = new FastDBQueryUI_XlsColumnDefLoader(null);
-                xlsLoader.execute();
+                checkXlsLoader(reset);
             }
             if (tableColumnDefText.getSelectedItem() != null && StringUtils.isNotBlank((String) tableColumnDefText.getSelectedItem())) {
                 if (mXlsColumnDefDlg == null || mXlsColumnDefDlg.getConfig() == null) {
@@ -5859,8 +5876,7 @@ public class FastDBQueryUI extends JFrame {
                 dir.mkdirs();
             }
             if (xlsLoader == null) {
-                xlsLoader = new FastDBQueryUI_XlsColumnDefLoader(null);
-                xlsLoader.execute();
+                checkXlsLoader(false);
             }
             if (mXlsColumnDefDlg == null || mXlsColumnDefDlg.getConfig() == null) {
                 Validate.isTrue(false, "請先按設定");
@@ -6230,8 +6246,8 @@ public class FastDBQueryUI extends JFrame {
 
     // ======================================================================================================================
     // alt + 左右切換頁籤工具
-    private class AltNativeKeyListener implements NativeKeyListener {
-        AltNativeKeyListener() {
+    private class MoveTabsNativeKeyListener implements NativeKeyListener {
+        MoveTabsNativeKeyListener() {
             initialize();
         }
 
