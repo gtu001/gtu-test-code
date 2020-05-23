@@ -271,6 +271,14 @@ public class SwingTabTemplateUI {
     public int getSelectTabIndex() {
         return tabbedPane.getSelectedIndex();
     }
+    
+    public void setSelectTabIndex(int idx) {
+        tabbedPane.setSelectedIndex(idx);
+    }
+    
+    public int getTabCount() {
+        return tabbedPane.getTabCount();
+    }
 
     public List<JFrame> getJframeKeeperLst() {
         return jframeKeeperLst;

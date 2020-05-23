@@ -30,7 +30,7 @@
                         <th scope="col">姓名</th>
                         <th scope="col">電話</th>
                         <th scope="col">Email</th>
-                        <th width="100">功能</th>
+                        <th width="200">功能</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -40,12 +40,14 @@
 						<td>${user.name}</td>
 						<td>${user.phoneNumber}</td>
 						<td>${user.email}</td>
-					    <sec:authorize access="hasRole('ADMIN') or hasRole('DBA')">
-							<td><a href="<c:url value='/edit-user-${user.ssoId}' />" class="btn btn-success custom-width">編輯</a></td>
-				        </sec:authorize>
-				        <sec:authorize access="hasRole('ADMIN')">
-							<td><a href="<c:url value='/admin/delete-user-${user.ssoId}' />" class="btn btn-danger custom-width">刪除</a></td>
-        				</sec:authorize>
+						<td>
+							<sec:authorize access="hasRole('ADMIN') or hasRole('DBA')">
+								<a href="<c:url value='/edit-user-${user.ssoId}' />" class="btn btn-success custom-width">編輯</a>
+					        </sec:authorize>
+					        <sec:authorize access="hasRole('ADMIN')">
+								<a href="<c:url value='/admin/delete-user-${user.ssoId}' />" class="btn btn-danger custom-width">刪除</a>
+	        				</sec:authorize>
+        				</td>
 					</tr>
 				</c:forEach>
                 </tbody>

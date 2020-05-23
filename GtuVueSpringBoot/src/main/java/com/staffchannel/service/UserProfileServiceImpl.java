@@ -36,4 +36,9 @@ public class UserProfileServiceImpl implements UserProfileService {
     public void update(UserProfile userProfile) {
         dao.update(userProfile);
     }
+    
+    @Override
+    public void delete(UserProfile userProfile) {
+        dao.delete(userProfile);
+    }
 }

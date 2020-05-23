@@ -44,8 +44,4 @@ public class UserProfileDaoImpl extends AbstractDao<Integer, UserProfile>impleme
 	public void save(UserProfile userProfile){
 		merge(userProfile);
 	}
-	
-	public void update(UserProfile userProfile){
-	    this.update(userProfile);
-	}
 }

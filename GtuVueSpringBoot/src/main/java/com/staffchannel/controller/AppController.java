@@ -1,8 +1,13 @@
 package com.staffchannel.controller;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -123,18 +128,8 @@ public class AppController {
         return "mainPage";
     }
 
-    // 使用者 ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
-    // 使用者 ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
-    // 使用者 ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
-    // 使用者 ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
-    // 使用者 ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
-    // 使用者 ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
-    // 使用者 ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
-    // 使用者 ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
-    // 使用者 ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
-    // 使用者 ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
-    // 使用者 ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
-    // 使用者 ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
+    //  ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+    //  ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
 
     // 使用者 ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
     /*
@@ -350,7 +345,10 @@ public class AppController {
     @RequestMapping(value = { "/admin/newRole" }, method = RequestMethod.GET)
     public String newRole(ModelMap model) {
         UserProfile userProfile = new UserProfile();
+        List<Menu> menuexisting = menuService.findAllMenus();
+        model.addAttribute("userHasMenusChecked", getUserProfileHasMenuChecked(userProfile));
         model.addAttribute("userProfile", userProfile);
+        model.addAttribute("menuexisting", menuexisting);
         model.addAttribute("edit", false);
         return "role/role_edit";
     }
@@ -360,8 +358,11 @@ public class AppController {
      */
     @RequestMapping(value = { "/edit-role-{roleId}" }, method = RequestMethod.GET)
     public String editRole(@PathVariable String roleId, ModelMap model) {
-        UserProfile userProflie = userProfileService.findById(Integer.parseInt(roleId));
-        model.addAttribute("userProflie", userProflie);
+        UserProfile userProfile = userProfileService.findById(Integer.parseInt(roleId));
+        List<Menu> menuexisting = menuService.findAllMenus();
+        model.addAttribute("userHasMenusChecked", getUserProfileHasMenuChecked(userProfile));
+        model.addAttribute("userProfile", userProfile);
+        model.addAttribute("menuexisting", menuexisting);
         model.addAttribute("edit", true);
         return "role/role_edit";
     }
@@ -371,6 +372,7 @@ public class AppController {
      */
     @RequestMapping(value = { "/edit-role-{roleId}" }, method = RequestMethod.POST)
     public String updateRole(@Valid UserProfile userProfile, BindingResult result, ModelMap model, @PathVariable String roleId) {
+        processUserProfileMenuDetails(userProfile);
         if (!isAdmin()) {
             return "accessDenied";
         }
@@ -378,12 +380,13 @@ public class AppController {
             debugErrorMessage(result);
             return "redirect:/edit-role-{roleId}";
         }
-        UserProfile profile2 = userProfileService.findById(Integer.parseInt(roleId));
-        if (profile2 != null) {
-            userProfileService.update(userProfile);
-        } else {
-            userProfileService.save(userProfile);
-        }
+        // UserProfile profile2 =
+        // userProfileService.findById(Integer.parseInt(roleId));
+        // if (profile2 != null) {
+        // userProfileService.update(userProfile);
+        // } else {
+        userProfileService.save(userProfile);
+        // }
         model.addAttribute("success", "角色 " + userProfile.getType() + " 更新成功!");
         return "role/roleEditSuccess";
     }
@@ -392,7 +395,9 @@ public class AppController {
      * 修改角色POST
      */
     @RequestMapping(value = { "/admin/newRole" }, method = { RequestMethod.POST })
-    public String saveRole(@Valid UserProfile userProfile, BindingResult result, ModelMap model) {
+    public String saveRole(@Valid UserProfile userProfile, BindingResult result, ModelMap model, HttpServletRequest request) {
+        debugParameters(request);
+        processUserProfileMenuDetails(userProfile);
         if (!isAdmin()) {
             return "accessDenied";
         }
@@ -405,12 +410,55 @@ public class AppController {
         return "role/roleEditSuccess";
     }
 
+    private Map<Integer, String> getUserProfileHasMenuChecked(UserProfile userProfile) {
+        Map<Integer, String> hasMenuMap = new HashMap<Integer, String>();
+        if (userProfile.getMenuList() == null) {
+            return hasMenuMap;
+        }
+        for (Menu menu : userProfile.getMenuList()) {
+            if (menu.getId() != null) {
+                hasMenuMap.put(menu.getId(), "checked");
+            }
+            if (menu.getSubMenu() != null && !menu.getSubMenu().isEmpty()) {
+                for (Menu m2 : menu.getSubMenu()) {
+                    if (m2.getId() != null) {
+                        hasMenuMap.put(m2.getId(), "checked");
+                    }
+                }
+            }
+        }
+        return hasMenuMap;
+    }
+
+    private void processUserProfileMenuDetails(UserProfile userProfile) {
+        if (userProfile.getMenuList() == null) {
+            return;
+        }
+        List<Menu> appendMenuLst = new ArrayList<Menu>();
+        for (Menu menu : userProfile.getMenuList()) {
+            if (menu.getId() != null) {
+                appendMenuLst.add(menu);
+            }
+            if (menu.getSubMenu() != null && !menu.getSubMenu().isEmpty()) {
+                for (Menu m2 : menu.getSubMenu()) {
+                    if (m2.getId() != null) {
+                        appendMenuLst.add(m2);
+                    }
+                }
+            }
+        }
+        userProfile.setMenuList(appendMenuLst);
+    }
+
     /**
      * 刪除角色
      */
     @RequestMapping(value = { "/admin/delete-role-{roleId}" }, method = RequestMethod.GET)
     public String deleteRole(@PathVariable String roleId) {
-        // userProfileService.delete
+        UserProfile userProfile = userProfileService.findById(Integer.parseInt(roleId));
+        if (userProfile != null) {
+            userProfileService.delete(userProfile);
+        }
         return "redirect:/admin/rolesList";
     }
     // 角色 ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
@@ -452,15 +500,25 @@ public class AppController {
         return isAdmin;
     }
 
+    private void debugParameters(HttpServletRequest request) {
+        logger.info("debugParameters ...start");
+        for (Enumeration enu = request.getParameterNames(); enu.hasMoreElements();) {
+            String key = (String) enu.nextElement();
+            String[] values = request.getParameterValues(key);
+            logger.info("\t" + key + "\tvalue:" + Arrays.toString(values));
+        }
+        logger.info("debugParameters ...end");
+    }
+
     private void debugErrorMessage(BindingResult result) {
         for (Object object : result.getAllErrors()) {
             if (object instanceof FieldError) {
                 FieldError fieldError = (FieldError) object;
-                logger.error(fieldError.getCode(), fieldError.getRejectedValue(), fieldError.getDefaultMessage());
+                logger.error(messageSource.getMessage(fieldError, null) + " : " + fieldError);
             }
             if (object instanceof ObjectError) {
                 ObjectError objectError = (ObjectError) object;
-                logger.error(objectError.getCode(), objectError.getObjectName(), objectError.getDefaultMessage());
+                logger.error(messageSource.getMessage(objectError, null) + " : " + objectError);
             }
         }
     }

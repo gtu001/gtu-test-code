@@ -16,4 +16,6 @@ public interface UserProfileDao {
 	void save(UserProfile userProfile);
 	
 	void update(UserProfile userProfile);
+	
+	void delete(UserProfile userProfile);
 }

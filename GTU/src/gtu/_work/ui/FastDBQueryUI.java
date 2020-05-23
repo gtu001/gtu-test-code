@@ -6283,6 +6283,7 @@ public class FastDBQueryUI extends JFrame {
         public void nativeKeyReleased(NativeKeyEvent e) {
             if (TAB_UI1 != null && JFrameUtil.isVisible(TAB_UI1.getJframe())) {
                 boolean altClick = (e.getModifiers() & NativeKeyEvent.ALT_MASK) != 0;
+                boolean ctlClick = (e.getModifiers() & NativeKeyEvent.CTRL_MASK) != 0;
                 if (altClick) {
                     if (e.getKeyCode() == NativeKeyEvent.VC_LEFT) {
                         System.out.println("tab --------LEFT");
@@ -6293,6 +6294,19 @@ public class FastDBQueryUI extends JFrame {
                         System.out.println("tab --------RIGHT");
                         if (tabbedPane.getSelectedIndex() <= tabbedPane.getTabCount() - 1) {
                             tabbedPane.setSelectedIndex(tabbedPane.getSelectedIndex() + 1);
+                        }
+                    }
+                }
+                if (ctlClick) {
+                    if (e.getKeyCode() == NativeKeyEvent.VC_LEFT) {
+                        System.out.println("tab --------LEFT");
+                        if (TAB_UI1.getSelectTabIndex() > 0) {
+                            TAB_UI1.setSelectTabIndex(TAB_UI1.getSelectTabIndex() - 1);
+                        }
+                    } else if (e.getKeyCode() == NativeKeyEvent.VC_RIGHT) {
+                        System.out.println("tab --------RIGHT");
+                        if (TAB_UI1.getSelectTabIndex() <= TAB_UI1.getTabCount() - 1) {
+                            TAB_UI1.setSelectTabIndex(TAB_UI1.getSelectTabIndex() + 1);
                         }
                     }
                 }
