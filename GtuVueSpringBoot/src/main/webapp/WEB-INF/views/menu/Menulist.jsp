@@ -52,10 +52,10 @@
 						<td>${menu.menuDesc}</td>
 						<td>${menu.fatherId}</td>
 					    <sec:authorize access="hasRole('ADMIN') or hasRole('DBA')">
-							<td><a href="<c:url value='/edit-user-menu-${menu.id}' />" class="btn btn-success custom-width">編輯</a></td>
+							<td><a href="<c:url value='/edit-menu-${menu.id}' />" class="btn btn-success custom-width">編輯</a></td>
 				        </sec:authorize>
 				        <sec:authorize access="hasRole('ADMIN')">
-							<td><a href="<c:url value='/delete-user-menu-${menu.id}' />" class="btn btn-danger custom-width">刪除</a></td>
+							<td><a href="<c:url value='/delete-menu-${menu.id}' />" class="btn btn-danger custom-width">刪除</a></td>
         				</sec:authorize>
 					</tr>
 					
@@ -68,10 +68,10 @@
 						<td>${submenu.menuDesc}</td>
 						<td>${submenu.fatherId}</td>
 					    <sec:authorize access="hasRole('ADMIN') or hasRole('DBA')">
-							<td><a href="<c:url value='/edit-user-menu-${submenu.id}' />" class="btn btn-success custom-width">編輯</a></td>
+							<td><a href="<c:url value='/edit-menu-${submenu.id}' />" class="btn btn-success custom-width">編輯</a></td>
 				        </sec:authorize>
 				        <sec:authorize access="hasRole('ADMIN')">
-							<td><a href="<c:url value='/delete-user-menu-${submenu.id}' />" class="btn btn-danger custom-width">刪除</a></td>
+							<td><a href="<c:url value='/delete-menu-${submenu.id}' />" class="btn btn-danger custom-width">刪除</a></td>
         				</sec:authorize>
 					</tr>
 					</c:forEach>

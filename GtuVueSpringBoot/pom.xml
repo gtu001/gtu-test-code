@@ -25,25 +25,6 @@
 
 	<dependencies>
 		<!-- Spring -->
-
-
-
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
-		</dependency>
-
-
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-core</artifactId>
@@ -149,6 +130,7 @@
 
 
 		<!-- https://mvnrepository.com/artifact/microsoft/sqljdbc -->
+		<!-- 
 		<dependency>
 			<groupId>com.microsoft.sqlserver</groupId>
 			<artifactId>sqljdbc4</artifactId>
@@ -156,6 +138,7 @@
 			<scope>system</scope>
 			<systemPath>D:\my_tool\FastDBQueryUI\sqljdbc4-4.1.jar</systemPath>
 		</dependency>
+		 -->
 
 		<!-- SLF4J/Logback -->
 		<dependency>

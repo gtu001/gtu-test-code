@@ -139,12 +139,12 @@ public class DBDateUtil {
         Sqlite {
             @Override
             public String date2Varchar(String columnName) {
-                return String.format(" FORMAT(%s, 'yyyy/MM/dd') ", columnName);
+                return String.format(" strftime('%Y-%m-%d', %s) ", columnName);
             }
 
             @Override
             public String timestamp2Varchar(String columnName) {
-                return String.format(" FORMAT(%s, 'yyyy/MM/dd h:mm:ss.tt') ", columnName);
+                return String.format(" strftime('%Y-%m-%d %H:%M:%f', %s) ", columnName);
             }
 
             @Override
@@ -159,7 +159,7 @@ public class DBDateUtil {
 
             @Override
             public String sysdate() {
-                return " date('now') ";
+                return " datetime('now', 'localtime') ";
             }
         };
 

@@ -45,4 +45,7 @@ public class UserProfileDaoImpl extends AbstractDao<Integer, UserProfile>impleme
 		merge(userProfile);
 	}
 	
+	public void update(UserProfile userProfile){
+	    this.update(userProfile);
+	}
 }

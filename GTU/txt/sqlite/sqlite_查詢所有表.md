@@ -8,4 +8,4 @@ sqlite_查詢所有表.md
         sqlite_master 
     WHERE 
         type ='table' AND 
-        name NOT LIKE 'sqlite_%';
+        name NOT LIKE 'sqlite_%' 

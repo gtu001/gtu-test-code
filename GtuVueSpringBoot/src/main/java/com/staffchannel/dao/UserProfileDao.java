@@ -14,4 +14,6 @@ public interface UserProfileDao {
 	UserProfile findById(int id);
 	
 	void save(UserProfile userProfile);
+	
+	void update(UserProfile userProfile);
 }

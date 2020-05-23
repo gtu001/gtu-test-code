@@ -15,4 +15,6 @@ public interface UserProfileService {
 	
 	void save(UserProfile userProfile);
 	
+	void update(UserProfile userProfile);
+	
 }

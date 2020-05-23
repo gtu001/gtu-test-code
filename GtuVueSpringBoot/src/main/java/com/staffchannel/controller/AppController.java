@@ -8,6 +8,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.security.authentication.AuthenticationTrustResolver;
@@ -20,6 +22,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,6 +41,8 @@ import com.staffchannel.service.UserService;
 @RequestMapping("/")
 @SessionAttributes("roles")
 public class AppController {
+
+    private static final Logger logger = LoggerFactory.getLogger(AppController.class);
 
     @Autowired
     UserService userService;
@@ -160,6 +165,7 @@ public class AppController {
     public String saveUser(@Valid User user, BindingResult result, ModelMap model) {
 
         if (result.hasErrors()) {
+            debugErrorMessage(result);
             return "user/registration";
         }
 
@@ -208,6 +214,7 @@ public class AppController {
         }
 
         if (result.hasErrors()) {
+            debugErrorMessage(result);
             return "user/registration";
         }
 
@@ -243,7 +250,7 @@ public class AppController {
         return "menu/Menulist";
     }
 
-    @RequestMapping(value = "/edit-user-menu-{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/edit-menu-{id}", method = RequestMethod.GET)
     public String listedit(@PathVariable Integer id, ModelMap model) {
         Menu menu = menuService.findById(id);
         model.addAttribute("menu", menu);
@@ -259,7 +266,7 @@ public class AppController {
         return "menu/EditMenu";
     }
 
-    @RequestMapping(value = "/delete-user-menu-{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/delete-menu-{id}", method = RequestMethod.GET)
     public String deleteMenu(@PathVariable String id) {
         menuService.delete(Integer.parseInt(id));
         return "redirect:/menulist";
@@ -284,37 +291,129 @@ public class AppController {
 
         return "Menulist";
     }
-    
 
     /**
      * 修改使用者POST
      */
-    @RequestMapping(value = { "/newMenu" }, method = { RequestMethod.POST})
+    @RequestMapping(value = { "/newMenu" }, method = { RequestMethod.POST })
     public String saveMenu(@Valid Menu menu, BindingResult result, ModelMap model) {
-//        if (!ssoId.equals(getUserSSO())) {
-//            if (!isAdmin()) {
-//                return "accessDenied";
-//            }
-//        }
-//
-//        if (result.hasErrors()) {
-//            return "user/registration";
-//        }
-//
-//        // 檢查是否unique
-//        if (!userService.isUserSSOUnique(user.getId(), user.getSsoId())) {
-//            FieldError ssoError = new FieldError("user", "ssoId", messageSource.getMessage("non.unique.ssoId", new String[] { user.getSsoId() }, Locale.getDefault()));
-//            result.addError(ssoError);
-//            return "user/registration";
-//        }
-
+        if (!isAdmin()) {
+            return "accessDenied";
+        }
+        if (result.hasErrors()) {
+            debugErrorMessage(result);
+            return "redirect:/newMenu";
+        }
         menuService.save(menu);
-        
         model.addAttribute("success", "清單 :  " + menu.getMenuName() + " 更新成功!");
         return "menu/menuSaveSuccess";
     }
-    
+
+    /**
+     * 修改使用者POST
+     */
+    @RequestMapping(value = { "/edit-menu-{id}" }, method = RequestMethod.POST)
+    public String updateMenu(@Valid Menu menu, BindingResult result, ModelMap model, @PathVariable String id) {
+        if (!isAdmin()) {
+            return "accessDenied";
+        }
+        if (result.hasErrors()) {
+            debugErrorMessage(result);
+            return "redirect:/edit-menu-{id}";
+        }
+        Menu menu2 = menuService.findById(Integer.parseInt(id));
+        if (menu2 != null) {
+            menuService.update(menu);
+        } else {
+            menuService.save(menu);
+        }
+        model.addAttribute("success", "清單 :  " + menu.getMenuName() + " 更新成功!");
+        return "menu/menuSaveSuccess";
+    }
+
     // 菜單 ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
+
+    // 角色 ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+    /*
+     * 管理角色列表
+     */
+    @RequestMapping(value = { "/admin/rolesList" }, method = RequestMethod.GET)
+    public String listRoles(ModelMap model) {
+        List<UserProfile> roles = userProfileService.findAll();
+        model.addAttribute("roles", roles);
+        return "role/rolesList";
+    }
+
+    /*
+     * 新增角色GET
+     */
+    @RequestMapping(value = { "/admin/newRole" }, method = RequestMethod.GET)
+    public String newRole(ModelMap model) {
+        UserProfile userProfile = new UserProfile();
+        model.addAttribute("userProfile", userProfile);
+        model.addAttribute("edit", false);
+        return "role/role_edit";
+    }
+
+    /**
+     * 修改角色GET
+     */
+    @RequestMapping(value = { "/edit-role-{roleId}" }, method = RequestMethod.GET)
+    public String editRole(@PathVariable String roleId, ModelMap model) {
+        UserProfile userProflie = userProfileService.findById(Integer.parseInt(roleId));
+        model.addAttribute("userProflie", userProflie);
+        model.addAttribute("edit", true);
+        return "role/role_edit";
+    }
+
+    /**
+     * 修改角色POST
+     */
+    @RequestMapping(value = { "/edit-role-{roleId}" }, method = RequestMethod.POST)
+    public String updateRole(@Valid UserProfile userProfile, BindingResult result, ModelMap model, @PathVariable String roleId) {
+        if (!isAdmin()) {
+            return "accessDenied";
+        }
+        if (result.hasErrors()) {
+            debugErrorMessage(result);
+            return "redirect:/edit-role-{roleId}";
+        }
+        UserProfile profile2 = userProfileService.findById(Integer.parseInt(roleId));
+        if (profile2 != null) {
+            userProfileService.update(userProfile);
+        } else {
+            userProfileService.save(userProfile);
+        }
+        model.addAttribute("success", "角色 " + userProfile.getType() + " 更新成功!");
+        return "role/roleEditSuccess";
+    }
+
+    /**
+     * 修改角色POST
+     */
+    @RequestMapping(value = { "/admin/newRole" }, method = { RequestMethod.POST })
+    public String saveRole(@Valid UserProfile userProfile, BindingResult result, ModelMap model) {
+        if (!isAdmin()) {
+            return "accessDenied";
+        }
+        if (result.hasErrors()) {
+            debugErrorMessage(result);
+            return "redirect:/admin/newRole";
+        }
+        userProfileService.save(userProfile);
+        model.addAttribute("success", "角色 " + userProfile.getType() + " 更新成功!");
+        return "role/roleEditSuccess";
+    }
+
+    /**
+     * 刪除角色
+     */
+    @RequestMapping(value = { "/admin/delete-role-{roleId}" }, method = RequestMethod.GET)
+    public String deleteRole(@PathVariable String roleId) {
+        // userProfileService.delete
+        return "redirect:/admin/rolesList";
+    }
+    // 角色 ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
 
     /**
      * This method handles Access-Denied redirect.
@@ -353,4 +452,16 @@ public class AppController {
         return isAdmin;
     }
 
+    private void debugErrorMessage(BindingResult result) {
+        for (Object object : result.getAllErrors()) {
+            if (object instanceof FieldError) {
+                FieldError fieldError = (FieldError) object;
+                logger.error(fieldError.getCode(), fieldError.getRejectedValue(), fieldError.getDefaultMessage());
+            }
+            if (object instanceof ObjectError) {
+                ObjectError objectError = (ObjectError) object;
+                logger.error(objectError.getCode(), objectError.getObjectName(), objectError.getDefaultMessage());
+            }
+        }
+    }
 }
