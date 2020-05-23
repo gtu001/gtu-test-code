@@ -40,6 +40,7 @@
 							<c:when test="${edit}">
 								<form:input type="text" path="type" id="type"
 									class="form-control input-sm" disabled="true" />
+								<form:input type="hidden" path="type" id="type" />
 							</c:when>
 							<c:otherwise>
 								<form:input type="text" path="type" id="type"
@@ -78,12 +79,14 @@
 									</c:forEach>
 								</ul>
 							</c:if>
+							<%--
 							<c:if test="${existing.subMenu==null }">
 								<div>
 									<input type="checkbox" value="" id="defaultCheck1"> <label
 										class="form-check-label" for="defaultCheck1">${existing.menuName}</label>
 								</div>
 							</c:if>
+							 --%>
 						</c:forEach>
 					</div>
 				</div>

@@ -81,6 +81,7 @@ import gtu.swing.util.JFrameRGBColorPanel;
 import gtu.swing.util.JFrameUtil;
 import gtu.swing.util.JListUtil;
 import gtu.swing.util.JMouseEventUtil;
+import gtu.swing.util.JSwingCommonConfigUtil;
 import gtu.swing.util.JTabbedPaneUtil;
 import taobe.tec.jcc.JChineseConvertor;
 
@@ -108,10 +109,9 @@ public class AVChoicerUI extends JFrame {
     private static final String AV_EXE_KEY = "avExeText";
 
     private PropertiesUtilBean config = new PropertiesUtilBean(AVChoicerUI.class);// xxxxxxxxxxxxxxxxxxxxxxx
-    // private PropertiesUtilBean config = new PropertiesUtilBean(new
-    // File("/media/gtu001/OLD_D/my_tool/AVChoicerUI_config.properties"));
-    // private PropertiesUtilBean config = new PropertiesUtilBean(new
-    // File("D:/my_tool/AVChoicerUI_config.properties"));
+    {
+        config = JSwingCommonConfigUtil.checkTestingPropertiesUtilBean(config, getClass(), AVChoicerUI.class.getSimpleName());
+    }
 
     private Set<File> clickAvSet = new HashSet<File>();
     private AtomicReference<File> currentAvFile = new AtomicReference<File>();
@@ -477,22 +477,6 @@ public class AVChoicerUI extends JFrame {
             }
         });
 
-        config.reflectInit(this);
-        initAvDirList();
-        avExeConfigHandler = new AvExeConfigHandler();
-        avExeConfigHandler.nextConfig();
-
-        JCommonUtil.setJFrameCenter(this);
-        JCommonUtil.setJFrameIcon(this, "resource/images/ico/pornHub.ico");
-        JCommonUtil.defaultToolTipDelay();
-
-        trayUtil = HideInSystemTrayHelper.newInstance();
-        trayUtil.apply(this);
-
-        jFrameRGBColorPanel = new JFrameRGBColorPanel(this);
-
-        panel_16.add(jFrameRGBColorPanel.getToggleButton(false));
-
         JPanel panel_18 = new JPanel();
         tabbedPane.addTab("目錄檢視", null, panel_18, null);
         panel_18.setLayout(new BorderLayout(0, 0));
@@ -566,18 +550,42 @@ public class AVChoicerUI extends JFrame {
         JPanel panel_24 = new JPanel();
         panel_23.add(panel_24, BorderLayout.NORTH);
 
+        readyMoveFromDirText = new JTextField();
+        JCommonUtil.jTextFieldSetFilePathMouseEvent(readyMoveFromDirText, true);
+        panel_24.add(readyMoveFromDirText);
+        readyMoveFromDirText.setColumns(10);
+
+        JButton readyMoveFromBtn = new JButton("Add");
+        panel_24.add(readyMoveFromBtn);
+        readyMoveFromBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    File moveFromFile = JCommonUtil.filePathCheck(readyMoveFromDirText.getText(), "來源檔案有誤", false);
+                    DefaultListModel model = (DefaultListModel) readyMoveLst.getModel();
+                    model.addElement(new MoveFileZ(moveFromFile));
+                } catch (Exception ex) {
+                    JCommonUtil.handleException(ex);
+                }
+            }
+        });
+
         JLabel lblNewLabel_5 = new JLabel("目的地");
         panel_24.add(lblNewLabel_5);
 
         readyMoveToDirText = new JTextField();
         JCommonUtil.jTextFieldSetFilePathMouseEvent(readyMoveToDirText, true);
         panel_24.add(readyMoveToDirText);
-        readyMoveToDirText.setColumns(20);
+        readyMoveToDirText.setColumns(10);
 
         readyMoveBtn = new JButton("開始移動");
         readyMoveBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                readyMoveBtnAction();
+                boolean startMove = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("是否開始移動？", "Start Move");
+                if (startMove) {
+                    readyMoveBtnAction();
+                    config.reflectSetConfig(AVChoicerUI.this);
+                    config.store();
+                }
             }
         });
         panel_24.add(readyMoveBtn);
@@ -657,6 +665,24 @@ public class AVChoicerUI extends JFrame {
                 }
             }
         });
+
+        // 000000000000000000000000000000000000000000000000000000000000000000000000000000000
+
+        config.reflectInit(this);
+        initAvDirList();
+        avExeConfigHandler = new AvExeConfigHandler();
+        avExeConfigHandler.nextConfig();
+
+        JCommonUtil.setJFrameCenter(this);
+        JCommonUtil.setJFrameIcon(this, "resource/images/ico/pornHub.ico");
+        JCommonUtil.defaultToolTipDelay();
+
+        trayUtil = HideInSystemTrayHelper.newInstance();
+        trayUtil.apply(this);
+
+        jFrameRGBColorPanel = new JFrameRGBColorPanel(this);
+
+        panel_16.add(jFrameRGBColorPanel.getToggleButton(false));
 
         System.out.println("file.encoding : " + System.getProperty("file.encoding"));
     }
@@ -1386,6 +1412,7 @@ public class AVChoicerUI extends JFrame {
     private DropFileChecker mDropFileChecker = null;
     private JList readyMoveLst;
     private JTextField readyMoveToDirText;
+    private JTextField readyMoveFromDirText;
     private JButton readyMoveBtn;
 
     private List<File> dirCheckTextActionPerformed(List<File> fileLst) {

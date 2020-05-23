@@ -35,7 +35,7 @@ public class UserProfile implements Serializable{
 	@Column(name="TYPE", length=15, unique=true, nullable=false)
 	private String type = UserProfileType.USER.getUserProfileType();
 
-//	@NotEmpty
+	@NotEmpty
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
 	@JoinTable(name = "USER_PROFILE_MENU", 
              joinColumns = { @JoinColumn(name = "USER_PROFILE_ID") }, 
