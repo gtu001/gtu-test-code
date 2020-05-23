@@ -125,8 +125,11 @@ public class JTextFieldUtil {
                 public void caretUpdate(CaretEvent e) {
                     JTextComponent textComp = (JTextComponent) e.getSource();
                     try {
-                        rect = textComp.getUI().modelToView(textComp, e.getDot());
-                        System.out.println("caretUpdate = " + rect.toString());
+                        Rectangle mRectangle = textComp.getUI().modelToView(textComp, e.getDot());
+                        if (mRectangle != null) {
+                            System.out.println("caretUpdate = " + mRectangle.toString());
+                            rect = mRectangle;
+                        }
                     } catch (BadLocationException ex) {
                         throw new RuntimeException("Failed to get pixel position of caret", ex);
                     }
