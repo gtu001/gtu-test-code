@@ -9,3 +9,13 @@ sqlite_查詢所有表.md
     WHERE 
         type ='table' AND 
         name NOT LIKE 'sqlite_%' 
+        
+   
+查詢column     
+---
+	  PRAGMA table_info(table_name)
+	  
+
+
+
+

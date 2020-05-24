@@ -12,6 +12,17 @@
 <html>
 
 <head>
+<!-- ============================== -->
+	<script defer src="<c:url value='/static/js/jquery.validate.js' />"></script>
+	<script defer src="<c:url value='/static/js/localization/messages_zh_TW.js' />"></script>
+<!-- ============================== -->
+<style>
+	span.required::before {
+		content: "*";
+		color:#FF0000;
+	}
+</style>
+
 <meta charset="UTF-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport"
@@ -28,23 +39,19 @@
 			<!-- Page Content Holder -->
 			<jsp:include page="../common/TopNav.jsp"></jsp:include>
 			<h2>工作日管理</h2>
+			
+			<div id="message" class="alert alert-success lead"></div>
 
 			<form:form id="form1" method="POST" modelAttribute="workdays" class="form-horizontal">
 			<div class="form-row">
 				<div class="form-group col-md-6">
 					<label for="year">年</label>
-					<form:input type="text" path="year" id="year" class="form-control" />
-					<div class="has-error">
-						<form:errors path="year" class="text-danger" />
-					</div>
+					<input type="text" name="year" id="year" class="form-control" />
 				</div>
 				<div class="form-group col-md-6">
 					<label for="month">月</label>
-					<form:input type="text" path="month" id="month"
+					<input type="text" name="month" id="month"
 						class="form-control" />
-					<div class="has-error">
-						<form:errors path="month" class="text-danger" />
-					</div>
 				</div>
 			</div>
 			
@@ -87,14 +94,46 @@
 		</div>
 	</div>
 	
-	<script type="javascript">
+	<script type="text/javascript">
 		function doQuery() {
-			window.href = "/workday/mainPage-" + $("#year").val() + "-" + $("#month").val();
+			messageHandler.hide();
+			var year = $("#year").val();
+			var month = $("#month").val();
+			if(!/\d{4}/.test($.trim(year))) {
+				messageHandler.text("請輸入年");
+				return;
+			}
+			if(!/\d{1,2}/.test($.trim(month))) {
+				messageHandler.text("請輸入月");
+				return;
+			}
+			window.location = "mainPage-" + $("#year").val() + "-" + $("#month").val();
 		}
+		
+		var messageHandler = new function() {
+			this.show = function() {
+				$("#message").show();
+			};
+			this.hide =  function() {
+				$("#message").hide();
+			};
+			this.text =  function(text) {
+				this.show(true);
+				$("#message").text(text);
+			};
+			this.append = function(text) {
+				this.show(true);
+				$("#message").text($("#message").text() + " " + text);
+			};
+			this.hide();
+		};
 	
 		function doSave() {
 			$("#form1").submit();
 		}
+		
+		$(document).ready(function(){
+		});
 	</script>
 </body>
 </html>

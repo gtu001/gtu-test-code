@@ -139,12 +139,12 @@ public class DBDateUtil {
         Sqlite {
             @Override
             public String date2Varchar(String columnName) {
-                return String.format(" strftime('%Y-%m-%d', %s) ", columnName);
+                return String.format(" strftime('%%Y-%%m-%%d', %s / 1000, 'unixepoch') ", columnName);
             }
 
             @Override
             public String timestamp2Varchar(String columnName) {
-                return String.format(" strftime('%Y-%m-%d %H:%M:%f', %s) ", columnName);
+                return String.format(" strftime('%%Y-%%m-%%d %%H:%%M:%%f', %s / 1000, 'unixepoch') ", columnName);
             }
 
             @Override

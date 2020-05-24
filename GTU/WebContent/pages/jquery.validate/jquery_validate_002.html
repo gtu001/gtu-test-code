@@ -102,6 +102,12 @@
 		function doSubmit(){
 			$("#signupForm").submit();
 		}
+		
+		function validate() {
+			if($("#signupForm").valid()){
+				$("#signupForm").submit();
+			}
+		}
 	</script>
 
 	<style>
