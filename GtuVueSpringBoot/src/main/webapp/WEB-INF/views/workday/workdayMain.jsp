@@ -12,16 +12,6 @@
 <html>
 
 <head>
-<!-- ============================== -->
-	<script defer src="<c:url value='/static/js/jquery.validate.js' />"></script>
-	<script defer src="<c:url value='/static/js/localization/messages_zh_TW.js' />"></script>
-<!-- ============================== -->
-<style>
-	span.required::before {
-		content: "*";
-		color:#FF0000;
-	}
-</style>
 
 <meta charset="UTF-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
