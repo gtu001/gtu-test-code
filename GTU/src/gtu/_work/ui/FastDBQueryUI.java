@@ -5844,8 +5844,15 @@ public class FastDBQueryUI extends JFrame {
                 String sql = getCurrentSQL();
                 Pattern ptn = Pattern.compile(column + "[\\s\\t\\n\\r]*\\/\\*(.*?)\\*\\/", Pattern.DOTALL | Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
                 Matcher mth = ptn.matcher(sql);
-                if (mth.find()) {
-                    return mth.group(1);
+                String tmpTip = null;
+                while (mth.find()) {
+                    int startPos = mth.start();
+                    tmpTip = mth.group(1);
+                    String prefix = StringUtils.substring(sql, startPos - 1, startPos);
+                    if (prefix.matches("[a-zA-Z]")) {
+                        continue;
+                    }
+                    return tmpTip;
                 }
                 return null;
             }
