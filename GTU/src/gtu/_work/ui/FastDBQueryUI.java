@@ -2391,6 +2391,9 @@ public class FastDBQueryUI extends JFrame {
 
             // 儲存sqlId mapping dataSource 設定
             sqlIdListDSMappingHandler.store(true);
+
+            // 設定預設欄位定義
+            setCustomColumnTitleTooltip();
         } catch (Exception ex) {
             queryResultTable.setModel(JTableUtil.createModel(true, "ERROR"));
             String category = refSearchCategoryCombobox_Auto.getTextComponent().getText();
@@ -5829,6 +5832,24 @@ public class FastDBQueryUI extends JFrame {
                 break;
             }
         }
+    }
+
+    // 設定預設欄位定義
+    public void setCustomColumnTitleTooltip() {
+        queryResultTable.setTitleTooltipTransformer(new Transformer() {
+            @Override
+            public Object transform(Object input) {
+                Pair<Integer, Object> p = (Pair<Integer, Object>) input;
+                String column = (String) p.getRight();
+                String sql = getCurrentSQL();
+                Pattern ptn = Pattern.compile(column + "[\\s\\t\\n\\r]*\\/\\*(.*?)\\*\\/", Pattern.DOTALL | Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
+                Matcher mth = ptn.matcher(sql);
+                if (mth.find()) {
+                    return mth.group(1);
+                }
+                return null;
+            }
+        });
     }
 
     class TableColumnDefTextHandler {
