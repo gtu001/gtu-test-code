@@ -6,8 +6,6 @@ import java.awt.Color;
 import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.GraphicsDevice;
-import java.awt.GraphicsEnvironment;
 import java.awt.Robot;
 import java.awt.TrayIcon.MessageType;
 import java.awt.event.ActionEvent;
@@ -37,6 +35,7 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -76,6 +75,7 @@ import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang3.Range;
 import org.apache.commons.lang3.StringUtils;
@@ -113,6 +113,7 @@ import gtu.number.RandomUtil;
 import gtu.properties.PropertiesUtil;
 import gtu.properties.PropertiesUtilBean;
 import gtu.runtime.DesktopUtil;
+import gtu.spring.SimilarityUtil;
 import gtu.swing.util.AutoComboBox;
 import gtu.swing.util.HideInSystemTrayHelper;
 import gtu.swing.util.JComboBoxUtil;
@@ -125,6 +126,7 @@ import gtu.swing.util.JPopupMenuUtil;
 import gtu.swing.util.JTextAreaUtil;
 import gtu.swing.util.JTextFieldUtil;
 import gtu.swing.util.KeyEventUtil;
+import gtu.swing.util.SimpleCheckListDlg;
 import taobe.tec.jcc.JChineseConvertor;
 
 public class EnglishSearchUI extends JFrame {
@@ -1520,63 +1522,149 @@ public class EnglishSearchUI extends JFrame {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                // ---------------------------------------------------------
-                WordInfo info = new WordInfo();
                 try {
-                    info = t.parseToWordInfo(text);
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
+                    // ---------------------------------------------------------
+                    final StringBuffer sb = new StringBuffer();
+                    if (!StringUtils.contains(text, " ")) {
+                        WordInfo info = new WordInfo();
+                        try {
+                            info = t.parseToWordInfo(text);
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
 
-                final StringBuffer sb = new StringBuffer();
-                sb.append(text + "\n");
-                sb.append(info.getPronounce() + "\n");
-                sb.append(info.getMeaning() + "\n");
-                sb.append("\n");
+                        sb.append(text + "\n");
+                        sb.append(info.getPronounce() + "\n");
+                        sb.append(info.getMeaning() + "\n");
+                        sb.append("\n");
 
-                meaningText.setText(info.getMeaning());
-                googleTranslateArea_SetTooltip(text, info.getMeaning());
+                        meaningText.setText(info.getMeaning());
+                        googleTranslateArea_SetTooltip(text, info.getMeaning());
 
-                if (StringUtils.isNotBlank(info.getMeaning())) {
-                    findOk.set(true);
-                    appendMemoryBank(text, info.getMeaning());
-                }
-
-                // ---------------------------------------------------------
-                int maxLoop = simpleSentanceChk.isSelected() ? 1 : 10;
-
-                for (int ii = 0; ii < maxLoop; ii++) {
-                    try {
+                        if (StringUtils.isNotBlank(info.getMeaning())) {
+                            findOk.set(true);
+                            appendMemoryBank(text, info.getMeaning());
+                        }
+                    } else {
                         WordInfo2 info2 = t2.parseToWordInfo(text, 1);
-                        List<Pair<String, String>> exampleSentanceList = info2.getExampleSentanceList();
-                        if (exampleSentanceList.isEmpty()) {
-                            break;
-                        }
-                        for (Pair<String, String> p : exampleSentanceList) {
-                            sb.append(p.getKey() + "\n");
-                            sb.append(p.getValue() + "\n");
-                            sb.append("\n");
-                        }
 
-                        meaningSet.add(info2.getMeaning2());
-                        if (ii == 0) {
-                            googleTranslateArea_SetTooltip(text, info2.getMeaning2());
-                        }
+                        sb.append(text + "\n");
+                        sb.append(info2.getMeaning2() + "\n");
+                        sb.append(info2.getMeaningList() + "\n");
+                        sb.append("\n");
 
-                        if (findOk.get() == false && StringUtils.isNotBlank(info2.getMeaning2())) {
+                        meaningText.setText(info2.getMeaning2());
+                        googleTranslateArea_SetTooltip(text, info2.getMeaning2());
+
+                        if (StringUtils.isNotBlank(info2.getMeaning2())) {
                             findOk.set(true);
                             appendMemoryBank(text, info2.getMeaning2());
                         }
-                    } catch (Exception ex) {
-                        break;
+                    }
+
+                    // ---------------------------------------------------------
+                    int maxLoop = simpleSentanceChk.isSelected() ? 1 : 10;
+
+                    for (int ii = 0; ii < maxLoop; ii++) {
+                        try {
+                            WordInfo2 info2 = t2.parseToWordInfo(text, 1);
+                            List<Pair<String, String>> exampleSentanceList = info2.getExampleSentanceList();
+                            if (exampleSentanceList.isEmpty()) {
+                                break;
+                            }
+                            for (Pair<String, String> p : exampleSentanceList) {
+                                sb.append(p.getKey() + "\n");
+                                sb.append(p.getValue() + "\n");
+                                sb.append("\n");
+                            }
+
+                            meaningSet.add(info2.getMeaning2());
+                            if (ii == 0) {
+                                googleTranslateArea_SetTooltip(text, info2.getMeaning2());
+                            }
+
+                            if (findOk.get() == false && StringUtils.isNotBlank(info2.getMeaning2())) {
+                                findOk.set(true);
+                                appendMemoryBank(text, info2.getMeaning2());
+                            }
+                        } catch (Exception ex) {
+                            break;
+                        }
+                    }
+                    searchResultArea.setText(sb.toString());
+                    meaningText.setText(meaningText.getText() + ";" + StringUtils.join(meaningSet, ";"));
+
+                    mEnglishIdDropdownHandler.hidePopup4EnglishIdText();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                } finally {
+                    if (findOk.get() == false && offlineProp != null && !offlineProp.isEmpty()) {
+                        //
+                        List<String> wordLst = similarityWordList(text);
+                        int limit = 20;
+                        Map<String, String> wordMap = new LinkedHashMap<String, String>();
+                        for (int ii = 0; ii < wordLst.size(); ii++) {
+                            String t1 = wordLst.get(ii);
+                            wordMap.put(t1, offlineProp.getProperty(t1));
+                            if (ii >= limit) {
+                                break;
+                            }
+                        }
+                        if (!wordMap.isEmpty()) {
+                            SimpleCheckListDlg.newInstance("相似單字", wordMap, new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    List<String> wordLst2 = ((SimpleCheckListDlg) e.getSource()).getCheckedList();
+                                    if (!wordLst2.isEmpty()) {
+                                        searchEnglishIdText_auto.getTextComponent().setText(wordLst2.get(0));
+                                    }
+                                }
+                            }, new ActionListener() {
+
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                }
+                            });
+                        }
                     }
                 }
-                searchResultArea.setText(sb.toString());
-                meaningText.setText(meaningText.getText() + ";" + StringUtils.join(meaningSet, ";"));
-
-                mEnglishIdDropdownHandler.hidePopup4EnglishIdText();
             }
         }).start();
+    }
+
+    /**
+     * 取得相似度排序
+     */
+    public List<String> similarityWordList(String englishWord) {
+        long startTime = System.currentTimeMillis();
+
+        List<String> rtnList = new ArrayList<String>();
+        if (offlineProp == null) {
+            return rtnList;
+        }
+
+        Map<Double, List<String>> map = new HashMap<Double, List<String>>();
+        for (Enumeration enu = offlineProp.keys(); enu.hasMoreElements();) {
+            String word1 = (String) enu.nextElement();
+            Double d = SimilarityUtil.sim(englishWord, word1);
+            List<String> lst = new ArrayList<String>();
+            if (map.containsKey(d)) {
+                lst = map.get(d);
+            }
+            lst.add(word1);
+            map.put(d, lst);
+        }
+
+        List<Double> valueList = new ArrayList<Double>(map.keySet());
+        Collections.sort(valueList);
+        Collections.reverse(valueList);
+
+        for (Double d : valueList) {
+            rtnList.addAll(map.get(d));
+        }
+
+        long during = System.currentTimeMillis() - startTime;
+        return rtnList;
     }
 
     private void appendMemoryBank(String word, String desc) {

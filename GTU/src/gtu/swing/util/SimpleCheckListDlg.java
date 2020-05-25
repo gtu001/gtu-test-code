@@ -1,4 +1,4 @@
-package gtu._work.ui;
+package gtu.swing.util;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -10,6 +10,7 @@ import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -26,41 +27,40 @@ import javax.swing.table.DefaultTableModel;
 
 import org.apache.commons.lang.StringUtils;
 
-import gtu.swing.util.JCommonUtil;
-import gtu.swing.util.JTableUtil;
 import gtu.swing.util.JCommonUtil.HandleDocumentEvent;
 
-public class FastDBQueryUI_RowDiffWatcherDlg extends JDialog {
+public class SimpleCheckListDlg extends JDialog {
 
     private final JPanel contentPanel = new JPanel();
     private JTable table;
-    private JTextField searchText;
     private ActionListener okButtonAction = new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e) {
         }
     };
+    private JTextField searchText;
 
     /**
      * Launch the application.
      */
     public static void main(String[] args) {
-        final FastDBQueryUI_RowDiffWatcherDlg dlg = FastDBQueryUI_RowDiffWatcherDlg.newInstance(Arrays.asList("aa", "bb", "cc", "dd"), new ActionListener() {
+        final SimpleCheckListDlg dlg = SimpleCheckListDlg.newInstance("XXXXXX", Arrays.asList("aa", "bb", "cc", "dd"), new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                System.out.println(((FastDBQueryUI_RowDiffWatcherDlg) e.getSource()).getPkLst());
+                System.out.println(((SimpleCheckListDlg) e.getSource()).getCheckedList());
             }
         }, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                System.out.println(((FastDBQueryUI_RowDiffWatcherDlg) e.getSource()).getPkLst());
+                System.out.println(((SimpleCheckListDlg) e.getSource()).getCheckedList());
             }
         });
     }
 
-    public static FastDBQueryUI_RowDiffWatcherDlg newInstance(List<String> titleLst, ActionListener okButtonAction, final ActionListener onCloseListener) {
+    public static SimpleCheckListDlg newInstance(String title, List<String> titleLst, ActionListener okButtonAction, final ActionListener onCloseListener) {
         try {
-            final FastDBQueryUI_RowDiffWatcherDlg dialog = new FastDBQueryUI_RowDiffWatcherDlg(titleLst);
+            final SimpleCheckListDlg dialog = new SimpleCheckListDlg(titleLst, null);
+            dialog.setTitle(title);
             dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
             dialog.setVisible(true);
             dialog.okButtonAction = okButtonAction;
@@ -84,7 +84,34 @@ public class FastDBQueryUI_RowDiffWatcherDlg extends JDialog {
         }
     }
 
-    public List<String> getPkLst() {
+    public static SimpleCheckListDlg newInstance(String title, Map<String, String> titleMap, ActionListener okButtonAction, final ActionListener onCloseListener) {
+        try {
+            final SimpleCheckListDlg dialog = new SimpleCheckListDlg(null, titleMap);
+            dialog.setTitle(title);
+            dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+            dialog.setVisible(true);
+            dialog.okButtonAction = okButtonAction;
+
+            JTableUtil.setColumnWidths_Percent(dialog.table, new float[] { 10f, 45f, 45f });
+
+            dialog.addWindowListener(new WindowAdapter() {
+                public void windowClosed(WindowEvent e) {
+                    if (onCloseListener != null) {
+                        onCloseListener.actionPerformed(new ActionEvent(dialog, -1, "close"));
+                    }
+                }
+
+                public void windowClosing(WindowEvent e) {
+                }
+            });
+            JCommonUtil.setFrameAtop(dialog, true);
+            return dialog;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public List<String> getCheckedList() {
         List<String> pkLst = new ArrayList<String>();
         JTableUtil t = JTableUtil.newInstance(table);
         DefaultTableModel model = (DefaultTableModel) table.getModel();
@@ -98,11 +125,25 @@ public class FastDBQueryUI_RowDiffWatcherDlg extends JDialog {
         return pkLst;
     }
 
+    public Map<String, String> getCheckedMap() {
+        Map<String, String> rtnMap = new LinkedHashMap<String, String>();
+        JTableUtil t = JTableUtil.newInstance(table);
+        DefaultTableModel model = (DefaultTableModel) table.getModel();
+        for (int ii = 0; ii < model.getRowCount(); ii++) {
+            Boolean v = (Boolean) t.getValueAt(true, ii, 0);
+            String n = (String) t.getValueAt(true, ii, 1);
+            String v2 = (String) t.getValueAt(true, ii, 2);
+            if (v) {
+                rtnMap.put(n, v2);
+            }
+        }
+        return rtnMap;
+    }
+
     /**
      * Create the dialog.
      */
-    public FastDBQueryUI_RowDiffWatcherDlg(List<String> titleLst) {
-        setTitle("請設定主鍵");
+    public SimpleCheckListDlg(List<String> titleLst, Map<String, String> titleMap) {
         setBounds(100, 100, 450, 300);
         getContentPane().setLayout(new BorderLayout());
         contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -179,10 +220,19 @@ public class FastDBQueryUI_RowDiffWatcherDlg extends JDialog {
         {
             table = new JTable();
             contentPanel.add(JCommonUtil.createScrollComponent(table), BorderLayout.CENTER);
-            DefaultTableModel model = JTableUtil.createModel(new int[] { 0 }, new Object[] { "主鍵", "欄位" }, new Class[] { Boolean.class, String.class });
-            table.setModel(model);
-            for (String column : titleLst) {
-                model.addRow(new Object[] { false, column });
+
+            if (titleLst != null && !titleLst.isEmpty()) {
+                DefaultTableModel model = JTableUtil.createModel(new int[] { 0 }, new Object[] { "勾選", "項目" }, new Class[] { Boolean.class, String.class });
+                table.setModel(model);
+                for (String column : titleLst) {
+                    model.addRow(new Object[] { false, column });
+                }
+            } else if (titleMap != null && !titleMap.isEmpty()) {
+                DefaultTableModel model = JTableUtil.createModel(new int[] { 0 }, new Object[] { "勾選", "項目", "說明" }, new Class[] { Boolean.class, String.class, String.class });
+                table.setModel(model);
+                for (String column : titleMap.keySet()) {
+                    model.addRow(new Object[] { false, column, StringUtils.trimToEmpty(titleMap.get(column)) });
+                }
             }
         }
         {
@@ -195,9 +245,9 @@ public class FastDBQueryUI_RowDiffWatcherDlg extends JDialog {
                 okButton.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        List<String> pkLst = getPkLst();
+                        List<String> pkLst = getCheckedList();
                         if (!pkLst.isEmpty()) {
-                            okButtonAction.actionPerformed(new ActionEvent(FastDBQueryUI_RowDiffWatcherDlg.this, -1, "this"));
+                            okButtonAction.actionPerformed(new ActionEvent(SimpleCheckListDlg.this, -1, "this"));
                             dispose();
                         } else {
                             JCommonUtil._jOptionPane_showMessageDialog_error("請選擇主鍵!");

@@ -1309,15 +1309,24 @@ public class JTableUtil {
     }
 
     public static void setColumnWidths_Percent(JTable table, float[] widthPercentArry) {
+        setColumnWidths_Percent(table, null, widthPercentArry);
+    }
+
+    public static void setColumnWidths_Percent(JTable table, Double tableFullWidth, float[] widthPercentArry) {
         int columnCount = table.getColumnCount();
         if (columnCount != widthPercentArry.length) {
             throw new RuntimeException("陣列長度必須為 : " + columnCount);
         }
-        TableColumnModel tcm = table.getColumnModel();
-        double wholeSize = table.getSize().getWidth();
-        if (table.getParent() instanceof JViewport) {
-            wholeSize = ((JViewport) table.getParent()).getSize().getWidth() - 5;
+
+        Double wholeSize = tableFullWidth;
+        if (wholeSize == null) {
+            wholeSize = table.getSize().getWidth();
+            if (table.getParent() instanceof JViewport) {
+                wholeSize = ((JViewport) table.getParent()).getSize().getWidth() - 5;
+            }
         }
+
+        TableColumnModel tcm = table.getColumnModel();
         System.out.println("table wholeSize : " + wholeSize);
         for (int i = 0; i < columnCount; i++) {
             int width = (int) (wholeSize * (widthPercentArry[i] / 100));
@@ -1762,9 +1771,10 @@ public class JTableUtil {
         } else {
             table.getColumnModel().getColumn(cellIdx).setCellRenderer(mMyRenderer);
         }
+        table.updateUI();
     }
 
-    public void setCellBackgroundColor(Color color, final Map<Integer, List<Integer>> changeColorRowCellIdxMap) {
+    public void setCellBackgroundColor(Color color, final Map<Integer, List<Integer>> changeColorRowCellIdxMap, List<Integer> ignoreColLst) {
         class MyRenderer extends DefaultTableCellRenderer {
             java.awt.Color color;
 
@@ -1795,8 +1805,12 @@ public class JTableUtil {
         }
         MyRenderer mMyRenderer = new MyRenderer(color);
         for (int ii = 0; ii < table.getColumnModel().getColumnCount(); ii++) {
+            if (ignoreColLst != null && ignoreColLst.contains(ii)) {
+                continue;
+            }
             table.getColumnModel().getColumn(ii).setCellRenderer(mMyRenderer);
         }
+        table.updateUI();
     }
 
     public void setRowSelection() {

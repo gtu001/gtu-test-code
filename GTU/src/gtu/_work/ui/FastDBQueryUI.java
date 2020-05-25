@@ -2545,7 +2545,7 @@ public class FastDBQueryUI extends JFrame {
         }
 
         if (changeColorRowCellIdxMap != null) {
-            JTableUtil.newInstance(queryResultTable).setCellBackgroundColor(Color.green.brighter(), changeColorRowCellIdxMap);
+            JTableUtil.newInstance(queryResultTable).setCellBackgroundColor(Color.green.brighter(), changeColorRowCellIdxMap, null);
         }
 
         JTableUtil.newInstance(queryResultTable).columnIsButton(QUERY_RESULT_COLUMN_NO);
