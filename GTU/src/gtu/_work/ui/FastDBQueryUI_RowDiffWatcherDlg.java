@@ -5,8 +5,14 @@ import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.BufferedReader;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -26,9 +32,12 @@ import javax.swing.table.DefaultTableModel;
 
 import org.apache.commons.lang.StringUtils;
 
+import gtu.clipboard.ClipboardUtil;
 import gtu.swing.util.JCommonUtil;
-import gtu.swing.util.JTableUtil;
+import gtu.swing.util.JMouseEventUtil;
 import gtu.swing.util.JCommonUtil.HandleDocumentEvent;
+import gtu.swing.util.JPopupMenuUtil;
+import gtu.swing.util.JTableUtil;
 
 public class FastDBQueryUI_RowDiffWatcherDlg extends JDialog {
 
@@ -119,6 +128,32 @@ public class FastDBQueryUI_RowDiffWatcherDlg extends JDialog {
                 searchText = new JTextField();
                 panel.add(searchText);
                 searchText.setColumns(30);
+
+                searchText.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                        if (JMouseEventUtil.buttonRightClick(1, e)) {
+                            JPopupMenuUtil.newInstance(searchText)//
+                                    .addJMenuItem("多行貼上", new ActionListener() {
+                                        @Override
+                                        public void actionPerformed(ActionEvent e) {
+                                            String text = ClipboardUtil.getInstance().getContents();
+                                            try {
+                                                List<String> lst = new ArrayList<String>();
+                                                BufferedReader reader = new BufferedReader(new StringReader(text));
+                                                for (String line = null; (line = reader.readLine()) != null;) {
+                                                    lst.add(line);
+                                                }
+                                                searchText.setText(StringUtils.join(lst, "^"));
+                                                reader.close();
+                                            } catch (Exception ex) {
+                                            }
+                                        }
+                                    }).applyEvent(e).show();
+                        }
+                    }
+                });
+
                 searchText.getDocument().addDocumentListener(JCommonUtil.getDocumentListener(new HandleDocumentEvent() {
                     @Override
                     public void process(DocumentEvent event) {
@@ -130,6 +165,14 @@ public class FastDBQueryUI_RowDiffWatcherDlg extends JDialog {
                             }
                             String text1 = StringUtils.trimToEmpty(searchText.getText());
                             String text = text1.toLowerCase();
+                            List<String> textLst = new ArrayList<String>();
+                            for (String t : text1.split("\\^", -1)) {
+                                t = StringUtils.trimToEmpty(t).toLowerCase();
+                                if (StringUtils.isNotBlank(t)) {
+                                    textLst.add(t);
+                                }
+                            }
+
                             Pattern ptn = null;
                             try {
                                 ptn = Pattern.compile(text1, Pattern.CASE_INSENSITIVE);
@@ -142,15 +185,25 @@ public class FastDBQueryUI_RowDiffWatcherDlg extends JDialog {
                             for (int ii = 0; ii < model.getRowCount(); ii++) {
                                 List<Integer> lst = new ArrayList<Integer>();
                                 changeColorMap.put(ii, lst);
-                                for (int jj = 0; jj < table.getColumnCount(); jj++) {
+                                A: for (int jj = 0; jj < table.getColumnCount(); jj++) {
                                     Object val = util.getValueAt(true, ii, jj);
                                     if (val instanceof String) {
                                         String strVal = (String) val;
+
+                                        for (String txt : textLst) {
+                                            if (strVal.toLowerCase().contains(txt)) {
+                                                lst.add(jj);
+                                                continue A;
+                                            }
+                                        }
+
                                         if (strVal.toLowerCase().contains(text)) {
                                             lst.add(jj);
+                                            continue A;
                                         } else if (ptn != null) {
                                             if (ptn.matcher(strVal).find()) {
                                                 lst.add(jj);
+                                                continue A;
                                             }
                                         }
                                     }

@@ -60,6 +60,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
 
+import gtu._work.ui.FastDBQueryUI.S2T_And_T2S_EventHandler;
 import gtu._work.ui.FastDBQueryUI_ColumnSearchFilter.FindTextHandler;
 import gtu._work.ui.JMenuBarUtil.JMenuAppender;
 import gtu.binary.Base64JdkUtil;
@@ -742,6 +743,11 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                 return super.stopCellEditing();// true 表示修改成功
             }
         });
+
+        // set value mouse event
+        JTextField editJTextField = new JTextField();
+        editJTextField.addMouseListener(new S2T_And_T2S_EventHandler(editJTextField).getEvent());
+        JTableUtil.newInstance(rowTable).columnIsComponent(ColumnOrderDef.value.ordinal(), editJTextField);
         return tableUtil.getModel();
     }
 
@@ -1421,65 +1427,6 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                             }
                             inst.addJMenuItem(chdMenu.getMenu());
                         }
-
-                        {// base64 --- start
-                            JMenuAppender chdMenu = JMenuAppender.newInstance("Base64");
-                            chdMenu.addMenuItem("Encode", new ActionListener() {
-                                @Override
-                                public void actionPerformed(ActionEvent e) {
-                                    Object val = JTableUtil.newInstance(rowTable).getSelectedValue();
-                                    if (val != null) {
-                                        String strVal = String.valueOf(val);
-                                        rowTable.setValueAt(Base64JdkUtil.encode(strVal), rowPos.get(), ColumnOrderDef.value.ordinal());
-                                    }
-                                }
-                            });
-                            chdMenu.addMenuItem("Decode", new ActionListener() {
-                                @Override
-                                public void actionPerformed(ActionEvent e) {
-                                    Object val = JTableUtil.newInstance(rowTable).getSelectedValue();
-                                    if (val != null) {
-                                        String strVal = String.valueOf(val);
-                                        rowTable.setValueAt(Base64JdkUtil.decodeToString(strVal), rowPos.get(), ColumnOrderDef.value.ordinal());
-                                    }
-                                }
-                            });
-                            inst.addJMenuItem(chdMenu.getMenu());
-                        } // base64 --- end
-
-                        {// 簡繁體 --- start
-                            JMenuAppender chdMenu = JMenuAppender.newInstance("Base64");
-                            chdMenu.addMenuItem("繁轉簡", new ActionListener() {
-                                @Override
-                                public void actionPerformed(ActionEvent e) {
-                                    Object val = JTableUtil.newInstance(rowTable).getSelectedValue();
-                                    if (val != null) {
-                                        String strVal = String.valueOf(val);
-                                        try {
-                                            rowTable.setValueAt(JChineseConvertor.getInstance().t2s(strVal), rowPos.get(), ColumnOrderDef.value.ordinal());
-                                        } catch (IOException e1) {
-                                            e1.printStackTrace();
-                                        }
-                                    }
-                                }
-                            });
-                            chdMenu.addMenuItem("簡轉繁", new ActionListener() {
-                                @Override
-                                public void actionPerformed(ActionEvent e) {
-                                    Object val = JTableUtil.newInstance(rowTable).getSelectedValue();
-                                    if (val != null) {
-                                        String strVal = String.valueOf(val);
-                                        try {
-                                            rowTable.setValueAt(JChineseConvertor.getInstance().s2t(strVal), rowPos.get(), ColumnOrderDef.value.ordinal());
-                                        } catch (IOException e1) {
-                                            e1.printStackTrace();
-                                        }
-                                    }
-                                }
-                            });
-                            inst.addJMenuItem(chdMenu.getMenu());
-                        } // 簡繁體 --- end
-                        
                         inst.applyEvent(e).show();
                     }
                 }

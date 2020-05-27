@@ -109,6 +109,7 @@ import gtu._work.ui.JMenuBarUtil.JMenuAppender;
 import gtu.binary.Base64JdkUtil;
 import gtu.clipboard.ClipboardUtil;
 import gtu.collection.ListUtil;
+import gtu.collection.MapUtil;
 import gtu.db.ExternalJDBCDriverJarLoader;
 import gtu.db.JdbcDBUtil;
 import gtu.db.jdbc.util.DBDateUtil.DBDateFormat;
@@ -1910,6 +1911,11 @@ public class FastDBQueryUI extends JFrame {
             comboBox.addItem(e);
         }
         sportColumn.setCellEditor(new DefaultCellEditor(comboBox));
+
+        // set value mouse event
+        JTextField editJTextField = new JTextField();
+        editJTextField.addMouseListener(new S2T_And_T2S_EventHandler(editJTextField).getEvent());
+        JTableUtil.newInstance(parametersTable).columnIsComponent(ParameterTableColumnDef.VALUE.idx, editJTextField);
     }
 
     private enum DataType {
@@ -2394,6 +2400,8 @@ public class FastDBQueryUI extends JFrame {
 
             // 設定預設欄位定義
             setCustomColumnTitleTooltip();
+            // 設定預設欄位代碼定義
+            setCustomColumnCodeValueTooptip();
         } catch (Exception ex) {
             queryResultTable.setModel(JTableUtil.createModel(true, "ERROR"));
             String category = refSearchCategoryCombobox_Auto.getTextComponent().getText();
@@ -3552,7 +3560,7 @@ public class FastDBQueryUI extends JFrame {
                 HSSFSheet sheet2 = wk.createSheet("sql");
 
                 // 寫sql
-                exlUtl.getCellChk(exlUtl.getRowChk(sheet2, 0), 0).setCellValue(StringUtils.trimToEmpty(sqlTextArea.getText()));
+                exlUtl.getCellChk(exlUtl.getRowChk(sheet2, 0), 0).setCellValue(StringUtils.trimToEmpty(getCurrentSQL()));
                 JTableUtil paramUtl = JTableUtil.newInstance(parametersTable);
                 int sqlRowPos = 2;
                 for (int ii = 0; ii < paramUtl.getModel().getRowCount(); ii++) {
@@ -5835,14 +5843,15 @@ public class FastDBQueryUI extends JFrame {
     }
 
     // 設定預設欄位定義
-    public void setCustomColumnTitleTooltip() {
+    // 格式為 /*中文解釋 */
+    private void setCustomColumnTitleTooltip() {
         queryResultTable.setTitleTooltipTransformer(new Transformer() {
             @Override
             public Object transform(Object input) {
                 Pair<Integer, Object> p = (Pair<Integer, Object>) input;
                 String column = (String) p.getRight();
                 String sql = getCurrentSQL();
-                Pattern ptn = Pattern.compile(column + "[\\s\\t\\n\\r]*\\/\\*(.*?)\\*\\/", Pattern.DOTALL | Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
+                Pattern ptn = Pattern.compile(column + "[\\]\\'\"]?[\\s\\t\n\r]*\\/\\*(.*?)\\*\\/", Pattern.DOTALL | Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
                 Matcher mth = ptn.matcher(sql);
                 String tmpTip = null;
                 while (mth.find()) {
@@ -5857,6 +5866,76 @@ public class FastDBQueryUI extends JFrame {
                 return null;
             }
         });
+    }
+
+    // 設定預設欄位代碼定義
+    // 格式為 /*中文解釋 code=label code=label etc..*/
+    private void setCustomColumnCodeValueTooptip() {
+        try {
+            Pattern ptn3 = Pattern.compile("\\s+(.*)", Pattern.DOTALL | Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
+            String sql = getCurrentSQL();
+            final Map<String, Map<String, String>> columnCodeValueMap = new HashMap<String, Map<String, String>>();
+            final List<Object> titles = JTableUtil.newInstance(queryResultTable).getColumnTitleArray();
+            for (Object tit : titles) {
+                String column = (String) tit;
+                Pattern ptn = Pattern.compile(column + "[\\]\\'\"]?[\\s\\t\n\r]*\\/\\*(.*?)\\*\\/", Pattern.DOTALL | Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
+                Matcher mth = ptn.matcher(sql);
+                String tmpTip = null;
+                while (mth.find()) {
+                    int startPos = mth.start();
+                    tmpTip = mth.group(1);
+                    String prefix = StringUtils.substring(sql, startPos - 1, startPos);
+                    if (prefix.matches("[a-zA-Z]")) {
+                        continue;
+                    }
+                    break;
+                }
+                if (StringUtils.isNotBlank(tmpTip)) {
+                    Matcher mth21 = ptn3.matcher(tmpTip);
+                    if (mth21.find()) {
+                        String coleValueString = mth21.group(1).replaceAll("[\\r\\n]", " ");
+                        Map<String, String> codeValMap = new HashMap<String, String>();
+                        String[] arry = coleValueString.split(" ", -1);
+                        for (String keyVal : arry) {
+                            String[] arry2 = keyVal.split("=", -1);
+                            String code = StringUtils.trimToEmpty(arry2[0]);
+                            if (StringUtils.isNotBlank(code)) {
+                                String value = StringUtils.trimToEmpty(arry2[1]);
+                                codeValMap.put(code, value);
+                            }
+                        }
+                        columnCodeValueMap.put(column, codeValMap);
+                    }
+                }
+            }
+            if (!columnCodeValueMap.isEmpty()) {
+                JTableUtil.newInstance(queryResultTable).applyOnHoverEvent(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        Pair<Integer, Integer> pair = (Pair<Integer, Integer>) e.getSource();
+                        Object title = JTableUtil.newInstance(queryResultTable).getColumnTitle(pair.getRight());
+                        if (title == null) {
+                            queryResultTable.setToolTipText(null);
+                            return;
+                        }
+                        String column = (String) title;
+                        if (columnCodeValueMap.containsKey(column)) {
+                            Object val = JTableUtil.newInstance(queryResultTable).getValueAt(true, pair.getLeft(), pair.getRight());
+                            Map<String, String> codeValueMap = MapUtil.getIgnorecase(column, columnCodeValueMap);
+                            if (val != null) {
+                                String value = StringUtils.trimToEmpty(String.valueOf(val));
+                                String mappingLabel = MapUtil.getIgnorecase(value, codeValueMap);
+                                queryResultTable.setToolTipText(mappingLabel);
+                                return;
+                            }
+                        }
+                        queryResultTable.setToolTipText(null);
+                    }
+                });
+            }
+        } catch (Exception ex) {
+            JCommonUtil.handleException(ex);
+        }
     }
 
     class TableColumnDefTextHandler {
@@ -6193,11 +6272,11 @@ public class FastDBQueryUI extends JFrame {
 
     // ======================================================================================================================
 
-    private class S2T_And_T2S_EventHandler {
+    public static class S2T_And_T2S_EventHandler {
 
         JTextField input;
 
-        S2T_And_T2S_EventHandler(JTextField input) {
+        public S2T_And_T2S_EventHandler(JTextField input) {
             this.input = input;
         }
 
@@ -6221,6 +6300,36 @@ public class FastDBQueryUI extends JFrame {
                             text = JChineseConvertor.getInstance().s2t(text);
                         } else {
                             text = JChineseConvertor.getInstance().t2s(text);
+                        }
+                        return text;
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+                return text;
+            }
+        };
+
+        final Transformer trans2 = new Transformer() {
+            public Object transform(final Object _input) {
+                String text = input.getText();
+                try {
+                    boolean isEncode = (Boolean) _input;
+                    if (StringUtils.isNotBlank(input.getSelectedText())) {
+                        String before = StringUtils.substring(text, 0, input.getSelectionStart());
+                        String middle = input.getSelectedText();
+                        if (isEncode) {
+                            middle = Base64JdkUtil.encode(middle);
+                        } else {
+                            middle = Base64JdkUtil.decodeToString(middle);
+                        }
+                        String after = StringUtils.substring(text, input.getSelectionEnd());
+                        return before + middle + after;
+                    } else {
+                        if (isEncode) {
+                            text = Base64JdkUtil.encode(text);
+                        } else {
+                            text = Base64JdkUtil.decodeToString(text);
                         }
                         return text;
                     }
@@ -6261,6 +6370,16 @@ public class FastDBQueryUI extends JFrame {
                                         @Override
                                         public void actionPerformed(ActionEvent e) {
                                             input.setText((String) trans.transform(true));
+                                        }
+                                    }).addJMenuItem("Encode", new ActionListener() {
+                                        @Override
+                                        public void actionPerformed(ActionEvent e) {
+                                            input.setText((String) trans2.transform(true));
+                                        }
+                                    }).addJMenuItem("Decode", new ActionListener() {
+                                        @Override
+                                        public void actionPerformed(ActionEvent e) {
+                                            input.setText((String) trans2.transform(false));
                                         }
                                     }).applyEvent(e).show();
                         }

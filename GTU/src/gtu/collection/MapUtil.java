@@ -162,11 +162,23 @@ public class MapUtil {
             }
         }
     }
+    
+    /**
+     * 取得key對應value忽略大小寫
+     */
+    public static <V> V getIgnorecase(String fetichKey, Map<String, V> map) {
+        for (String key : map.keySet()) {
+            if (fetichKey.equalsIgnoreCase(key)) {
+                return map.get(key);
+            }
+        }
+        return null;
+    }
 
     /**
      * 取得key對應value忽略大小寫
      */
-    public static <V> List<V> getIgnorecase(String fetichKey, Map<String, V> map) {
+    public static <V> List<V> getIgnorecaseToList(String fetichKey, Map<String, V> map) {
         List<V> list = new ArrayList<V>();
         for (String key : map.keySet()) {
             if (fetichKey.equalsIgnoreCase(key)) {

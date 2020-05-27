@@ -1507,6 +1507,15 @@ public class JTableUtil {
         Pair<Color, Color> getTableColour(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column);
     }
 
+    public Object getColumnTitle(int col) {
+        TableColumnModel titleModel = table.getTableHeader().getColumnModel();
+        if (titleModel.getColumnCount() > col) {
+            TableColumn col2 = titleModel.getColumn(col);
+            return col2.getHeaderValue();
+        }
+        return null;
+    }
+
     public List<Object> getColumnTitleArray() {
         List<Object> titles = new ArrayList<Object>();
         TableColumnModel titleModel = table.getTableHeader().getColumnModel();
