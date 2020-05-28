@@ -3568,46 +3568,48 @@ public class FastDBQueryUI extends JFrame {
                 ExcelColorCreater mExcelColorCreater = ExcelColorCreater.newInstance(wk);
 
                 // 寫sql
-                JTableUtil paramUtl = JTableUtil.newInstance(parametersTable);
-                Row sqlRow = exlUtl.getRowChk(sheet2, 0);
-                Cell sqlCell = exlUtl.getCellChk(sqlRow, 0);
-                sqlCell.setCellValue(StringUtils.trimToEmpty(getCurrentSQL()));
-                sqlRow.setHeightInPoints((10 * sheet2.getDefaultRowHeightInPoints()));
+                {
+                    JTableUtil paramUtl = JTableUtil.newInstance(parametersTable);
+                    Row sqlRow = exlUtl.getRowChk(sheet2, 0);
+                    Cell sqlCell = exlUtl.getCellChk(sqlRow, 0);
+                    sqlCell.setCellValue(StringUtils.trimToEmpty(getCurrentSQL()));
+                    sqlRow.setHeightInPoints((10 * sheet2.getDefaultRowHeightInPoints()));
 
-                if (paramUtl.getModel().getRowCount() > 0) {
-                    int sqlRowPos = 2;
-                    CellStyleHandler titleCs1 = ExcelWriter.CellStyleHandler.newInstance(wk.createCellStyle())//
-                            .setForegroundColor(mExcelColorCreater.of("#678F8D"));
-                    CellStyleHandler titleCs2 = ExcelWriter.CellStyleHandler.newInstance(wk.createCellStyle())//
-                            .setForegroundColor(mExcelColorCreater.of("#77A88D")).setAlignment(HSSFCellStyle.ALIGN_CENTER);
-                    CellStyleHandler titleCs3 = ExcelWriter.CellStyleHandler.newInstance(wk.createCellStyle())//
-                            .setForegroundColor(mExcelColorCreater.of("#FFD000"));
-                    Cell c00 = exlUtl.getCellChk(exlUtl.getRowChk(sheet2, sqlRowPos), 0);
-                    Cell c01 = exlUtl.getCellChk(exlUtl.getRowChk(sheet2, sqlRowPos), 1);
-                    sqlRowPos++;
-                    titleCs1.applyStyle(c00);
-                    titleCs1.applyStyle(c01);
-                    c00.setCellValue("以下為參數列表");
-                    Cell c10 = exlUtl.getCellChk(exlUtl.getRowChk(sheet2, sqlRowPos), 0);
-                    Cell c11 = exlUtl.getCellChk(exlUtl.getRowChk(sheet2, sqlRowPos), 1);
-                    titleCs2.applyStyle(c10);
-                    titleCs2.applyStyle(c11);
-                    c10.setCellValue("參數名稱");
-                    c11.setCellValue("值");
-                    sqlRowPos++;
-                    for (int ii = 0; ii < paramUtl.getModel().getRowCount(); ii++) {
-                        int col1 = JTableUtil.getRealColumnPos(ParameterTableColumnDef.COLUMN.idx, parametersTable);
-                        int val1 = JTableUtil.getRealColumnPos(ParameterTableColumnDef.VALUE.idx, parametersTable);
-                        Object col = paramUtl.getRealValueAt(JTableUtil.getRealRowPos(ii, parametersTable), col1);
-                        Object val = paramUtl.getRealValueAt(JTableUtil.getRealRowPos(ii, parametersTable), val1);
-
-                        Cell cc1 = exlUtl.getCellChk(exlUtl.getRowChk(sheet2, sqlRowPos), 0);
-                        Cell cc2 = exlUtl.getCellChk(exlUtl.getRowChk(sheet2, sqlRowPos), 1);
-                        cc1.setCellValue(String.valueOf(col));
-                        cc2.setCellValue(String.valueOf(val));
-                        titleCs3.applyStyle(cc1);
-                        titleCs3.applyStyle(cc2);
+                    if (paramUtl.getModel().getRowCount() > 0) {
+                        int sqlRowPos = 2;
+                        CellStyleHandler titleCs1 = ExcelWriter.CellStyleHandler.newInstance(wk.createCellStyle())//
+                                .setForegroundColor(mExcelColorCreater.of("#678F8D"));
+                        CellStyleHandler titleCs2 = ExcelWriter.CellStyleHandler.newInstance(wk.createCellStyle())//
+                                .setForegroundColor(mExcelColorCreater.of("#77A88D")).setAlignment(HSSFCellStyle.ALIGN_CENTER);
+                        CellStyleHandler titleCs3 = ExcelWriter.CellStyleHandler.newInstance(wk.createCellStyle())//
+                                .setForegroundColor(mExcelColorCreater.of("#FFD000"));
+                        Cell c00 = exlUtl.getCellChk(exlUtl.getRowChk(sheet2, sqlRowPos), 0);
+                        Cell c01 = exlUtl.getCellChk(exlUtl.getRowChk(sheet2, sqlRowPos), 1);
                         sqlRowPos++;
+                        titleCs1.applyStyle(c00);
+                        titleCs1.applyStyle(c01);
+                        c00.setCellValue("以下為參數列表");
+                        Cell c10 = exlUtl.getCellChk(exlUtl.getRowChk(sheet2, sqlRowPos), 0);
+                        Cell c11 = exlUtl.getCellChk(exlUtl.getRowChk(sheet2, sqlRowPos), 1);
+                        titleCs2.applyStyle(c10);
+                        titleCs2.applyStyle(c11);
+                        c10.setCellValue("參數名稱");
+                        c11.setCellValue("值");
+                        sqlRowPos++;
+                        for (int ii = 0; ii < paramUtl.getModel().getRowCount(); ii++) {
+                            int col1 = JTableUtil.getRealColumnPos(ParameterTableColumnDef.COLUMN.idx, parametersTable);
+                            int val1 = JTableUtil.getRealColumnPos(ParameterTableColumnDef.VALUE.idx, parametersTable);
+                            Object col = paramUtl.getRealValueAt(JTableUtil.getRealRowPos(ii, parametersTable), col1);
+                            Object val = paramUtl.getRealValueAt(JTableUtil.getRealRowPos(ii, parametersTable), val1);
+
+                            Cell cc1 = exlUtl.getCellChk(exlUtl.getRowChk(sheet2, sqlRowPos), 0);
+                            Cell cc2 = exlUtl.getCellChk(exlUtl.getRowChk(sheet2, sqlRowPos), 1);
+                            cc1.setCellValue(String.valueOf(col));
+                            cc2.setCellValue(String.valueOf(val));
+                            titleCs3.applyStyle(cc1);
+                            titleCs3.applyStyle(cc2);
+                            sqlRowPos++;
+                        }
                     }
                 }
 
