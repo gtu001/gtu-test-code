@@ -6,10 +6,7 @@ import com.example.englishtester.common.FileUtilAndroid;
 import com.example.englishtester.common.FileUtilGtu;
 import com.example.englishtester.common.Log;
 import com.example.englishtester.common.TagMatcher;
-import com.nostra13.universalimageloader.utils.L;
 
-import org.apache.commons.collections.TransformerUtils;
-import org.apache.commons.collections4.Transformer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 
@@ -20,12 +17,10 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.LinkedList;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -59,6 +54,7 @@ public abstract class HtmlBaseParser {
     public static final String WORD_HTML_ENCODE = "BIG5";
     public static final int HYPER_LINK_LABEL_MAX_LENGTH = 50;
     protected static final String NEW_LINE = "\r\n\r\n";
+    protected static final String NEW_LINE_Single = "\r\n";
 
     private static final String TAG = HtmlBaseParser.class.getSimpleName();
 
@@ -153,6 +149,8 @@ public abstract class HtmlBaseParser {
         validateContent("_step1_fontSize_Indicate", content, checkStr);
         content = _step2_normalContent(content, isPure);
         validateContent("_step2_nomalContent", content, checkStr);
+        content = _step2_replaceToNewLine(content, isPure);
+        validateContent("_step2_replaceToNewLine_byPattern", content, checkStr);
         content = _step2_hrefTag(content, isPure);
         validateContent("_step2_hrefTag", content, checkStr);
         content = _step2$1_hrefTag(content, isPure);
@@ -194,6 +192,12 @@ public abstract class HtmlBaseParser {
         content = org.springframework.web.util.HtmlUtils.htmlUnescape(content);
 
         Log.v(TAG, "# getFromContentMain END...");
+        return content;
+    }
+
+    private String _step2_replaceToNewLine(String content, boolean isPure) {
+        content = _step2_replaceToNewLine_byPattern(content, "\\<title\\s+class\\=(?:.|\n)*?\\>", false, isPure);
+        content = _step2_replaceToNewLine_byPattern(content, "\\<br\\/\\>", true, isPure);
         return content;
     }
 
@@ -446,6 +450,29 @@ public abstract class HtmlBaseParser {
         return sb.toString();
     }
 
+    protected String _step2_replaceToNewLine_byPattern(String content, String pattern, boolean isSingleNewLine, boolean isPure) {
+        Pattern titleStylePtn = Pattern.compile(pattern, Pattern.DOTALL | Pattern.MULTILINE);
+        StringBuffer sb = new StringBuffer();
+        Matcher mth = titleStylePtn.matcher(content);
+        String newLine = NEW_LINE;
+        if (isSingleNewLine) {
+            newLine = NEW_LINE_Single;
+        }
+        while (mth.find()) {
+            AtomicReference<String> errMsg = new AtomicReference<String>();
+            try {
+                mth.appendReplacement(sb, newLine);
+            } catch (Exception ex) {
+                for (int ii = 0; ii < 10; ii++)
+                    Log.e(TAG, "處理失敗 : " + ex.getMessage() + " ==== " + errMsg.get());
+                ex.printStackTrace();
+                mth.appendReplacement(sb, mth.group());
+            }
+        }
+        mth.appendTail(sb);
+        return sb.toString();
+    }
+
     protected String _step2_normalContent(String content, boolean isPure) {
         Pattern titleStylePtn = Pattern.compile("\\<span(?:.|\n)*?\\>((?:.|\n)*?)\\<\\/span\\>", Pattern.DOTALL | Pattern.MULTILINE);
         StringBuffer sb = new StringBuffer();
@@ -527,7 +554,7 @@ public abstract class HtmlBaseParser {
         if (url.matches("https?\\:.*") || //
                 url.matches("www\\..*") || //
                 url.matches("\\w+\\.\\w+.*") //
-                ) {
+        ) {
             return url;
         }
 
@@ -833,6 +860,9 @@ public abstract class HtmlBaseParser {
         validateContent("_stepFinal_hidden_tag 35", content, checkStr);
         content = _stepFinal_hidden_tag(content, "\\<figcaption\\s(?:.|\n)*?\\>");
         validateContent("_stepFinal_hidden_tag 36", content, checkStr);
+        content = _stepFinal_hidden_tag(content, "\\<meta\\s(?:.|\n)*?\\>");
+        validateContent("_stepFinal_hidden_tag 37", content, checkStr);
+
         content = _stepFinal_hidden_tag(content, "\\<a(?:.|\n)*?\\>");
         validateContent("_stepFinal_hidden_tag (for link contain IMG)", content, checkStr);
 
