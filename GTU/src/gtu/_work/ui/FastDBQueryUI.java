@@ -92,6 +92,7 @@ import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.hssf.util.HSSFColor;
+import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
@@ -120,6 +121,7 @@ import gtu.file.OsInfoUtil;
 import gtu.keyboard_mouse.JnativehookKeyboardMouseHelper;
 import gtu.log.LoggerAppender;
 import gtu.number.RandomUtil;
+import gtu.poi.hssf.ExcelColorCreater;
 import gtu.poi.hssf.ExcelUtil_Xls97;
 import gtu.poi.hssf.ExcelWriter;
 import gtu.poi.hssf.ExcelWriter.CellStyleHandler;
@@ -366,6 +368,7 @@ public class FastDBQueryUI extends JFrame {
     private JLabel label_2;
     private JLabel lblNewLabel_19;
     private JLabel columnXlsDefFindRowCountLbl;
+    private JCheckBox radio_export_excel_ignoreNull;
 
     private final Predicate IGNORE_PREDICT = new Predicate() {
         @Override
@@ -1231,6 +1234,9 @@ public class FastDBQueryUI extends JFrame {
                 excelExportBtnAction();
             }
         });
+
+        radio_export_excel_ignoreNull = new JCheckBox("匯出null改為空白");
+        panel_15.add(radio_export_excel_ignoreNull);
         panel_15.add(excelExportBtn);
 
         recordWatcherToggleBtn = new JToggleButton("監聽");
@@ -3558,20 +3564,46 @@ public class FastDBQueryUI extends JFrame {
                 HSSFSheet sheet0 = wk.createSheet("string value sheet");
                 HSSFSheet sheet1 = wk.createSheet("orign value sheet");
                 HSSFSheet sheet2 = wk.createSheet("sql");
+                ExcelColorCreater mExcelColorCreater = ExcelColorCreater.newInstance(wk);
 
                 // 寫sql
-                exlUtl.getCellChk(exlUtl.getRowChk(sheet2, 0), 0).setCellValue(StringUtils.trimToEmpty(getCurrentSQL()));
                 JTableUtil paramUtl = JTableUtil.newInstance(parametersTable);
-                int sqlRowPos = 2;
-                for (int ii = 0; ii < paramUtl.getModel().getRowCount(); ii++) {
-                    int col1 = JTableUtil.getRealColumnPos(ParameterTableColumnDef.COLUMN.idx, parametersTable);
-                    int val1 = JTableUtil.getRealColumnPos(ParameterTableColumnDef.VALUE.idx, parametersTable);
-                    Object col = paramUtl.getRealValueAt(JTableUtil.getRealRowPos(ii, parametersTable), col1);
-                    Object val = paramUtl.getRealValueAt(JTableUtil.getRealRowPos(ii, parametersTable), val1);
-
-                    exlUtl.getCellChk(exlUtl.getRowChk(sheet2, sqlRowPos), 0).setCellValue(String.valueOf(col));
-                    exlUtl.getCellChk(exlUtl.getRowChk(sheet2, sqlRowPos), 1).setCellValue(String.valueOf(val));
+                exlUtl.getCellChk(exlUtl.getRowChk(sheet2, 0), 0).setCellValue(StringUtils.trimToEmpty(getCurrentSQL()));
+                if (paramUtl.getModel().getRowCount() > 0) {
+                    int sqlRowPos = 2;
+                    CellStyleHandler titleCs1 = ExcelWriter.CellStyleHandler.newInstance(wk.createCellStyle())//
+                            .setForegroundColor(mExcelColorCreater.of("#678F8D"));
+                    CellStyleHandler titleCs2 = ExcelWriter.CellStyleHandler.newInstance(wk.createCellStyle())//
+                            .setForegroundColor(mExcelColorCreater.of("#77A88D"));
+                    CellStyleHandler titleCs3 = ExcelWriter.CellStyleHandler.newInstance(wk.createCellStyle())//
+                            .setForegroundColor(mExcelColorCreater.of("#FFD000"));
+                    Cell c00 = exlUtl.getCellChk(exlUtl.getRowChk(sheet2, sqlRowPos), 0);
+                    Cell c01 = exlUtl.getCellChk(exlUtl.getRowChk(sheet2, sqlRowPos), 1);
                     sqlRowPos++;
+                    titleCs1.applyStyle(c00);
+                    titleCs1.applyStyle(c01);
+                    c00.setCellValue("以下為參數列表");
+                    Cell c10 = exlUtl.getCellChk(exlUtl.getRowChk(sheet2, sqlRowPos), 0);
+                    Cell c11 = exlUtl.getCellChk(exlUtl.getRowChk(sheet2, sqlRowPos), 1);
+                    titleCs2.applyStyle(c10);
+                    titleCs2.applyStyle(c11);
+                    c10.setCellValue("參數名稱");
+                    c11.setCellValue("值");
+                    sqlRowPos++;
+                    for (int ii = 0; ii < paramUtl.getModel().getRowCount(); ii++) {
+                        int col1 = JTableUtil.getRealColumnPos(ParameterTableColumnDef.COLUMN.idx, parametersTable);
+                        int val1 = JTableUtil.getRealColumnPos(ParameterTableColumnDef.VALUE.idx, parametersTable);
+                        Object col = paramUtl.getRealValueAt(JTableUtil.getRealRowPos(ii, parametersTable), col1);
+                        Object val = paramUtl.getRealValueAt(JTableUtil.getRealRowPos(ii, parametersTable), val1);
+
+                        Cell cc1 = exlUtl.getCellChk(exlUtl.getRowChk(sheet2, sqlRowPos), 0);
+                        Cell cc2 = exlUtl.getCellChk(exlUtl.getRowChk(sheet2, sqlRowPos), 1);
+                        cc1.setCellValue(String.valueOf(col));
+                        cc2.setCellValue(String.valueOf(val));
+                        titleCs3.applyStyle(cc1);
+                        titleCs3.applyStyle(cc2);
+                        sqlRowPos++;
+                    }
                 }
 
                 // 寫資料
@@ -3609,7 +3641,9 @@ public class FastDBQueryUI extends JFrame {
                         for (int jj = 0; jj < columns.size(); jj++) {
                             String col = columns.get(jj);
                             Object value = rows[jj];
-
+                            if (value == null && radio_export_excel_ignoreNull.isSelected()) {
+                                value = "";
+                            }
                             exlUtl.setCellValue(exlUtl.getCellChk(row_string, jj), String.valueOf(value));
                             exlUtl.setCellValue(exlUtl.getCellChk(row_orign$, jj), value);
                         }
@@ -3622,10 +3656,11 @@ public class FastDBQueryUI extends JFrame {
                         Object[] rows = tmpQueryList.getRight().get(ii);
                         for (int jj = 0; jj < columnLst.size(); jj++) {
                             String col = columnLst.get(jj);
-
                             int newIdx = getColumnIndicateIndex(jj, columns, col);
                             Object value = rows[newIdx];
-
+                            if (value == null && radio_export_excel_ignoreNull.isSelected()) {
+                                value = "";
+                            }
                             exlUtl.setCellValue(exlUtl.getCellChk(row_string, jj), String.valueOf(value));
                             exlUtl.setCellValue(exlUtl.getCellChk(row_orign$, jj), value);
                         }
