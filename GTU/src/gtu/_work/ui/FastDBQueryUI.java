@@ -88,6 +88,7 @@ import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
+import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -3568,13 +3569,17 @@ public class FastDBQueryUI extends JFrame {
 
                 // 寫sql
                 JTableUtil paramUtl = JTableUtil.newInstance(parametersTable);
-                exlUtl.getCellChk(exlUtl.getRowChk(sheet2, 0), 0).setCellValue(StringUtils.trimToEmpty(getCurrentSQL()));
+                Row sqlRow = exlUtl.getRowChk(sheet2, 0);
+                Cell sqlCell = exlUtl.getCellChk(sqlRow, 0);
+                sqlCell.setCellValue(StringUtils.trimToEmpty(getCurrentSQL()));
+                sqlRow.setHeightInPoints((10 * sheet2.getDefaultRowHeightInPoints()));
+
                 if (paramUtl.getModel().getRowCount() > 0) {
                     int sqlRowPos = 2;
                     CellStyleHandler titleCs1 = ExcelWriter.CellStyleHandler.newInstance(wk.createCellStyle())//
                             .setForegroundColor(mExcelColorCreater.of("#678F8D"));
                     CellStyleHandler titleCs2 = ExcelWriter.CellStyleHandler.newInstance(wk.createCellStyle())//
-                            .setForegroundColor(mExcelColorCreater.of("#77A88D"));
+                            .setForegroundColor(mExcelColorCreater.of("#77A88D")).setAlignment(HSSFCellStyle.ALIGN_CENTER);
                     CellStyleHandler titleCs3 = ExcelWriter.CellStyleHandler.newInstance(wk.createCellStyle())//
                             .setForegroundColor(mExcelColorCreater.of("#FFD000"));
                     Cell c00 = exlUtl.getCellChk(exlUtl.getRowChk(sheet2, sqlRowPos), 0);
@@ -3669,7 +3674,7 @@ public class FastDBQueryUI extends JFrame {
 
                 exlUtl.autoCellSize(sheet0);
                 exlUtl.autoCellSize(sheet1);
-                exlUtl.autoCellSize(sheet2);
+                exlUtl.setSheetWidth(sheet2, new short[] { 8000, 8000 });
 
                 String filename = FastDBQueryUI.class.getSimpleName() + //
                         "_Export_" + //
