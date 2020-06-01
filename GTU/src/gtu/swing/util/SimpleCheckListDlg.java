@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.swing.JButton;
@@ -32,6 +33,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.table.DefaultTableModel;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
 import gtu.clipboard.ClipboardUtil;
 import gtu.string.StringUtil_;
@@ -195,6 +197,32 @@ public class SimpleCheckListDlg extends JDialog {
                 });
 
                 searchText.getDocument().addDocumentListener(JCommonUtil.getDocumentListener(new HandleDocumentEvent() {
+
+                    protected Pair<String, List<Pattern>> filterPattern(String filterText) {
+                        Pattern ptn = Pattern.compile("\\/(.*?)\\/");
+                        Matcher mth = ptn.matcher(filterText);
+                        StringBuffer sb = new StringBuffer();
+                        List<Pattern> lst = new ArrayList<Pattern>();
+                        while (mth.find()) {
+                            String temp = mth.group(1);
+                            Pattern tmpPtn = null;
+                            if (StringUtils.isNotBlank(temp)) {
+                                try {
+                                    tmpPtn = Pattern.compile(temp, Pattern.CASE_INSENSITIVE);
+                                } catch (Exception ex) {
+                                }
+                            }
+                            if (tmpPtn != null) {
+                                lst.add(tmpPtn);
+                                mth.appendReplacement(sb, "");
+                            } else {
+                                mth.appendReplacement(sb, mth.group(0));
+                            }
+                        }
+                        mth.appendTail(sb);
+                        return Pair.of(sb.toString(), lst);
+                    }
+
                     @Override
                     public void process(DocumentEvent event) {
                         try {
@@ -203,7 +231,10 @@ public class SimpleCheckListDlg extends JDialog {
                                 JTableUtil.newInstance(table).setCellBackgroundColor(Color.green.brighter(), changeColorMap, Arrays.asList(0));
                                 return;
                             }
-                            String text1 = StringUtils.trimToEmpty(searchText.getText());
+
+                            Pair<String, List<Pattern>> mthPtn = filterPattern(searchText.getText());
+
+                            String text1 = StringUtils.trimToEmpty(mthPtn.getLeft());
                             String text = text1.toLowerCase();
                             List<String> textLst = new ArrayList<String>();
                             for (String t : text1.split("\\^", -1)) {
@@ -211,12 +242,6 @@ public class SimpleCheckListDlg extends JDialog {
                                 if (StringUtils.isNotBlank(t)) {
                                     textLst.add(t);
                                 }
-                            }
-
-                            Pattern ptn = null;
-                            try {
-                                ptn = Pattern.compile(text1, Pattern.CASE_INSENSITIVE);
-                            } catch (Exception ex2) {
                             }
 
                             JTableUtil util = JTableUtil.newInstance(table);
@@ -229,19 +254,14 @@ public class SimpleCheckListDlg extends JDialog {
                                     Object val = util.getValueAt(true, ii, jj);
                                     if (val instanceof String) {
                                         String strVal = (String) val;
-
                                         for (String txt : textLst) {
                                             if (strVal.toLowerCase().contains(txt)) {
                                                 lst.add(jj);
                                                 continue A;
                                             }
                                         }
-
-                                        if (strVal.toLowerCase().contains(text)) {
-                                            lst.add(jj);
-                                            continue A;
-                                        } else if (ptn != null) {
-                                            if (ptn.matcher(strVal).find()) {
+                                        for (Pattern pp : mthPtn.getRight()) {
+                                            if (pp != null && pp.matcher(strVal).find()) {
                                                 lst.add(jj);
                                                 continue A;
                                             }

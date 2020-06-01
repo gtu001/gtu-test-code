@@ -1559,6 +1559,20 @@ public class JTableUtil {
         });
     }
 
+    public DefaultTableModel cloneModelSimpleV1(boolean cloneData) {
+        DefaultTableModel model = (DefaultTableModel) table.getModel();
+        List<Object> titles = JTableUtil.newInstance(table).getColumnTitleArray();
+        DefaultTableModel cloneModel = new DefaultTableModel(titles.toArray(), 0);
+        Vector vec = model.getDataVector();
+        if (cloneData) {
+            for (int ii = 0; ii < vec.size(); ii++) {
+                Vector row = (Vector) vec.get(ii);
+                cloneModel.addRow(row.toArray());
+            }
+        }
+        return cloneModel;
+    }
+
     public static class ColumnSearchFilter {
         JTable table;
         String delimit;
@@ -1573,7 +1587,7 @@ public class JTableUtil {
 
         Pair<List<Object>, List<TableColumn>> headerDef = null;
 
-        private void initTableColumns() {
+        protected void initTableColumns() {
             if (headerDef == null) {
                 TableColumnModel columnModel = this.table.getTableHeader().getColumnModel();
                 List<Object> headerLst = new ArrayList<Object>();
@@ -1587,7 +1601,7 @@ public class JTableUtil {
             }
         }
 
-        private void removeAll() {
+        protected void removeAll() {
             TableColumnModel columnModel = this.table.getTableHeader().getColumnModel();
             A: for (int ii = 0; ii < columnModel.getColumnCount(); ii++) {
                 Object colName = columnModel.getColumn(ii).getHeaderValue();
@@ -1611,7 +1625,7 @@ public class JTableUtil {
             }
         }
 
-        private Pair<String, List<Pattern>> filterPattern(String filterText) {
+        protected Pair<String, List<Pattern>> filterPattern(String filterText) {
             Pattern ptn = Pattern.compile("\\/(.*?)\\/");
             Matcher mth = ptn.matcher(filterText);
             StringBuffer sb = new StringBuffer();
@@ -1636,7 +1650,7 @@ public class JTableUtil {
             return Pair.of(sb.toString(), lst);
         }
 
-        private void __filterText(String filterText) {
+        protected void __filterText(String filterText) {
             TableColumnModel columnModel = table.getTableHeader().getColumnModel();
 
             // 解析 regex ptn
@@ -1701,6 +1715,7 @@ public class JTableUtil {
             removeAll();
             __filterText(filterText);
         }
+
     }
 
     /**

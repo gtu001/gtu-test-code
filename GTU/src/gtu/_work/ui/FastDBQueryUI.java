@@ -3232,7 +3232,7 @@ public class FastDBQueryUI extends JFrame {
                     List<Object> colLst = JTableUtil.newInstance(queryResultTable).getColumnTitleArray();
                     List<String> strLst = new ArrayList<String>();
                     for (int jj = 0; jj < selectColIdxArry.length; jj++) {
-                        strLst.add(String.valueOf(colLst.get(selectColIdxArry[jj])));
+                        strLst.add("/^" + String.valueOf(colLst.get(selectColIdxArry[jj])) + "$/");
                     }
                     columnFilterText.setText(StringUtils.join(strLst, "^"));
                 }
