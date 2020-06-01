@@ -532,54 +532,17 @@ public class BrowserHistoryHandlerUI extends JFrame {
 
             JPanel panel_3 = new JPanel();
             tabbedPane.addTab("設定", null, panel_3, null);
-            panel_3.setLayout(new FormLayout(new ColumnSpec[] {
-                    FormFactory.RELATED_GAP_COLSPEC,
-                    FormFactory.DEFAULT_COLSPEC,
-                    FormFactory.RELATED_GAP_COLSPEC,
-                    ColumnSpec.decode("default:grow"),
-                    FormFactory.RELATED_GAP_COLSPEC,
-                    ColumnSpec.decode("default:grow"),
-                    FormFactory.RELATED_GAP_COLSPEC,
-                    FormFactory.DEFAULT_COLSPEC,
-                    FormFactory.RELATED_GAP_COLSPEC,
-                    ColumnSpec.decode("default:grow"),
-                    FormFactory.RELATED_GAP_COLSPEC,
-                    FormFactory.DEFAULT_COLSPEC,
-                    FormFactory.RELATED_GAP_COLSPEC,
-                    FormFactory.DEFAULT_COLSPEC,
-                    FormFactory.RELATED_GAP_COLSPEC,
-                    FormFactory.DEFAULT_COLSPEC,
-                    FormFactory.RELATED_GAP_COLSPEC,
-                    FormFactory.DEFAULT_COLSPEC,
-                    FormFactory.RELATED_GAP_COLSPEC,
-                    FormFactory.DEFAULT_COLSPEC,
-                    FormFactory.RELATED_GAP_COLSPEC,
-                    FormFactory.DEFAULT_COLSPEC,
-                    FormFactory.RELATED_GAP_COLSPEC,
-                    FormFactory.DEFAULT_COLSPEC,
-                    FormFactory.RELATED_GAP_COLSPEC,
-                    FormFactory.DEFAULT_COLSPEC,
-                    FormFactory.RELATED_GAP_COLSPEC,
-                    FormFactory.DEFAULT_COLSPEC,
-                    FormFactory.RELATED_GAP_COLSPEC,
-                    FormFactory.DEFAULT_COLSPEC,
-                    FormFactory.RELATED_GAP_COLSPEC,
-                    FormFactory.DEFAULT_COLSPEC,},
-                new RowSpec[] {
-                    FormFactory.RELATED_GAP_ROWSPEC,
-                    FormFactory.DEFAULT_ROWSPEC,
-                    FormFactory.RELATED_GAP_ROWSPEC,
-                    FormFactory.DEFAULT_ROWSPEC,
-                    FormFactory.RELATED_GAP_ROWSPEC,
-                    FormFactory.DEFAULT_ROWSPEC,
-                    FormFactory.RELATED_GAP_ROWSPEC,
-                    FormFactory.DEFAULT_ROWSPEC,
-                    FormFactory.RELATED_GAP_ROWSPEC,
-                    FormFactory.DEFAULT_ROWSPEC,
-                    FormFactory.RELATED_GAP_ROWSPEC,
-                    FormFactory.DEFAULT_ROWSPEC,
-                    FormFactory.RELATED_GAP_ROWSPEC,
-                    FormFactory.DEFAULT_ROWSPEC,}));
+            panel_3.setLayout(new FormLayout(
+                    new ColumnSpec[] { FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow"),
+                            FormFactory.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow"), FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC,
+                            ColumnSpec.decode("default:grow"), FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC,
+                            FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC,
+                            FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC,
+                            FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC,
+                            FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, },
+                    new RowSpec[] { FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
+                            FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
+                            FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, }));
 
             JLabel lblNewLabel = new JLabel("bookmark config");
             panel_3.add(lblNewLabel, "2, 2, right, default");
@@ -751,7 +714,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
                 }
             });
             panel_12.add(JCommonUtil.createScrollComponent(logWatcherTextArea), BorderLayout.CENTER);
-            
+
             screenSelectComboBox = new JComboBox();
             JComboBoxUtil.setShowOnScreenSelectActionListener(screenSelectComboBox, this, true);
             panel_3.add(screenSelectComboBox, "10, 4, fill, default");
@@ -1070,11 +1033,13 @@ public class BrowserHistoryHandlerUI extends JFrame {
 
             System.out.println("[doOpen]>>>" + this.name());
 
+            boolean isRemarkIsBat = _this.useRemarkOpenChk.isSelected() || "Y".equalsIgnoreCase(d.isUseRemarkOpen);
+
             // 判斷是否為自動產生
             if (d != null) {
-                if (StringUtil_.isUUID(url) && !"Y".equalsIgnoreCase(d.isUseRemarkOpen)) {
+                if (StringUtil_.isUUID(url) && !isRemarkIsBat) {
                     // JCommonUtil._jOptionPane_showMessageDialog_error("此非合理URL!");
-                } else if ("Y".equalsIgnoreCase(d.isUseRemarkOpen)) {
+                } else if (isRemarkIsBat) {
                     _this.doOpenWithRemark(d, false);
                 } else {
                     // if (OsInfoUtil.isWindows()) {

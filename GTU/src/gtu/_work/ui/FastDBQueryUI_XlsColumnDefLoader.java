@@ -40,9 +40,13 @@ public class FastDBQueryUI_XlsColumnDefLoader {
     XlsColumnDefClz columnDef;
     XlsColumnDefClz chineseDef;
     XlsColumnDefClz pkDef;
+    XlsColumnDefClz tableDef;
 
-    public FastDBQueryUI_XlsColumnDefLoader(File customDir) {
+    public FastDBQueryUI_XlsColumnDefLoader(File customDir, List<XlsColumnDefClz> configLst) {
         this.customDir = customDir;
+        if (configLst != null) {
+            setMappingConfig(configLst);
+        }
     }
 
     public List<String> getPkList(final String tableName) {
@@ -89,6 +93,8 @@ public class FastDBQueryUI_XlsColumnDefLoader {
                 columnDef = c1;
             } else if (c1.type == XlsColumnDefType.PK) {
                 pkDef = c1;
+            } else if (c1.type == XlsColumnDefType.TABLE) {
+                tableDef = c1;
             }
         }
     }
@@ -185,23 +191,101 @@ public class FastDBQueryUI_XlsColumnDefLoader {
         if (lst == null) {
             System.out.println("欄位定義目錄不存在 : " + dir);
         } else {
-            for (File f : lst) {
-                if (f.getName().endsWith(".xls")) {
-                    HSSFWorkbook wk = ExcelUtil_Xls97.getInstance().readExcel(f);
-                    for (int ii = 0; ii < wk.getNumberOfSheets(); ii++) {
-                        HSSFSheet sheet = wk.getSheetAt(ii);
-                        String table = sheet.getSheetName();
-                        TableDef tb = new TableDef();
-                        tb.file = f;
-                        tb.table = table;
-                        Object[] objs = getColumnDefMap(sheet);
-                        tb.columnLst = (List<Map<Integer, String>>) objs[0];
-                        tb.columnLstMappingToRowIndexMap = (Map<Map<Integer, String>, Integer>) objs[1];
-                        tabLst.add(tb);
+            if (tableDef == null || tableDef.index < 0) {
+                for (File f : lst) {
+                    if (f.getName().endsWith(".xls")) {
+                        HSSFWorkbook wk = ExcelUtil_Xls97.getInstance().readExcel(f);
+                        for (int ii = 0; ii < wk.getNumberOfSheets(); ii++) {
+                            HSSFSheet sheet = wk.getSheetAt(ii);
+                            String table = sheet.getSheetName();
+                            TableDef tb = new TableDef();
+                            tb.file = f;
+                            tb.table = table;
+                            Object[] objs = getColumnDefMap(sheet);
+                            tb.columnLst = (List<Map<Integer, String>>) objs[0];
+                            tb.columnLstMappingToRowIndexMap = (Map<Map<Integer, String>, Integer>) objs[1];
+                            tabLst.add(tb);
+                        }
+                    }
+                }
+            } else {
+                for (File f : lst) {
+                    if (f.getName().endsWith(".xls")) {
+                        TempTableHolder mTempTableHolder = new TempTableHolder();
+                        HSSFWorkbook wk = ExcelUtil_Xls97.getInstance().readExcel(f);
+                        for (int ii = 0; ii < wk.getNumberOfSheets(); ii++) {
+                            HSSFSheet sheet = wk.getSheetAt(ii);
+                            this.processColumnDefMap_ForTableDef(mTempTableHolder, sheet, tableDef);
+                        }
+                        for (String tableName : mTempTableHolder.getTables()) {
+                            TableDef tb = new TableDef();
+                            tb.file = f;
+                            tb.table = tableName;
+                            tb.columnLst = mTempTableHolder.getColLst(tableName);
+                            tb.columnLstMappingToRowIndexMap = mTempTableHolder.getColumnLstMappingToRowIndexMap(tableName);
+                            tabLst.add(tb);
+                        }
                     }
                 }
             }
             System.out.println("欄位定義目錄找到table數 : " + tabLst.size());
+        }
+    }
+
+    private class TempTableHolder {
+        public Set<String> getTables() {
+            return colLstMap.keySet();
+        }
+
+        Map<String, Map<Map<Integer, String>, Integer>> columnLstMappingToRowIndexMapMap = new HashMap<String, Map<Map<Integer, String>, Integer>>();
+
+        Map<String, List<Map<Integer, String>>> colLstMap = new HashMap<String, List<Map<Integer, String>>>();
+
+        public Map<Map<Integer, String>, Integer> getColumnLstMappingToRowIndexMap(String tableName) {
+            return columnLstMappingToRowIndexMapMap.get(tableName);
+        }
+
+        public List<Map<Integer, String>> getColLst(String tableName) {
+            return colLstMap.get(tableName);
+        }
+
+        public void appendColLst(String tableName, Map<Integer, String> map) {
+            List<Map<Integer, String>> colLst = new ArrayList<Map<Integer, String>>();
+            if (colLstMap.containsKey(tableName)) {
+                colLst = colLstMap.get(tableName);
+            }
+            colLst.add(map);
+            colLstMap.put(tableName, colLst);
+        }
+
+        public void appendColumnLstMappingToRowIndexMap(String tableName, Map<Integer, String> map, int index) {
+            Map<Map<Integer, String>, Integer> columnLstMappingToRowIndexMap = new HashMap<Map<Integer, String>, Integer>();
+            if (columnLstMappingToRowIndexMapMap.containsKey(tableName)) {
+                columnLstMappingToRowIndexMap = columnLstMappingToRowIndexMapMap.get(tableName);
+            }
+            columnLstMappingToRowIndexMap.put(map, index);
+            columnLstMappingToRowIndexMapMap.put(tableName, columnLstMappingToRowIndexMap);
+        }
+    }
+
+    private void processColumnDefMap_ForTableDef(TempTableHolder mTempTableHolder, HSSFSheet sheet, XlsColumnDefClz tableDef) {
+        for (int ii = 0; ii <= sheet.getLastRowNum(); ii++) {
+            Row row = sheet.getRow(ii);
+            if (row == null) {
+                continue;
+            }
+            Map<Integer, String> map = new HashMap<Integer, String>();
+            for (int jj = 0; jj < row.getLastCellNum(); jj++) {
+                String value = ExcelUtil_Xls97.getInstance().readCell(row.getCell(jj));
+                map.put(jj, value);
+            }
+
+            String tableName = map.get(tableDef.index);
+            if (StringUtils.isBlank(tableName)) {
+                continue;
+            }
+            mTempTableHolder.appendColLst(tableName, map);
+            mTempTableHolder.appendColumnLstMappingToRowIndexMap(tableName, map, ii);
         }
     }
 
@@ -234,7 +318,7 @@ public class FastDBQueryUI_XlsColumnDefLoader {
     }
 
     public enum XlsColumnDefType {
-        COLUMN("", 0, "", "BLACK"), CHINESE("", 1, "", "BLACK"), PK("", -1, "", "RED"), LABEL("", -1, "", "BLACK");
+        TABLE("", -1, "", "BLACK"), COLUMN("", 0, "", "BLACK"), CHINESE("", 1, "", "BLACK"), PK("", -1, "", "RED"), LABEL("", -1, "", "BLACK");
 
         String label;
         int index;

@@ -116,7 +116,7 @@ public class PropertiesUtilBean {
     public PropertiesUtilBean(Class<?> clz, String fileName) {
         this.init(new File(PropertiesUtil.getJarCurrentPath(clz), fileName + "_config.properties"));
     }
-    
+
     public PropertiesUtilBean(File parentDir, String fileName) {
         this.init(new File(parentDir, fileName + "_config.properties"));
     }
@@ -127,7 +127,7 @@ public class PropertiesUtilBean {
             String remark = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSSSS").format(new Date());
             PropertiesUtil.storeProperties(configProp, propFile, "SAVE_TIME : " + remark);
             fileChangeHandler.resetLastModifiedUnderControl();
-            logger.info("store success!");
+            logger.info("store success! : " + propFile);
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }

@@ -460,7 +460,7 @@ public class ExcelUtil {
      */
     public String readCell(Cell cell) {
         if (cell == null) {
-            System.out.println("cell 為 null");
+//            System.out.println("cell 為 null");
             return "";
         }
         final DecimalFormat df = new DecimalFormat("####################0.##########");
@@ -491,7 +491,7 @@ public class ExcelUtil {
      */
     public Object readCell2(Cell cell) {
         if (cell == null) {
-            System.out.println("cell 為 null");
+//            System.out.println("cell 為 null");
             return "";
         }
         switch (cell.getCellType()) {

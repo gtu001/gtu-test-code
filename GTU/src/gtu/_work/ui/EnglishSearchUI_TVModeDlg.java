@@ -34,16 +34,21 @@ public class EnglishSearchUI_TVModeDlg extends JDialog {
             System.out.println("FontSize = " + e.getID());
         }
     };
+    private ActionListener okConfirmListener = new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+        }
+    };
 
     /**
      * Launch the application.
      */
     public static void main(String[] args) {
-        EnglishSearchUI_TVModeDlg.newInstance("測試XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX", 30, null);
+        EnglishSearchUI_TVModeDlg.newInstance("測試XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX", 30, null, null);
         System.out.println("done...");
     }
 
-    public static EnglishSearchUI_TVModeDlg newInstance(String strVal, Integer fontSize, ActionListener setFontSizeCallback) {
+    public static EnglishSearchUI_TVModeDlg newInstance(String strVal, Integer fontSize, ActionListener setFontSizeCallback, ActionListener okConfirmListener) {
         EnglishSearchUI_TVModeDlg dialog = new EnglishSearchUI_TVModeDlg(fontSize);
         try {
             dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -54,6 +59,9 @@ public class EnglishSearchUI_TVModeDlg extends JDialog {
             dialog.setVisible(true);
             if (setFontSizeCallback != null) {
                 dialog.setFontSizeCallback = setFontSizeCallback;
+            }
+            if (okConfirmListener != null) {
+                dialog.okConfirmListener = okConfirmListener;
             }
             return dialog;
         } catch (Exception e) {
@@ -138,6 +146,7 @@ public class EnglishSearchUI_TVModeDlg extends JDialog {
                 okButton.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
+                        okConfirmListener.actionPerformed(new ActionEvent(getFontSize(), getFontSize(), "fontSizeChange"));
                         EnglishSearchUI_TVModeDlg.this.dispose();
                     }
                 });

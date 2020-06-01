@@ -123,6 +123,7 @@ import gtu.swing.util.JFrameRGBColorPanel;
 import gtu.swing.util.JFrameUtil;
 import gtu.swing.util.JMouseEventUtil;
 import gtu.swing.util.JPopupMenuUtil;
+import gtu.swing.util.JSwingCommonConfigUtil;
 import gtu.swing.util.JTextAreaUtil;
 import gtu.swing.util.JTextFieldUtil;
 import gtu.swing.util.KeyEventUtil;
@@ -167,22 +168,14 @@ public class EnglishSearchUI extends JFrame {
     private List<String> englishLst;
     Integer tvModeDlgFontSize = null;
 
-    private PropertiesUtilBean propertyBean = new PropertiesUtilBean(EnglishSearchUI.class);
+    private PropertiesUtilBean propertyBean = new PropertiesUtilBean(this.getClass());
     {
-        if (OsInfoUtil.isWindows()) {
-            System.out.println("[win10]");
-            propertyBean = new PropertiesUtilBean(EnglishSearchUI.class, EnglishSearchUI.class.getSimpleName() + "_win10");
-        } else {
-            System.out.println("[linux]");
-            propertyBean = new PropertiesUtilBean(EnglishSearchUI.class, EnglishSearchUI.class.getSimpleName() + "_linux");
-        }
-
-        File tmpFile = new File("D:\\my_tool\\EnglishSearchUI\\EnglishSearchUI_win10_config.properties");
-        if (tmpFile.exists()) {
-            propertyBean = new PropertiesUtilBean(tmpFile);
-        } else {
-            tmpFile = new File("/media/gtu001/OLD_D/my_tool/EnglishSearchUI/EnglishSearchUI_linux_config.properties");
-            propertyBean = new PropertiesUtilBean(tmpFile);
+        if (!PropertiesUtil.isClassInJar(EnglishSearchUI.class)) {
+            if (OsInfoUtil.isWindows()) {
+                propertyBean = new PropertiesUtilBean(new File("D:/my_tool/EnglishSearchUI/EnglishSearchUI_win10_config.properties"));
+            } else {
+                propertyBean = new PropertiesUtilBean(new File("/media/gtu001/OLD_D/my_tool/EnglishSearchUI/EnglishSearchUI_linux_config.properties"));
+            }
         }
         System.out.println("configFile : " + propertyBean.getPropFile());
     }
@@ -1305,10 +1298,23 @@ public class EnglishSearchUI extends JFrame {
     }
 
     private void showTvModeDialog() {
+        final String key = "tvModeDlgFontSize";
+        if (propertyBean.getConfigProp().containsKey(key)) {
+            tvModeDlgFontSize = Integer.parseInt(propertyBean.getConfigProp().getProperty(key));
+        }
         EnglishSearchUI_TVModeDlg.newInstance(meaningText.getText(), tvModeDlgFontSize, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 tvModeDlgFontSize = e.getID();
+            }
+        }, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                tvModeDlgFontSize = e.getID();
+                if (Integer.parseInt(propertyBean.getConfigProp().getProperty(key)) != tvModeDlgFontSize) {
+                    propertyBean.getConfigProp().setProperty(key, String.valueOf(tvModeDlgFontSize));
+                    propertyBean.store();
+                }
             }
         });
     }
@@ -1910,6 +1916,13 @@ public class EnglishSearchUI extends JFrame {
 
     private void configSettingBtnAction() {
         try {
+            if (StringUtils.isBlank(newWordTxtPathText.getText())) {
+                File fff = new File(FileUtil.DESKTOP_PATH, "new_word.txt");
+                if (!fff.exists()) {
+                    fff.createNewFile();
+                }
+                newWordTxtPathText.setText(fff.getAbsolutePath());
+            }
             File f = JCommonUtil.filePathCheck(newWordTxtPathText.getText(), "請輸入new_word.txt路徑", "txt");
             if (!f.getName().equals("new_word.txt")) {
                 JCommonUtil._jOptionPane_showMessageDialog_error("檔案名稱必須為 new_word.txt!");

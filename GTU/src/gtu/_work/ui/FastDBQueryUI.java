@@ -3878,16 +3878,17 @@ public class FastDBQueryUI extends JFrame {
                             StringBuilder sb = new StringBuilder();
                             Pattern ptn = Pattern.compile("[\\w+\\.]+");
                             Matcher mth = ptn.matcher(selection);
-                            boolean findFirst = true;
-                            String alais = getRandomAlias();
+                            // String alais = getRandomAlias();
                             List<String> condLst = new ArrayList<String>();
+                            List<String> orignLst = new ArrayList<String>();
                             while (mth.find()) {
-                                String cond = mth.group();
-                                if (findFirst) {
-                                    findFirst = false;
-                                    sb.append("\t  left join " + cond + " " + alais + " on ");//
-                                } else {
-                                    condLst.add(" " + alais + "." + cond + " = " + fromAlias + cond);//
+                                orignLst.add(mth.group());
+                            }
+                            String alais = orignLst.get(1);
+                            sb.append("\t  left join " + orignLst.get(0) + " " + alais + " on ");//
+                            if (orignLst.size() >= 3) {
+                                for (int ii = 2; ii < orignLst.size(); ii++) {
+                                    condLst.add(" " + alais + "." + orignLst.get(ii) + " = " + fromAlias + orignLst.get(ii));//
                                 }
                             }
                             sb.append(StringUtils.join(condLst, " and ") + "\r\n");
@@ -5613,7 +5614,8 @@ public class FastDBQueryUI extends JFrame {
     private void moveTabToQueryResultIfHasRecords() {
         DefaultTableModel model = (DefaultTableModel) queryResultTable.getModel();
         if (model.getRowCount() != 0) {
-            JTabbedPaneUtil.newInst(tabbedPane).setSelectedIndexByTitle("查詢結果");
+            // JTabbedPaneUtil.newInst(tabbedPane).setSelectedIndexByTitle("查詢結果");//
+            // TODO
         }
     }
 
@@ -5986,17 +5988,28 @@ public class FastDBQueryUI extends JFrame {
         int toIndex = -1;
         int pkIndex = -1;
         int fkIndex = -1;
-        String resourcePoolKey = TableColumnDefTextHandler.class.getName();
+        String xlsLoaderResourceKey = TableColumnDefTextHandler.class.getName() + "_xlsLoaderResourceKey";
+        String xlsColumnDefDlgKey = TableColumnDefTextHandler.class.getName() + "_xlsColumnDefDlgKey";
 
         private void checkXlsLoader(boolean reset) {
+            if (mXlsColumnDefDlg == null) {
+                if (TAB_UI1 != null) {
+                    mXlsColumnDefDlg = (XlsColumnDefDlg) TAB_UI1.getResourcesPool().get(xlsColumnDefDlgKey);
+                }
+                if (mXlsColumnDefDlg == null) {
+                    mXlsColumnDefDlg = new XlsColumnDefDlg();
+                }
+                TAB_UI1.getResourcesPool().put(xlsColumnDefDlgKey, mXlsColumnDefDlg);
+            }
+
             if (TAB_UI1 != null) {
-                xlsLoader = (FastDBQueryUI_XlsColumnDefLoader) TAB_UI1.getResourcesPool().get(resourcePoolKey);
+                xlsLoader = (FastDBQueryUI_XlsColumnDefLoader) TAB_UI1.getResourcesPool().get(xlsLoaderResourceKey);
             }
             if (xlsLoader == null || reset) {
-                xlsLoader = new FastDBQueryUI_XlsColumnDefLoader(null);
+                xlsLoader = new FastDBQueryUI_XlsColumnDefLoader(null, mXlsColumnDefDlg.getConfig());
                 xlsLoader.execute();
                 if (TAB_UI1 != null) {
-                    TAB_UI1.getResourcesPool().put(resourcePoolKey, xlsLoader);
+                    TAB_UI1.getResourcesPool().put(xlsLoaderResourceKey, xlsLoader);
                 }
             }
         }
@@ -6010,7 +6023,7 @@ public class FastDBQueryUI extends JFrame {
                 checkXlsLoader(reset);
             }
             if (tableColumnDefText.getSelectedItem() != null && StringUtils.isNotBlank((String) tableColumnDefText.getSelectedItem())) {
-                if (mXlsColumnDefDlg == null || mXlsColumnDefDlg.getConfig() == null) {
+                if (mXlsColumnDefDlg.getConfig() == null) {
                     Validate.isTrue(false, "請先按設定");
                 }
                 xlsLoader.setMappingConfig(mXlsColumnDefDlg.getConfig());
@@ -6027,7 +6040,7 @@ public class FastDBQueryUI extends JFrame {
             if (xlsLoader == null) {
                 checkXlsLoader(false);
             }
-            if (mXlsColumnDefDlg == null || mXlsColumnDefDlg.getConfig() == null) {
+            if (mXlsColumnDefDlg.getConfig() == null) {
                 Validate.isTrue(false, "請先按設定");
             }
             xlsLoader.setMappingConfig(mXlsColumnDefDlg.getConfig());
@@ -6173,6 +6186,7 @@ public class FastDBQueryUI extends JFrame {
             XlsColumnDefClz c1 = new XlsColumnDefClz();
             XlsColumnDefClz c2 = new XlsColumnDefClz();
             XlsColumnDefClz c3 = new XlsColumnDefClz();
+            XlsColumnDefClz c4 = new XlsColumnDefClz();
             if (prop.containsKey("column")) {
                 c1.fromConfig(prop.getProperty("column"));
             } else {
@@ -6188,15 +6202,21 @@ public class FastDBQueryUI extends JFrame {
             } else {
                 c3 = XlsColumnDefType.PK.getConfig();
             }
+            if (prop.containsKey("table")) {
+                c4.fromConfig(prop.getProperty("table"));
+            } else {
+                c4 = XlsColumnDefType.TABLE.getConfig();
+            }
             lst.add(c1);
             lst.add(c2);
             lst.add(c3);
+            lst.add(c4);
             for (Enumeration enu = prop.keys(); enu.hasMoreElements();) {
                 String key = (String) enu.nextElement();
                 if (key.contains("TAG")) {
-                    XlsColumnDefClz c4 = new XlsColumnDefClz();
-                    c4.fromConfig(prop.getProperty(key));
-                    lst.add(c4);
+                    XlsColumnDefClz cx = new XlsColumnDefClz();
+                    cx.fromConfig(prop.getProperty(key));
+                    lst.add(cx);
                 }
             }
             DefaultTableModel model = JTableUtil.createModel(false, "類型", "標籤字", "index", "含有文字", "顏色");
@@ -6224,6 +6244,8 @@ public class FastDBQueryUI extends JFrame {
                     prop.setProperty("chinese", c1.toConfig());
                 } else if (c1.type == XlsColumnDefType.PK) {
                     prop.setProperty("pk", c1.toConfig());
+                } else if (c1.type == XlsColumnDefType.TABLE) {
+                    prop.setProperty("table", c1.toConfig());
                 } else {
                     prop.setProperty("TAG" + ii, c1.toConfig());
                 }
