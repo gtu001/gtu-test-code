@@ -37,6 +37,7 @@ public class JProgressBarHelper {
     private int barValue = 0;
     private ActionListener closeListener;
     private boolean modal = true;
+    private boolean limitMoveBound = true;
 
     private static ActionListener DEFAULT_CLOSE_EVENT = new ActionListener() {
         @Override
@@ -128,6 +129,11 @@ public class JProgressBarHelper {
         return this;
     }
 
+    public JProgressBarHelper limitMoveBound(boolean limitMoveBound) {
+        this.limitMoveBound = limitMoveBound;
+        return this;
+    }
+
     public JProgressBarHelper dismissByMax() {
         setBarValue(max);
         try {
@@ -216,13 +222,17 @@ public class JProgressBarHelper {
         dlg.add(BorderLayout.NORTH, stateLabel);
         dlg.add(BorderLayout.SOUTH, counterLabel);
         counterLabel.setText("");
-        dlg.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
         dlg.setSize(width, height);
         dlg.setLocationRelativeTo(parentFrame);
         dlg.setModal(modal);
         setBarValue(barValue);
-        this.applyMoveBoundEvent(dlg);
-        if (this.closeListener != null) {
+        if (limitMoveBound) {
+            this.applyMoveBoundEvent(dlg);
+        }
+        if (this.closeListener == null) {
+            dlg.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+        } else {
+            dlg.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
             applyOncloseEvent(dlg);
         }
         return this;
@@ -238,6 +248,11 @@ public class JProgressBarHelper {
             public void actionPerformed(ActionEvent arg0) {
                 final JProgressBarHelper inst = JProgressBarHelper.newInstance(frame, "test title");
                 inst.max(100);
+                inst.closeListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                    }
+                });
                 inst.build();
                 inst.show();
                 new Thread(new Runnable() {

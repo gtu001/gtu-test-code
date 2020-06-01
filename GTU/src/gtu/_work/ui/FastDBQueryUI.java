@@ -39,6 +39,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.concurrent.Callable;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -3514,7 +3515,15 @@ public class FastDBQueryUI extends JFrame {
 
                 final JProgressBarHelper prog = JProgressBarHelper.newInstance(this, "import excel");
                 prog.max(sheet.getLastRowNum());
+                prog.limitMoveBound(false);
                 prog.modal(false);
+                final AtomicBoolean exitFlag = new AtomicBoolean(false);
+                prog.closeListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent arg0) {
+                        exitFlag.set(true);
+                    }
+                });
                 prog.build();
                 prog.show();
 
@@ -3546,6 +3555,10 @@ public class FastDBQueryUI extends JFrame {
                             }
                             model.addRow(rows.toArray());
                             prog.addOne();
+
+                            if (exitFlag.get()) {
+                                return;
+                            }
                         }
                         prog.dismiss();
                     }
@@ -3565,7 +3578,15 @@ public class FastDBQueryUI extends JFrame {
 
                 final JProgressBarHelper prog = JProgressBarHelper.newInstance(this, "export excel");
                 prog.max(tmpQueryList.get().getRight().size());
+                prog.limitMoveBound(false);
                 prog.modal(false);
+                final AtomicBoolean exitFlag = new AtomicBoolean(false);
+                prog.closeListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent arg0) {
+                        exitFlag.set(true);
+                    }
+                });
                 prog.build();
                 prog.show();
 
@@ -3677,6 +3698,10 @@ public class FastDBQueryUI extends JFrame {
                                     exlUtl.setCellValue(exlUtl.getCellChk(row_string, jj), String.valueOf(value));
                                     exlUtl.setCellValue(exlUtl.getCellChk(row_orign$, jj), value);
                                     prog.addOne();
+
+                                    if (exitFlag.get()) {
+                                        return;
+                                    }
                                 }
                             }
                         } else {
@@ -3695,6 +3720,10 @@ public class FastDBQueryUI extends JFrame {
                                     exlUtl.setCellValue(exlUtl.getCellChk(row_string, jj), String.valueOf(value));
                                     exlUtl.setCellValue(exlUtl.getCellChk(row_orign$, jj), value);
                                     prog.addOne();
+
+                                    if (exitFlag.get()) {
+                                        return;
+                                    }
                                 }
                             }
                         }
