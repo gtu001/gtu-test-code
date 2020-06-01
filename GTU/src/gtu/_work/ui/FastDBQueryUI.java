@@ -146,6 +146,7 @@ import gtu.swing.util.JFrameUtil;
 import gtu.swing.util.JListUtil;
 import gtu.swing.util.JMouseEventUtil;
 import gtu.swing.util.JPopupMenuUtil;
+import gtu.swing.util.JProgressBarHelper;
 import gtu.swing.util.JTabbedPaneUtil;
 import gtu.swing.util.JTableUtil;
 import gtu.swing.util.JTableUtil.ColumnSearchFilter;
@@ -3509,190 +3510,218 @@ public class FastDBQueryUI extends JFrame {
                     return;
                 }
 
-                HSSFSheet sheet = wk.getSheet(importExcelSheetName);
+                final HSSFSheet sheet = wk.getSheet(importExcelSheetName);
 
-                DefaultTableModel model = null;
-                for (int ii = 0; ii <= 0; ii++) {
-                    Row row = sheet.getRow(ii);
-                    List<Object> titles = new ArrayList<Object>();
-                    for (int jj = 0; jj < row.getLastCellNum(); jj++) {
-                        String value = ExcelUtil_Xls97.getInstance().readCell(row.getCell(jj));
-                        titles.add(value);
-                    }
-                    model = JTableUtil.createModel(true, titles.toArray());
-                    queryResultTable.setModel(model);
-                    JTableUtil.newInstance(queryResultTable).setRowHeightByFontSize();
-                }
+                final JProgressBarHelper prog = JProgressBarHelper.newInstance(this, "import excel");
+                prog.max(sheet.getLastRowNum());
+                prog.modal(false);
+                prog.build();
+                prog.show();
 
-                for (int ii = 1; ii <= sheet.getLastRowNum(); ii++) {
-                    Row row = sheet.getRow(ii);
-                    if (row == null) {
-                        continue;
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        DefaultTableModel model = null;
+                        for (int ii = 0; ii <= 0; ii++) {
+                            Row row = sheet.getRow(ii);
+                            List<Object> titles = new ArrayList<Object>();
+                            for (int jj = 0; jj < row.getLastCellNum(); jj++) {
+                                String value = ExcelUtil_Xls97.getInstance().readCell(row.getCell(jj));
+                                titles.add(value);
+                            }
+                            model = JTableUtil.createModel(true, titles.toArray());
+                            queryResultTable.setModel(model);
+                            JTableUtil.newInstance(queryResultTable).setRowHeightByFontSize();
+                        }
+
+                        for (int ii = 1; ii <= sheet.getLastRowNum(); ii++) {
+                            Row row = sheet.getRow(ii);
+                            if (row == null) {
+                                continue;
+                            }
+                            List<Object> rows = new ArrayList<Object>();
+                            for (int jj = 0; jj < row.getLastCellNum(); jj++) {
+                                String value = ExcelUtil_Xls97.getInstance().readCell(row.getCell(jj));
+                                rows.add(value);
+                            }
+                            model.addRow(rows.toArray());
+                            prog.addOne();
+                        }
+                        prog.dismiss();
                     }
-                    List<Object> rows = new ArrayList<Object>();
-                    for (int jj = 0; jj < row.getLastCellNum(); jj++) {
-                        String value = ExcelUtil_Xls97.getInstance().readCell(row.getCell(jj));
-                        rows.add(value);
-                    }
-                    model.addRow(rows.toArray());
-                }
+                }).start();
             } else if (radio_export_excel == selBtn) {
-                Triple<List<String>, List<Class<?>>, List<Object[]>> tmpQueryList = null;
+                AtomicReference<Triple<List<String>, List<Class<?>>, List<Object[]>>> tmpQueryList = new AtomicReference<Triple<List<String>, List<Class<?>>, List<Object[]>>>();
                 if (filterRowsQueryList != null && !isResetQuery) {
-                    tmpQueryList = filterRowsQueryList;
+                    tmpQueryList.set(filterRowsQueryList);
                 } else if (queryList != null) {
-                    tmpQueryList = queryList;
+                    tmpQueryList.set(queryList);
                 }
 
-                if (tmpQueryList == null || tmpQueryList.getRight().isEmpty()) {
+                if (tmpQueryList.get() == null || tmpQueryList.get().getRight().isEmpty()) {
                     JCommonUtil._jOptionPane_showMessageDialog_info("沒有資料!");
                     return;
                 }
 
-                List<String> columnLst = new ArrayList<String>();
-                if (StringUtils.isNotBlank(columnFilterText.getText())) {
-                    List<Object> lst = JTableUtil.newInstance(queryResultTable).getColumnTitleArray();
-                    for (Object v : lst) {
-                        String name = String.valueOf(v);
-                        if (QUERY_RESULT_COLUMN_NO.equals(name)) {
-                            continue;
-                        }
-                        columnLst.add(name);
-                    }
-                }
+                final JProgressBarHelper prog = JProgressBarHelper.newInstance(this, "export excel");
+                prog.max(tmpQueryList.get().getRight().size());
+                prog.modal(false);
+                prog.build();
+                prog.show();
 
-                HSSFWorkbook wk = new HSSFWorkbook();
-                HSSFSheet sheet0 = wk.createSheet("string value sheet");
-                HSSFSheet sheet1 = wk.createSheet("orign value sheet");
-                HSSFSheet sheet2 = wk.createSheet("sql");
-                ExcelColorCreater mExcelColorCreater = ExcelColorCreater.newInstance(wk);
-
-                // 寫sql
-                {
-                    JTableUtil paramUtl = JTableUtil.newInstance(parametersTable);
-                    Row sqlRow = exlUtl.getRowChk(sheet2, 0);
-                    Cell sqlCell = exlUtl.getCellChk(sqlRow, 0);
-                    sqlCell.setCellValue(StringUtils.trimToEmpty(getCurrentSQL()));
-                    sqlRow.setHeightInPoints((10 * sheet2.getDefaultRowHeightInPoints()));
-
-                    if (paramUtl.getModel().getRowCount() > 0) {
-                        int sqlRowPos = 2;
-                        CellStyleHandler titleCs1 = ExcelWriter.CellStyleHandler.newInstance(wk.createCellStyle())//
-                                .setForegroundColor(mExcelColorCreater.of("#678F8D"));
-                        CellStyleHandler titleCs2 = ExcelWriter.CellStyleHandler.newInstance(wk.createCellStyle())//
-                                .setForegroundColor(mExcelColorCreater.of("#77A88D")).setAlignment(HSSFCellStyle.ALIGN_CENTER);
-                        CellStyleHandler titleCs3 = ExcelWriter.CellStyleHandler.newInstance(wk.createCellStyle())//
-                                .setForegroundColor(mExcelColorCreater.of("#FFD000"));
-                        Cell c00 = exlUtl.getCellChk(exlUtl.getRowChk(sheet2, sqlRowPos), 0);
-                        Cell c01 = exlUtl.getCellChk(exlUtl.getRowChk(sheet2, sqlRowPos), 1);
-                        sqlRowPos++;
-                        titleCs1.applyStyle(c00);
-                        titleCs1.applyStyle(c01);
-                        c00.setCellValue("以下為參數列表");
-                        Cell c10 = exlUtl.getCellChk(exlUtl.getRowChk(sheet2, sqlRowPos), 0);
-                        Cell c11 = exlUtl.getCellChk(exlUtl.getRowChk(sheet2, sqlRowPos), 1);
-                        titleCs2.applyStyle(c10);
-                        titleCs2.applyStyle(c11);
-                        c10.setCellValue("參數名稱");
-                        c11.setCellValue("值");
-                        sqlRowPos++;
-                        for (int ii = 0; ii < paramUtl.getModel().getRowCount(); ii++) {
-                            int col1 = JTableUtil.getRealColumnPos(ParameterTableColumnDef.COLUMN.idx, parametersTable);
-                            int val1 = JTableUtil.getRealColumnPos(ParameterTableColumnDef.VALUE.idx, parametersTable);
-                            Object col = paramUtl.getRealValueAt(JTableUtil.getRealRowPos(ii, parametersTable), col1);
-                            Object val = paramUtl.getRealValueAt(JTableUtil.getRealRowPos(ii, parametersTable), val1);
-
-                            Cell cc1 = exlUtl.getCellChk(exlUtl.getRowChk(sheet2, sqlRowPos), 0);
-                            Cell cc2 = exlUtl.getCellChk(exlUtl.getRowChk(sheet2, sqlRowPos), 1);
-                            cc1.setCellValue(String.valueOf(col));
-                            cc2.setCellValue(String.valueOf(val));
-                            titleCs3.applyStyle(cc1);
-                            titleCs3.applyStyle(cc2);
-                            sqlRowPos++;
-                        }
-                    }
-                }
-
-                // 寫資料
-                CellStyleHandler titleCs = ExcelWriter.CellStyleHandler.newInstance(wk.createCellStyle())//
-                        .setForegroundColor(new HSSFColor.LIGHT_GREEN());
-                List<String> columns = new ArrayList<String>(tmpQueryList.getLeft());
-                HSSFRow titleRow0 = sheet0.createRow(0);
-                HSSFRow titleRow1 = sheet1.createRow(0);
-                if (columnLst.isEmpty()) {
-                    for (int ii = 0; ii < columns.size(); ii++) {
-                        exlUtl.setCellValue(exlUtl.getCellChk(titleRow0, ii), columns.get(ii));
-                        titleCs.applyStyle(exlUtl.getCellChk(titleRow0, ii));
-                    }
-                    for (int ii = 0; ii < columns.size(); ii++) {
-                        exlUtl.setCellValue(exlUtl.getCellChk(titleRow1, ii), columns.get(ii));
-                        titleCs.applyStyle(exlUtl.getCellChk(titleRow1, ii));
-                    }
-                } else {
-                    for (int ii = 0; ii < columnLst.size(); ii++) {
-                        exlUtl.setCellValue(exlUtl.getCellChk(titleRow0, ii), columnLst.get(ii));
-                        titleCs.applyStyle(exlUtl.getCellChk(titleRow0, ii));
-                    }
-                    for (int ii = 0; ii < columnLst.size(); ii++) {
-                        exlUtl.setCellValue(exlUtl.getCellChk(titleRow1, ii), columnLst.get(ii));
-                        titleCs.applyStyle(exlUtl.getCellChk(titleRow1, ii));
-                    }
-                }
-
-                if (columnLst.isEmpty()) {
-                    for (int ii = 0; ii < tmpQueryList.getRight().size(); ii++) {
-                        Row row_string = sheet0.createRow(ii + 1);
-                        Row row_orign$ = sheet1.createRow(ii + 1);
-
-                        Object[] rows = tmpQueryList.getRight().get(ii);
-                        for (int jj = 0; jj < columns.size(); jj++) {
-                            String col = columns.get(jj);
-                            Object value = rows[jj];
-                            if (value == null && radio_export_excel_ignoreNull.isSelected()) {
-                                value = "";
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        List<String> columnLst = new ArrayList<String>();
+                        if (StringUtils.isNotBlank(columnFilterText.getText())) {
+                            List<Object> lst = JTableUtil.newInstance(queryResultTable).getColumnTitleArray();
+                            for (Object v : lst) {
+                                String name = String.valueOf(v);
+                                if (QUERY_RESULT_COLUMN_NO.equals(name)) {
+                                    continue;
+                                }
+                                columnLst.add(name);
                             }
-                            exlUtl.setCellValue(exlUtl.getCellChk(row_string, jj), String.valueOf(value));
-                            exlUtl.setCellValue(exlUtl.getCellChk(row_orign$, jj), value);
                         }
-                    }
-                } else {
-                    for (int ii = 0; ii < tmpQueryList.getRight().size(); ii++) {
-                        Row row_string = sheet0.createRow(ii + 1);
-                        Row row_orign$ = sheet1.createRow(ii + 1);
 
-                        Object[] rows = tmpQueryList.getRight().get(ii);
-                        for (int jj = 0; jj < columnLst.size(); jj++) {
-                            String col = columnLst.get(jj);
-                            int newIdx = getColumnIndicateIndex(jj, columns, col);
-                            Object value = rows[newIdx];
-                            if (value == null && radio_export_excel_ignoreNull.isSelected()) {
-                                value = "";
+                        HSSFWorkbook wk = new HSSFWorkbook();
+                        HSSFSheet sheet0 = wk.createSheet("string value sheet");
+                        HSSFSheet sheet1 = wk.createSheet("orign value sheet");
+                        HSSFSheet sheet2 = wk.createSheet("sql");
+                        ExcelColorCreater mExcelColorCreater = ExcelColorCreater.newInstance(wk);
+
+                        // 寫sql
+                        {
+                            JTableUtil paramUtl = JTableUtil.newInstance(parametersTable);
+                            Row sqlRow = exlUtl.getRowChk(sheet2, 0);
+                            Cell sqlCell = exlUtl.getCellChk(sqlRow, 0);
+                            sqlCell.setCellValue(StringUtils.trimToEmpty(getCurrentSQL()));
+                            sqlRow.setHeightInPoints((10 * sheet2.getDefaultRowHeightInPoints()));
+
+                            if (paramUtl.getModel().getRowCount() > 0) {
+                                int sqlRowPos = 2;
+                                CellStyleHandler titleCs1 = ExcelWriter.CellStyleHandler.newInstance(wk.createCellStyle())//
+                                        .setForegroundColor(mExcelColorCreater.of("#678F8D"));
+                                CellStyleHandler titleCs2 = ExcelWriter.CellStyleHandler.newInstance(wk.createCellStyle())//
+                                        .setForegroundColor(mExcelColorCreater.of("#77A88D")).setAlignment(HSSFCellStyle.ALIGN_CENTER);
+                                CellStyleHandler titleCs3 = ExcelWriter.CellStyleHandler.newInstance(wk.createCellStyle())//
+                                        .setForegroundColor(mExcelColorCreater.of("#FFD000"));
+                                Cell c00 = exlUtl.getCellChk(exlUtl.getRowChk(sheet2, sqlRowPos), 0);
+                                Cell c01 = exlUtl.getCellChk(exlUtl.getRowChk(sheet2, sqlRowPos), 1);
+                                sqlRowPos++;
+                                titleCs1.applyStyle(c00);
+                                titleCs1.applyStyle(c01);
+                                c00.setCellValue("以下為參數列表");
+                                Cell c10 = exlUtl.getCellChk(exlUtl.getRowChk(sheet2, sqlRowPos), 0);
+                                Cell c11 = exlUtl.getCellChk(exlUtl.getRowChk(sheet2, sqlRowPos), 1);
+                                titleCs2.applyStyle(c10);
+                                titleCs2.applyStyle(c11);
+                                c10.setCellValue("參數名稱");
+                                c11.setCellValue("值");
+                                sqlRowPos++;
+                                for (int ii = 0; ii < paramUtl.getModel().getRowCount(); ii++) {
+                                    int col1 = JTableUtil.getRealColumnPos(ParameterTableColumnDef.COLUMN.idx, parametersTable);
+                                    int val1 = JTableUtil.getRealColumnPos(ParameterTableColumnDef.VALUE.idx, parametersTable);
+                                    Object col = paramUtl.getRealValueAt(JTableUtil.getRealRowPos(ii, parametersTable), col1);
+                                    Object val = paramUtl.getRealValueAt(JTableUtil.getRealRowPos(ii, parametersTable), val1);
+
+                                    Cell cc1 = exlUtl.getCellChk(exlUtl.getRowChk(sheet2, sqlRowPos), 0);
+                                    Cell cc2 = exlUtl.getCellChk(exlUtl.getRowChk(sheet2, sqlRowPos), 1);
+                                    cc1.setCellValue(String.valueOf(col));
+                                    cc2.setCellValue(String.valueOf(val));
+                                    titleCs3.applyStyle(cc1);
+                                    titleCs3.applyStyle(cc2);
+                                    sqlRowPos++;
+                                }
                             }
-                            exlUtl.setCellValue(exlUtl.getCellChk(row_string, jj), String.valueOf(value));
-                            exlUtl.setCellValue(exlUtl.getCellChk(row_orign$, jj), value);
                         }
-                    }
-                }
 
-                exlUtl.autoCellSize(sheet0);
-                exlUtl.autoCellSize(sheet1);
-                exlUtl.setSheetWidth(sheet2, new short[] { 8000, 8000 });
+                        // 寫資料
+                        CellStyleHandler titleCs = ExcelWriter.CellStyleHandler.newInstance(wk.createCellStyle())//
+                                .setForegroundColor(new HSSFColor.LIGHT_GREEN());
+                        List<String> columns = new ArrayList<String>(tmpQueryList.get().getLeft());
+                        HSSFRow titleRow0 = sheet0.createRow(0);
+                        HSSFRow titleRow1 = sheet1.createRow(0);
+                        if (columnLst.isEmpty()) {
+                            for (int ii = 0; ii < columns.size(); ii++) {
+                                exlUtl.setCellValue(exlUtl.getCellChk(titleRow0, ii), columns.get(ii));
+                                titleCs.applyStyle(exlUtl.getCellChk(titleRow0, ii));
+                            }
+                            for (int ii = 0; ii < columns.size(); ii++) {
+                                exlUtl.setCellValue(exlUtl.getCellChk(titleRow1, ii), columns.get(ii));
+                                titleCs.applyStyle(exlUtl.getCellChk(titleRow1, ii));
+                            }
+                        } else {
+                            for (int ii = 0; ii < columnLst.size(); ii++) {
+                                exlUtl.setCellValue(exlUtl.getCellChk(titleRow0, ii), columnLst.get(ii));
+                                titleCs.applyStyle(exlUtl.getCellChk(titleRow0, ii));
+                            }
+                            for (int ii = 0; ii < columnLst.size(); ii++) {
+                                exlUtl.setCellValue(exlUtl.getCellChk(titleRow1, ii), columnLst.get(ii));
+                                titleCs.applyStyle(exlUtl.getCellChk(titleRow1, ii));
+                            }
+                        }
 
-                String filename = FastDBQueryUI.class.getSimpleName() + //
+                        if (columnLst.isEmpty()) {
+                            for (int ii = 0; ii < tmpQueryList.get().getRight().size(); ii++) {
+                                Row row_string = sheet0.createRow(ii + 1);
+                                Row row_orign$ = sheet1.createRow(ii + 1);
+
+                                Object[] rows = tmpQueryList.get().getRight().get(ii);
+                                for (int jj = 0; jj < columns.size(); jj++) {
+                                    String col = columns.get(jj);
+                                    Object value = rows[jj];
+                                    if (value == null && radio_export_excel_ignoreNull.isSelected()) {
+                                        value = "";
+                                    }
+                                    exlUtl.setCellValue(exlUtl.getCellChk(row_string, jj), String.valueOf(value));
+                                    exlUtl.setCellValue(exlUtl.getCellChk(row_orign$, jj), value);
+                                    prog.addOne();
+                                }
+                            }
+                        } else {
+                            for (int ii = 0; ii < tmpQueryList.get().getRight().size(); ii++) {
+                                Row row_string = sheet0.createRow(ii + 1);
+                                Row row_orign$ = sheet1.createRow(ii + 1);
+
+                                Object[] rows = tmpQueryList.get().getRight().get(ii);
+                                for (int jj = 0; jj < columnLst.size(); jj++) {
+                                    String col = columnLst.get(jj);
+                                    int newIdx = getColumnIndicateIndex(jj, columns, col);
+                                    Object value = rows[newIdx];
+                                    if (value == null && radio_export_excel_ignoreNull.isSelected()) {
+                                        value = "";
+                                    }
+                                    exlUtl.setCellValue(exlUtl.getCellChk(row_string, jj), String.valueOf(value));
+                                    exlUtl.setCellValue(exlUtl.getCellChk(row_orign$, jj), value);
+                                    prog.addOne();
+                                }
+                            }
+                        }
+
+                        exlUtl.autoCellSize(sheet0);
+                        exlUtl.autoCellSize(sheet1);
+                        exlUtl.setSheetWidth(sheet2, new short[] { 8000, 8000 });
+
+                        prog.dismiss();
+
+                        String filename = FastDBQueryUI.class.getSimpleName() + //
                         "_Export_" + //
                         "_" + StringUtils.trimToEmpty(sqlIdText.getText()) + "_" + //
                         DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMdd_HHmmss") + //
                         ".xls";
-                filename = JCommonUtil._jOptionPane_showInputDialog("儲存檔案", filename);
-                if (StringUtils.isNotBlank(filename) || !filename.endsWith(".xls")) {
-                    File exportFile = new File(FileUtil.DESKTOP_DIR, filename);
-                    exlUtl.writeExcel(exportFile, wk);
-                    if (exportFile.exists()) {
-                        JCommonUtil._jOptionPane_showMessageDialog_info("匯出成功!");
+                        filename = JCommonUtil._jOptionPane_showInputDialog("儲存檔案", filename);
+                        if (StringUtils.isNotBlank(filename) || !filename.endsWith(".xls")) {
+                            File exportFile = new File(FileUtil.DESKTOP_DIR, filename);
+                            exlUtl.writeExcel(exportFile, wk);
+                            if (exportFile.exists()) {
+                                JCommonUtil._jOptionPane_showMessageDialog_info("匯出成功!");
+                            }
+                        } else {
+                            JCommonUtil._jOptionPane_showMessageDialog_info("檔名有誤!");
+                        }
                     }
-                } else {
-                    JCommonUtil._jOptionPane_showMessageDialog_info("檔名有誤!");
-                }
+                }).start();
             }
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
