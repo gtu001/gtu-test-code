@@ -3487,7 +3487,7 @@ public class FastDBQueryUI extends JFrame {
 
     private void excelExportBtnAction() {
         try {
-            ExcelUtil_Xls97 exlUtl = ExcelUtil_Xls97.getInstance();
+            final ExcelUtil_Xls97 exlUtl = ExcelUtil_Xls97.getInstance();
             AbstractButton selBtn = JButtonGroupUtil.getSelectedButton(btnExcelBtn);
             if (radio_import_excel == selBtn) {
                 File xlsfile = JCommonUtil._jFileChooser_selectFileOnly();
@@ -3551,7 +3551,7 @@ public class FastDBQueryUI extends JFrame {
                     }
                 }).start();
             } else if (radio_export_excel == selBtn) {
-                AtomicReference<Triple<List<String>, List<Class<?>>, List<Object[]>>> tmpQueryList = new AtomicReference<Triple<List<String>, List<Class<?>>, List<Object[]>>>();
+                final AtomicReference<Triple<List<String>, List<Class<?>>, List<Object[]>>> tmpQueryList = new AtomicReference<Triple<List<String>, List<Class<?>>, List<Object[]>>>();
                 if (filterRowsQueryList != null && !isResetQuery) {
                     tmpQueryList.set(filterRowsQueryList);
                 } else if (queryList != null) {
