@@ -39,7 +39,6 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.concurrent.Callable;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -6216,7 +6215,7 @@ public class FastDBQueryUI extends JFrame {
             try {
                 if (init(false)) {
                     String table = String.valueOf(tableColumnDefText.getSelectedItem());
-                    return xlsLoader.getDBColumnChinese(column, table);
+                    return xlsLoader.getDBColumnChinese(column, true, table);
                 }
             } catch (Exception ex) {
                 JCommonUtil.handleException(ex);
@@ -6224,17 +6223,28 @@ public class FastDBQueryUI extends JFrame {
             return null;
         }
 
+        private String getTableAlias(String table, boolean appendDot) {
+            String sql = getCurrentSQL();
+            Pattern ptn = Pattern.compile(table + "\\s+(\\w+)", Pattern.DOTALL | Pattern.MULTILINE);
+            Matcher mth = ptn.matcher(sql);
+            if (mth.find()) {
+                return StringUtils.trimToEmpty(mth.group(1)) + (appendDot ? "." : "");
+            }
+            return "";
+        }
+
         public String getSelectColumns() {
             StringBuffer sb = new StringBuffer();
             try {
                 if (init(false)) {
                     String table = String.valueOf(tableColumnDefText.getSelectedItem());
+                    String tableAlias = getTableAlias(table, true);
                     List<String> colLst = xlsLoader.getColumnLst(table);
                     for (Object tit : JTableUtil.newInstance(queryResultTable).getColumnTitleArray()) {
                         String column = (String) tit;
                         if (colLst.contains(column)) {
-                            String chinese = StringUtils.trimToEmpty(getChinese(column));
-                            sb.append(column + " /*" + chinese + "*/,\r\n");
+                            String chinese = xlsLoader.getDBColumnChinese(column, false, table);
+                            sb.append(tableAlias + column + " /*" + chinese + "*/,\r\n");
                         }
                     }
                 }

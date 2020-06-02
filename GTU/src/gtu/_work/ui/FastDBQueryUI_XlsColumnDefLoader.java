@@ -119,7 +119,7 @@ public class FastDBQueryUI_XlsColumnDefLoader {
         }
     }
 
-    public String getDBColumnChinese(final String column, final String tableName) {
+    public String getDBColumnChinese(final String column, boolean forTooltip, final String tableName) {
         final List<TableDef> tbs = getTable(tableName);
         if (tbs.isEmpty()) {
             System.out.println("查無資料表欄位定義Table : " + tableName);
@@ -129,12 +129,12 @@ public class FastDBQueryUI_XlsColumnDefLoader {
             for (Map<Integer, String> map : tb.columnLst) {
                 if (StringUtils.equalsIgnoreCase(StringUtils.trimToEmpty(map.get(columnDef.index)), StringUtils.trimToEmpty(column)) && //
                         StringUtils.isNotBlank(map.get(chineseDef.index))) {
-                    return getTooltipFormat(map);
+                    return getTooltipFormat(map, forTooltip);
                 }
             }
         }
         System.out.println("查無資料表欄位定義 : " + tableName + "." + column);
-        return null;
+        return forTooltip ? null : "";
     }
 
     private String getTagString(XlsColumnDefClz pkDef, Map<Integer, String> map) {
@@ -156,8 +156,11 @@ public class FastDBQueryUI_XlsColumnDefLoader {
         return pk;
     }
 
-    private String getTooltipFormat(Map<Integer, String> map) {
+    private String getTooltipFormat(Map<Integer, String> map, boolean forTooltip) {
         String chinese = map.get(chineseDef.index);
+        if (!forTooltip) {
+            return StringUtils.trimToEmpty(chinese);
+        }
         if (StringUtils.isBlank(chinese)) {
             return null;
         }
@@ -186,7 +189,7 @@ public class FastDBQueryUI_XlsColumnDefLoader {
                     for (Map<Integer, String> map : tb.columnLst) {
                         if (StringUtils.equalsIgnoreCase(StringUtils.trimToEmpty(map.get(columnDef.index)), StringUtils.trimToEmpty(column)) && //
                         StringUtils.isNotBlank(map.get(chineseDef.index))) {
-                            return getTooltipFormat(map);
+                            return getTooltipFormat(map, true);
                         }
                     }
                 }
@@ -234,7 +237,7 @@ public class FastDBQueryUI_XlsColumnDefLoader {
                     }
                 }
             }
-            if (tableDef != null || tableDef.index >= 0) {
+            if (tableDef != null && tableDef.index >= 0) {
                 for (File f : lst) {
                     if (f.getName().endsWith(".xls")) {
                         TempTableHolder mTempTableHolder = new TempTableHolder();
