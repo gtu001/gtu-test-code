@@ -250,6 +250,7 @@ public class FastDBQueryUI extends JFrame {
     private JButton excelExportBtn;
     private JRadioButton radio_import_excel;
     private JRadioButton radio_export_excel;
+	private JRadioButton radio_export_json;
 
     private ButtonGroup btnExcelBtn;
     private JLabel label;
@@ -1229,14 +1230,16 @@ public class FastDBQueryUI extends JFrame {
         radio_export_excel = new JRadioButton("匯出excel");
         panel_15.add(radio_export_excel);
 
-        btnExcelBtn = JButtonGroupUtil.createRadioButtonGroup(radio_import_excel, radio_export_excel);
-
         excelExportBtn = new JButton("動作");
         excelExportBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 excelExportBtnAction();
             }
         });
+
+        radio_export_json = new JRadioButton("匯出json");
+        panel_15.add(radio_export_json);
+        btnExcelBtn = JButtonGroupUtil.createRadioButtonGroup(radio_import_excel, radio_export_excel, radio_export_json);
 
         radio_export_excel_ignoreNull = new JCheckBox("匯出null改為空白");
         panel_15.add(radio_export_excel_ignoreNull);
@@ -2390,7 +2393,7 @@ public class FastDBQueryUI extends JFrame {
 
                         queryModeProcess(queryList, false, Pair.of(param, parameterList), null);
 
-                        showJsonArry(queryList);
+                        showJsonArry(queryList, 1000, null);
 
                         // 過濾欄位apply
                         if (StringUtils.isNotBlank(rowFilterText.getText())) {
@@ -2501,10 +2504,17 @@ public class FastDBQueryUI extends JFrame {
         }
     }
 
-    private void showJsonArry(Triple<List<String>, List<Class<?>>, List<Object[]>> queryList) {
+    private String showJsonArry(Triple<List<String>, List<Class<?>>, List<Object[]>> queryList, int dataLimit, final JProgressBarHelper prog) {
+        String jsonString = "";
         try {
             List<String> columns = queryList.getLeft();
             List<Map<String, Object>> cloneLst = new ArrayList<Map<String, Object>>();
+            int index = 0;
+
+            if (prog != null) {
+                prog.max(queryList.getRight().size());
+            }
+
             for (Object[] rows : queryList.getRight()) {
                 Map<String, Object> rowMap = new LinkedHashMap<String, Object>();
                 for (int ii = 0; ii < columns.size(); ii++) {
@@ -2518,12 +2528,47 @@ public class FastDBQueryUI extends JFrame {
                         rowMap.put(key, String.valueOf(rowMap.get(key)));
                     }
                 }
+                index++;
+                if (dataLimit > 0 && index >= dataLimit) {
+                    break;
+                }
+                if (prog != null) {
+                    prog.addOne();
+                    if (prog.isExitFlag()) {
+                        return "";
+                    }
+                }
             }
-            queryResultJsonTextArea.setText(JSONUtils.valueToString(JSONArray.fromObject(cloneLst), 8, 4));
+
+            if (prog != null) {
+                prog.dismiss();
+            }
+
+            jsonString = JSONUtils.valueToString(JSONArray.fromObject(cloneLst), 8, 4);
+            if (prog == null) {
+                queryResultJsonTextArea.setText(jsonString);
+            } else {
+                String filename = FastDBQueryUI.class.getSimpleName() + //
+                        "_Export_" + //
+                        "_" + StringUtils.trimToEmpty(sqlIdText.getText()) + "_" + //
+                        DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMdd_HHmmss") + //
+                        ".json";
+                filename = JCommonUtil._jOptionPane_showInputDialog("儲存檔案", filename);
+                if (StringUtils.isNotBlank(filename) || !filename.endsWith(".json")) {
+                    File exportFile = new File(FileUtil.DESKTOP_DIR, filename);
+                    FileUtil.saveToFile(exportFile, jsonString, "UTF8");
+                    if (exportFile.exists()) {
+                        JCommonUtil._jOptionPane_showMessageDialog_info("匯出成功!");
+                    }
+                } else {
+                    JCommonUtil._jOptionPane_showMessageDialog_info("檔名有誤!");
+                }
+            }
         } catch (Exception ex) {
             queryResultJsonTextArea.setText("");
             JCommonUtil.handleException(ex);
         }
+        return jsonString;
     }
 
     /**
@@ -2567,19 +2612,13 @@ public class FastDBQueryUI extends JFrame {
         // 設定 Value 顯示方式
         JTableUtil.newInstance(queryResultTable).columnUseCommonFormatter(null, false);
 
-        JTableUtil.newInstance(queryResultTable).columnIsButton(QUERY_RESULT_COLUMN_NO, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JTableUtil.newInstance(queryResultTable).setRowSelection();
-            }
-        });
+        JTableUtil.newInstance(queryResultTable).columnIsButton(QUERY_RESULT_COLUMN_NO);
 
         for (int ii = 0; ii < queryList.getRight().size(); ii++) {
             Object[] rows = queryList.getRight().get(ii);
             Object[] rows2 = new Object[rows.length + 1];
             System.arraycopy(rows, 0, rows2, 1, rows.length);
-            // rows2[0] = createSelectionBtn(ii + 1);// TODO
-            rows2[0] = ii + 1;// TODO
+            rows2[0] = createSelectionBtn(ii + 1);// TODO
             createModel.addRow(rows2);
         }
 
@@ -3534,11 +3573,10 @@ public class FastDBQueryUI extends JFrame {
                 prog.max(sheet.getLastRowNum());
                 prog.limitMoveBound(false);
                 prog.modal(false);
-                final AtomicBoolean exitFlag = new AtomicBoolean(false);
                 prog.closeListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent arg0) {
-                        exitFlag.set(true);
+                        prog.setExitFlag(true);
                     }
                 });
                 prog.build();
@@ -3573,7 +3611,7 @@ public class FastDBQueryUI extends JFrame {
                             model.addRow(rows.toArray());
                             prog.addOne();
 
-                            if (exitFlag.get()) {
+                            if (prog.isExitFlag()) {
                                 return;
                             }
                         }
@@ -3597,11 +3635,10 @@ public class FastDBQueryUI extends JFrame {
                 prog.max(tmpQueryList.get().getRight().size());
                 prog.limitMoveBound(false);
                 prog.modal(false);
-                final AtomicBoolean exitFlag = new AtomicBoolean(false);
                 prog.closeListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent arg0) {
-                        exitFlag.set(true);
+                        prog.setExitFlag(true);
                     }
                 });
                 prog.build();
@@ -3716,7 +3753,7 @@ public class FastDBQueryUI extends JFrame {
                                     exlUtl.setCellValue(exlUtl.getCellChk(row_orign$, jj), value);
                                     prog.addOne();
 
-                                    if (exitFlag.get()) {
+                                    if (prog.isExitFlag()) {
                                         return;
                                     }
                                 }
@@ -3738,7 +3775,7 @@ public class FastDBQueryUI extends JFrame {
                                     exlUtl.setCellValue(exlUtl.getCellChk(row_orign$, jj), value);
                                     prog.addOne();
 
-                                    if (exitFlag.get()) {
+                                    if (prog.isExitFlag()) {
                                         return;
                                     }
                                 }
@@ -3766,6 +3803,38 @@ public class FastDBQueryUI extends JFrame {
                         } else {
                             JCommonUtil._jOptionPane_showMessageDialog_info("檔名有誤!");
                         }
+                    }
+                }).start();
+            } else if (radio_export_json == selBtn) {
+                final AtomicReference<Triple<List<String>, List<Class<?>>, List<Object[]>>> tmpQueryList = new AtomicReference<Triple<List<String>, List<Class<?>>, List<Object[]>>>();
+                if (filterRowsQueryList != null && !isResetQuery) {
+                    tmpQueryList.set(filterRowsQueryList);
+                } else if (queryList != null) {
+                    tmpQueryList.set(queryList);
+                }
+
+                if (tmpQueryList.get() == null || tmpQueryList.get().getRight().isEmpty()) {
+                    JCommonUtil._jOptionPane_showMessageDialog_info("沒有資料!");
+                    return;
+                }
+
+                final JProgressBarHelper prog = JProgressBarHelper.newInstance(this, "export excel");
+                prog.max(tmpQueryList.get().getRight().size());
+                prog.limitMoveBound(false);
+                prog.modal(false);
+                prog.closeListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent arg0) {
+                        prog.setExitFlag(true);
+                    }
+                });
+                prog.build();
+                prog.show();
+
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        showJsonArry(tmpQueryList.get(), Integer.MAX_VALUE, prog);
                     }
                 }).start();
             }
@@ -5929,6 +5998,7 @@ public class FastDBQueryUI extends JFrame {
             }
         }
     };
+    
 
     private class JDlgHolderBringToFrontHandler {
         LRUMap map = new LRUMap(10);

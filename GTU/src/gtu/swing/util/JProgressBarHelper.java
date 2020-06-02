@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -38,10 +39,12 @@ public class JProgressBarHelper {
     private ActionListener closeListener;
     private boolean modal = true;
     private boolean limitMoveBound = true;
+    private final AtomicBoolean exitFlag = new AtomicBoolean(false);
 
-    private static ActionListener DEFAULT_CLOSE_EVENT = new ActionListener() {
+    private ActionListener default_close_event = new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e) {
+            exitFlag.set(true);
         }
     };
 
@@ -89,7 +92,7 @@ public class JProgressBarHelper {
     }
 
     public JProgressBarHelper closeListenerDefault() {
-        this.closeListener = DEFAULT_CLOSE_EVENT;
+        this.closeListener = default_close_event;
         return this;
     }
 
@@ -236,6 +239,14 @@ public class JProgressBarHelper {
             applyOncloseEvent(dlg);
         }
         return this;
+    }
+
+    public boolean isExitFlag() {
+        return exitFlag.get();
+    }
+
+    public void setExitFlag(boolean exitFlag1) {
+        exitFlag.set(exitFlag1);
     }
 
     public static void main(String[] args) {
