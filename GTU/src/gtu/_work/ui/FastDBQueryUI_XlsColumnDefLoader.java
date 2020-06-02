@@ -50,16 +50,18 @@ public class FastDBQueryUI_XlsColumnDefLoader {
     }
 
     public List<String> getPkList(final String tableName) {
-        final TableDef tb = getTable(tableName);
-        if (tb == null) {
+        final List<TableDef> tbs = getTable(tableName);
+        if (tbs.isEmpty()) {
             System.out.println("查無資料表欄位定義Table : " + tableName);
             return null;
         }
         List<String> pkLst = new ArrayList<String>();
-        for (Map<Integer, String> map : tb.columnLst) {
-            String column = getPkColumn(map);
-            if (StringUtils.isNotBlank(column)) {
-                pkLst.add(column);
+        for (TableDef tb : tbs) {
+            for (Map<Integer, String> map : tb.columnLst) {
+                String column = getPkColumn(map);
+                if (StringUtils.isNotBlank(column)) {
+                    pkLst.add(column);
+                }
             }
         }
         return pkLst;
@@ -100,14 +102,17 @@ public class FastDBQueryUI_XlsColumnDefLoader {
     }
 
     public String getDBColumnChinese(final String column, final String tableName) {
-        final TableDef tb = getTable(tableName);
-        if (tb == null) {
+        final List<TableDef> tbs = getTable(tableName);
+        if (tbs.isEmpty()) {
             System.out.println("查無資料表欄位定義Table : " + tableName);
             return null;
         }
-        for (Map<Integer, String> map : tb.columnLst) {
-            if (StringUtils.equalsIgnoreCase(StringUtils.trimToEmpty(map.get(columnDef.index)), StringUtils.trimToEmpty(column))) {
-                return getTooltipFormat(map);
+        for (TableDef tb : tbs) {
+            for (Map<Integer, String> map : tb.columnLst) {
+                if (StringUtils.equalsIgnoreCase(StringUtils.trimToEmpty(map.get(columnDef.index)), StringUtils.trimToEmpty(column)) && //
+                        StringUtils.isNotBlank(map.get(chineseDef.index))) {
+                    return getTooltipFormat(map);
+                }
             }
         }
         System.out.println("查無資料表欄位定義 : " + tableName + "." + column);
@@ -149,8 +154,8 @@ public class FastDBQueryUI_XlsColumnDefLoader {
     }
 
     public Transformer getTableTitleTransformer(final String tableName) {
-        final TableDef tb = getTable(tableName);
-        if (tb == null) {
+        final List<TableDef> tbs = getTable(tableName);
+        if (tbs.isEmpty()) {
             System.out.println("查無資料表欄位定義Table : " + tableName);
             return null;
         }
@@ -159,9 +164,12 @@ public class FastDBQueryUI_XlsColumnDefLoader {
             public Object transform(Object input) {
                 Pair<Integer, Object> p = (Pair<Integer, Object>) input;
                 String column = (String) p.getRight();
-                for (Map<Integer, String> map : tb.columnLst) {
-                    if (StringUtils.equalsIgnoreCase(StringUtils.trimToEmpty(map.get(columnDef.index)), StringUtils.trimToEmpty(column))) {
-                        return getTooltipFormat(map);
+                for (TableDef tb : tbs) {
+                    for (Map<Integer, String> map : tb.columnLst) {
+                        if (StringUtils.equalsIgnoreCase(StringUtils.trimToEmpty(map.get(columnDef.index)), StringUtils.trimToEmpty(column)) && //
+                        StringUtils.isNotBlank(map.get(chineseDef.index))) {
+                            return getTooltipFormat(map);
+                        }
                     }
                 }
                 System.out.println("查無資料表欄位定義 : " + tableName + "." + column);
@@ -170,14 +178,15 @@ public class FastDBQueryUI_XlsColumnDefLoader {
         };
     }
 
-    private TableDef getTable(String tableName) {
+    private List<TableDef> getTable(String tableName) {
         tableName = StringUtils.trimToEmpty(tableName);
+        List<TableDef> rtnLst = new ArrayList<TableDef>();
         for (TableDef tb : tabLst) {
             if (StringUtils.equalsIgnoreCase(StringUtils.trimToEmpty(tb.table), tableName)) {
-                return tb;
+                rtnLst.add(tb);
             }
         }
-        return null;
+        return rtnLst;
     }
 
     List<TableDef> tabLst = new ArrayList<TableDef>();
