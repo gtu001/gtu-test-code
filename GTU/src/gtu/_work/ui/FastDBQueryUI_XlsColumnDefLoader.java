@@ -49,6 +49,24 @@ public class FastDBQueryUI_XlsColumnDefLoader {
         }
     }
 
+    public List<String> getColumnLst(final String tableName) {
+        final List<TableDef> tbs = getTable(tableName);
+        if (tbs.isEmpty()) {
+            System.out.println("查無資料表欄位定義Table : " + tableName);
+            return null;
+        }
+        List<String> colLst = new ArrayList<String>();
+        for (TableDef tb : tbs) {
+            for (Map<Integer, String> map : tb.columnLst) {
+                String column = map.get(columnDef.index);
+                if (StringUtils.isNotBlank(column) && !colLst.contains(column)) {
+                    colLst.add(column);
+                }
+            }
+        }
+        return colLst;
+    }
+
     public List<String> getPkList(final String tableName) {
         final List<TableDef> tbs = getTable(tableName);
         if (tbs.isEmpty()) {

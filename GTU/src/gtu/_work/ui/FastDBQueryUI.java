@@ -1053,6 +1053,13 @@ public class FastDBQueryUI extends JFrame {
                                 }
                             });
                         }
+                        popUtil.addJMenuItem("參考excel設定select欄位", new ActionListener() {
+                            @Override
+                            public void actionPerformed(ActionEvent e) {
+                                String selectColumnString = mTableColumnDefTextHandler.getSelectColumns();
+                                new SimpleTextDlg(selectColumnString, "", null).show();
+                            }
+                        });
                     }
                     popUtil.applyEvent(e).show();
                 }
@@ -1563,7 +1570,7 @@ public class FastDBQueryUI extends JFrame {
         columnXlsDefTableQryText.addMouseListener(new S2T_And_T2S_EventHandler(columnXlsDefTableQryText).getEvent());
         columnXlsDefColumnQryText.addMouseListener(new S2T_And_T2S_EventHandler(columnXlsDefColumnQryText).getEvent());
         columnXlsDefOtherQryText.addMouseListener(new S2T_And_T2S_EventHandler(columnXlsDefOtherQryText).getEvent());
-        
+
         columnXlsDefShowChineseChk = new JCheckBox("顯示中文");
         panel_29.add(columnXlsDefShowChineseChk);
 
@@ -6215,6 +6222,26 @@ public class FastDBQueryUI extends JFrame {
                 JCommonUtil.handleException(ex);
             }
             return null;
+        }
+
+        public String getSelectColumns() {
+            StringBuffer sb = new StringBuffer();
+            try {
+                if (init(false)) {
+                    String table = String.valueOf(tableColumnDefText.getSelectedItem());
+                    List<String> colLst = xlsLoader.getColumnLst(table);
+                    for (Object tit : JTableUtil.newInstance(queryResultTable).getColumnTitleArray()) {
+                        String column = (String) tit;
+                        if (colLst.contains(column)) {
+                            String chinese = StringUtils.trimToEmpty(getChinese(column));
+                            sb.append(column + " /*" + chinese + "*/,\r\n");
+                        }
+                    }
+                }
+            } catch (Exception ex) {
+                JCommonUtil.handleException(ex);
+            }
+            return sb.toString();
         }
 
         public List<String> getPkLst() {
