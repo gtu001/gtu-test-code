@@ -200,24 +200,23 @@ public class FastDBQueryUI_XlsColumnDefLoader {
         if (lst == null) {
             System.out.println("欄位定義目錄不存在 : " + dir);
         } else {
-            if (tableDef == null || tableDef.index < 0) {
-                for (File f : lst) {
-                    if (f.getName().endsWith(".xls")) {
-                        HSSFWorkbook wk = ExcelUtil_Xls97.getInstance().readExcel(f);
-                        for (int ii = 0; ii < wk.getNumberOfSheets(); ii++) {
-                            HSSFSheet sheet = wk.getSheetAt(ii);
-                            String table = sheet.getSheetName();
-                            TableDef tb = new TableDef();
-                            tb.file = f;
-                            tb.table = table;
-                            Object[] objs = getColumnDefMap(sheet);
-                            tb.columnLst = (List<Map<Integer, String>>) objs[0];
-                            tb.columnLstMappingToRowIndexMap = (Map<Map<Integer, String>, Integer>) objs[1];
-                            tabLst.add(tb);
-                        }
+            for (File f : lst) {
+                if (f.getName().endsWith(".xls")) {
+                    HSSFWorkbook wk = ExcelUtil_Xls97.getInstance().readExcel(f);
+                    for (int ii = 0; ii < wk.getNumberOfSheets(); ii++) {
+                        HSSFSheet sheet = wk.getSheetAt(ii);
+                        String table = sheet.getSheetName();
+                        TableDef tb = new TableDef();
+                        tb.file = f;
+                        tb.table = table;
+                        Object[] objs = getColumnDefMap(sheet);
+                        tb.columnLst = (List<Map<Integer, String>>) objs[0];
+                        tb.columnLstMappingToRowIndexMap = (Map<Map<Integer, String>, Integer>) objs[1];
+                        tabLst.add(tb);
                     }
                 }
-            } else {
+            }
+            if (tableDef != null || tableDef.index >= 0) {
                 for (File f : lst) {
                     if (f.getName().endsWith(".xls")) {
                         TempTableHolder mTempTableHolder = new TempTableHolder();
