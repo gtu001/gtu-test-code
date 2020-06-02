@@ -53,11 +53,13 @@ import java.util.regex.Pattern;
 
 import javax.swing.AbstractButton;
 import javax.swing.DefaultCellEditor;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
@@ -82,6 +84,7 @@ import org.apache.commons.collections.Transformer;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.Triple;
 
 import gtu.clipboard.ClipboardUtil;
 import gtu.string.StringUtil_;
@@ -364,6 +367,93 @@ public class JTableUtil {
         }
     }
 
+    /**
+     * 重要 : 該 column 必須為可編輯狀態
+     */
+    public void columnIsButton(final String columnName, final ActionListener clickListener) {
+        class ButtonRenderer extends JButton implements TableCellRenderer {
+            private static final long serialVersionUID = 1L;
+
+            public ButtonRenderer() {
+                setOpaque(true);
+            }
+
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                if (isSelected) {
+                    setForeground(table.getSelectionForeground());
+                    setBackground(table.getSelectionBackground());
+                } else {
+                    setForeground(table.getForeground());
+                    setBackground(UIManager.getColor("Button.background"));
+                }
+                setText((value == null) ? "" : value.toString());
+                return this;
+            }
+        }
+
+        class ButtonEditor extends DefaultCellEditor {
+            private static final long serialVersionUID = 1L;
+            protected JButton button;
+            private String label;
+            private boolean isPushed;
+
+            Object latestValue;
+            int latestRow;
+            int latestCol;
+
+            public ButtonEditor(JCheckBox checkBox) {
+                super(checkBox);
+                button = new JButton();
+                button.setOpaque(true);
+                button.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        fireEditingStopped();
+                    }
+                });
+            }
+
+            public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
+                latestValue = value;
+                latestRow = row;
+                latestCol = column;
+
+                if (isSelected) {
+                    button.setForeground(table.getSelectionForeground());
+                    button.setBackground(table.getSelectionBackground());
+                } else {
+                    button.setForeground(table.getForeground());
+                    button.setBackground(table.getBackground());
+                }
+                label = (value == null) ? "" : value.toString();
+                button.setText(label);
+                isPushed = true;
+                return button;
+            }
+
+            public Object getCellEditorValue() {
+                if (isPushed) {
+                    if (clickListener != null) {
+                        clickListener.actionPerformed(new ActionEvent(Triple.of(latestValue, latestRow, latestCol), -1, "click btn"));
+                    }
+                }
+                isPushed = false;
+                return new String(label);
+            }
+
+            public boolean stopCellEditing() {
+                isPushed = false;
+                return super.stopCellEditing();
+            }
+
+            protected void fireEditingStopped() {
+                super.fireEditingStopped();
+            }
+        }
+
+        table.getColumn(columnName).setCellEditor(new ButtonEditor(new JCheckBox()));
+        table.getColumn(columnName).setCellRenderer(new ButtonRenderer());
+    }
+
     public void setRowHeight(int rowPos, int height) {
         table.setRowHeight(rowPos, height);
     }
@@ -436,6 +526,28 @@ public class JTableUtil {
         if (event.getButton() == 1) {
             table.setToolTipText(content);
         }
+    }
+
+    public static DefaultTableModel createModelIndicateType(final List<Integer> notReadOnlyColumnLst, List<?> header, final List<Class<?>> typeLst) {
+        DefaultTableModel model = new DefaultTableModel(new Object[][] {}, header.toArray()) {
+            private static final long serialVersionUID = 1L;
+
+            // 設定column class
+            @Override
+            public Class<?> getColumnClass(int c) {
+                return typeLst.get(c);
+            }
+
+            // 設定可否編輯
+            public boolean isCellEditable(int row, int column) {
+                if (!notReadOnlyColumnLst.contains(column)) {
+                    return false;
+                } else {
+                    return super.isCellEditable(row, column);
+                }
+            }
+        };
+        return model;
     }
 
     public static DefaultTableModel createModelIndicateType(final boolean readonly, List<?> header, final List<Class<?>> typeLst) {

@@ -2547,7 +2547,7 @@ public class FastDBQueryUI extends JFrame {
         LinkedList<Class<?>> middle = new LinkedList<Class<?>>(queryList.getMiddle());
         left.addFirst(QUERY_RESULT_COLUMN_NO);
         middle.addFirst(JButton.class);
-        DefaultTableModel createModel = JTableUtil.createModelIndicateType(true, left, middle);
+        DefaultTableModel createModel = JTableUtil.createModelIndicateType(Arrays.asList(0), left, middle);
 
         queryResultTable.setModel(createModel);
 
@@ -2556,19 +2556,25 @@ public class FastDBQueryUI extends JFrame {
         // 設定 Value 顯示方式
         JTableUtil.newInstance(queryResultTable).columnUseCommonFormatter(null, false);
 
+        JTableUtil.newInstance(queryResultTable).columnIsButton(QUERY_RESULT_COLUMN_NO, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JTableUtil.newInstance(queryResultTable).setRowSelection();
+            }
+        });
+
         for (int ii = 0; ii < queryList.getRight().size(); ii++) {
             Object[] rows = queryList.getRight().get(ii);
             Object[] rows2 = new Object[rows.length + 1];
             System.arraycopy(rows, 0, rows2, 1, rows.length);
-            rows2[0] = createSelectionBtn(ii + 1);
+            // rows2[0] = createSelectionBtn(ii + 1);// TODO
+            rows2[0] = ii + 1;// TODO
             createModel.addRow(rows2);
         }
 
         if (changeColorRowCellIdxMap != null) {
             JTableUtil.newInstance(queryResultTable).setCellBackgroundColor(Color.green.brighter(), changeColorRowCellIdxMap, null);
         }
-
-        JTableUtil.newInstance(queryResultTable).columnIsButton(QUERY_RESULT_COLUMN_NO);
 
         if (true) {
             Map<String, Object> preference = new HashMap<String, Object>();
