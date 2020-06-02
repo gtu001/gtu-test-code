@@ -69,6 +69,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.JToolTip;
+import javax.swing.SwingWorker;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.MenuKeyEvent;
@@ -148,7 +149,6 @@ import gtu.swing.util.JListUtil;
 import gtu.swing.util.JMouseEventUtil;
 import gtu.swing.util.JPopupMenuUtil;
 import gtu.swing.util.JProgressBarHelper;
-import gtu.swing.util.JTabbedPaneUtil;
 import gtu.swing.util.JTableUtil;
 import gtu.swing.util.JTableUtil.ColumnSearchFilter;
 import gtu.swing.util.JTableUtil.JTooltipTable;
@@ -2283,150 +2283,161 @@ public class FastDBQueryUI extends JFrame {
      * 執行sql
      */
     private void executeSqlButtonClick() {
-        long startTime = System.currentTimeMillis();
-        try {
-            // init
-            {
-                isResetQuery = true;
-                filterRowsQueryList = null;// rows 過濾清除
-                importExcelSheetName = null; // 清除匯入黨名
-                queryResultTimeLbl.setText("");
-            }
+        class ExecuteSqlButtonClickGo extends SwingWorker<String, Object> {
+            @Override
+            public String doInBackground() {
+                long startTime = System.currentTimeMillis();
+                try {
+                    // init
+                    {
+                        isResetQuery = true;
+                        filterRowsQueryList = null;// rows 過濾清除
+                        importExcelSheetName = null; // 清除匯入黨名
+                        queryResultTimeLbl.setText("");
+                    }
 
-            JTableUtil util = JTableUtil.newInstance(parametersTable);
+                    JTableUtil util = JTableUtil.newInstance(parametersTable);
 
-            Map<String, Object> paramMap = new HashMap<String, Object>();
-            Map<String, String> sqlInjectMap = new LinkedHashMap<String, String>();
+                    Map<String, Object> paramMap = new HashMap<String, Object>();
+                    Map<String, String> sqlInjectMap = new LinkedHashMap<String, String>();
 
-            Set<String> forceAddColumns = new HashSet<String>();
+                    Set<String> forceAddColumns = new HashSet<String>();
 
-            for (int ii = 0; ii < parametersTable.getRowCount(); ii++) {
-                Boolean isInUse = (Boolean) util.getRealValueAt(ii, ParameterTableColumnDef.USE.idx);
-                if (isInUse == null) {
-                    isInUse = false;
-                }
+                    for (int ii = 0; ii < parametersTable.getRowCount(); ii++) {
+                        Boolean isInUse = (Boolean) util.getRealValueAt(ii, ParameterTableColumnDef.USE.idx);
+                        if (isInUse == null) {
+                            isInUse = false;
+                        }
 
-                String columnName = (String) util.getRealValueAt(ii, ParameterTableColumnDef.COLUMN.idx);
-                String value = (String) util.getRealValueAt(ii, ParameterTableColumnDef.VALUE.idx);
+                        String columnName = (String) util.getRealValueAt(ii, ParameterTableColumnDef.COLUMN.idx);
+                        String value = (String) util.getRealValueAt(ii, ParameterTableColumnDef.VALUE.idx);
 
-                if (SqlParam.sqlInjectionPATTERN.matcher(columnName).matches()) {
-                    // sql Injection
-                    if (isInUse) {
-                        sqlInjectMap.put(columnName, StringUtils.trimToEmpty(value));
+                        if (SqlParam.sqlInjectionPATTERN.matcher(columnName).matches()) {
+                            // sql Injection
+                            if (isInUse) {
+                                sqlInjectMap.put(columnName, StringUtils.trimToEmpty(value));
+                            } else {
+                                sqlInjectMap.put(columnName, null);
+                            }
+                        } else {
+                            // 一般處理
+                            DataType dataType = (DataType) util.getRealValueAt(ii, ParameterTableColumnDef.TYPE.idx);
+                            if (isInUse) {
+                                paramMap.put(columnName, getRealValue(value, dataType));
+                            } else {
+                                paramMap.put(columnName, null);
+                            }
+
+                            if (dataType.isForceAddColumn()) {
+                                forceAddColumns.add(columnName);
+                            }
+                        }
+                    }
+
+                    String sql = getCurrentSQL();
+
+                    JCommonUtil.isBlankErrorMsg(sql, "請輸入sql");
+
+                    // 取得執行sql物件
+                    SqlParam param = parseSqlToParam(sql);
+
+                    // 檢查參數是否異動
+                    for (String columnName : param.paramSet) {
+                        if (!paramMap.containsKey(columnName) && !sqlInjectMap.containsKey(columnName)) {
+                            Validate.isTrue(false, "參數有異動!, 請重新按儲存按鈕");
+                        }
+                    }
+
+                    // 組參數列
+                    List<Object> parameterList = new ArrayList<Object>();
+                    if (param.getClass() == SqlParam.class) {
+                        for (String columnName : param.paramList) {
+                            if (!paramMap.containsKey(columnName)) {
+                                Validate.isTrue(false, "參數未設定 : " + columnName);
+                            }
+                            parameterList.add(paramMap.get(columnName));
+                        }
+                    } else if (param.getClass() == SqlParam_IfExists.class) {
+                        parameterList.addAll(((SqlParam_IfExists) param).processParamMap(paramMap, sqlInjectMap, forceAddColumns));
+                    }
+
+                    // 設定 sqlInjectionMap
+                    param.sqlInjectionMap.putAll(sqlInjectMap);
+
+                    System.out.println("尚未執行=====================================================");
+                    System.out.println(param.getQuestionSql());
+                    for (int i = 0; i < parameterList.size(); i++) {
+                        System.out.println("param[" + i + "]:\"" + parameterList.get(i) + "\"  (" + (parameterList.get(i) != null ? parameterList.get(i).getClass().getName() : "NA") + ")");
+                    }
+                    System.out.println("尚未執行=====================================================");
+
+                    // 判斷執行模式
+                    if (querySqlRadio.isSelected()) {
+                        int maxRowsLimit = StringNumberUtil.parseInt(maxRowsText.getText(), 0);
+                        Triple<List<String>, List<Class<?>>, List<Object[]>> orignQueryResult = JdbcDBUtil.queryForList_customColumns(param.getQuestionSql(), parameterList.toArray(),
+                                getDataSource().getConnection(), true, maxRowsLimit);
+
+                        createRecordWatcher(orignQueryResult, param.getQuestionSql(), parameterList.toArray(), true, maxRowsLimit);
+
+                        mSqlIdColumnHolder.setColumns(mSqlIdColumnHolder.getSqlId(), orignQueryResult.getLeft());
+
+                        queryList = orignQueryResult;
+
+                        // 切換查詢結果
+                        if (!queryList.getRight().isEmpty()) {
+                            tabbedPane.setSelectedIndex(3);
+                        }
+
+                        queryModeProcess(queryList, false, Pair.of(param, parameterList), null);
+
+                        showJsonArry(queryList);
+
+                        // 過濾欄位apply
+                        if (StringUtils.isNotBlank(rowFilterText.getText())) {
+                            rowFilterTextDoFilter.run();
+                        }
+                    } else if (updateSqlRadio.isSelected()) {
+                        int modifyResult = JdbcDBUtil.modify(param.questionSql, parameterList.toArray(), getDataSource().getConnection(), true);
+                        JCommonUtil._jOptionPane_showMessageDialog_info("update : " + modifyResult);
+                    }
+
+                    // 設定欄位解釋定義
+                    setupCustomColumnDefExcelChinese();
+
+                    // 儲存參數設定
+                    saveParameterTableConfig(false);
+
+                    // 儲存sqlId mapping dataSource 設定
+                    sqlIdListDSMappingHandler.store(true);
+
+                    // 設定預設欄位定義
+                    setCustomColumnTitleTooltip();
+                    // 設定預設欄位代碼定義
+                    setCustomColumnCodeValueTooptip();
+                } catch (Exception ex) {
+                    queryResultTable.setModel(JTableUtil.createModel(true, "ERROR"));
+                    String category = refSearchCategoryCombobox_Auto.getTextComponent().getText();
+                    String findMessage = refSearchListConfigHandler.findExceptionMessage(category, ex.getMessage());
+                    // 一般顯示
+                    if (StringUtils.isBlank(findMessage)) {
+                        JCommonUtil.handleException(ex);
                     } else {
-                        sqlInjectMap.put(columnName, null);
+                        // html顯示
+                        JCommonUtil.handleException(String.format("參考 : %s", findMessage), ex, true, "", "yyyyMMdd", false, true);
                     }
-                } else {
-                    // 一般處理
-                    DataType dataType = (DataType) util.getRealValueAt(ii, ParameterTableColumnDef.TYPE.idx);
-                    if (isInUse) {
-                        paramMap.put(columnName, getRealValue(value, dataType));
-                    } else {
-                        paramMap.put(columnName, null);
-                    }
-
-                    if (dataType.isForceAddColumn()) {
-                        forceAddColumns.add(columnName);
-                    }
+                } finally {
+                    BigDecimal duringTime = new BigDecimal(System.currentTimeMillis() - startTime).divide(new BigDecimal(1000), 3, BigDecimal.ROUND_HALF_EVEN);
+                    queryResultTimeLbl.setText("查詢耗時:  " + duringTime + " 秒");
+                    JTableUtil.newInstance(queryResultTable).setRowHeightByFontSize();
                 }
+                return "OK";
             }
 
-            String sql = getCurrentSQL();
-
-            JCommonUtil.isBlankErrorMsg(sql, "請輸入sql");
-
-            // 取得執行sql物件
-            SqlParam param = parseSqlToParam(sql);
-
-            // 檢查參數是否異動
-            for (String columnName : param.paramSet) {
-                if (!paramMap.containsKey(columnName) && !sqlInjectMap.containsKey(columnName)) {
-                    Validate.isTrue(false, "參數有異動!, 請重新按儲存按鈕");
-                }
+            @Override
+            protected void done() {
             }
-
-            // 組參數列
-            List<Object> parameterList = new ArrayList<Object>();
-            if (param.getClass() == SqlParam.class) {
-                for (String columnName : param.paramList) {
-                    if (!paramMap.containsKey(columnName)) {
-                        Validate.isTrue(false, "參數未設定 : " + columnName);
-                    }
-                    parameterList.add(paramMap.get(columnName));
-                }
-            } else if (param.getClass() == SqlParam_IfExists.class) {
-                parameterList.addAll(((SqlParam_IfExists) param).processParamMap(paramMap, sqlInjectMap, forceAddColumns));
-            }
-
-            // 設定 sqlInjectionMap
-            param.sqlInjectionMap.putAll(sqlInjectMap);
-
-            System.out.println("尚未執行=====================================================");
-            System.out.println(param.getQuestionSql());
-            for (int i = 0; i < parameterList.size(); i++) {
-                System.out.println("param[" + i + "]:\"" + parameterList.get(i) + "\"  (" + (parameterList.get(i) != null ? parameterList.get(i).getClass().getName() : "NA") + ")");
-            }
-            System.out.println("尚未執行=====================================================");
-
-            // 判斷執行模式
-            if (querySqlRadio.isSelected()) {
-                int maxRowsLimit = StringNumberUtil.parseInt(maxRowsText.getText(), 0);
-                Triple<List<String>, List<Class<?>>, List<Object[]>> orignQueryResult = JdbcDBUtil.queryForList_customColumns(param.getQuestionSql(), parameterList.toArray(),
-                        this.getDataSource().getConnection(), true, maxRowsLimit);
-
-                createRecordWatcher(orignQueryResult, param.getQuestionSql(), parameterList.toArray(), true, maxRowsLimit);
-
-                mSqlIdColumnHolder.setColumns(mSqlIdColumnHolder.getSqlId(), orignQueryResult.getLeft());
-
-                this.queryList = orignQueryResult;
-
-                // 切換查詢結果
-                if (!queryList.getRight().isEmpty()) {
-                    tabbedPane.setSelectedIndex(3);
-                }
-
-                this.queryModeProcess(queryList, false, Pair.of(param, parameterList), null);
-
-                this.showJsonArry(queryList);
-
-                // 過濾欄位apply
-                if (StringUtils.isNotBlank(rowFilterText.getText())) {
-                    rowFilterTextDoFilter.run();
-                }
-            } else if (updateSqlRadio.isSelected()) {
-                int modifyResult = JdbcDBUtil.modify(param.questionSql, parameterList.toArray(), this.getDataSource().getConnection(), true);
-                JCommonUtil._jOptionPane_showMessageDialog_info("update : " + modifyResult);
-            }
-
-            // 設定欄位解釋定義
-            setupCustomColumnDefExcelChinese();
-
-            // 儲存參數設定
-            saveParameterTableConfig(false);
-
-            // 儲存sqlId mapping dataSource 設定
-            sqlIdListDSMappingHandler.store(true);
-
-            // 設定預設欄位定義
-            setCustomColumnTitleTooltip();
-            // 設定預設欄位代碼定義
-            setCustomColumnCodeValueTooptip();
-        } catch (Exception ex) {
-            queryResultTable.setModel(JTableUtil.createModel(true, "ERROR"));
-            String category = refSearchCategoryCombobox_Auto.getTextComponent().getText();
-            String findMessage = refSearchListConfigHandler.findExceptionMessage(category, ex.getMessage());
-            // 一般顯示
-            if (StringUtils.isBlank(findMessage)) {
-                JCommonUtil.handleException(ex);
-            } else {
-                // html顯示
-                JCommonUtil.handleException(String.format("參考 : %s", findMessage), ex, true, "", "yyyyMMdd", false, true);
-            }
-        } finally {
-            BigDecimal duringTime = new BigDecimal(System.currentTimeMillis() - startTime).divide(new BigDecimal(1000), 3, BigDecimal.ROUND_HALF_EVEN);
-            queryResultTimeLbl.setText("查詢耗時:  " + duringTime + " 秒");
-            JTableUtil.newInstance(queryResultTable).setRowHeightByFontSize();
         }
+        new ExecuteSqlButtonClickGo().execute();
     }
 
     private void setupCustomColumnDefExcelChinese() {
