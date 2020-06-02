@@ -367,8 +367,9 @@ public class FastDBQueryUI_XlsColumnDefLoader {
         List<TableDef> findTabLst;
         DefaultTableModel model;
         int findRowCount = 0;
-
+        boolean hasChinese;
         Pattern p1 = Pattern.compile("\\/(.*?)\\/");
+        private int DEFAULT_EXCEL_TITLES_COUNT = 50;
 
         private boolean isRegexMatch(String target, Pattern[] search) {
             if (search != null && search.length > 0) {
@@ -476,7 +477,7 @@ public class FastDBQueryUI_XlsColumnDefLoader {
         }
 
         private DefaultTableModel toModel() {
-            Object[] titles = new Object[150];
+            Object[] titles = new Object[DEFAULT_EXCEL_TITLES_COUNT];
             titles[0] = "file";
             titles[1] = "sheet";
             titles[2] = "row";
@@ -500,10 +501,17 @@ public class FastDBQueryUI_XlsColumnDefLoader {
                     });
                     arry.addFirst(btn);
                     if (!StringUtil_.hasChineseWord2(tab.table) && //
-                            StringUtils.isNotBlank(map.get(columnDef.index)) && //
-                            StringUtils.isNotBlank(map.get(chineseDef.index))) {
-                        model.addRow(arry.toArray());
-                        findRowCount++;
+                            StringUtils.isNotBlank(map.get(columnDef.index))) {
+                        boolean addOk = false;
+                        if (this.hasChinese && StringUtils.isNotBlank(map.get(chineseDef.index))) {
+                            addOk = true;
+                        } else if (!this.hasChinese) {
+                            addOk = true;
+                        }
+                        if (addOk) {
+                            model.addRow(arry.toArray());
+                            findRowCount++;
+                        }
                     }
                 }
             }
@@ -542,7 +550,8 @@ public class FastDBQueryUI_XlsColumnDefLoader {
             return Pair.of(paramLst.toArray(new String[0]), ptnLst.toArray(new Pattern[0]));
         }
 
-        public QueryHandler(String tableQry, String columnQry, String otherQry, JTable jtable) {
+        public QueryHandler(String tableQry, String columnQry, String otherQry, final boolean hasChinese, JTable jtable) {
+            this.hasChinese = hasChinese;
             if (StringUtils.isNotBlank(tableQry)) {
                 Pair<String[], Pattern[]> val = toSearchCondition(tableQry);
                 tableQryText = val.getLeft();
@@ -563,8 +572,9 @@ public class FastDBQueryUI_XlsColumnDefLoader {
         }
     }
 
-    public Triple<DefaultTableModel, Integer, ActionListener> query(final String tableQry, final String columnQry, final String otherQry, final JTable jtable, final JFrame jframe) {
-        final QueryHandler mQueryHandler = new QueryHandler(tableQry, columnQry, otherQry, jtable);
+    public Triple<DefaultTableModel, Integer, ActionListener> query(final String tableQry, final String columnQry, final String otherQry, final boolean hasChinese, final JTable jtable,
+            final JFrame jframe) {
+        final QueryHandler mQueryHandler = new QueryHandler(tableQry, columnQry, otherQry, hasChinese, jtable);
         final ActionListener listener = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

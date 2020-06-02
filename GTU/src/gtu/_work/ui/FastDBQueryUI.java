@@ -250,7 +250,7 @@ public class FastDBQueryUI extends JFrame {
     private JButton excelExportBtn;
     private JRadioButton radio_import_excel;
     private JRadioButton radio_export_excel;
-	private JRadioButton radio_export_json;
+    private JRadioButton radio_export_json;
 
     private ButtonGroup btnExcelBtn;
     private JLabel label;
@@ -369,6 +369,7 @@ public class FastDBQueryUI extends JFrame {
     private XlsColumnDefDlg mXlsColumnDefDlg;
     private JTextField columnXlsDefColumnQryText;
     private JTextField columnXlsDefOtherQryText;
+    private JCheckBox columnXlsDefShowChineseChk;
     private JLabel label_2;
     private JLabel lblNewLabel_19;
     private JLabel columnXlsDefFindRowCountLbl;
@@ -1562,6 +1563,9 @@ public class FastDBQueryUI extends JFrame {
         columnXlsDefTableQryText.addMouseListener(new S2T_And_T2S_EventHandler(columnXlsDefTableQryText).getEvent());
         columnXlsDefColumnQryText.addMouseListener(new S2T_And_T2S_EventHandler(columnXlsDefColumnQryText).getEvent());
         columnXlsDefOtherQryText.addMouseListener(new S2T_And_T2S_EventHandler(columnXlsDefOtherQryText).getEvent());
+        
+        columnXlsDefShowChineseChk = new JCheckBox("顯示中文");
+        panel_29.add(columnXlsDefShowChineseChk);
 
         columnXlsDefTableColumnQryTable = new JTable();
         panel_28.add(JCommonUtil.createScrollComponent(columnXlsDefTableColumnQryTable), BorderLayout.CENTER);
@@ -5998,7 +6002,6 @@ public class FastDBQueryUI extends JFrame {
             }
         }
     };
-    
 
     private class JDlgHolderBringToFrontHandler {
         LRUMap map = new LRUMap(10);
@@ -6226,9 +6229,9 @@ public class FastDBQueryUI extends JFrame {
             return Collections.emptyList();
         }
 
-        public Triple<DefaultTableModel, Integer, ActionListener> query(String tableQry, String columnQry, String otherQry, JTable jtable, JFrame jframe) {
+        public Triple<DefaultTableModel, Integer, ActionListener> query(String tableQry, String columnQry, String otherQry, boolean hasChinese, JTable jtable, JFrame jframe) {
             init2();
-            return xlsLoader.query(tableQry, columnQry, otherQry, jtable, jframe);
+            return xlsLoader.query(tableQry, columnQry, otherQry, hasChinese, jtable, jframe);
         }
     }
 
@@ -6468,8 +6471,9 @@ public class FastDBQueryUI extends JFrame {
             String tableQry = columnXlsDefTableQryText.getText();
             String columnQry = columnXlsDefColumnQryText.getText();
             String otherQry = columnXlsDefOtherQryText.getText();
+            boolean hasChinese = columnXlsDefShowChineseChk.isSelected();
 
-            Triple<DefaultTableModel, Integer, ActionListener> result = mTableColumnDefTextHandler.query(tableQry, columnQry, otherQry, columnXlsDefTableColumnQryTable, this);
+            Triple<DefaultTableModel, Integer, ActionListener> result = mTableColumnDefTextHandler.query(tableQry, columnQry, otherQry, hasChinese, columnXlsDefTableColumnQryTable, this);
             DefaultTableModel model = result.getLeft();
             columnXlsDefFindRowCountLbl.setText(String.valueOf(result.getMiddle()));
             columnXlsDefTableColumnQryTable.setModel(model);
