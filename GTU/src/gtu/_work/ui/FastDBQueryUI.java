@@ -2188,6 +2188,11 @@ public class FastDBQueryUI extends JFrame {
      */
     private void saveSqlButtonClick(boolean saveSqlIdConfig) {
         try {
+            String sqlId = sqlIdText.getText();
+            String sql = sqlTextArea.getText();
+            JCommonUtil.isBlankErrorMsg(sqlId, "請輸入sql Id");
+            JCommonUtil.isBlankErrorMsg(sql, "請輸入sql");
+            
             if (isSqlIdChange()) {
                 boolean isContinue = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("您輸入SqlID以存在:" + sqlIdText.getText() + ", 是否要繼續?", "已存在SqlID");
                 if (!isContinue) {
@@ -2195,14 +2200,10 @@ public class FastDBQueryUI extends JFrame {
                     return;
                 }
             }
-
-            String sqlId = sqlIdText.getText();
+            
             RefSearchColor color = (RefSearchColor) sqlIdColorComboBox.getSelectedItem();
             String category = sqlIdCategoryComboBox_Auto.getTextComponent().getText();
-            String sql = sqlTextArea.getText();
             String sqlComment = sqlIdCommentArea.getText();
-            JCommonUtil.isBlankErrorMsg(sqlId, "請輸入sql Id");
-            JCommonUtil.isBlankErrorMsg(sql, "請輸入sql");
 
             SqlParam param = parseSqlToParam(sql);
 
@@ -4391,11 +4392,12 @@ public class FastDBQueryUI extends JFrame {
         }
 
         private String getUniqueKey() {
-            String prefix = "";
-            if (StringUtils.isNotBlank(category)) {
-                prefix = StringUtils.trimToEmpty(category) + "_";
-            }
-            return prefix + StringUtils.trimToEmpty(sqlId);
+            // String prefix = "";
+            // if (StringUtils.isNotBlank(category)) {
+            // prefix = StringUtils.trimToEmpty(category) + "_";
+            // }
+            // return prefix + StringUtils.trimToEmpty(sqlId);
+            return StringUtils.trimToEmpty(sqlId);
         }
 
         public static SqlIdConfigBean of(String key, String value) {
@@ -4423,6 +4425,14 @@ public class FastDBQueryUI extends JFrame {
         }
 
         @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + ((sql == null) ? 0 : sql.hashCode());
+            return result;
+        }
+
+        @Override
         public boolean equals(Object obj) {
             if (this == obj)
                 return true;
@@ -4431,15 +4441,10 @@ public class FastDBQueryUI extends JFrame {
             if (getClass() != obj.getClass())
                 return false;
             SqlIdConfigBean other = (SqlIdConfigBean) obj;
-            if (category == null) {
-                if (other.category != null)
+            if (sql == null) {
+                if (other.sql != null)
                     return false;
-            } else if (!category.equals(other.category))
-                return false;
-            if (sqlId == null) {
-                if (other.sqlId != null)
-                    return false;
-            } else if (!sqlId.equals(other.sqlId))
+            } else if (!sql.equals(other.sql))
                 return false;
             return true;
         }
@@ -6091,18 +6096,21 @@ public class FastDBQueryUI extends JFrame {
                 if (StringUtils.isNotBlank(tmpTip)) {
                     Matcher mth21 = ptn3.matcher(tmpTip);
                     if (mth21.find()) {
-                        String coleValueString = mth21.group(1).replaceAll("[\\r\\n]", " ");
-                        Map<String, String> codeValMap = new HashMap<String, String>();
-                        String[] arry = coleValueString.split(" ", -1);
-                        for (String keyVal : arry) {
-                            String[] arry2 = keyVal.split("=", -1);
-                            String code = StringUtils.trimToEmpty(arry2[0]);
-                            if (StringUtils.isNotBlank(code)) {
-                                String value = StringUtils.trimToEmpty(arry2[1]);
-                                codeValMap.put(code, value);
+                        String tmpStr = mth21.group(1);
+                        if (StringUtils.contains(tmpStr, "=")) {
+                            String coleValueString = tmpStr.replaceAll("[\\r\\n]", " ");
+                            Map<String, String> codeValMap = new HashMap<String, String>();
+                            String[] arry = coleValueString.split(" ", -1);
+                            for (String keyVal : arry) {
+                                String[] arry2 = keyVal.split("=", -1);
+                                String code = StringUtils.trimToEmpty(arry2[0]);
+                                if (StringUtils.isNotBlank(code)) {
+                                    String value = StringUtils.trimToEmpty(arry2[1]);
+                                    codeValMap.put(code, value);
+                                }
                             }
+                            columnCodeValueMap.put(column, codeValMap);
                         }
-                        columnCodeValueMap.put(column, codeValMap);
                     }
                 }
             }
@@ -6225,7 +6233,7 @@ public class FastDBQueryUI extends JFrame {
 
         private String getTableAlias(String table, boolean appendDot) {
             String sql = getCurrentSQL();
-            Pattern ptn = Pattern.compile(table + "\\s+(\\w+)", Pattern.DOTALL | Pattern.MULTILINE);
+            Pattern ptn = Pattern.compile(table + "\\s+(\\w+)", Pattern.DOTALL | Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
             Matcher mth = ptn.matcher(sql);
             if (mth.find()) {
                 return StringUtils.trimToEmpty(mth.group(1)) + (appendDot ? "." : "");
@@ -6242,7 +6250,7 @@ public class FastDBQueryUI extends JFrame {
                     List<String> colLst = xlsLoader.getColumnLst(table);
                     for (Object tit : JTableUtil.newInstance(queryResultTable).getColumnTitleArray()) {
                         String column = (String) tit;
-                        if (colLst.contains(column)) {
+                        if (ListUtil.constainIgnorecase(column, colLst)) {
                             String chinese = xlsLoader.getDBColumnChinese(column, false, table);
                             sb.append(tableAlias + column + " /*" + chinese + "*/,\r\n");
                         }
