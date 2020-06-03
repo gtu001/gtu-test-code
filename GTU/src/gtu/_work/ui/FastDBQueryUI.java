@@ -373,6 +373,7 @@ public class FastDBQueryUI extends JFrame {
     private JLabel lblNewLabel_19;
     private JLabel columnXlsDefFindRowCountLbl;
     private JCheckBox radio_export_excel_ignoreNull;
+    private UndoSaveHanlder mUndoSaveHanlder;
 
     private final Predicate IGNORE_PREDICT = new Predicate() {
         @Override
@@ -1900,6 +1901,8 @@ public class FastDBQueryUI extends JFrame {
 
             new MoveTabsNativeKeyListener();// alt + 左右切換頁籤工具
 
+            mUndoSaveHanlder = new UndoSaveHanlder();
+
             tabbedPane.setSelectedIndex(1);// 預設為SQL頁籤
 
             sqlTextArea.setText("\r\n\r\n\r\n        ");// 初始化輸入位置
@@ -2192,7 +2195,7 @@ public class FastDBQueryUI extends JFrame {
             String sql = sqlTextArea.getText();
             JCommonUtil.isBlankErrorMsg(sqlId, "請輸入sql Id");
             JCommonUtil.isBlankErrorMsg(sql, "請輸入sql");
-            
+
             if (isSqlIdChange()) {
                 boolean isContinue = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("您輸入SqlID以存在:" + sqlIdText.getText() + ", 是否要繼續?", "已存在SqlID");
                 if (!isContinue) {
@@ -2200,7 +2203,11 @@ public class FastDBQueryUI extends JFrame {
                     return;
                 }
             }
-            
+
+            if (sqlBean != null) {
+                mUndoSaveHanlder.push(sqlBean.sql);
+            }
+
             RefSearchColor color = (RefSearchColor) sqlIdColorComboBox.getSelectedItem();
             String category = sqlIdCategoryComboBox_Auto.getTextComponent().getText();
             String sqlComment = sqlIdCommentArea.getText();
@@ -4207,6 +4214,15 @@ public class FastDBQueryUI extends JFrame {
                             column = e2.varchar2Timestamp(column);
 
                             sqlTextArea.setText(prefix + column + suffix);
+                        }
+                    })//
+                    .addJMenuItem("儲存回復!!!", new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            String sql = mUndoSaveHanlder.reverse(false);
+                            if (StringUtils.isNotBlank(sql)) {
+                                sqlTextArea.setText(sql);
+                            }
                         }
                     })//
                     .applyEvent(e)//
@@ -6716,6 +6732,35 @@ public class FastDBQueryUI extends JFrame {
                     }
                 }
             }
+        }
+    }
+
+    // ======================================================================================================================
+    // 儲存回復工具
+    private class UndoSaveHanlder {
+        private LinkedList<String> sqlLst = new LinkedList<String>();
+
+        private void push(String text) {
+            if (StringUtils.isBlank(text)) {
+                return;
+            }
+            if (!sqlLst.isEmpty()) {
+                String sql = sqlLst.getLast();
+                if (!StringUtils.equals(text, sql)) {
+                    sqlLst.push(text);
+                }
+            }
+        }
+
+        private String reverse(boolean consume) {
+            if (!sqlLst.isEmpty()) {
+                String sql = sqlLst.getLast();
+                if (consume) {
+                    sqlLst.removeLast();
+                }
+                return sql;
+            }
+            return "";
         }
     }
 }

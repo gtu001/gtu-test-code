@@ -20,7 +20,7 @@
 - comboLst: [
     ]
   configKeyText: codeValue_下拉
-  exampleArea: 下拉測試 txtDropDownTest accidentcode
+  exampleArea: 契變項目 EdorType edortype
   fromVal: (.*?)\s+(.*?)\s+(.*)
   multiLine: false
   toVal: |2-
@@ -583,4 +583,75 @@
   multiLine: false
   toVal: toSchema.set${arry[1]?cap_first}(fromSchema.get${arry[1]?cap_first}());
   tradeOff: '{"arry":[],"not_arry":[],"sourceFiles":[],"ftl":"arry","only_match":true}'
+- comboLst: [
+    ]
+  configKeyText: XXXXX
+  exampleArea: |2-
+
+        select * from sssss ffff = :ddddd and ffff = :rrrr
+  fromVal: (?:\:(\w+))
+  multiLine: false
+  toVal: |2-
+
+    String ${arry[1]} = "";
+
+    ^split^
+
+    if(${arry[1]} != null) {
+        sbv.put("${arry[1]}", ${arry[1]});
+    }
+  tradeOff: '{"arry":[],"not_arry":[],"sourceFiles":[],"ftl":"arry","only_match":true,"split":"^split^"}'
+- comboLst: [
+    ]
+  configKeyText: SQL_Generate
+  exampleArea: select * from LCMidValueTrace where ContNo = :ContNo and PolNo = :PolNo
+  fromVal: (?:\:(\w+))
+  multiLine: false
+  toVal: |-
+    String ${arry[1]} = "";
+    ^split^'?${arry[1]}?'^split^
+
+    if(${arry[1]} != null) {
+        sql += " and ${arry[1]} = '?${arry[1]}?' ";
+    }
+
+    if(${arry[1]} != null) {
+        sbv.put("${arry[1]}", ${arry[1]});
+    }
+  tradeOff: '{"arry":[],"not_arry":[],"sourceFiles":[],"ftl":"arry","only_match":true,"split":"^split^","splitFull":["1"]}'
+- comboLst: [
+    ]
+  configKeyText: '333333'
+  exampleArea: |-
+    EDORCODE
+    EDORACCEPTNO
+    EDORNO
+    EDORAPPNO
+    GRPCONTNO
+    CONTNO
+    VPU
+    AMNT
+    AMNT
+    POLNO
+    MODIFYDATE
+    PAYENDDATE
+    PAYTODATE
+    CVALIDATE
+    IN_THINK_PERIOD
+  fromVal: \w+
+  multiLine: false
+  toVal: var ${arry[0]} = row[${index}];
+  tradeOff: '{"arry":[],"not_arry":[],"splitFull":[],"sourceFiles":[],"ftl":"arry","only_match":true}'
+- comboLst: [
+    ]
+  configKeyText: 日歷
+  exampleArea: 生效日期 cValiDate
+  fromVal: (.*?)\s+(.*)
+  multiLine: false
+  toVal: |2-
+                        <TD  class= title data-i18n=""> #1# </TD>
+                        <TD  class= input><!--<Input class="multiDatePicker" readonly name=#2# >-->
+                            <Input class="coolDatePicker" onClick="laydate({elem: '##2#'});" verify="有效开始日期~xIDx155818928601478XidX|DATE" dateFormat="short" name=#2# id="#2#"><span class="icon"><a onClick="laydate({elem: '##2#'});"><img src="../common/laydate/skins/default/icon.png" /></a></span>
+                        </TD>
+  tradeOff: ''
 ...

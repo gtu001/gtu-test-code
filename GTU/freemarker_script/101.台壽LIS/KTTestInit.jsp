@@ -33,9 +33,9 @@
             <#list columnLst as col>
             iArray[${col?index}] = new Array();
             iArray[${col?index}][0] = "${col}";//列名
-            iArray[${col?index}][1] = "100px";//列宽
+            iArray[${col?index}][1] = "100px";//列宽(隱藏為0px)
             iArray[${col?index}][2] = 10;//列最大值
-            iArray[${col?index}][3] = 0;//是否允许输入,1表示允许，0表示不允许
+            iArray[${col?index}][3] = 0;//是否允许输入,1表示允许，0表示不允许,3=隱藏
             
             </#list>                
 
@@ -84,7 +84,7 @@
 	}
 
 	function queryClick(){
-        init${ct.getGridName()}();
+        //init${ct.getGridName()}();
 
         <#list columnLst as col>
         var ${col} = $("#${col}").val();
@@ -107,6 +107,9 @@
         }
     }
 
+    function querySimple() {
+    	simpleGridQuery("${ct.getFunObj()['pkg']}.${ct.getFunObj()['sqlClass']}", "${ct.getFunObj()['sqlMethod']}", ['86110020190410001782'], "${ct.getFunObj()['module']}", ${ct.getGridName()});
+    }
 
 	function showSelection() {
         var arrResult = new Array();
@@ -119,6 +122,11 @@
             var strSQL = "";
             var codetype = ${ct.getGridName()}.getRowColData(tSel - 1, 1);
             var code = ${ct.getGridName()}.getRowColData(tSel - 1, 2);
+
+            debugger
+            <#list 1..50 as x>
+            var para${x} = ${ct.getGridName()}.getRowColData(tSel - 1, ${x});
+            </#list>
 
             var tResourceName = "${ct.getFunObj()['pkg']}.${ct.getFunObj()['sqlClass']}";
             var sqlid4 = "${ct.getFunObj()['sqlMethod']}";
@@ -279,4 +287,65 @@
 		tmpShowInfo.focus();
 		return tmpShowInfo;
 	}
+
+
+
+
+	/*
+	* sqlresourcename = "bq.PEdorTypePTInputSql"
+	* sqlId = "PEdorTypePTInputSql3"
+	* paramArry = [tContNo,tContNo]
+	* pkg = "ind_pa"
+	*/
+	function simpleGridQuery(sqlresourcename, sqlId, paramArry, pkg, DataGrid) {
+	    var strSQL = wrapSql(sqlresourcename, sqlId, paramArry, pkg);
+	    var arrSelected = new Array();
+	    turnPage.strQueryResult  = easyQueryVer3(strSQL, 1, 0, 1);
+	
+	    //判断是否查询成功
+	    if (!turnPage.strQueryResult) {
+	        //i18nAlert("没有相应的投保人或被保人信息！", "xIDx15581913594741XidX");
+	        return false;
+	    }
+	    //清空数据容器，两个不同查询共用一个turnPage对象时必须使用，最好加上，容错
+	    turnPage.arrDataCacheSet = clearArrayElements(turnPage.arrDataCacheSet);
+	    //查询成功则拆分字符串，返回二维数组
+	    turnPage.arrDataCacheSet = decodeEasyQueryResult(turnPage.strQueryResult);
+	    //设置初始化过的MULTILINE对象，VarGrid为在初始化页中定义的全局变量
+	    turnPage.pageDisplayGrid = DataGrid;
+	    //保存SQL语句
+	    turnPage.strQuerySql = strSQL;
+	    //设置查询起始位置
+	    turnPage.pageIndex = 0;
+	    //在查询结果数组中取出符合页面显示大小设置的数组
+	    arrDataSet = turnPage.getData(turnPage.arrDataCacheSet, turnPage.pageIndex, MAXSCREENLINES);
+	    console.table(arrDataSet);
+	    //调用MULTILINE对象显示查询结果
+	    displayMultiline(arrDataSet, turnPage.pageDisplayGrid);
+	}
+
+
+	//setDropdownValue("#EdorType", "#EdorTypeName", "edortype", "PT");
+  	function setDropdownValue(field, cField, strCodeName, value) {
+  		value = String(value);
+  		$(field).val(value);
+  		var Field = $(field).get(0);
+  		var strCondition = ['3'];
+  		var strConditionField = ['risktype3'];
+  		var tCode = searchCode(strCodeName, strCondition, strConditionField);
+  		if(!tCode) {
+  			console.log(strCodeName + " 取得下拉失敗! : " + value);
+  			return;
+  		}
+  		//console.table(tCode);
+  		for(var ii = 0 ; ii < tCode.length; ii ++) {
+  			var arry = tCode[ii];
+  			if(arry[0] == value) {
+  				$(cField).val(arry[1]);
+  				return true;
+  			}
+  		}
+  		$(cField).val("");
+  		return false;
+  	}
 </script>
