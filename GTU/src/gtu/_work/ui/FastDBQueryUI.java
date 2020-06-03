@@ -4219,9 +4219,12 @@ public class FastDBQueryUI extends JFrame {
                     .addJMenuItem("儲存回復!!!", new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
-                            String sql = mUndoSaveHanlder.reverse(false);
-                            if (StringUtils.isNotBlank(sql)) {
-                                sqlTextArea.setText(sql);
+                            boolean isConfirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("是否要回復上一次儲存內容？", "SQL回覆");
+                            if (isConfirm) {
+                                String sql = mUndoSaveHanlder.reverse(true);
+                                if (StringUtils.isNotBlank(sql)) {
+                                    sqlTextArea.setText(sql);
+                                }
                             }
                         }
                     })//
@@ -6744,11 +6747,12 @@ public class FastDBQueryUI extends JFrame {
             if (StringUtils.isBlank(text)) {
                 return;
             }
+            String sql = "";
             if (!sqlLst.isEmpty()) {
-                String sql = sqlLst.getLast();
-                if (!StringUtils.equals(text, sql)) {
-                    sqlLst.push(text);
-                }
+                sql = sqlLst.getLast();
+            }
+            if (!StringUtils.equals(text, sql)) {
+                sqlLst.push(text);
             }
         }
 
