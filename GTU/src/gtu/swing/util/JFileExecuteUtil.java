@@ -22,7 +22,6 @@ import org.apache.commons.collections4.Predicate;
 import org.apache.commons.collections4.Transformer;
 import org.apache.commons.lang.StringUtils;
 
-import com.ibm.db2.jcc.am.l;
 
 import gtu.collection.ListUtil;
 import gtu.file.FileUtil;

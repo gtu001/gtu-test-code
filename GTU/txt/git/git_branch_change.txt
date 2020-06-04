@@ -1,0 +1,9 @@
+尋找遠端 branch
+$ git branch -r --all | grep T028
+  remotes/origin/Feature/#NCSPOS-T028
+  remotes/origin/feature/#NCSPOS-T028
+
+切遠端 branch
+$ git checkout origin/feature/#NCSPOS-T028
+$ git checkout -b feature/#NCSPOS-T028 origin/feature/#NCSPOS-T028
+

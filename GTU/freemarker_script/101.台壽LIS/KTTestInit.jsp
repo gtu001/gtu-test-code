@@ -326,26 +326,71 @@
 
 
 	//setDropdownValue("#EdorType", "#EdorTypeName", "edortype", "PT");
-  	function setDropdownValue(field, cField, strCodeName, value) {
-  		value = String(value);
-  		$(field).val(value);
-  		var Field = $(field).get(0);
-  		var strCondition = ['3'];
-  		var strConditionField = ['risktype3'];
-  		var tCode = searchCode(strCodeName, strCondition, strConditionField);
-  		if(!tCode) {
-  			console.log(strCodeName + " 取得下拉失敗! : " + value);
-  			return;
-  		}
-  		//console.table(tCode);
-  		for(var ii = 0 ; ii < tCode.length; ii ++) {
-  			var arry = tCode[ii];
-  			if(arry[0] == value) {
-  				$(cField).val(arry[1]);
-  				return true;
-  			}
-  		}
-  		$(cField).val("");
-  		return false;
-  	}
+    function setDropdownValue(field, cField, strCodeName, value) {
+        value = String(value);
+        $(field).val(value);
+        var Field = $(field).get(0);
+        var strCondition = '3';
+        var strConditionField = 'risktype3';
+        var arrShowCodeObj = Object();
+        var refresh = false;
+        var showWidth = 0;
+        var changeEven = undefined;
+        var tCode = searchCode(strCodeName, strCondition, strConditionField);
+        if(!tCode) {
+            requestServer(strCodeName, strCondition, strConditionField, showWidth, changeEven);
+            document.all("spanCode").style.display ='none';
+        }
+        var tCode = searchCode(strCodeName, strCondition, strConditionField);
+        if(!tCode) {
+            console.log(strCodeName + " 取得下拉失敗! : " + value);
+            return;
+        }
+        //console.table(tCode);
+        for(var ii = 0 ; ii < tCode.length; ii ++) {
+            var arry = tCode[ii];
+            if(arry[0] == value) {
+                $(cField).val(arry[1]);
+                return true;
+            }
+        }
+        $(cField).val("");
+        return false;
+    }
+
+  	    
+    function RowGridHelper(gridId) {
+    	var config = {
+    		gridId : gridId
+    	}
+    	
+    	var getMaxRowNo = function() {
+    		var maxRow = 0;
+    		var testInput = $("[name^=" + config.gridId + "]");
+	    	var reg = new RegExp(config.gridId + ".*?r(\\d+)");
+	    	for(var ii = 0 ; ii < testInput.length; ii ++ ){
+	    		var mth = reg.exec($(testInput).eq(ii).attr("id"));
+	    		if(mth != null) {
+	    			maxRow = Math.max(maxRow, parseFloat(mth[1], 10));
+	    		}
+	    	}
+	    	return maxRow;
+    	};
+    	
+    	var getMappingCellInput = function(rowNo, cellNo) {
+    		return $("#" + config.gridId + cellNo + "r" + rowNo);
+    	};
+    	
+    	var getMappingCellInputFromObj = function(refElement, cellNo) {
+    		var mth = /.*?r(\d+)/.exec($(refElement).attr("id"));
+    		var rowNo = parseFloat(mth[1], 10);
+    		return getMappingCellInput(rowNo, cellNo);
+    	};
+    	
+    	return {
+    		getMaxRowNo : getMaxRowNo,
+    		getMappingCellInput : getMappingCellInput,
+    		getMappingCellInputFromObj : getMappingCellInputFromObj
+    	}
+    }
 </script>
