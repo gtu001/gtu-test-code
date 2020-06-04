@@ -48,3 +48,34 @@ https://docs.google.com/spreadsheets/d/11ljKyF0eMgY3qqZWjVVBvI0brfv9IxocXjroYtJy
 	ss = 1
 	steamVR custom 20%
 	steamVR game 100%
+
+
+#Lone Echo
+---
+	平行投影 off
+	SS 1.25
+	steamVR custom 20%
+	steamVR game 100%
+	FOV Large
+	選 My games -> Import -> ‪Lone.Echo\ready-at-dawn-lone-echo\bin\win7\LoneEcho.exe
+	在 My games 點自訂圖示啟動
+
+
+#COMPOUND
+---
+	平行投影 off
+	SS 1.25
+	steamVR custom 20%
+	steamVR game 100%
+	FOV Large
+	操作設定重設 :
+		刪除 : C:\Users\gtu00\AppData\Local\COMPOUND
+
+
+#No Man's Sky
+---
+	平行投影 off
+	SS 1.5
+	steamVR custom 20%
+	steamVR game 200%
+	FOV Large
