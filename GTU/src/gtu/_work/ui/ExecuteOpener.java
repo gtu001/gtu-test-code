@@ -54,7 +54,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 import javax.swing.WindowConstants;
 import javax.swing.event.ChangeEvent;
@@ -83,6 +82,7 @@ import gtu.swing.util.HideInSystemTrayHelper;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JFileChooserUtil;
 import gtu.swing.util.JFileExecuteUtil;
+import gtu.swing.util.JFileExecuteUtil.RevertBackFileHelper;
 import gtu.swing.util.JFileExecuteUtil_ConfigDlg;
 import gtu.swing.util.JFrameRGBColorPanel;
 import gtu.swing.util.JListUtil;
@@ -92,9 +92,9 @@ import gtu.swing.util.JPopupMenuUtil;
 import gtu.swing.util.JTextAreaUtil;
 import gtu.swing.util.JTextFieldUtil;
 import gtu.swing.util.SwingActionUtil;
-import gtu.swing.util.SwingTabTemplateUI;
 import gtu.swing.util.SwingActionUtil.Action;
 import gtu.swing.util.SwingActionUtil.ActionAdapter;
+import gtu.swing.util.SwingTabTemplateUI;
 import gtu.swing.util.SwingTabTemplateUI.ChangeTabHandlerGtu001;
 import gtu.zip.ZipUtils;
 
@@ -1185,7 +1185,7 @@ public class ExecuteOpener extends javax.swing.JFrame {
             swingUtil.addAction("fileScan.actionPerformed", new Action() {
 
                 Thread scanMainThread = null;
-                
+
                 private String[] getIgnoreAry() {
                     Object[] igArry_ = ((DefaultListModel) ignoreScanList.getModel()).toArray();
                     String[] igArry = new String[igArry_.length];
@@ -2074,11 +2074,16 @@ public class ExecuteOpener extends javax.swing.JFrame {
                     });
             popupUtil//
                     .addJMenuItem("zip selected", new ActionListener() {
+
                         public void actionPerformed(ActionEvent e) {
                             Object[] files = (Object[]) scanList.getSelectedValues();
                             List<File> fileLst = new ArrayList<File>();
                             for (Object f : files) {
                                 fileLst.add((ZFile) f);
+                            }
+                            File logFile = RevertBackFileHelper.createLogFile(fileLst);
+                            if (logFile != null && logFile.exists()) {
+                                fileLst.add(logFile);
                             }
                             SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
                             File zipfile = new File(FileUtil.DESKTOP_DIR, "zip_" + sdf.format(new Date()) + ".zip");
@@ -2091,6 +2096,13 @@ public class ExecuteOpener extends javax.swing.JFrame {
                             }
                         }
                     });
+            popupUtil//
+                    .addJMenuItem("zip revert back", new ActionListener() {
+                        public void actionPerformed(ActionEvent e) {
+                            RevertBackFileHelper.revertLogFile();
+                        }
+                    });
+            // SimpleCheckListDlg
             popupUtil.show();//
         }
     }

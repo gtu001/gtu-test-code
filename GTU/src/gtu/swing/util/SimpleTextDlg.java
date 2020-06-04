@@ -18,6 +18,8 @@ import javax.swing.JTextArea;
 
 import org.apache.commons.lang.StringUtils;
 
+import gtu._work.ui.FastDBQueryUI.S2T_And_T2S_EventHandler;
+
 public class SimpleTextDlg {
     final JDialog dlg;
     final JLabel lbl;
@@ -64,10 +66,21 @@ public class SimpleTextDlg {
                 lbl.setText("選擇長度:" + strVal.length() + "/位元長度:" + strVal.getBytes().length);
             }
         };
+
+        S2T_And_T2S_EventHandler mS2T_And_T2S_EventHandler = new S2T_And_T2S_EventHandler(text);
+        final JPopupMenuUtil jpopUtil = JPopupMenuUtil.newInstance(text)//
+                .addJMenuItem(mS2T_And_T2S_EventHandler.getMenuItem(true))//
+                .addJMenuItem(mS2T_And_T2S_EventHandler.getMenuItem(false))//
+                .addJMenuItem(mS2T_And_T2S_EventHandler.getMenuItem2(true))//
+                .addJMenuItem(mS2T_And_T2S_EventHandler.getMenuItem2(false));
+
         text.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseReleased(MouseEvent e) {
                 runner.run();
+                if (JMouseEventUtil.buttonRightClick(1, e)) {
+                    jpopUtil.applyEvent(e).show();
+                }
             }
         });
         text.addKeyListener(new KeyAdapter() {

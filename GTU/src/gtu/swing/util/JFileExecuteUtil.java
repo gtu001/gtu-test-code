@@ -4,7 +4,6 @@ import java.awt.Desktop;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -16,11 +15,20 @@ import java.util.regex.Pattern;
 
 import javax.swing.JMenuItem;
 
+import org.apache.commons.collections4.Closure;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.IterableUtils;
+import org.apache.commons.collections4.Predicate;
+import org.apache.commons.collections4.Transformer;
 import org.apache.commons.lang.StringUtils;
 
+import com.ibm.db2.jcc.am.l;
+
+import gtu.collection.ListUtil;
 import gtu.file.FileUtil;
 import gtu.properties.PropertiesUtilBean;
 import gtu.runtime.DesktopUtil;
+import gtu.swing.util.JFileExecuteUtil.RevertBackFileHelper;
 import gtu.zip.ZipUtils;
 
 public class JFileExecuteUtil {
@@ -268,7 +276,7 @@ public class JFileExecuteUtil {
         }
         {
             JMenuItem item = new JMenuItem();
-            item.setText("zip file");
+            item.setText("zip single file");
             item.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent paramActionEvent) {
                     SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
@@ -350,6 +358,72 @@ public class JFileExecuteUtil {
                 }
             }
             return null;
+        }
+    }
+
+    public static class RevertBackFileHelper {
+        public static File createLogFile(List<File> fileLst) {
+            try {
+                File tmpFile = File.createTempFile("FileListLog_", "_.txt");
+                List<String> lst = new ArrayList<String>();
+                for (File f : fileLst) {
+                    lst.add(f.getAbsolutePath());
+                }
+                String content = "檔案清單：\r\n" + StringUtils.join(lst, "\r\n");
+                FileUtil.saveToFile(tmpFile, content, "UTF8");
+                return tmpFile;
+            } catch (Exception ex) {
+                return null;
+            }
+        }
+
+        public static List<File> getLogFileList(File logFile) {
+            List<String> lst = FileUtil.loadFromFile_asList(logFile, "UTF8");
+            lst = ListUtil.subList(lst, 1, lst.size());
+            List<File> rtnLst = (List<File>) CollectionUtils.collect(lst, new Transformer<String, File>() {
+                @Override
+                public File transform(String input) {
+                    return new File((String) input);
+                }
+            });
+            return rtnLst;
+        }
+
+        public static boolean revertLogFile() {
+            try {
+                final File choiceDir = JCommonUtil._jFileChooser_selectDirectoryOnly();
+                if (choiceDir == null || !choiceDir.exists()) {
+                    return false;
+                }
+                final List<File> lst2 = ListUtil.toList(choiceDir.listFiles());
+                File logFile = CollectionUtils.find(lst2, new Predicate<File>() {
+                    @Override
+                    public boolean evaluate(File object) {
+                        return object.getName().matches("FileListLog\\w+\\.txt");
+                    }
+                });
+                final List<File> logFiles = getLogFileList(logFile);
+                final List<String> mvLst = new ArrayList<String>();
+                IterableUtils.forEach(logFiles, new Closure<File>() {
+                    @Override
+                    public void execute(File input) {
+                        File toFile = CollectionUtils.find(lst2, new Predicate<File>() {
+                            @Override
+                            public boolean evaluate(File object) {
+                                return StringUtils.equals(object.getName(), input.getName());
+                            }
+                        });
+                        boolean moveOk = FileUtil.fileMove(input.getAbsolutePath(), toFile.getAbsolutePath());
+                        if (!moveOk) {
+                            mvLst.add(input.getName());
+                        }
+                    }
+                });
+                JCommonUtil._jOptionPane_showMessageDialog_info(("搬運數：" + CollectionUtils.size(logFiles) + "\r\n以下為失敗：" + StringUtils.join(mvLst, "\r\n")));
+            } catch (Exception ex) {
+                JCommonUtil.handleException(ex);
+            }
+            return true;
         }
     }
 

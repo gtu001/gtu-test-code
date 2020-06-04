@@ -2,6 +2,7 @@ package gtu.collection;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -328,6 +329,10 @@ public class ListUtil {
             endExclude = lst.size();
         }
         return lst.subList(startInclude, endExclude);
+    }
+
+    public static <T> List<T> toList(T[] arry) {
+        return new ArrayList<T>(Arrays.asList(arry));
     }
 
     public static class PageListUtil {

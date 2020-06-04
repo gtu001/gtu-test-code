@@ -3929,7 +3929,7 @@ public class FastDBQueryUI extends JFrame {
 
     private void sqlTextAreaMouseClickedAction(MouseEvent e) {
         if (JMouseEventUtil.buttonRightClick(1, e)) {
-            JPopupMenuUtil.newInstance(sqlTextArea)//
+            JPopupMenuUtil jpopUtil = JPopupMenuUtil.newInstance(sqlTextArea)//
                     .addJMenuItem("SQL 格式化", new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
@@ -4215,20 +4215,22 @@ public class FastDBQueryUI extends JFrame {
 
                             sqlTextArea.setText(prefix + column + suffix);
                         }
-                    })//
-                    .addJMenuItem("儲存回復!!!", new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            boolean isConfirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("是否要回復上一次儲存內容？", "SQL回覆");
-                            if (isConfirm) {
-                                String sql = mUndoSaveHanlder.reverse(true);
-                                if (StringUtils.isNotBlank(sql)) {
-                                    sqlTextArea.setText(sql);
-                                }
+                    });//
+            if (mUndoSaveHanlder.hasRecord()) {
+                jpopUtil.addJMenuItem("儲存回復!!!", new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        boolean isConfirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("是否要回復上一次儲存內容？", "SQL回覆");
+                        if (isConfirm) {
+                            String sql = mUndoSaveHanlder.reverse(true);
+                            if (StringUtils.isNotBlank(sql)) {
+                                sqlTextArea.setText(sql);
                             }
                         }
-                    })//
-                    .applyEvent(e)//
+                    }
+                });//
+            }
+            jpopUtil.applyEvent(e)//
                     .show();
         }
     }
@@ -6328,36 +6330,37 @@ public class FastDBQueryUI extends JFrame {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     FastDBQueryUI_RowDiffWatcherDlg dlg = (FastDBQueryUI_RowDiffWatcherDlg) e.getSource();
-                    final List<Integer> pkIndexLst = new ArrayList<Integer>();
-                    for (int ii = 0; ii < columnLst.size(); ii++) {
-                        String column = columnLst.get(ii);
-                        for (String mColumn : dlg.getPkLst()) {
-                            if (StringUtils.equals(column, mColumn)) {
-                                pkIndexLst.add(ii);
+                    try {
+                        final List<Integer> pkIndexLst = new ArrayList<Integer>();
+                        for (int ii = 0; ii < columnLst.size(); ii++) {
+                            String column = columnLst.get(ii);
+                            for (String mColumn : dlg.getPkLst()) {
+                                if (StringUtils.equals(column, mColumn)) {
+                                    pkIndexLst.add(ii);
+                                }
                             }
                         }
-                    }
-                    if (pkIndexLst.isEmpty()) {
-                        JCommonUtil._jOptionPane_showMessageDialog_error("請選擇主鍵!");
-                    } else {
-                        new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                // -------------------------------------------------↓↓↓↓↓↓
+                        if (pkIndexLst.isEmpty()) {
+                            JCommonUtil._jOptionPane_showMessageDialog_error("請選擇主鍵!");
+                        } else {
+                            // -------------------------------------------------↓↓↓↓↓↓
 
-                                FastDBQueryUI_RecordWatcherDirectXls mFastDBQueryUI_RecordWatcherDirectXls = new FastDBQueryUI_RecordWatcherDirectXls(fileMiddleName, pkIndexLst);
-                                Pair<File, String> result = mFastDBQueryUI_RecordWatcherDirectXls.run(beforeXlsFile, afterXlsFile);
-                                File reulstFile = result.getLeft();
-                                String errMsg = result.getRight();
-                                if (StringUtils.isNotBlank(errMsg)) {
-                                    JCommonUtil._jOptionPane_showMessageDialog_error(errMsg);
-                                }
-                                if (reulstFile != null && reulstFile.exists()) {
-                                    JCommonUtil._jOptionPane_showMessageDialog_error("檔案產生成功\n" + reulstFile);
-                                }
-                                // -------------------------------------------------↑↑↑↑↑↑
+                            FastDBQueryUI_RecordWatcherDirectXls mFastDBQueryUI_RecordWatcherDirectXls = new FastDBQueryUI_RecordWatcherDirectXls(fileMiddleName, pkIndexLst);
+                            Pair<File, String> result = mFastDBQueryUI_RecordWatcherDirectXls.run(beforeXlsFile, afterXlsFile);
+                            File reulstFile = result.getLeft();
+                            String errMsg = result.getRight();
+                            if (StringUtils.isNotBlank(errMsg)) {
+                                JCommonUtil._jOptionPane_showMessageDialog_error(errMsg);
                             }
-                        }).start();
+                            if (reulstFile != null && reulstFile.exists()) {
+                                dlg.dispose();
+                                JCommonUtil._jOptionPane_showMessageDialog_error("檔案產生成功\n" + reulstFile);
+                            }
+                            // -------------------------------------------------↑↑↑↑↑↑
+                        }
+                    } catch (Exception ex) {
+                        dlg.dispose();
+                        JCommonUtil.handleException(ex);
                     }
                 }
             }, new ActionListener() {
@@ -6551,9 +6554,9 @@ public class FastDBQueryUI extends JFrame {
 
     public static class S2T_And_T2S_EventHandler {
 
-        JTextField input;
+        JTextComponent input;
 
-        public S2T_And_T2S_EventHandler(JTextField input) {
+        public S2T_And_T2S_EventHandler(JTextComponent input) {
             this.input = input;
         }
 
@@ -6623,6 +6626,17 @@ public class FastDBQueryUI extends JFrame {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     input.setText((String) trans.transform(isS2t));
+                }
+            });
+            return item;
+        }
+
+        public JMenuItem getMenuItem2(final boolean isEncode) {
+            JMenuItem item = new JMenuItem(isEncode ? "Encode" : "Decode");
+            item.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    input.setText((String) trans2.transform(isEncode));
                 }
             });
             return item;
@@ -6743,13 +6757,24 @@ public class FastDBQueryUI extends JFrame {
     private class UndoSaveHanlder {
         private LinkedList<String> sqlLst = new LinkedList<String>();
 
+        private boolean hasRecord() {
+            if (sqlLst.isEmpty()) {
+                return false;
+            }
+            String text = sqlLst.getFirst();
+            if (StringUtils.equals(text, sqlTextArea.getText())) {
+                return false;
+            }
+            return true;
+        }
+
         private void push(String text) {
             if (StringUtils.isBlank(text)) {
                 return;
             }
             String sql = "";
             if (!sqlLst.isEmpty()) {
-                sql = sqlLst.getLast();
+                sql = sqlLst.getFirst();
             }
             if (!StringUtils.equals(text, sql)) {
                 sqlLst.push(text);
@@ -6758,9 +6783,9 @@ public class FastDBQueryUI extends JFrame {
 
         private String reverse(boolean consume) {
             if (!sqlLst.isEmpty()) {
-                String sql = sqlLst.getLast();
+                String sql = sqlLst.getFirst();
                 if (consume) {
-                    sqlLst.removeLast();
+                    sqlLst.removeFirst();
                 }
                 return sql;
             }
