@@ -405,10 +405,10 @@ public class JFileExecuteUtil {
                 final List<String> mvLst = new ArrayList<String>();
                 IterableUtils.forEach(logFiles, new Closure<File>() {
                     @Override
-                    public void execute(File input) {
+                    public void execute(final File input) {
                         File toFile = CollectionUtils.find(lst2, new Predicate<File>() {
                             @Override
-                            public boolean evaluate(File object) {
+                            public boolean evaluate(final File object) {
                                 return StringUtils.equals(object.getName(), input.getName());
                             }
                         });
