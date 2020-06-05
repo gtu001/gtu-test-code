@@ -440,6 +440,8 @@ public class GitConflictDetectUI extends JFrame {
             this.applyAppMenu();
             JCommonUtil.defaultToolTipDelay();
             this.setTitle("You Set My World On Fire");
+            
+            gitExePathText.setText("TortoiseGitMerge.exe  /base:\"%s\" /theirs:\"%s\"");
         }
     }
 

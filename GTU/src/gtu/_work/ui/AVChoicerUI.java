@@ -1499,6 +1499,7 @@ public class AVChoicerUI extends JFrame {
                     }
                     readyMoveLst.updateUI();
                 }
+                readyMoveLst.updateUI();
                 JCommonUtil._jOptionPane_showMessageDialog_info("全部完成!!");
                 readyMoveBtn.setText("開始移動");
             }

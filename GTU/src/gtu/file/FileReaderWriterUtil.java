@@ -12,82 +12,101 @@ import java.io.OutputStreamWriter;
 import org.apache.commons.lang3.StringUtils;
 
 public class FileReaderWriterUtil {
-    
+
     public static class WriterZ {
         private File file;
         private String encode;
         private boolean append;
         private BufferedWriter writer;
-        
-        public static WriterZ newInstance(File file){
+
+        public static WriterZ newInstance(File file) {
             return new WriterZ(file, "utf8", false);
         }
-        public static WriterZ newInstance(File file, String encode){
+
+        public static WriterZ newInstance(File file, String encode) {
             return new WriterZ(file, encode, false);
         }
-        public static WriterZ newInstance(File file, String encode, boolean append){
+
+        public static WriterZ newInstance(File file, String encode, boolean append) {
             return new WriterZ(file, encode, append);
         }
-        
-        private WriterZ(File file, String encode, boolean append){
+
+        private WriterZ(File file, String encode, boolean append) {
             this.file = file;
             this.encode = encode;
             this.append = append;
-            if(StringUtils.isBlank(this.encode)){
+            if (StringUtils.isBlank(this.encode)) {
                 this.encode = "utf8";
             }
         }
-        
-        public void init(){
-            try{
+
+        public void init() {
+            try {
                 this.writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file, this.append), this.encode));
-            }catch(Exception ex){
+            } catch (Exception ex) {
                 throw new RuntimeException(ex);
             }
         }
-        
-        public void writeLine(String line){
-            try{
+
+        public void writeLine(String line) {
+            try {
                 writer.write(line + '\n');
-            }catch(Exception ex){
+            } catch (Exception ex) {
                 throw new RuntimeException(ex);
             }
         }
-        
-        public void write(String line){
-            try{
+
+        public void writeLine(Object... objects) {
+            if (objects != null) {
+                for (Object o : objects) {
+                    try {
+                        writer.write(String.valueOf(o) + " ");
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+                try {
+                    writer.newLine();
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+
+        public void write(String line) {
+            try {
                 writer.write(line);
-            }catch(Exception ex){
+            } catch (Exception ex) {
                 throw new RuntimeException(ex);
             }
         }
-        
-        public void flush(){
-            try{
+
+        public void flush() {
+            try {
                 writer.flush();
-            }catch(Exception ex){
+            } catch (Exception ex) {
                 throw new RuntimeException(ex);
             }
         }
-        
-        public void writeAndFlush(String line){
-            try{
+
+        public void writeAndFlush(String line) {
+            try {
                 writer.write(line);
                 writer.flush();
-            }catch(Exception ex){
+            } catch (Exception ex) {
                 throw new RuntimeException(ex);
             }
         }
-        
-        public void close(){
-            try{
+
+        public void close() {
+            try {
                 writer.close();
-            }catch(Exception ex){
+            } catch (Exception ex) {
                 ex.printStackTrace();
             }
         }
     }
-    
+
     public interface ReaderZLine {
         boolean readLine(String line);
     }
@@ -96,42 +115,43 @@ public class FileReaderWriterUtil {
         private File file;
         private String encode;
         private BufferedReader reader;
-        
-        public static ReaderZ newInstance(File file){
+
+        public static ReaderZ newInstance(File file) {
             return new ReaderZ(file, "utf8");
         }
-        public static ReaderZ newInstance(File file, String encode){
+
+        public static ReaderZ newInstance(File file, String encode) {
             return new ReaderZ(file, encode);
         }
-        
-        public ReaderZ(File file, String encode){
+
+        public ReaderZ(File file, String encode) {
             this.file = file;
             this.encode = encode;
-            if(StringUtils.isBlank(this.encode)){
+            if (StringUtils.isBlank(this.encode)) {
                 this.encode = "utf8";
             }
         }
-        
-        public void init(){
-            try{
+
+        public void init() {
+            try {
                 this.reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), this.encode));
-            }catch(Exception ex){
+            } catch (Exception ex) {
                 throw new RuntimeException(ex);
             }
         }
-        
-        public String readLine(){
+
+        public String readLine() {
             try {
                 return reader.readLine();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }
-        
-        public void read(ReaderZLine readerZLine){
+
+        public void read(ReaderZLine readerZLine) {
             try {
-                for(String line = null; (line = reader.readLine())!=null;){
-                    if(!readerZLine.readLine(line)){
+                for (String line = null; (line = reader.readLine()) != null;) {
+                    if (!readerZLine.readLine(line)) {
                         break;
                     }
                 }
@@ -145,8 +165,8 @@ public class FileReaderWriterUtil {
                 }
             }
         }
-        
-        public void close(){
+
+        public void close() {
             try {
                 reader.close();
             } catch (IOException e) {

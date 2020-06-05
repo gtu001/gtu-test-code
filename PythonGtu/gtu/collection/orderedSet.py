@@ -1,6 +1,15 @@
+'''
+from gtu.collection import orderedSet
+'''
+
+
 import collections
 
 class OrderedSet(collections.OrderedDict, collections.MutableSet):
+
+    def appendAll(self, lst) :
+        for v in lst :
+            self.add(v)
 
     def update(self, *args, **kwargs):
         if kwargs:

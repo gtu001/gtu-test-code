@@ -1424,6 +1424,25 @@ public class JTableUtil {
         setColumnWidths_Percent(table, null, widthPercentArry);
     }
 
+    /**
+     */
+    public static Double getTableWidth(JTable table) {
+        Double wholeSize = table.getSize().getWidth();
+        if (table.getParent() instanceof JViewport) {
+            JViewport view = ((JViewport) table.getParent());
+            wholeSize = view.getSize().getWidth();
+
+            if (wholeSize == null || wholeSize == 0) {
+                wholeSize = view.getBounds().getWidth();
+            }
+            wholeSize -= 5;
+        }
+        if (wholeSize == null || wholeSize == 0) {
+            wholeSize = table.getBounds().getWidth();
+        }
+        return wholeSize;
+    }
+
     public static void setColumnWidths_Percent(JTable table, Double tableFullWidth, float[] widthPercentArry) {
         int columnCount = table.getColumnCount();
         if (columnCount != widthPercentArry.length) {
@@ -1432,10 +1451,7 @@ public class JTableUtil {
 
         Double wholeSize = tableFullWidth;
         if (wholeSize == null) {
-            wholeSize = table.getSize().getWidth();
-            if (table.getParent() instanceof JViewport) {
-                wholeSize = ((JViewport) table.getParent()).getSize().getWidth() - 5;
-            }
+            wholeSize = getTableWidth(table);
         }
 
         TableColumnModel tcm = table.getColumnModel();

@@ -30,8 +30,8 @@ public class ListUtil {
     }
 
     /**
-     * 建立一個lazyList當get超出範圍時會動態建立到符合的範圍 Ex : list = [] -> list.get(0) -> [T]
-     * list = [] -> list.get(2) -> [null, null, T]
+     * 建立一個lazyList當get超出範圍時會動態建立到符合的範圍 Ex : list = [] -> list.get(0) -> [T] list =
+     * [] -> list.get(2) -> [null, null, T]
      */
     @SuppressWarnings("unchecked")
     public static <T> List<T> getLazyList(List<T> list, final T clz) {
@@ -333,6 +333,14 @@ public class ListUtil {
 
     public static <T> List<T> toList(T[] arry) {
         return new ArrayList<T>(Arrays.asList(arry));
+    }
+
+    public static List<Integer> range(int start, int end) {
+        List<Integer> lst = new ArrayList<Integer>();
+        for (int ii = start; ii <= end; ii++) {
+            lst.add(ii);
+        }
+        return lst;
     }
 
     public static class PageListUtil {

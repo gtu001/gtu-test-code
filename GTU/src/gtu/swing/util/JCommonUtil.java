@@ -853,8 +853,9 @@ public class JCommonUtil {
     /**
      * 未輸入值要顯示錯誤訊息 外層要包 try catch(){ JCommonUtil.handleException }
      */
-    public static void isBlankErrorMsg(String text, String errMsg) {
+    public static String isBlankErrorMsg(String text, String errMsg) {
         Validate.isTrue(StringUtils.isNotBlank(text), errMsg);
+        return text;
     }
 
     /**

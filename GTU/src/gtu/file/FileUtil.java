@@ -18,6 +18,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.LineNumberReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
@@ -36,7 +37,9 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -140,9 +143,9 @@ public class FileUtil {
      * 換副檔名
      * 
      * @param file
-     *            要換的檔案
+     *                    要換的檔案
      * @param subName
-     *            要換的副檔名
+     *                    要換的副檔名
      * @return
      */
     public static File changeSubName(File file, String subName) {
@@ -186,7 +189,7 @@ public class FileUtil {
      * 讀取檔案
      * 
      * @param fileName
-     *            完整檔案路徑
+     *                     完整檔案路徑
      * @return
      */
     public static byte[] loadFromFile(String fileName) {
@@ -197,7 +200,7 @@ public class FileUtil {
      * 讀取檔案
      * 
      * @param fileName
-     *            完整檔案路徑
+     *                     完整檔案路徑
      * @return
      */
     public static byte[] loadFromFile(File file) {
@@ -237,9 +240,9 @@ public class FileUtil {
      * 存檔案
      * 
      * @param fileName
-     *            完整檔案路徑
+     *                     完整檔案路徑
      * @param data
-     *            若為字串 .getBytes() 轉為byte[]
+     *                     若為字串 .getBytes() 轉為byte[]
      */
     public static void saveToFile(String fileName, byte[] data) {
         saveToFile(new File(fileName), data);
@@ -249,9 +252,9 @@ public class FileUtil {
      * 存檔案
      * 
      * @param fileName
-     *            完整檔案路徑
+     *                     完整檔案路徑
      * @param data
-     *            若為字串 .getBytes() 轉為byte[]
+     *                     若為字串 .getBytes() 轉為byte[]
      */
     public static void saveToFile(File file, byte[] data) {
         try {
@@ -311,6 +314,27 @@ public class FileUtil {
                 lst.add(line);
             }
             return lst;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
+        } finally {
+            try {
+                reader.close();
+            } catch (Exception e) {
+            }
+        }
+    }
+
+    public static Map<Integer, String> loadFromFile_asMap(File file, String encode) {
+        LineNumberReader reader = null;
+        try {
+            Map<Integer, String> map = new LinkedHashMap<Integer, String>();
+            reader = new LineNumberReader(new InputStreamReader(new FileInputStream(file), encode));
+            String line = null;
+            while ((line = reader.readLine()) != null) {
+                map.put(reader.getLineNumber(), line);
+            }
+            return map;
         } catch (Exception ex) {
             ex.printStackTrace();
             return null;
@@ -505,7 +529,7 @@ public class FileUtil {
      * 刪除檔案
      * 
      * @param fileName
-     *            檔案路徑
+     *                     檔案路徑
      */
     public static void deleteFile(String fileName) {
         File f = new File(fileName);
@@ -527,9 +551,9 @@ public class FileUtil {
      * 檔案搬移 (可換檔名或資料夾名)
      * 
      * @param soucepath
-     *            來源檔路徑名
+     *                      來源檔路徑名
      * @param despath
-     *            目的檔路徑名
+     *                      目的檔路徑名
      * @return
      */
     public static boolean fileMove(String soucepath, String despath) {
@@ -542,7 +566,7 @@ public class FileUtil {
      * 傳回目錄底下所有檔案 File的 List物件
      * 
      * @param fileName
-     *            目錄路徑
+     *                     目錄路徑
      * @param fileList
      * @return
      */
@@ -564,11 +588,11 @@ public class FileUtil {
      * targetBasepath，filePath前面的路徑replaceBasePath將會被targetBasepath給取代
      * 
      * @param filePath
-     *            來源檔案或目錄路徑(可為檔案或目錄)
+     *                            來源檔案或目錄路徑(可為檔案或目錄)
      * @param replaceBasePath
-     *            來源檔案根目錄
+     *                            來源檔案根目錄
      * @param targetBasepath
-     *            新建立目錄結構的根目錄
+     *                            新建立目錄結構的根目錄
      * @return
      * @throws IOException
      */
@@ -604,11 +628,11 @@ public class FileUtil {
      * targetBasepath，filePath前面的路徑replaceBasePath將會被targetBasepath給取代
      * 
      * @param srcFile
-     *            來源檔案或目錄路徑(可為檔案或目錄)
+     *                          來源檔案或目錄路徑(可為檔案或目錄)
      * @param srcBaseDir
-     *            來源檔案根目錄
+     *                          來源檔案根目錄
      * @param targetBaseDir
-     *            新建立目錄結構的根目錄
+     *                          新建立目錄結構的根目錄
      * @return
      * @throws IOException
      */
@@ -680,11 +704,11 @@ public class FileUtil {
      * 搜尋目標符合pattern的檔案(matches)
      * 
      * @param file
-     *            搜尋的目錄
+     *                     搜尋的目錄
      * @param pattern
-     *            regex pattern
+     *                     regex pattern
      * @param fileList
-     *            找到符合的檔案
+     *                     找到符合的檔案
      */
     public static void searchFileContains(File file, String containsText, boolean ignoreCase, List<File> fileList) {
         if (!file.exists()) {
@@ -711,11 +735,11 @@ public class FileUtil {
      * 搜尋目標符合pattern的檔案(matches)
      * 
      * @param file
-     *            搜尋的目錄
+     *                     搜尋的目錄
      * @param pattern
-     *            regex pattern
+     *                     regex pattern
      * @param fileList
-     *            找到符合的檔案
+     *                     找到符合的檔案
      */
     public static void searchFileMatchs(File file, String pattern, List<File> fileList) {
         if (!file.exists()) {
@@ -738,11 +762,11 @@ public class FileUtil {
      * 搜尋目標符合pattern的檔案(find)
      * 
      * @param file
-     *            搜尋的目錄
+     *                     搜尋的目錄
      * @param pattern
-     *            regex pattern
+     *                     regex pattern
      * @param fileList
-     *            找到符合的檔案
+     *                     找到符合的檔案
      */
     public static void searchFilefind(File file, String pattern, List<File> fileList) {
         if (!file.exists()) {
@@ -765,9 +789,9 @@ public class FileUtil {
      * 將檔案清單前置路徑截掉
      * 
      * @param cutPath
-     *            截掉的路徑
+     *                     截掉的路徑
      * @param fileList
-     *            要截掉的清單
+     *                     要截掉的清單
      * @return
      */
     public static List<String> cutRootPath(File cutPath, List<File> fileList) {
@@ -1145,9 +1169,9 @@ public class FileUtil {
      * 從class目錄底下取得檔案成字串
      * 
      * @param clz
-     *            clz所在位置
+     *                     clz所在位置
      * @param fileName
-     *            檔名Ex : xxx.txt(不用路徑)
+     *                     檔名Ex : xxx.txt(不用路徑)
      * @return
      */
     public static String getFileFromClass(Class<?> clz, String fileName) {
@@ -1255,7 +1279,7 @@ public class FileUtil {
      * 
      * @param filename
      * @param ignoreNotEscapeFileSepator
-     *            false = 要把 \/轉成全形, true = 不把 \/轉成全形
+     *                                       false = 要把 \/轉成全形, true = 不把 \/轉成全形
      * @return
      */
     public static String escapeFilename_replaceToFullChar(String filename, boolean ignoreNotEscapeFileSepator) {

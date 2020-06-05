@@ -15,6 +15,7 @@ from gtu.error import errorHandler
 from abc import ABCMeta, abstractmethod
 
 from gtu.io import LogWriter
+from gtu.collection import orderedSet
 
 log = LogWriter.LogWriter()
 
@@ -125,24 +126,36 @@ def main(dir_path, main_find_str, subFileName, second_finds, ignoreCase, encodin
 
 def writeFilesRelativeLines(file, masterLineNumberLst, secondFindsMap, log) :
     contentLst = fileUtil.loadFile_asList(file)
-    if len(secondFindsMap) == 0 :
-        for i, lineNumber in enumerate(masterLineNumberLst) :
-            if lineNumber - 1 < len(contentLst):
-                prefix = "M"
-                log.writeline("\t" + prefix + "[" + str(lineNumber) + "]" + contentLst[lineNumber - 1])
-    else : 
-        for i, k in enumerate(secondFindsMap) :
-            lineLst = secondFindsMap[k]
-            for ii, lineNumber in enumerate(lineLst) :
-                findLines = contentLst[lineNumber - 1 - 2 : lineNumber - 1 + 2]
-                lineNumberArry = list(range(lineNumber - 2, lineNumber + 2))
-                for iii,line in enumerate(findLines) :
-                    prefix = " "
-                    if lineNumberArry[iii] in masterLineNumberLst :
-                        prefix = "M" #主
-                    elif lineNumber == lineNumberArry[iii] :
-                        prefix = "S" #次
-                    log.writeline("\t" + prefix + "[" + str(lineNumberArry[iii]) + "]" + line)
+    showLineNumbers = orderedSet.OrderedSet()
+    prefixMap = dict()
+    
+    for i, lineNumber in enumerate(masterLineNumberLst) :
+        lineNumberArry =  list(range(lineNumber - range_gap, lineNumber + range_gap))
+        showLineNumbers.appendAll(lineNumberArry)
+
+    for i,k in enumerate(secondFindsMap) :
+        lineLst = secondFindsMap[k]
+        for j,lineNumber in enumerate(lineLst) :
+            lineNumberArry =  list(range(lineNumber - range_gap, lineNumber + range_gap))
+            showLineNumbers.appendAll(lineNumberArry)
+
+    for i, lineNumber in enumerate(showLineNumbers) :
+        if lineNumber in masterLineNumberLst :
+            prefixMap[lineNumber] = "M" #主
+        else :
+            for j,k in enumerate(secondFindsMap) :
+                lineLst = secondFindsMap[k]
+                if lineNumber in lineLst :
+                    prefixMap[lineNumber] = "S" #次
+    
+    for i, lineNumber in enumerate(showLineNumbers) :
+        if lineNumber - 1 >= 0 or lineNumber - 1 < len(contentLst) :
+            line = contentLst[lineNumber - 1]
+            if lineNumber in prefixMap :
+                prefix = prefixMap[lineNumber]
+            else :
+                prefix = " "
+            log.writeline("\t" + prefix + "[" + str(lineNumber) + "]" + line)
 
 
 class SecondFindDef () :
@@ -163,17 +176,22 @@ class SecondFindDef () :
         return "(reprFind:" + self.findStr + ")"
 
 
+global range_gap
+range_gap = 2
+
 
 if __name__ == '__main__' :
-    dir_path = "D:/work_tool/Z-Code"
-    main_find_str = "Pay_Detail"
-    subFileName = "xml"
+    dir_path = "D:\\workstuff\\gtu-test-code" #"D:/work_tool/Z-Code"
+    main_find_str = "log" #"Pay_Detail"
+    subFileName = "(java|sql)" #"xml"
     ignoreCase = True
     second_finds = [
         # findStr, relativeLineNumber, isRegex, ignoreCase
-        SecondFindDef("insert", 3, False, ignoreCase),
+        #SecondFindDef("insert", 3, False, ignoreCase),
+        SecondFindDef("file", 3, False, ignoreCase),
     ]
     encoding = "UTF8"
     isAnd = True
+    range_gap = 2
     main(dir_path, main_find_str, subFileName, second_finds, ignoreCase, encoding, isAnd)
     print("done..")

@@ -26,6 +26,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
 
 public class JTextFieldUtil {
@@ -166,5 +167,21 @@ public class JTextFieldUtil {
 
     public static void setText_withoutTriggerChange(JTextComponent textArea, String text) {
         JTextAreaUtil.setText_withoutTriggerChange(textArea, text);
+    }
+
+    public static int getValueFailSetDefault(int defaultVal, JTextComponent textComponent) {
+        try {
+            return Integer.parseInt(textComponent.getText());
+        } catch (Exception ex) {
+            textComponent.setText(String.valueOf(defaultVal));
+            return defaultVal;
+        }
+    }
+
+    public static String getValueFailSetDefault(String defaultVal, JTextComponent textComponent) {
+        if (StringUtils.isBlank(textComponent.getText())) {
+            textComponent.setText(defaultVal);
+        }
+        return textComponent.getText();
     }
 }
