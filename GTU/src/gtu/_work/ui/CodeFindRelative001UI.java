@@ -37,6 +37,7 @@ import gtu.swing.util.JFrameRGBColorPanel;
 import gtu.swing.util.JFrameUtil;
 import gtu.swing.util.JMouseEventUtil;
 import gtu.swing.util.JPopupMenuUtil;
+import gtu.swing.util.JProgressBarHelper;
 import gtu.swing.util.JSwingCommonConfigUtil;
 import gtu.swing.util.JTableUtil;
 import gtu.swing.util.JTextFieldUtil;
@@ -285,39 +286,59 @@ public class CodeFindRelative001UI extends JFrame {
 
             @Override
             public void action(EventObject evt) throws Exception {
-                CodeFindRelative001 t = new CodeFindRelative001();
+                final JProgressBarHelper prog = JProgressBarHelper.newInstance(CodeFindRelative001UI.this, "搜尋開始");
+                prog.indeterminate(true);
+                prog.build();
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        CodeFindRelative001 t = new CodeFindRelative001();
 
-                File searchDir = JCommonUtil.filePathCheck(searchDirText.getText(), "必須為目錄", true);
-                String mainSearch = JCommonUtil.isBlankErrorMsg(mainSearchText.getText(), "主搜尋必輸輸入");
+                        File searchDir = JCommonUtil.filePathCheck(searchDirText.getText(), "必須為目錄", true);
+                        String mainSearch = JCommonUtil.isBlankErrorMsg(mainSearchText.getText(), "主搜尋必輸輸入");
 
-                List<SecondFindDef> second_finds = new ArrayList<SecondFindDef>();
-                boolean ignoreCase = isIgnoreCaseChk.isSelected();
+                        List<SecondFindDef> second_finds = new ArrayList<SecondFindDef>();
+                        boolean ignoreCase = isIgnoreCaseChk.isSelected();
 
-                DefaultTableModel model = (DefaultTableModel) secondTable.getModel();
-                JTableUtil util = JTableUtil.newInstance(secondTable);
-                for (int ii = 0; ii < secondTable.getRowCount(); ii++) {
-                    String findText = (String) util.getValueAt(true, ii, 0);
-                    int affectLineNumber = (Integer) util.getValueAt(true, ii, 1);
-                    boolean isRegExp = (Boolean) util.getValueAt(true, ii, 2);
-                    if (StringUtils.isBlank(findText)) {
-                        continue;
+                        DefaultTableModel model = (DefaultTableModel) secondTable.getModel();
+                        JTableUtil util = JTableUtil.newInstance(secondTable);
+                        for (int ii = 0; ii < secondTable.getRowCount(); ii++) {
+                            String findText = (String) util.getValueAt(true, ii, 0);
+                            int affectLineNumber = (Integer) util.getValueAt(true, ii, 1);
+                            boolean isRegExp = (Boolean) util.getValueAt(true, ii, 2);
+                            if (StringUtils.isBlank(findText)) {
+                                continue;
+                            }
+                            second_finds.add(new SecondFindDef(findText, affectLineNumber, isRegExp, ignoreCase));
+                        }
+
+                        File dir_path = searchDir;
+                        String main_find_str = mainSearch;
+                        String subFileName = StringUtils.trimToEmpty(subFileText.getText());
+                        int range_gap = JTextFieldUtil.getValueFailSetDefault(2, gapLineNumberText);
+                        boolean isAnd = isAndChk.isSelected();
+                        String encoding = JTextFieldUtil.getValueFailSetDefault("UTF8", encodingText);
+
+                        t.setStatusTextListener(new ActionListener() {
+                            @Override
+                            public void actionPerformed(ActionEvent e) {
+                                prog.indeterminate(false);
+                                prog.max(e.getID());
+                                prog.setStateText(((File) e.getSource()).getName());
+                                prog.addOne();
+                            }
+                        });
+
+                        prog.show();
+                        t.execute(dir_path, main_find_str, subFileName, second_finds, ignoreCase, encoding, isAnd, range_gap, "html");
+                        prog.dismiss();
+
+                        JCommonUtil._jOptionPane_showMessageDialog_info("執行完成!");
+
+                        config.reflectSetConfig(CodeFindRelative001UI.this);
+                        config.store();
                     }
-                    second_finds.add(new SecondFindDef(findText, affectLineNumber, isRegExp, ignoreCase));
-                }
-
-                File dir_path = searchDir;
-                String main_find_str = mainSearch;
-                String subFileName = StringUtils.trimToEmpty(subFileText.getText());
-                int range_gap = JTextFieldUtil.getValueFailSetDefault(2, gapLineNumberText);
-                boolean isAnd = isAndChk.isSelected();
-                String encoding = JTextFieldUtil.getValueFailSetDefault("UTF8", encodingText);
-
-                t.execute(dir_path, main_find_str, subFileName, second_finds, ignoreCase, encoding, isAnd, range_gap);
-
-                JCommonUtil._jOptionPane_showMessageDialog_info("執行完成!");
-
-                config.reflectSetConfig(CodeFindRelative001UI.this);
-                config.store();
+                }).start();
             }
         });
     }

@@ -59,6 +59,9 @@ public class JProgressBarHelper {
 
     public JProgressBarHelper max(int max) {
         this.max = max;
+        if (progressBar != null) {
+            progressBar.setMaximum(max);
+        }
         return this;
     }
 
@@ -114,6 +117,9 @@ public class JProgressBarHelper {
      */
     public JProgressBarHelper indeterminate(boolean indeterminate) {
         this.indeterminate = indeterminate;
+        if (progressBar != null) {
+            progressBar.setIndeterminate(indeterminate);
+        }
         return this;
     }
 
@@ -265,6 +271,7 @@ public class JProgressBarHelper {
                     }
                 });
                 inst.build();
+                inst.setStateText("XXXXXX");
                 inst.show();
                 new Thread(new Runnable() {
                     @Override

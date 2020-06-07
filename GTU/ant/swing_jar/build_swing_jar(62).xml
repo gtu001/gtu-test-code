@@ -181,7 +181,7 @@
 			<classpath>
 				<path location="${build_dir}" />
 			</classpath>
-			<!--<classpath refid="javafx_class_path" /> -->
+			<classpath refid="javafx_class_path" />
 		</javac>
 	</target>
 
@@ -212,7 +212,7 @@
 			<manifest>
 				<attribute name="Main-Class" value="${main_class_full}" />
 				<attribute name="Class-Path" value="." />
-				<attribute name="Rsrc-Class-Path" value="./ ojdbc14.jar" />
+				<!--<attribute name="Rsrc-Class-Path" value="./ ojdbc14.jar" />-->
 			</manifest>
 		</jar>
 	</target>

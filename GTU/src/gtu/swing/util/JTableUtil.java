@@ -1503,6 +1503,10 @@ public class JTableUtil {
         }
     }
 
+    public static void setColumnWidths_ByDataContent(JTable table, Map<String, Object> preferences, Insets insets) {
+        setColumnWidths_ByDataContent(table, preferences, insets, false);
+    }
+
     /**
      * 設定蘭寬
      * 
@@ -1512,7 +1516,7 @@ public class JTableUtil {
      * @param setMinimum
      * @param setMaximum
      */
-    public static void setColumnWidths_ByDataContent(JTable table, Map<String, Object> preferences, Insets insets) {
+    public static void setColumnWidths_ByDataContent(JTable table, Map<String, Object> preferences, Insets insets, boolean isFullByPercent) {
         preferences = preferences == null ? Collections.EMPTY_MAP : preferences;
         float offset = (Float) (preferences.containsKey("offset") ? preferences.get("offset") : 1f);
         boolean isCaculateTitle = (Boolean) (preferences.containsKey("isCaculateTitle") ? preferences.get("isCaculateTitle") : true);
@@ -1581,6 +1585,27 @@ public class JTableUtil {
             column.setPreferredWidth(width + 1);
 
             System.out.println("set preferedWidth - " + width);
+        }
+
+        if (isFullByPercent && table.getParent() instanceof JViewport) {
+            JViewport view = ((JViewport) table.getParent());
+            Double wholeSize = view.getSize().getWidth();
+            int divideMother = table.getWidth();
+            if (wholeSize != 0 && divideMother != 0) {
+                for (int i = 0; i < columnCount; i++) {
+                    if (presetColumns.containsKey(i)) {
+                        divideMother -= presetColumns.get(i);
+                    }
+                }
+                for (int i = 0; i < columnCount; i++) {
+                    TableColumn column = tcm.getColumn(i);
+                    int width = column.getPreferredWidth();
+                    if (!presetColumns.containsKey(i)) {
+                        width = (int) (((double) width / (double) divideMother) * wholeSize * 0.95);
+                        column.setPreferredWidth(width);
+                    }
+                }
+            }
         }
     }
 

@@ -1,5 +1,7 @@
 package gtu._work;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -7,7 +9,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -29,6 +30,7 @@ public class CodeFindRelative001 {
     boolean ignoreCase;
     String encoding;
     boolean isAnd;
+    LogStyle mLogStyle = new LogStyle();
 
     private Pair<List<Integer>, Map<SecondFindDef, List<Integer>>> checkFile(File file, String main_find_str, List<SecondFindDef> second_finds, boolean ignoreCase, String encoding) {
         main_find_str = getIgnoreCaseText(main_find_str, ignoreCase);
@@ -115,7 +117,8 @@ public class CodeFindRelative001 {
         }
     }
 
-    public void execute(File dir_path, String main_find_str, String subFileName, List<SecondFindDef> second_finds, boolean ignoreCase, String encoding, boolean isAnd, int range_gap) {
+    public void execute(File dir_path, String main_find_str, String subFileName, List<SecondFindDef> second_finds, boolean ignoreCase, String encoding, boolean isAnd, int range_gap,
+            String printStyle) {
         {
             this.dir_path = dir_path;
             this.main_find_str = main_find_str;
@@ -125,9 +128,12 @@ public class CodeFindRelative001 {
             this.encoding = encoding;
             this.isAnd = isAnd;
             CodeFindRelative001.range_gap = range_gap;
+            if(printStyle !=null && printStyle.equalsIgnoreCase("html")) {
+                this.mLogStyle = new HtmlStyle();
+            }
         }
-        
-        String filename = CodeFindRelative001.class.getSimpleName() + "_" + new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()) + ".htm";
+
+        String filename = CodeFindRelative001.class.getSimpleName() + "_" + new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()) + mLogStyle.subName;
         File file = new File(FileUtil.DESKTOP_DIR, filename);
         log = FileReaderWriterUtil.WriterZ.newInstance(file, "UTF8");
         log.init();
@@ -142,7 +148,7 @@ public class CodeFindRelative001 {
         FileUtil.searchFileMatchs(dir_path, filePattern, fileLst);
 
         log.writeLine("<html>");
-        log.writeLine("<table border=0>");
+        log.writeLine("<table border=1>");
 
         for (File f : fileLst) {
             System.out.println("start " + f);
@@ -155,10 +161,11 @@ public class CodeFindRelative001 {
             }
 
             if (checkSecondFindsMapCondition(secondFindsMap, isAnd)) {
-                // log.writeLine(f, secondFindsMap);
-                log.writeLine("<tr><td colspan=10>&nbsp;</td></tr>");
-                log.writeLine("<tr><td colspan=10><font style='background-color:#c7edcc'>" + f + "</font><font style='background-color:#e4c67b'>" + masterLineNumberLst + secondFindsMap.values()
-                        + "</font></td></tr>");
+                mLogStyle.writeTitle(file, masterLineNumberLst, secondFindsMap);
+
+                if (this.statusTextListener != null) {
+                    this.statusTextListener.actionPerformed(new ActionEvent(f, fileLst.size(), "---"));
+                }
 
                 // # 紀錄檔案該行
                 writeFilesRelativeLines(f, masterLineNumberLst, secondFindsMap, log, encoding);
@@ -209,9 +216,35 @@ public class CodeFindRelative001 {
                 if (StringUtils.isBlank(prefix)) {
                     prefix = " ";
                 }
-                // log.writeLine("\t" + prefix + "[" + lineNumber + "]" + line);
-                log.writeLine("<tr><td>" + prefix + "</td><td>" + lineNumber + "</td><td>" + transferToHtml(prefix, line) + "</td></tr>");
+                
+                mLogStyle.writeInner(prefix, lineNumber, line);
             }
+        }
+    }
+
+    private class LogStyle {
+        String subName = ".txt";
+
+        protected void writeInner(String prefix, int lineNumber, String line) {
+            log.writeLine("\t" + prefix + "[" + lineNumber + "]" + line);
+        }
+
+        protected void writeTitle(File f, List<Integer> masterLineNumberLst, Map<SecondFindDef, List<Integer>> secondFindsMap) {
+            log.writeLine(f, secondFindsMap);
+        }
+    }
+
+    private class HtmlStyle extends LogStyle {
+        String subName = ".htm";
+
+        protected void writeInner(String prefix, int lineNumber, String line) {
+            log.writeLine("<tr><td width='2%'>" + prefix + "</td><td width='3%'>" + lineNumber + "</td><td width='95%'>" + transferToHtml(prefix, line) + "</td></tr>");
+        }
+
+        protected void writeTitle(File f, List<Integer> masterLineNumberLst, Map<SecondFindDef, List<Integer>> secondFindsMap) {
+            log.writeLine("<tr><td colspan=3>&nbsp;</td></tr>");
+            log.writeLine("<tr><td colspan=3><font style='background-color:#c7edcc'>" + f + "</font><font style='background-color:#e4c67b'>" + masterLineNumberLst + secondFindsMap.values()
+                    + "</font></td></tr>");
         }
     }
 
@@ -289,6 +322,11 @@ public class CodeFindRelative001 {
 
     private static FileReaderWriterUtil.WriterZ log;
     private static int range_gap = 2;
+    private ActionListener statusTextListener;
+
+    public void setStatusTextListener(ActionListener statusTextListener) {
+        this.statusTextListener = statusTextListener;
+    }
 
     public static void main(String[] args) {
         CodeFindRelative001 t = new CodeFindRelative001();
@@ -304,8 +342,9 @@ public class CodeFindRelative001 {
 
         String encoding = "UTF8";
         boolean isAnd = true;
+        String printStyle = "txt";//html
 
-        t.execute(dir_path, main_find_str, subFileName, second_finds, ignoreCase, encoding, isAnd, range_gap);
+        t.execute(dir_path, main_find_str, subFileName, second_finds, ignoreCase, encoding, isAnd, range_gap, printStyle);
         System.out.println("done...");
     }
 

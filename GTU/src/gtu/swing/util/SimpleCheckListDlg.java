@@ -3,6 +3,7 @@ package gtu.swing.util;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
@@ -15,6 +16,7 @@ import java.io.BufferedReader;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -54,7 +56,11 @@ public class SimpleCheckListDlg extends JDialog {
      * Launch the application.
      */
     public static void main(String[] args) {
-        final SimpleCheckListDlg dlg = SimpleCheckListDlg.newInstance("XXXXXX", Arrays.asList("aa", "bb", "cc", "dd"), new ActionListener() {
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("aaa", "bbbbbbbb");
+        map.put("ccc", "dddddddd");
+        List<String> lst3 = Arrays.asList("aa", "bb", "cc", "dd");
+        final SimpleCheckListDlg dlg = SimpleCheckListDlg.newInstance("XXXXXX", map, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 System.out.println(((SimpleCheckListDlg) e.getSource()).getCheckedList());
@@ -102,7 +108,11 @@ public class SimpleCheckListDlg extends JDialog {
             dialog.setVisible(true);
             dialog.okButtonAction = okButtonAction;
 
-            JTableUtil.setColumnWidths_Percent(dialog.table, new float[] { 10f, 45f, 45f });
+            Map<String, Object> preferences = new HashMap<String, Object>();
+            Map<Integer, Integer> presetColumns = new HashMap<Integer, Integer>();
+            presetColumns.put(0, 20);
+            preferences.put("presetColumns", presetColumns);
+            JTableUtil.setColumnWidths_ByDataContent(dialog.table, preferences, dialog.getInsets(), false);
 
             dialog.addWindowListener(new WindowAdapter() {
                 public void windowClosed(WindowEvent e) {
@@ -291,6 +301,7 @@ public class SimpleCheckListDlg extends JDialog {
         }
         {
             table = new JTable();
+            JTableUtil.defaultSetting(table);
             contentPanel.add(JCommonUtil.createScrollComponent(table), BorderLayout.CENTER);
 
             if (titleLst != null && !titleLst.isEmpty()) {
