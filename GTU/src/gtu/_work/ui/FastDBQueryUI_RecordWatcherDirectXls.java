@@ -109,9 +109,9 @@ public class FastDBQueryUI_RecordWatcherDirectXls {
         }
 
         CellStyleHandler pkCs = ExcelWriter.CellStyleHandler.newInstance(wb.createCellStyle())//
-                .setForegroundColor(new HSSFColor.AQUA());
+                .setForegroundColor(new HSSFColor.LAVENDER());
         CellStyleHandler nonPkCs = ExcelWriter.CellStyleHandler.newInstance(wb.createCellStyle())//
-                .setForegroundColor(new HSSFColor.CORAL());
+                .setForegroundColor(new HSSFColor.AQUA());
 
         CellStyleHandler changeCs = ExcelWriter.CellStyleHandler.newInstance(wb.createCellStyle())//
                 .setForegroundColor(new HSSFColor.YELLOW());
@@ -173,7 +173,11 @@ public class FastDBQueryUI_RecordWatcherDirectXls {
         pkCs.setSheet(sn);
         nonPkCs.setSheet(sn);
         Row row = sn.getRow(rowIdx);
-        for (int ii = 0; ii <= row.getLastCellNum(); ii++) {
+        int max = row.getLastCellNum();
+        if (max >= 255) {
+            max = 255;
+        }
+        for (int ii = 0; ii <= max; ii++) {
             if (indexLst.contains(ii)) {
                 pkCs.applyStyle(rowIdx, ii);
             } else {
@@ -257,7 +261,9 @@ public class FastDBQueryUI_RecordWatcherDirectXls {
         List<String> columnLst = new ArrayList<String>();
         for (int jj = 0; jj < sheet.getRow(0).getLastCellNum(); jj++) {
             String value = ExcelUtil_Xls97.getInstance().readCell(sheet.getRow(0).getCell(jj));
-            columnLst.add(value);
+            if (StringUtils.isNotBlank(value)) {
+                columnLst.add(value);
+            }
         }
         int columnCount = columnLst.size();
         TreeMap<Integer, Class<?>> typeClzMap = new TreeMap<Integer, Class<?>>();
@@ -275,7 +281,11 @@ public class FastDBQueryUI_RecordWatcherDirectXls {
                 }
             }
             if (columnCount != dataRow.size()) {
-                throw new RuntimeException("Row " + ii + " 現實欄位數為 " + dataRow.size() + " , 要求為 " + columnCount);
+                // throw new RuntimeException("Warning : " + xlsFile.getName() +
+                // ", Row " + ii + " 現實欄位數為 " + dataRow.size() + " , 要求為 " +
+                // columnCount);
+                System.out.println("Warning : " + xlsFile.getName() + ", Row " + ii + " 現實欄位數為 " + dataRow.size() + " , 要求為 " + columnCount);
+                continue;
             }
             rowLst.add(dataRow.toArray());
         }

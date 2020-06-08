@@ -24,6 +24,7 @@ import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.hssf.util.HSSFColor;
+import org.apache.poi.ss.usermodel.Row;
 
 import gtu.db.JdbcDBUtil;
 import gtu.file.FileUtil;
@@ -170,6 +171,8 @@ public class FastDBQueryUI_RecordWatcher extends Thread {
         }
 
         CellStyleHandler pkCs = ExcelWriter.CellStyleHandler.newInstance(wb.createCellStyle())//
+                .setForegroundColor(new HSSFColor.LAVENDER());
+        CellStyleHandler nonPkCs = ExcelWriter.CellStyleHandler.newInstance(wb.createCellStyle())//
                 .setForegroundColor(new HSSFColor.AQUA());
 
         CellStyleHandler changeCs = ExcelWriter.CellStyleHandler.newInstance(wb.createCellStyle())//
@@ -183,9 +186,9 @@ public class FastDBQueryUI_RecordWatcher extends Thread {
             addRow(0, sn, titleLst2);
             addRow(0, sd, titleLst2);
             addRow(0, su, titleLst2);
-            applyStyleByIndex(0, sn, pkIndexLst, pkCs);
-            applyStyleByIndex(0, sd, pkIndexLst, pkCs);
-            applyStyleByIndex(0, su, pkIndexLst, pkCs);
+            applyStyleByIndex(0, sn, pkIndexLst, pkCs, nonPkCs);
+            applyStyleByIndex(0, sd, pkIndexLst, pkCs, nonPkCs);
+            applyStyleByIndex(0, su, pkIndexLst, pkCs, nonPkCs);
         } else {
             addRowSplit(sn.getLastRowNum() + 1, sn, titleLst2, splitCs);
             addRowSplit(sd.getLastRowNum() + 1, sd, titleLst2, splitCs);
@@ -219,10 +222,20 @@ public class FastDBQueryUI_RecordWatcher extends Thread {
         return xlsFile;
     }
 
-    private void applyStyleByIndex(int rowIdx, HSSFSheet sn, List<Integer> indexLst, CellStyleHandler pkCs) {
+    private void applyStyleByIndex(int rowIdx, HSSFSheet sn, List<Integer> indexLst, CellStyleHandler pkCs, CellStyleHandler nonPkCs) {
         pkCs.setSheet(sn);
-        for (int celIdx : indexLst) {
-            pkCs.applyStyle(rowIdx, celIdx);
+        nonPkCs.setSheet(sn);
+        Row row = sn.getRow(rowIdx);
+        int max = row.getLastCellNum();
+        if (max >= 255) {
+            max = 255;
+        }
+        for (int ii = 0; ii <= max; ii++) {
+            if (indexLst.contains(ii)) {
+                pkCs.applyStyle(rowIdx, ii);
+            } else {
+                nonPkCs.applyStyle(rowIdx, ii);
+            }
         }
     }
 
