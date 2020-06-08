@@ -13,6 +13,7 @@ import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.os.Binder;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -276,7 +277,14 @@ public class FloatViewService extends Service {
         wmParams = new WindowManager.LayoutParams();
         // 设置window type
         // 會出錯 改用右邊這兩個 LayoutParams.TYPE_TOAST or TYPE_APPLICATION_PANEL
-        wmParams.type = LayoutParams.TYPE_PHONE; //LayoutParams.TYPE_PHONE;
+
+        //wmParams.type = LayoutParams.TYPE_PHONE; //LayoutParams.TYPE_PHONE;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            wmParams.type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
+        } else {
+            wmParams.type = WindowManager.LayoutParams.TYPE_PHONE;
+        }
+
         // 设置图片格式，效果为背景透明
         wmParams.format = PixelFormat.RGBA_8888;
 

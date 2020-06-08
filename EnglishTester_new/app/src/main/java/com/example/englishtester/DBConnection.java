@@ -89,16 +89,6 @@ public class DBConnection extends SQLiteOpenHelper {
         sb.append(" );                                                 ");
         Log.i("haiyang:createDB 1=", sb.toString());
         db.execSQL(sb.toString());
-
-        sb.setLength(0);
-        sb.append(" create table Dropbox_Html (                        ");
-        sb.append("     file_name  text  primary key not null,         ");
-        sb.append("     upload_date  long not null,                    ");
-        sb.append("     file_size  long not null,                      ");
-        sb.append("     full_path  text not null                       ");
-        sb.append(" );                                                 ");
-        Log.i("haiyang:createDB 1=", sb.toString());
-        db.execSQL(sb.toString());
     }
 
     @Override
