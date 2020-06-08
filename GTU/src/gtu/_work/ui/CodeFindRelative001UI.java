@@ -12,8 +12,10 @@ import java.util.ArrayList;
 import java.util.EventObject;
 import java.util.List;
 
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -75,6 +77,7 @@ public class CodeFindRelative001UI extends JFrame {
     private JTextField encodingText;
 
     private PropertiesUtilBean config = new PropertiesUtilBean(CodeFindRelative001UI.class);
+    private JComboBox exportStyleCombobox;
     {
         JSwingCommonConfigUtil.checkTestingPropertiesUtilBean(config, getClass(), getClass().getSimpleName());
     }
@@ -128,7 +131,7 @@ public class CodeFindRelative001UI extends JFrame {
 
         mainSearchText = new JTextField();
         panel_3.add(mainSearchText);
-        mainSearchText.setColumns(20);
+        mainSearchText.setColumns(10);
 
         label_1 = new JLabel("副檔名");
         panel_3.add(label_1);
@@ -146,6 +149,13 @@ public class CodeFindRelative001UI extends JFrame {
 
         isAndChk = new JCheckBox("AND條件相依");
         panel_3.add(isAndChk);
+
+        exportStyleCombobox = new JComboBox();
+        DefaultComboBoxModel model = new DefaultComboBoxModel();
+        model.addElement("html");
+        model.addElement("txt");
+        exportStyleCombobox.setModel(model);
+        panel_3.add(exportStyleCombobox);
 
         panel_4 = new JPanel();
         panel.add(panel_4, BorderLayout.WEST);
@@ -168,7 +178,7 @@ public class CodeFindRelative001UI extends JFrame {
 
         searchDirText = new JTextField();
         JCommonUtil.jTextFieldSetFilePathMouseEvent(searchDirText, true);
-        searchDirText.setColumns(20);
+        searchDirText.setColumns(10);
         panel_5.add(searchDirText);
 
         executeBtn = new JButton("開始");
@@ -318,6 +328,7 @@ public class CodeFindRelative001UI extends JFrame {
                         int range_gap = JTextFieldUtil.getValueFailSetDefault(2, gapLineNumberText);
                         boolean isAnd = isAndChk.isSelected();
                         String encoding = JTextFieldUtil.getValueFailSetDefault("UTF8", encodingText);
+                        String exportStyle = (String) exportStyleCombobox.getSelectedItem();
 
                         t.setStatusTextListener(new ActionListener() {
                             @Override
@@ -330,7 +341,7 @@ public class CodeFindRelative001UI extends JFrame {
                         });
 
                         prog.show();
-                        t.execute(dir_path, main_find_str, subFileName, second_finds, ignoreCase, encoding, isAnd, range_gap, "html");
+                        t.execute(dir_path, main_find_str, subFileName, second_finds, ignoreCase, encoding, isAnd, range_gap, exportStyle);
                         prog.dismiss();
 
                         JCommonUtil._jOptionPane_showMessageDialog_info("執行完成!");
