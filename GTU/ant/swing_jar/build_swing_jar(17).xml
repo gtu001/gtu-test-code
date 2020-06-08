@@ -37,6 +37,12 @@
 			<filename name="**/*.jar" />
 		</fileset>
 	</path>
+	<path id="javafx_class_path">
+		<fileset dir="/media/gtu001/OLD_D/my_tool/jfxrt">
+			<filename name="**/*.jar" />
+		</fileset>
+		<pathelement path="${build.dir}" />
+	</path>
 
 	<!--
 	<target name="buildTest">
@@ -173,6 +179,7 @@
 			<classpath>
 				<path location="${build_dir}" />
 			</classpath>
+			<classpath refid="javafx_class_path" />
 		</javac>
 	</target>
 
