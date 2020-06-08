@@ -349,6 +349,7 @@ public class FastDBQueryUI extends JFrame {
     private JButton compareXlsClearBtn;
     private JLabel lblNewLabel_17;
     private JTextField compareXlsMiddleNameText;
+    private JTextField compareXlsColumnSettingTitleText;
     protected TableColumnDefTextHandler mTableColumnDefTextHandler;
     private JPanel panel_28;
     private JPanel panel_29;
@@ -1446,7 +1447,7 @@ public class FastDBQueryUI extends JFrame {
         tabbedPane.addTab("匯出檔比對", null, panel_26, null);
         panel_26.setLayout(new FormLayout(new ColumnSpec[] { FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow"), },
                 new RowSpec[] { FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
-                        FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, }));
+                        FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, }));
 
         lblNewLabel_15 = new JLabel("初始匯出檔xls");
         panel_26.add(lblNewLabel_15, "2, 2, right, default");
@@ -1471,8 +1472,34 @@ public class FastDBQueryUI extends JFrame {
         panel_26.add(compareXlsMiddleNameText, "4, 6, fill, default");
         compareXlsMiddleNameText.setColumns(10);
 
+        lblNewLabel_20 = new JLabel("取得excel中文欄位定義");
+        panel_26.add(lblNewLabel_20, "2, 8, right, default");
+
+        compareXlsColumnSettingTitleText = new JTextField();
+        panel_26.add(compareXlsColumnSettingTitleText, "4, 8, fill, default");
+        compareXlsColumnSettingTitleText.setColumns(10);
+        compareXlsColumnSettingTitleText.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusLost(FocusEvent e) {
+                if (StringUtils.isNotBlank(compareXlsColumnSettingTitleText.getText())) {
+                    if (mTableColumnDefTextHandler == null) {
+                        mTableColumnDefTextHandler = new TableColumnDefTextHandler();
+                    }
+                    if (mTableColumnDefTextHandler != null) {
+                        mTableColumnDefTextHandler.init(true);
+                    }
+                    if (mXlsColumnDefDlg == null) {
+                        mXlsColumnDefDlg = new XlsColumnDefDlg();
+                    }
+                    if (mXlsColumnDefDlg != null && mXlsColumnDefDlg.getConfig() == null) {
+                        mXlsColumnDefDlg.show();
+                    }
+                }
+            }
+        });
+
         panel_27 = new JPanel();
-        panel_26.add(panel_27, "4, 8, fill, fill");
+        panel_26.add(panel_27, "4, 10, fill, fill");
 
         compareXlsExecuteBtn = new JButton("比對");
         compareXlsExecuteBtn.addActionListener(new ActionListener() {
@@ -6034,6 +6061,7 @@ public class FastDBQueryUI extends JFrame {
             }
         }
     };
+    private JLabel lblNewLabel_20;
 
     private class JDlgHolderBringToFrontHandler {
         LRUMap map = new LRUMap(10);
@@ -6283,6 +6311,23 @@ public class FastDBQueryUI extends JFrame {
             return sb.toString();
         }
 
+        public Map<String, String> getColumnsAndChinese(String table) {
+            Map<String, String> rtnMap = new LinkedHashMap<String, String>();
+            try {
+                init2();
+                List<String> colLst = xlsLoader.getColumnLst(table);
+                for (String column : colLst) {
+                    if (ListUtil.constainIgnorecase(column, colLst)) {
+                        String chinese = xlsLoader.getDBColumnChinese(column, false, table);
+                        rtnMap.put(column, chinese);
+                    }
+                }
+            } catch (Exception ex) {
+                JCommonUtil.handleException(ex);
+            }
+            return rtnMap;
+        }
+
         public List<String> getPkLst() {
             try {
                 if (init(false)) {
@@ -6326,6 +6371,12 @@ public class FastDBQueryUI extends JFrame {
             JCommonUtil.isBlankErrorMsg(fileMiddleName, "中間檔名不可為空");
             final List<String> columnLst = getCompareXlsColumnLst(beforeXlsFile);
 
+            final AtomicReference<Map<String, String>> columnsAndChinese = new AtomicReference<Map<String, String>>();
+            if (StringUtils.isNotBlank(compareXlsColumnSettingTitleText.getText())) {
+                String tableName = compareXlsColumnSettingTitleText.getText();
+                columnsAndChinese.set(mTableColumnDefTextHandler.getColumnsAndChinese(tableName));
+            }
+
             final FastDBQueryUI_RowDiffWatcherDlg mFastDBQueryUI_RowDiffWatcherDlg = (FastDBQueryUI_RowDiffWatcherDlg.newInstance(columnLst, new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -6345,7 +6396,7 @@ public class FastDBQueryUI extends JFrame {
                         } else {
                             // -------------------------------------------------↓↓↓↓↓↓
 
-                            FastDBQueryUI_RecordWatcherDirectXls mFastDBQueryUI_RecordWatcherDirectXls = new FastDBQueryUI_RecordWatcherDirectXls(fileMiddleName, pkIndexLst);
+                            FastDBQueryUI_RecordWatcherDirectXls mFastDBQueryUI_RecordWatcherDirectXls = new FastDBQueryUI_RecordWatcherDirectXls(fileMiddleName, pkIndexLst, columnsAndChinese.get());
                             Pair<File, String> result = mFastDBQueryUI_RecordWatcherDirectXls.run(beforeXlsFile, afterXlsFile);
                             File reulstFile = result.getLeft();
                             String errMsg = result.getRight();

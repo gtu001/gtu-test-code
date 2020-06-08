@@ -25,7 +25,7 @@ public class CodeFindRelative001 {
 
     File dir_path;
     String main_find_str;
-    String subFileName;
+    String fileNameFilter;
     List<SecondFindDef> second_finds;
     boolean ignoreCase;
     String encoding;
@@ -117,18 +117,18 @@ public class CodeFindRelative001 {
         }
     }
 
-    public void execute(File dir_path, String main_find_str, String subFileName, List<SecondFindDef> second_finds, boolean ignoreCase, String encoding, boolean isAnd, int range_gap,
+    public void execute(File dir_path, String main_find_str, String fileNameFilter, List<SecondFindDef> second_finds, boolean ignoreCase, String encoding, boolean isAnd, int range_gap,
             String printStyle) {
         {
             this.dir_path = dir_path;
             this.main_find_str = main_find_str;
-            this.subFileName = subFileName;
+            this.fileNameFilter = fileNameFilter;
             this.second_finds = second_finds;
             this.ignoreCase = ignoreCase;
             this.encoding = encoding;
             this.isAnd = isAnd;
             CodeFindRelative001.range_gap = range_gap;
-            if(printStyle !=null && printStyle.equalsIgnoreCase("html")) {
+            if (printStyle != null && printStyle.equalsIgnoreCase("html")) {
                 this.mLogStyle = new HtmlStyle();
             }
         }
@@ -138,14 +138,13 @@ public class CodeFindRelative001 {
         log = FileReaderWriterUtil.WriterZ.newInstance(file, "UTF8");
         log.init();
 
-        String filePattern = ".*";
-        if (StringUtils.isNotBlank(subFileName)) {
-            filePattern = ".*\\." + subFileName;
+        if (StringUtils.isBlank(fileNameFilter)) {
+            fileNameFilter = ".*";
         }
-        System.out.println("#### filePattern : " + filePattern);
+        System.out.println("#### filePattern : " + fileNameFilter);
 
         List<File> fileLst = new ArrayList<File>();
-        FileUtil.searchFileMatchs(dir_path, filePattern, fileLst);
+        FileUtil.searchFileMatchs(dir_path, fileNameFilter, fileLst);
 
         log.writeLine("<html>");
         log.writeLine("<table border=1>");
@@ -216,7 +215,7 @@ public class CodeFindRelative001 {
                 if (StringUtils.isBlank(prefix)) {
                     prefix = " ";
                 }
-                
+
                 mLogStyle.writeInner(prefix, lineNumber, line);
             }
         }
@@ -342,7 +341,7 @@ public class CodeFindRelative001 {
 
         String encoding = "UTF8";
         boolean isAnd = true;
-        String printStyle = "txt";//html
+        String printStyle = "txt";// html
 
         t.execute(dir_path, main_find_str, subFileName, second_finds, ignoreCase, encoding, isAnd, range_gap, printStyle);
         System.out.println("done...");

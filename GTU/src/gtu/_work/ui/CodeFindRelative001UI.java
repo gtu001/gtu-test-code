@@ -65,7 +65,7 @@ public class CodeFindRelative001UI extends JFrame {
     private JTextField searchDirText;
     private JLabel label;
     private JLabel label_1;
-    private JTextField subFileText;
+    private JTextField fileNameFilterText;
     private JLabel label_2;
     private JTextField gapLineNumberText;
     private JCheckBox isAndChk;
@@ -109,7 +109,7 @@ public class CodeFindRelative001UI extends JFrame {
         swingUtil = SwingActionUtil.newInstance(this);
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setBounds(100, 100, 662, 452);
+        setBounds(100, 100, 785, 505);
         contentPane = new JPanel();
         contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
         contentPane.setLayout(new BorderLayout(0, 0));
@@ -133,12 +133,12 @@ public class CodeFindRelative001UI extends JFrame {
         panel_3.add(mainSearchText);
         mainSearchText.setColumns(10);
 
-        label_1 = new JLabel("副檔名");
+        label_1 = new JLabel("檔名過濾");
         panel_3.add(label_1);
 
-        subFileText = new JTextField();
-        subFileText.setColumns(10);
-        panel_3.add(subFileText);
+        fileNameFilterText = new JTextField();
+        fileNameFilterText.setColumns(10);
+        panel_3.add(fileNameFilterText);
 
         label_2 = new JLabel("範圍行數");
         panel_3.add(label_2);
@@ -275,7 +275,7 @@ public class CodeFindRelative001UI extends JFrame {
             public void action(EventObject evt) throws Exception {
                 // searchDirText
                 mainSearchText.setText("");
-                subFileText.setText("");
+                fileNameFilterText.setText("");
                 gapLineNumberText.setText("2");
                 isAndChk.setSelected(false);
                 initSecondTable();
@@ -324,7 +324,7 @@ public class CodeFindRelative001UI extends JFrame {
 
                         File dir_path = searchDir;
                         String main_find_str = mainSearch;
-                        String subFileName = StringUtils.trimToEmpty(subFileText.getText());
+                        String fileNameFilter = StringUtils.trimToEmpty(fileNameFilterText.getText());
                         int range_gap = JTextFieldUtil.getValueFailSetDefault(2, gapLineNumberText);
                         boolean isAnd = isAndChk.isSelected();
                         String encoding = JTextFieldUtil.getValueFailSetDefault("UTF8", encodingText);
@@ -341,7 +341,7 @@ public class CodeFindRelative001UI extends JFrame {
                         });
 
                         prog.show();
-                        t.execute(dir_path, main_find_str, subFileName, second_finds, ignoreCase, encoding, isAnd, range_gap, exportStyle);
+                        t.execute(dir_path, main_find_str, fileNameFilter, second_finds, ignoreCase, encoding, isAnd, range_gap, exportStyle);
                         prog.dismiss();
 
                         JCommonUtil._jOptionPane_showMessageDialog_info("執行完成!");

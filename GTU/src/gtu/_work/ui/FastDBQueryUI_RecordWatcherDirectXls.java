@@ -4,6 +4,7 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +19,7 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.Row;
 
+import gtu.collection.MapUtil;
 import gtu.file.FileUtil;
 import gtu.poi.hssf.ExcelUtil_Xls97;
 import gtu.poi.hssf.ExcelWriter;
@@ -31,10 +33,12 @@ public class FastDBQueryUI_RecordWatcherDirectXls {
     SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmssSSS");
     NewNameHandler mNewNameHandler;
     StringBuffer errMsg = new StringBuffer();
+    Map<String, String> columnsAndChinese;
 
-    public FastDBQueryUI_RecordWatcherDirectXls(String fileMiddleName, List<Integer> pkIndexLst) {
+    public FastDBQueryUI_RecordWatcherDirectXls(String fileMiddleName, List<Integer> pkIndexLst, Map<String, String> columnsAndChinese) {
         this.fileMiddleName = fileMiddleName;
         this.pkIndexLst = pkIndexLst;
+        this.columnsAndChinese = columnsAndChinese;
     }
 
     private File compareOldAndNew(List<Object[]> oldLst, List<Object[]> newLst, List<String> titleLst, long queryEndTime) {
@@ -106,6 +110,8 @@ public class FastDBQueryUI_RecordWatcherDirectXls {
 
         CellStyleHandler pkCs = ExcelWriter.CellStyleHandler.newInstance(wb.createCellStyle())//
                 .setForegroundColor(new HSSFColor.AQUA());
+        CellStyleHandler nonPkCs = ExcelWriter.CellStyleHandler.newInstance(wb.createCellStyle())//
+                .setForegroundColor(new HSSFColor.CORAL());
 
         CellStyleHandler changeCs = ExcelWriter.CellStyleHandler.newInstance(wb.createCellStyle())//
                 .setForegroundColor(new HSSFColor.YELLOW());
@@ -118,9 +124,18 @@ public class FastDBQueryUI_RecordWatcherDirectXls {
             addRow(0, sn, titleLst2);
             addRow(0, sd, titleLst2);
             addRow(0, su, titleLst2);
-            applyStyleByIndex(0, sn, pkIndexLst, pkCs);
-            applyStyleByIndex(0, sd, pkIndexLst, pkCs);
-            applyStyleByIndex(0, su, pkIndexLst, pkCs);
+            applyStyleByIndex(0, sn, pkIndexLst, pkCs, nonPkCs);
+            applyStyleByIndex(0, sd, pkIndexLst, pkCs, nonPkCs);
+            applyStyleByIndex(0, su, pkIndexLst, pkCs, nonPkCs);
+
+            if (columnsAndChinese != null && !columnsAndChinese.isEmpty()) {
+                addRow_NChinese(1, sn, titleLst2, columnsAndChinese);
+                addRow_NChinese(1, sd, titleLst2, columnsAndChinese);
+                addRow_NChinese(1, su, titleLst2, columnsAndChinese);
+                applyStyleByIndex(1, sn, pkIndexLst, pkCs, nonPkCs);
+                applyStyleByIndex(1, sd, pkIndexLst, pkCs, nonPkCs);
+                applyStyleByIndex(1, su, pkIndexLst, pkCs, nonPkCs);
+            }
         } else {
             addRowSplit(sn.getLastRowNum() + 1, sn, titleLst2, splitCs);
             addRowSplit(sd.getLastRowNum() + 1, sd, titleLst2, splitCs);
@@ -154,10 +169,16 @@ public class FastDBQueryUI_RecordWatcherDirectXls {
         return xlsFile;
     }
 
-    private void applyStyleByIndex(int rowIdx, HSSFSheet sn, List<Integer> indexLst, CellStyleHandler pkCs) {
+    private void applyStyleByIndex(int rowIdx, HSSFSheet sn, List<Integer> indexLst, CellStyleHandler pkCs, CellStyleHandler nonPkCs) {
         pkCs.setSheet(sn);
-        for (int celIdx : indexLst) {
-            pkCs.applyStyle(rowIdx, celIdx);
+        nonPkCs.setSheet(sn);
+        Row row = sn.getRow(rowIdx);
+        for (int ii = 0; ii <= row.getLastCellNum(); ii++) {
+            if (indexLst.contains(ii)) {
+                pkCs.applyStyle(rowIdx, ii);
+            } else {
+                nonPkCs.applyStyle(rowIdx, ii);
+            }
         }
     }
 
@@ -166,6 +187,15 @@ public class FastDBQueryUI_RecordWatcherDirectXls {
         for (int ii = 0; ii < data.length; ii++) {
             String d = String.valueOf(data[ii]);
             r1.createCell(ii).setCellValue(d);
+        }
+    }
+
+    private void addRow_NChinese(int rowIdx, HSSFSheet sn, Object[] data, Map<String, String> columnsAndChinese) {
+        HSSFRow r1 = sn.createRow(rowIdx);
+        for (int ii = 0; ii < data.length; ii++) {
+            String d = String.valueOf(data[ii]);
+            String chinese = MapUtil.getIgnorecase(d, columnsAndChinese);
+            r1.createCell(ii).setCellValue(chinese);
         }
     }
 
@@ -310,7 +340,7 @@ public class FastDBQueryUI_RecordWatcherDirectXls {
         pkIndexLst.add(2);
         File beforeFile = new File("C:/Users/wistronits/Desktop/執行前後/執行前後/1A.LCInsureAcc.xls");
         File afterFile = new File("C:/Users/wistronits/Desktop/執行前後/執行前後/1B.LCInsureAcc.xls");
-        FastDBQueryUI_RecordWatcherDirectXls mFastDBQueryUI_RecordWatcherDirectXls = new FastDBQueryUI_RecordWatcherDirectXls(fileMiddleName, pkIndexLst);
+        FastDBQueryUI_RecordWatcherDirectXls mFastDBQueryUI_RecordWatcherDirectXls = new FastDBQueryUI_RecordWatcherDirectXls(fileMiddleName, pkIndexLst, null);
         mFastDBQueryUI_RecordWatcherDirectXls.run(beforeFile, afterFile);
         System.out.println("done..");
     }
