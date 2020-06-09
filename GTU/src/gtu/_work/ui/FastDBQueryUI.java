@@ -2281,7 +2281,7 @@ public class FastDBQueryUI extends JFrame {
     private void setSqlListSelection(SqlIdConfigBean bean) {
         sqlBean = bean;
         sqlList.setSelectedValue(sqlBean, true);
-        sqlTextAreaChange();
+        sqlTextAreaChange();    
     }
 
     /**

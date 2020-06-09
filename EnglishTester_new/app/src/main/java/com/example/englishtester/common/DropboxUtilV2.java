@@ -86,7 +86,7 @@ public class DropboxUtilV2 {
             return true;
         } catch (Exception ex) {
             ex.printStackTrace();
-            throw new RuntimeException(ex);
+            throw new RuntimeException("ERR : " + ex.getMessage() + " , path : " + path, ex);
             // return false;
         }
     }
