@@ -1986,6 +1986,22 @@ public class ExecuteOpener extends javax.swing.JFrame {
                                 }
                             }
                         }
+                    }).addJMenuItem("delete selected", new ActionListener() {
+                        public void actionPerformed(ActionEvent e) {
+                            List<ZFile> lst = JListUtil.getLeadSelectionArry(scanList);
+                            List<String> log = new ArrayList<String>();
+                            for (ZFile f : lst) {
+                                log.add(f.getName());
+                            }
+                            boolean deleteConfirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption(StringUtils.join(lst, "\r\n"), "刪除所選？");
+                            log.clear();
+                            if (deleteConfirm) {
+                                for (ZFile f : lst) {
+                                    log.add(f.getName() + " " + f.delete());
+                                }
+                                JCommonUtil._jOptionPane_showMessageDialog_info(StringUtils.join(lst, "\r\n"), "刪除結果");
+                            }
+                        }
                     }).addJMenuItem("----------------", false).addJMenuItem("diff left : " + (diffLeft != null ? diffLeft.getName() : ""), true, new ActionListener() {
                         public void actionPerformed(ActionEvent arg0) {
                             File value = ((ZFile) JListUtil.getLeadSelectionObject(scanList));

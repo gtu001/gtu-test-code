@@ -315,6 +315,7 @@ public class FastDBQueryUI extends JFrame {
     private JTextField maxRowsText;
     private JButton executeSqlButton;
     private JLabel label_1;
+    private JLabel lbl4SqlTextAreaInfo;
     private JRadioButton updateSqlRadio;
     private JRadioButton querySqlRadio;
     private JButton executeSqlButton2;
@@ -324,9 +325,9 @@ public class FastDBQueryUI extends JFrame {
     private JTextArea sqlIdCommentArea;
     private EditColumnHistoryHandler editColumnHistoryHandler;
     private JLabel lblNewLabel_11;
-    private JLabel lblNewLabel_12;
     private JLabel queryResultTimeLbl;
     private JLabel lblNewLabel_13;
+    private JLabel lblNewLabel_12;
     private JTextComponentSelectPositionHandler mSqlTextAreaJTextAreaSelectPositionHandler;
     private SqlTextAreaPromptHandler mSqlTextAreaPromptHandler;
     private JComboBox tableColumnDefText;
@@ -602,7 +603,6 @@ public class FastDBQueryUI extends JFrame {
                     isConsume = mSqlTextAreaPromptHandler.performSelectTopColumn(e);
                     if (!isConsume) {
                         JTextAreaUtil.triggerTabKey(sqlTextArea, e);
-                        JTextAreaUtil.applyEnterKeyFixPosition(sqlTextArea, e);
                     }
                 } else if (e.getKeyCode() == KeyEvent.VK_ESCAPE && mSqlTextAreaPromptHandler != null) {
                     isConsume = mSqlTextAreaPromptHandler.performSelectClose();
@@ -633,6 +633,8 @@ public class FastDBQueryUI extends JFrame {
                 sqlTextAreaPromptProcess("insertUpdate", event);
             }
         }));
+
+        JTextAreaUtil.applyEnterKeyFixPosition(sqlTextArea);
 
         mSqlTextAreaJTextAreaSelectPositionHandler = JTextComponentSelectPositionHandler.newInst(sqlTextArea);
 
@@ -772,6 +774,9 @@ public class FastDBQueryUI extends JFrame {
             panel_3.add(panel_25, BorderLayout.SOUTH);
             panel_3.add(panel_25);
 
+            lbl4SqlTextAreaInfo = new JLabel("");
+            panel_25.add(lbl4SqlTextAreaInfo);
+
             label_1 = new JLabel("max rows :");
             panel_25.add(label_1);
 
@@ -827,6 +832,8 @@ public class FastDBQueryUI extends JFrame {
         JPanel innerPanel2 = new JPanel();
         innerPanel2.setLayout(new BorderLayout(0, 0));
         innerPanel2.add(scrollPane_1, BorderLayout.CENTER);
+
+        JTextAreaUtil.applyTextAreaPosition(sqlTextArea, lbl4SqlTextAreaInfo);
 
         {// 多包一層
             JPanel innerPanel11 = new JPanel();

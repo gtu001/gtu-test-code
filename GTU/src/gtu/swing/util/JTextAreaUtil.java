@@ -4,6 +4,9 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.LineNumberReader;
@@ -13,9 +16,11 @@ import java.io.PrintStream;
 import java.io.StringReader;
 import java.lang.reflect.Field;
 import java.util.TreeMap;
+import java.util.concurrent.Callable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.swing.JLabel;
 import javax.swing.JTextArea;
 import javax.swing.JTextPane;
 import javax.swing.event.DocumentEvent;
@@ -333,33 +338,142 @@ public class JTextAreaUtil {
         caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
     }
 
-    public static void applyEnterKeyFixPosition(JTextComponent textArea, KeyEvent keyEvent) {
-        if (keyEvent.getKeyCode() != KeyEvent.VK_ENTER) {
-            return;
-        }
-        String prefixLine = "";
-        LineNumberReader reader = null;
-        try {
-            reader = new LineNumberReader(new StringReader(textArea.getText()));
-            String lastLine = "";
-            for (String line = null; (line = reader.readLine()) != null;) {
-                lastLine = line;
+    public static void applyTextAreaPosition(final JTextComponent textArea, final JLabel lbl4Position) {
+        final Callable<String> call = new Callable<String>() {
+            @Override
+            public String call() throws Exception {
+                String text = StringUtils.substring(StringUtils.defaultString(textArea.getText()), 0, textArea.getCaretPosition());
+                LineNumberReader reader = null;
+                int lastLineNumber = 0;
+                int startPos = 0;
+                int selectLen = 0;
+                try {
+                    reader = new LineNumberReader(new StringReader(text));
+                    for (String line = null; (line = reader.readLine()) != null;) {
+                        startPos = StringUtils.defaultString(line).length();
+                        lastLineNumber = reader.getLineNumber();
+                    }
+                    selectLen = StringUtils.length(textArea.getSelectedText());
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                } finally {
+                    try {
+                        reader.close();
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
+                }
+                return new StringBuilder().append("(行：").append(lastLineNumber)//
+                        .append(", 位：").append(startPos).append(", 長：")//
+                        .append(selectLen).append(")").toString();//
             }
-            Pattern ptn = Pattern.compile("^[\\s\t]+");
-            Matcher mth = ptn.matcher(lastLine);
-            if (mth.find()) {
-                prefixLine = mth.group();
+        };
+
+        textArea.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                try {
+                    lbl4Position.setText((String) call.call());
+                } catch (Exception e1) {
+                    e1.printStackTrace();
+                }
             }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        } finally {
-            try {
-                reader.close();
-            } catch (IOException e1) {
-                e1.printStackTrace();
+        });
+        textArea.addKeyListener(new KeyListener() {
+            @Override
+            public void keyPressed(KeyEvent e) {
             }
-        }
-        JTextPaneUtil.newInstance(textArea).append(prefixLine);
-        textArea.setCaretPosition(StringUtils.length(textArea.getText()));
+
+            @Override
+            public void keyReleased(KeyEvent arg0) {
+                try {
+                    lbl4Position.setText((String) call.call());
+                } catch (Exception e1) {
+                    e1.printStackTrace();
+                }
+            }
+
+            @Override
+            public void keyTyped(KeyEvent arg0) {
+            }
+        });
+        textArea.getDocument().addDocumentListener(new DocumentListener() {
+            public void insertUpdate(DocumentEvent e) {
+                try {
+                    lbl4Position.setText((String) call.call());
+                } catch (Exception e1) {
+                    e1.printStackTrace();
+                }
+            }
+
+            public void removeUpdate(DocumentEvent e) {
+                try {
+                    lbl4Position.setText((String) call.call());
+                } catch (Exception e1) {
+                    e1.printStackTrace();
+                }
+            }
+
+            public void changedUpdate(DocumentEvent e) {
+                try {
+                    lbl4Position.setText((String) call.call());
+                } catch (Exception e1) {
+                    e1.printStackTrace();
+                }
+            }
+        });
+    }
+
+    public static void applyEnterKeyFixPosition(final JTextComponent textArea) {
+        textArea.addKeyListener(new KeyListener() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+            }
+
+            @Override
+            public void keyReleased(final KeyEvent e) {
+                if (e.getKeyCode() != KeyEvent.VK_ENTER) {
+                    return;
+                }
+                String prefixLine = "";
+                LineNumberReader reader = null;
+                try {
+                    reader = new LineNumberReader(new StringReader(text));
+                    String lastLine = "";
+                    int lastLineNumber = 0;
+                    for (String line = null; (line = reader.readLine()) != null;) {
+                        lastLine = line;
+                        lastLineNumber = reader.getLineNumber();
+                    }
+                    System.out.println("換行 ： " + lastLineNumber);
+                    Pattern ptn = Pattern.compile("^[\\s\t]+");
+                    Matcher mth = ptn.matcher(lastLine);
+                    if (mth.find()) {
+                        prefixLine = mth.group();
+                    }
+                    String beforeText = StringUtils.substring(textArea.getText(), 0, textArea.getCaretPosition());
+                    String afterText = StringUtils.substring(textArea.getText(), textArea.getCaretPosition());
+                    textArea.setText(beforeText + prefixLine + afterText);
+                    textArea.setCaretPosition(beforeText.length() + prefixLine.length());
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                } finally {
+                    try {
+                        reader.close();
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
+                }
+            }
+
+            String text = "";
+            int caretPosition = 0;
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+                caretPosition = textArea.getCaretPosition();
+                text = StringUtils.substring(StringUtils.defaultString(textArea.getText()), 0, caretPosition);
+            }
+        });
     }
 }
