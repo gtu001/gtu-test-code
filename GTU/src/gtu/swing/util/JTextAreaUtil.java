@@ -13,6 +13,8 @@ import java.io.PrintStream;
 import java.io.StringReader;
 import java.lang.reflect.Field;
 import java.util.TreeMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.JTextArea;
 import javax.swing.JTextPane;
@@ -329,5 +331,35 @@ public class JTextAreaUtil {
     public static void setScrollToBottomPloicy(JTextComponent textArea) {
         DefaultCaret caret = (DefaultCaret) textArea.getCaret();
         caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
+    }
+
+    public static void applyEnterKeyFixPosition(JTextComponent textArea, KeyEvent keyEvent) {
+        if (keyEvent.getKeyCode() != KeyEvent.VK_ENTER) {
+            return;
+        }
+        String prefixLine = "";
+        LineNumberReader reader = null;
+        try {
+            reader = new LineNumberReader(new StringReader(textArea.getText()));
+            String lastLine = "";
+            for (String line = null; (line = reader.readLine()) != null;) {
+                lastLine = line;
+            }
+            Pattern ptn = Pattern.compile("^[\\s\t]+");
+            Matcher mth = ptn.matcher(lastLine);
+            if (mth.find()) {
+                prefixLine = mth.group();
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        } finally {
+            try {
+                reader.close();
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+        }
+        JTextPaneUtil.newInstance(textArea).append(prefixLine);
+        textArea.setCaretPosition(StringUtils.length(textArea.getText()));
     }
 }

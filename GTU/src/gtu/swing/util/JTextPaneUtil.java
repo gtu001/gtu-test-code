@@ -3,28 +3,28 @@ package gtu.swing.util;
 import java.awt.EventQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import javax.swing.JTextArea;
 import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
-import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
+import javax.swing.text.JTextComponent;
 import javax.swing.text.MutableAttributeSet;
-import javax.swing.text.SimpleAttributeSet;
 
 import org.apache.commons.lang.StringUtils;
 
 public class JTextPaneUtil {
-    private JTextPane textArea;
+    private JTextComponent textArea;
 
-    public static JTextPaneUtil newInstance(JTextPane textArea) {
+    public static JTextPaneUtil newInstance(JTextComponent textArea) {
         return new JTextPaneUtil(textArea);
     }
 
-    public JTextPaneUtil(JTextPane textArea) {
+    public JTextPaneUtil(JTextComponent textArea) {
         this.textArea = textArea;
     }
 
     public void removeStyles() {
-        MutableAttributeSet mas = textArea.getInputAttributes();
+        MutableAttributeSet mas = ((JTextPane) textArea).getInputAttributes();
         System.out.println("before: " + mas);
         mas.removeAttributes(mas);
         System.out.println("after: " + mas);

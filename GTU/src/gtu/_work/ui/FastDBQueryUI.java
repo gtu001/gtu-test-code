@@ -602,6 +602,7 @@ public class FastDBQueryUI extends JFrame {
                     isConsume = mSqlTextAreaPromptHandler.performSelectTopColumn(e);
                     if (!isConsume) {
                         JTextAreaUtil.triggerTabKey(sqlTextArea, e);
+                        JTextAreaUtil.applyEnterKeyFixPosition(sqlTextArea, e);
                     }
                 } else if (e.getKeyCode() == KeyEvent.VK_ESCAPE && mSqlTextAreaPromptHandler != null) {
                     isConsume = mSqlTextAreaPromptHandler.performSelectClose();
@@ -751,6 +752,11 @@ public class FastDBQueryUI extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 dbNameIdText_Auto.getTextComponent().setText(String.valueOf(sqlPageDbConnCombox.getSelectedItem()));
                 JCommonUtil.triggerButtonActionPerformed(dbNameIdText);
+
+                // 設定新開視窗預設值
+                if (TAB_UI1 != null) {
+                    TAB_UI1.getResourcesPool().put("sqlPageDbConnCombox", sqlPageDbConnCombox.getSelectedItem());
+                }
             }
         });
 
@@ -1932,7 +1938,13 @@ public class FastDBQueryUI extends JFrame {
 
             tabbedPane.setSelectedIndex(1);// 預設為SQL頁籤
 
-            sqlTextArea.setText("\r\n\r\n\r\n        ");// 初始化輸入位置
+            sqlTextArea.setText("\r\n\r\n\r\n                     ");// 初始化輸入位置
+
+            if (TAB_UI1 != null) {
+                if (TAB_UI1.getResourcesPool().containsKey("sqlPageDbConnCombox")) {
+                    sqlPageDbConnCombox.setSelectedItem(TAB_UI1.getResourcesPool().get("sqlPageDbConnCombox"));
+                }
+            }
         }
     }
 
@@ -2242,7 +2254,7 @@ public class FastDBQueryUI extends JFrame {
             SqlParam param = parseSqlToParam(sql);
 
             // 更新parameter表
-            setParameterTable(param);
+            setParameterTable(param, false);
 
             // 儲存sqlList Prop
             SqlIdConfigBean bean = new SqlIdConfigBean();
@@ -2281,17 +2293,31 @@ public class FastDBQueryUI extends JFrame {
     private void setSqlListSelection(SqlIdConfigBean bean) {
         sqlBean = bean;
         sqlList.setSelectedValue(sqlBean, true);
-        sqlTextAreaChange();    
+        sqlTextAreaChange();
     }
 
     /**
      * 載入參數
      */
-    private void setParameterTable(SqlParam param) {
+    private void setParameterTable(SqlParam param, boolean reset) {
+        // 取得更新前參數值
+        Map<String, Object> valMap = new HashMap<String, Object>();
+        for (int ii = 0; ii < parametersTable.getRowCount(); ii++) {
+            String column = (String) parametersTable.getValueAt(ii, ParameterTableColumnDef.COLUMN.idx);
+            Object val = parametersTable.getValueAt(ii, ParameterTableColumnDef.VALUE.idx);
+            if (val != null) {
+                valMap.put(column, val);
+            }
+        }
+        // 重設參數列表
         initParametersTable();
         DefaultTableModel createModel = (DefaultTableModel) parametersTable.getModel();
         for (String column : param.getOrderParametersLst()) {
-            createModel.addRow(new Object[] { true, column, "", DataType.varchar });
+            Object val = "";
+            if (!reset && valMap.containsKey(column)) {
+                val = valMap.get(column);
+            }
+            createModel.addRow(new Object[] { true, column, val, DataType.varchar });
         }
     }
 
@@ -2462,6 +2488,11 @@ public class FastDBQueryUI extends JFrame {
                     setCustomColumnTitleTooltip();
                     // 設定預設欄位代碼定義
                     setCustomColumnCodeValueTooptip();
+
+                    // 設定新開視窗預設值
+                    if (TAB_UI1 != null) {
+                        TAB_UI1.getResourcesPool().put("sqlPageDbConnCombox", sqlPageDbConnCombox.getSelectedItem());
+                    }
                 } catch (Exception ex) {
                     queryResultTable.setModel(JTableUtil.createModel(true, "ERROR"));
                     String category = refSearchCategoryCombobox_Auto.getTextComponent().getText();
