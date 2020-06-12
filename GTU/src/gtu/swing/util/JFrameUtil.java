@@ -15,7 +15,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.swing.JDialog;
 import javax.swing.JFrame;
 
 import gtu.file.FileUtil;
@@ -23,7 +22,7 @@ import gtu.file.OsInfoUtil;
 import gtu.properties.PropertiesUtil;
 
 public class JFrameUtil {
-    
+
     public static void setVisible(boolean isShow, JFrame frame) {
         if (OsInfoUtil.isWindows()) {
             frame.setVisible(isShow);
@@ -54,7 +53,8 @@ public class JFrameUtil {
         JFrame frame = new JFrame();
         frame.setTitle(clz.getSimpleName());
         frame.setLayout(new FlowLayout());
-        JCommonUtil.setJFrameDefaultSetting(frame);
+        // frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        JCommonUtil.setJFrameCenter(frame);
         return frame;
     }
 

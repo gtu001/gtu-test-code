@@ -171,7 +171,7 @@ public class JProgressBarHelper {
     }
 
     // 設定關閉事件
-    private void applyOncloseEvent(JDialog dlg) {
+    private void applyOnCloseEvent(JDialog dlg) {
         dlg.addWindowListener(new WindowAdapter() {
             public void windowClosed(WindowEvent e) {
                 System.out.println("jdialog window closed event received");
@@ -239,10 +239,10 @@ public class JProgressBarHelper {
             this.applyMoveBoundEvent(dlg);
         }
         if (this.closeListener == null) {
-            dlg.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
-        } else {
             dlg.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-            applyOncloseEvent(dlg);
+        } else {
+            dlg.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+            applyOnCloseEvent(dlg);
         }
         return this;
     }

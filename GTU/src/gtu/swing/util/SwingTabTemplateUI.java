@@ -5,6 +5,8 @@ import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
@@ -59,8 +61,8 @@ public class SwingTabTemplateUI {
         if (callback != null) {
             callback.beforeInit(this);
         }
-        jframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        jframe.setBounds(100, 100, 450, 300);
+        // jframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//        jframe.setBounds(100, 100, 450, 300);
         contentPane = new JPanel();
         contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
         jframe.setContentPane(contentPane);
@@ -170,6 +172,11 @@ public class SwingTabTemplateUI {
                 }
             }
         });
+        jframe.addComponentListener(new ComponentAdapter() {
+            public void componentResized(ComponentEvent evt) {
+                System.out.println("resize ----");
+            }
+        });
         contentPane.add(tabbedPane, BorderLayout.CENTER);
 
         {
@@ -185,6 +192,25 @@ public class SwingTabTemplateUI {
         if (callback != null) {
             callback.afterInit(this);
         }
+    }
+
+    public void setWindowCloseEvent(ActionListener closeListener) {
+        jframe.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        jframe.addWindowListener(new WindowAdapter() {
+            public void windowClosed(WindowEvent e) {
+                System.out.println("jdialog window closed event received");
+            }
+
+            public void windowClosing(WindowEvent e) {
+                boolean isDoClose = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("確定要取消 : " + jframe.getTitle(), "取消 : " + jframe.getTitle());
+                if (isDoClose) {
+                    if (closeListener != null) {
+                        closeListener.actionPerformed(new ActionEvent(SwingTabTemplateUI.this, -1, "doClose"));
+                    }
+                    JFrameUtil.setVisible(false, jframe);
+                }
+            }
+        });
     }
 
     public SysTrayUtil getSysTrayUtil() {
@@ -271,11 +297,11 @@ public class SwingTabTemplateUI {
     public int getSelectTabIndex() {
         return tabbedPane.getSelectedIndex();
     }
-    
+
     public void setSelectTabIndex(int idx) {
         tabbedPane.setSelectedIndex(idx);
     }
-    
+
     public int getTabCount() {
         return tabbedPane.getTabCount();
     }

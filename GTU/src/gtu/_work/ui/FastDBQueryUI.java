@@ -8,6 +8,8 @@ import java.awt.EventQueue;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyAdapter;
@@ -197,6 +199,7 @@ public class FastDBQueryUI extends JFrame {
     public LoggerAppender updateLogger = new LoggerAppender(new File(JAR_PATH_FILE, "updateLog_" + DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMdd") + ".txt"));
     private static final String SQL_PARAM_PTN = "\\:([a-zA-Z]\\w*)";
     private static PropertiesGroupUtils_ByKey dataSourceConfig = new PropertiesGroupUtils_ByKey(new File(JAR_PATH_FILE, "dataSource.properties"));
+    private static PropertiesUtilBean defaultConfig = new PropertiesUtilBean(JAR_PATH_FILE, FastDBQueryUI.class.getSimpleName() + "_default");
 
     private JPanel contentPane;
     private JList sqlList;
@@ -363,7 +366,7 @@ public class FastDBQueryUI extends JFrame {
     private JTable columnXlsDefTableColumnQryTable;
     private JButton clearParameterBtn;
     private AtomicReference<FastDBQueryUI_RecordWatcher> mRecordWatcher = new AtomicReference<FastDBQueryUI_RecordWatcher>();
-    private JToggleButton recordWatcherToggleBtn;
+    private JButton recordWatcherToggleBtn;
     private JCheckBox rowFilterTextKeepMatchChk;
     private JButton resetQueryBtn;
     private JDlgHolderBringToFrontHandler mJDlgHolderBringToFrontHandler;
@@ -430,9 +433,22 @@ public class FastDBQueryUI extends JFrame {
                 }
             }
         });
+        tabUI.getJframe().addComponentListener(new ComponentAdapter() {
+            public void componentResized(ComponentEvent evt) {
+                defaultConfig.getConfigProp().put("frame_w", String.valueOf(tabUI.getJframe().getBounds().width));
+                defaultConfig.getConfigProp().put("frame_h", String.valueOf(tabUI.getJframe().getBounds().height));
+                defaultConfig.store();
+            }
+        });
+        if (defaultConfig.getConfigProp().containsKey("frame_w") && defaultConfig.getConfigProp().containsKey("frame_h")) {
+            int w = Integer.parseInt(defaultConfig.getConfigProp().getProperty("frame_w"));
+            int h = Integer.parseInt(defaultConfig.getConfigProp().getProperty("frame_h"));
+            tabUI.setSize(w, h);
+        } else {
+            java.awt.Dimension scr_size = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
+            tabUI.setSize((int) (scr_size.width * 0.8), (int) (scr_size.height * 0.8));
+        }
 
-        java.awt.Dimension scr_size = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        tabUI.setSize((int) (scr_size.width * 0.8), (int) (scr_size.height * 0.8));
         tabUI.startUI();
         tabUI.getSysTrayUtil().createDefaultTray();
         TAB_UI1 = tabUI;
@@ -1267,10 +1283,10 @@ public class FastDBQueryUI extends JFrame {
         panel_15.add(radio_export_excel_ignoreNull);
         panel_15.add(excelExportBtn);
 
-        recordWatcherToggleBtn = new JToggleButton("監聽");
+        recordWatcherToggleBtn = new JButton("監聽");
         recordWatcherToggleBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                startRecordWatcher(recordWatcherToggleBtn.isSelected());
+                startRecordWatcher();
             }
         });
         panel_15.add(recordWatcherToggleBtn);
@@ -2364,166 +2380,155 @@ public class FastDBQueryUI extends JFrame {
      * 執行sql
      */
     private void executeSqlButtonClick() {
-        class ExecuteSqlButtonClickGo extends SwingWorker<String, Object> {
-            @Override
-            public String doInBackground() {
-                long startTime = System.currentTimeMillis();
-                try {
-                    // init
-                    {
-                        isResetQuery = true;
-                        filterRowsQueryList = null;// rows 過濾清除
-                        importExcelSheetName = null; // 清除匯入黨名
-                        queryResultTimeLbl.setText("");
-                    }
+        long startTime = System.currentTimeMillis();
+        try {
+            // init
+            {
+                isResetQuery = true;
+                filterRowsQueryList = null;// rows 過濾清除
+                importExcelSheetName = null; // 清除匯入黨名
+                queryResultTimeLbl.setText("");
+            }
 
-                    JTableUtil util = JTableUtil.newInstance(parametersTable);
+            JTableUtil util = JTableUtil.newInstance(parametersTable);
 
-                    Map<String, Object> paramMap = new HashMap<String, Object>();
-                    Map<String, String> sqlInjectMap = new LinkedHashMap<String, String>();
+            Map<String, Object> paramMap = new HashMap<String, Object>();
+            Map<String, String> sqlInjectMap = new LinkedHashMap<String, String>();
 
-                    Set<String> forceAddColumns = new HashSet<String>();
+            Set<String> forceAddColumns = new HashSet<String>();
 
-                    for (int ii = 0; ii < parametersTable.getRowCount(); ii++) {
-                        Boolean isInUse = (Boolean) util.getRealValueAt(ii, ParameterTableColumnDef.USE.idx);
-                        if (isInUse == null) {
-                            isInUse = false;
-                        }
-
-                        String columnName = (String) util.getRealValueAt(ii, ParameterTableColumnDef.COLUMN.idx);
-                        String value = (String) util.getRealValueAt(ii, ParameterTableColumnDef.VALUE.idx);
-
-                        if (SqlParam.sqlInjectionPATTERN.matcher(columnName).matches()) {
-                            // sql Injection
-                            if (isInUse) {
-                                sqlInjectMap.put(columnName, StringUtils.trimToEmpty(value));
-                            } else {
-                                sqlInjectMap.put(columnName, null);
-                            }
-                        } else {
-                            // 一般處理
-                            DataType dataType = (DataType) util.getRealValueAt(ii, ParameterTableColumnDef.TYPE.idx);
-                            if (isInUse) {
-                                paramMap.put(columnName, getRealValue(value, dataType));
-                            } else {
-                                paramMap.put(columnName, null);
-                            }
-
-                            if (dataType.isForceAddColumn()) {
-                                forceAddColumns.add(columnName);
-                            }
-                        }
-                    }
-
-                    String sql = getCurrentSQL();
-
-                    JCommonUtil.isBlankErrorMsg(sql, "請輸入sql");
-
-                    // 取得執行sql物件
-                    SqlParam param = parseSqlToParam(sql);
-
-                    // 檢查參數是否異動
-                    for (String columnName : param.paramSet) {
-                        if (!paramMap.containsKey(columnName) && !sqlInjectMap.containsKey(columnName)) {
-                            Validate.isTrue(false, "參數有異動!, 請重新按儲存按鈕");
-                        }
-                    }
-
-                    // 組參數列
-                    List<Object> parameterList = new ArrayList<Object>();
-                    if (param.getClass() == SqlParam.class) {
-                        for (String columnName : param.paramList) {
-                            if (!paramMap.containsKey(columnName)) {
-                                Validate.isTrue(false, "參數未設定 : " + columnName);
-                            }
-                            parameterList.add(paramMap.get(columnName));
-                        }
-                    } else if (param.getClass() == SqlParam_IfExists.class) {
-                        parameterList.addAll(((SqlParam_IfExists) param).processParamMap(paramMap, sqlInjectMap, forceAddColumns));
-                    }
-
-                    // 設定 sqlInjectionMap
-                    param.sqlInjectionMap.putAll(sqlInjectMap);
-
-                    System.out.println("尚未執行=====================================================");
-                    System.out.println(param.getQuestionSql());
-                    for (int i = 0; i < parameterList.size(); i++) {
-                        System.out.println("param[" + i + "]:\"" + parameterList.get(i) + "\"  (" + (parameterList.get(i) != null ? parameterList.get(i).getClass().getName() : "NA") + ")");
-                    }
-                    System.out.println("尚未執行=====================================================");
-
-                    // 判斷執行模式
-                    if (querySqlRadio.isSelected()) {
-                        int maxRowsLimit = StringNumberUtil.parseInt(maxRowsText.getText(), 0);
-                        Triple<List<String>, List<Class<?>>, List<Object[]>> orignQueryResult = JdbcDBUtil.queryForList_customColumns(param.getQuestionSql(), parameterList.toArray(),
-                                getDataSource().getConnection(), true, maxRowsLimit);
-
-                        createRecordWatcher(orignQueryResult, param.getQuestionSql(), parameterList.toArray(), true, maxRowsLimit);
-
-                        mSqlIdColumnHolder.setColumns(mSqlIdColumnHolder.getSqlId(), orignQueryResult.getLeft());
-
-                        queryList = orignQueryResult;
-
-                        // 切換查詢結果
-                        if (!queryList.getRight().isEmpty()) {
-                            tabbedPane.setSelectedIndex(3);
-                        }
-
-                        queryModeProcess(queryList, false, Pair.of(param, parameterList), null);
-
-                        showJsonArry(queryList, 1000, null);
-
-                        // 過濾欄位apply
-                        if (StringUtils.isNotBlank(rowFilterText.getText())) {
-                            rowFilterTextDoFilter.run();
-                        }
-                    } else if (updateSqlRadio.isSelected()) {
-                        int modifyResult = JdbcDBUtil.modify(param.questionSql, parameterList.toArray(), getDataSource().getConnection(), true);
-                        JCommonUtil._jOptionPane_showMessageDialog_info("update : " + modifyResult);
-                    }
-
-                    // 設定欄位解釋定義
-                    setupCustomColumnDefExcelChinese();
-
-                    // 儲存參數設定
-                    saveParameterTableConfig(false);
-
-                    // 儲存sqlId mapping dataSource 設定
-                    sqlIdListDSMappingHandler.store(true);
-
-                    // 設定預設欄位定義
-                    setCustomColumnTitleTooltip();
-                    // 設定預設欄位代碼定義
-                    setCustomColumnCodeValueTooptip();
-
-                    // 設定新開視窗預設值
-                    if (TAB_UI1 != null) {
-                        TAB_UI1.getResourcesPool().put("sqlPageDbConnCombox", sqlPageDbConnCombox.getSelectedItem());
-                    }
-                } catch (Exception ex) {
-                    queryResultTable.setModel(JTableUtil.createModel(true, "ERROR"));
-                    String category = refSearchCategoryCombobox_Auto.getTextComponent().getText();
-                    String findMessage = refSearchListConfigHandler.findExceptionMessage(category, ex.getMessage());
-                    // 一般顯示
-                    if (StringUtils.isBlank(findMessage)) {
-                        JCommonUtil.handleException(ex);
-                    } else {
-                        // html顯示
-                        JCommonUtil.handleException(String.format("參考 : %s", findMessage), ex, true, "", "yyyyMMdd", false, true);
-                    }
-                } finally {
-                    BigDecimal duringTime = new BigDecimal(System.currentTimeMillis() - startTime).divide(new BigDecimal(1000), 3, BigDecimal.ROUND_HALF_EVEN);
-                    queryResultTimeLbl.setText("查詢耗時:  " + duringTime + " 秒");
-                    JTableUtil.newInstance(queryResultTable).setRowHeightByFontSize();
+            for (int ii = 0; ii < parametersTable.getRowCount(); ii++) {
+                Boolean isInUse = (Boolean) util.getRealValueAt(ii, ParameterTableColumnDef.USE.idx);
+                if (isInUse == null) {
+                    isInUse = false;
                 }
-                return "OK";
+
+                String columnName = (String) util.getRealValueAt(ii, ParameterTableColumnDef.COLUMN.idx);
+                String value = (String) util.getRealValueAt(ii, ParameterTableColumnDef.VALUE.idx);
+
+                if (SqlParam.sqlInjectionPATTERN.matcher(columnName).matches()) {
+                    // sql Injection
+                    if (isInUse) {
+                        sqlInjectMap.put(columnName, StringUtils.trimToEmpty(value));
+                    } else {
+                        sqlInjectMap.put(columnName, null);
+                    }
+                } else {
+                    // 一般處理
+                    DataType dataType = (DataType) util.getRealValueAt(ii, ParameterTableColumnDef.TYPE.idx);
+                    if (isInUse) {
+                        paramMap.put(columnName, getRealValue(value, dataType));
+                    } else {
+                        paramMap.put(columnName, null);
+                    }
+
+                    if (dataType.isForceAddColumn()) {
+                        forceAddColumns.add(columnName);
+                    }
+                }
             }
 
-            @Override
-            protected void done() {
+            String sql = getCurrentSQL();
+
+            JCommonUtil.isBlankErrorMsg(sql, "請輸入sql");
+
+            // 取得執行sql物件
+            SqlParam param = parseSqlToParam(sql);
+
+            // 檢查參數是否異動
+            for (String columnName : param.paramSet) {
+                if (!paramMap.containsKey(columnName) && !sqlInjectMap.containsKey(columnName)) {
+                    Validate.isTrue(false, "參數有異動!, 請重新按儲存按鈕");
+                }
             }
+
+            // 組參數列
+            List<Object> parameterList = new ArrayList<Object>();
+            if (param.getClass() == SqlParam.class) {
+                for (String columnName : param.paramList) {
+                    if (!paramMap.containsKey(columnName)) {
+                        Validate.isTrue(false, "參數未設定 : " + columnName);
+                    }
+                    parameterList.add(paramMap.get(columnName));
+                }
+            } else if (param.getClass() == SqlParam_IfExists.class) {
+                parameterList.addAll(((SqlParam_IfExists) param).processParamMap(paramMap, sqlInjectMap, forceAddColumns));
+            }
+
+            // 設定 sqlInjectionMap
+            param.sqlInjectionMap.putAll(sqlInjectMap);
+
+            System.out.println("尚未執行=====================================================");
+            System.out.println(param.getQuestionSql());
+            for (int i = 0; i < parameterList.size(); i++) {
+                System.out.println("param[" + i + "]:\"" + parameterList.get(i) + "\"  (" + (parameterList.get(i) != null ? parameterList.get(i).getClass().getName() : "NA") + ")");
+            }
+            System.out.println("尚未執行=====================================================");
+
+            // 判斷執行模式
+            if (querySqlRadio.isSelected()) {
+                int maxRowsLimit = StringNumberUtil.parseInt(maxRowsText.getText(), 0);
+                Triple<List<String>, List<Class<?>>, List<Object[]>> orignQueryResult = JdbcDBUtil.queryForList_customColumns(param.getQuestionSql(), parameterList.toArray(),
+                        getDataSource().getConnection(), true, maxRowsLimit);
+
+                createRecordWatcher(orignQueryResult, param.getQuestionSql(), parameterList.toArray(), true, maxRowsLimit);
+
+                mSqlIdColumnHolder.setColumns(mSqlIdColumnHolder.getSqlId(), orignQueryResult.getLeft());
+
+                queryList = orignQueryResult;
+
+                // 切換查詢結果
+                if (!queryList.getRight().isEmpty()) {
+                    tabbedPane.setSelectedIndex(3);
+                }
+
+                queryModeProcess(queryList, false, Pair.of(param, parameterList), null);
+
+                showJsonArry(queryList, 1000, null);
+
+                // 過濾欄位apply
+                if (StringUtils.isNotBlank(rowFilterText.getText())) {
+                    rowFilterTextDoFilter.run();
+                }
+            } else if (updateSqlRadio.isSelected()) {
+                int modifyResult = JdbcDBUtil.modify(param.questionSql, parameterList.toArray(), getDataSource().getConnection(), true);
+                JCommonUtil._jOptionPane_showMessageDialog_info("update : " + modifyResult);
+            }
+
+            // 設定欄位解釋定義
+            setupCustomColumnDefExcelChinese();
+
+            // 儲存參數設定
+            saveParameterTableConfig(false);
+
+            // 儲存sqlId mapping dataSource 設定
+            sqlIdListDSMappingHandler.store(true);
+
+            // 設定預設欄位定義
+            setCustomColumnTitleTooltip();
+            // 設定預設欄位代碼定義
+            setCustomColumnCodeValueTooptip();
+
+            // 設定新開視窗預設值
+            if (TAB_UI1 != null) {
+                TAB_UI1.getResourcesPool().put("sqlPageDbConnCombox", sqlPageDbConnCombox.getSelectedItem());
+            }
+        } catch (Exception ex) {
+            queryResultTable.setModel(JTableUtil.createModel(true, "ERROR"));
+            String category = refSearchCategoryCombobox_Auto.getTextComponent().getText();
+            String findMessage = refSearchListConfigHandler.findExceptionMessage(category, ex.getMessage());
+            // 一般顯示
+            if (StringUtils.isBlank(findMessage)) {
+                JCommonUtil.handleException(ex);
+            } else {
+                // html顯示
+                JCommonUtil.handleException(String.format("參考 : %s", findMessage), ex, true, "", "yyyyMMdd", false, true);
+            }
+        } finally {
+            BigDecimal duringTime = new BigDecimal(System.currentTimeMillis() - startTime).divide(new BigDecimal(1000), 3, BigDecimal.ROUND_HALF_EVEN);
+            queryResultTimeLbl.setText("查詢耗時:  " + duringTime + " 秒");
+            JTableUtil.newInstance(queryResultTable).setRowHeightByFontSize();
         }
-        new ExecuteSqlButtonClickGo().execute();
     }
 
     private void setupCustomColumnDefExcelChinese() {
@@ -4024,8 +4029,9 @@ public class FastDBQueryUI extends JFrame {
                             sql = StringUtils.join(lst, "  ");
                             StringBuffer sb = new StringBuffer();
                             Matcher mth = ptn.matcher(sql);
+                            String space = JTextAreaUtil.getSpaceOfCaretPositionLine(sqlTextArea);
                             while (mth.find()) {
-                                mth.appendReplacement(sb, "\r\n" + mth.group(1));
+                                mth.appendReplacement(sb, "\r\n" + space + mth.group(1));
                             }
                             mth.appendTail(sb);
                             return sb.toString();
@@ -4053,13 +4059,37 @@ public class FastDBQueryUI extends JFrame {
                             if (StringUtils.isBlank(tableName)) {
                                 tableName = "TABLE_NAME";
                             }
+                            String space = JTextAreaUtil.getSpaceOfCaretPositionLine(sqlTextArea);
                             StringBuilder sb = new StringBuilder();
-                            sb.append("\t\r\n");
-                            sb.append("\t\r\n");
-                            sb.append("\tselect t.* \r\n");
-                            sb.append("\tfrom ").append(tableName).append(" t \r\n");
-                            sb.append("\twhere 1=1 \r\n");
-                            sb.append("\t\r\n");
+                            sb.append(space).append("\r\n");
+                            sb.append(space).append("\r\n");
+                            sb.append(space).append("select t.* \r\n");
+                            sb.append(space).append("from ").append(tableName).append(" t \r\n");
+                            sb.append(space).append("where 1=1 \r\n");
+                            sb.append(space).append("\r\n");
+                            String prefix = StringUtils.substring(sqlTextArea.getText(), 0, sqlTextArea.getSelectionStart());
+                            String suffix = StringUtils.substring(sqlTextArea.getText(), sqlTextArea.getSelectionEnd());
+                            sqlTextArea.setText(prefix + sb + suffix);
+                        }
+                    })//
+                    .addJMenuItem("SQL 基礎 Select column append", new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            String fromAlias = StringUtils.trimToEmpty(JCommonUtil._jOptionPane_showInputDialog("輸入來源alias", "t"));
+                            if (StringUtils.isNotBlank(fromAlias)) {
+                                fromAlias = fromAlias + ".";
+                            }
+                            String selection = sqlTextArea.getSelectedText();
+                            if (StringUtils.isBlank(selection)) {
+                                return;
+                            }
+                            StringBuilder sb = new StringBuilder();
+                            Pattern ptn = Pattern.compile("[\\w+\\.]+");
+                            Matcher mth = ptn.matcher(selection);
+                            String space = JTextAreaUtil.getSpaceOfCaretPositionLine(sqlTextArea);
+                            while (mth.find()) {
+                                sb.append(space).append(fromAlias + mth.group()).append(" /**/, \r\n");
+                            }
                             String prefix = StringUtils.substring(sqlTextArea.getText(), 0, sqlTextArea.getSelectionStart());
                             String suffix = StringUtils.substring(sqlTextArea.getText(), sqlTextArea.getSelectionEnd());
                             sqlTextArea.setText(prefix + sb + suffix);
@@ -4072,13 +4102,14 @@ public class FastDBQueryUI extends JFrame {
                             if (StringUtils.isBlank(tableName)) {
                                 tableName = "TABLE_NAME";
                             }
+                            String space = JTextAreaUtil.getSpaceOfCaretPositionLine(sqlTextArea);
                             StringBuilder sb = new StringBuilder();
-                            sb.append("\t\r\n");
-                            sb.append("\t\r\n");
-                            sb.append("\tupdate ").append(tableName).append(" t \r\n");
-                            sb.append("\tset t.AAAAAAA = 'xxxxxx' ").append(" t \r\n");
-                            sb.append("\twhere t.AAAAAAA = 'xxxxxx' \r\n");
-                            sb.append("\t\r\n");
+                            sb.append(space).append("\r\n");
+                            sb.append(space).append("\r\n");
+                            sb.append(space).append("update ").append(tableName).append(" t \r\n");
+                            sb.append(space).append("set t.AAAAAAA = 'xxxxxx' ").append(" t \r\n");
+                            sb.append(space).append("where t.AAAAAAA = 'xxxxxx' \r\n");
+                            sb.append(space).append("\r\n");
                             String prefix = StringUtils.substring(sqlTextArea.getText(), 0, sqlTextArea.getSelectionStart());
                             String suffix = StringUtils.substring(sqlTextArea.getText(), sqlTextArea.getSelectionEnd());
                             sqlTextArea.setText(prefix + sb + suffix);
@@ -4112,7 +4143,8 @@ public class FastDBQueryUI extends JFrame {
                                 orignLst.add(mth.group());
                             }
                             String alais = orignLst.get(1);
-                            sb.append("\t  left join " + orignLst.get(0) + " " + alais + " on ");//
+                            String space = JTextAreaUtil.getSpaceOfCaretPositionLine(sqlTextArea);
+                            sb.append(space).append("left join " + orignLst.get(0) + " " + alais + " on ");//
                             if (orignLst.size() >= 3) {
                                 for (int ii = 2; ii < orignLst.size(); ii++) {
                                     condLst.add(" " + alais + "." + orignLst.get(ii) + " = " + fromAlias + orignLst.get(ii));//
@@ -4134,9 +4166,10 @@ public class FastDBQueryUI extends JFrame {
                             StringBuilder sb = new StringBuilder();
                             Pattern ptn = Pattern.compile("[\\w+\\.]+");
                             Matcher mth = ptn.matcher(selection);
+                            String space = JTextAreaUtil.getSpaceOfCaretPositionLine(sqlTextArea);
                             while (mth.find()) {
                                 String cond = mth.group();
-                                sb.append("\t   and ").append(cond).append(" = 'XXXXXXXXXX'   \r\n");
+                                sb.append(space).append(" and ").append(cond).append(" = 'XXXXXXXXXX'   \r\n");
                             }
                             String prefix = StringUtils.substring(sqlTextArea.getText(), 0, sqlTextArea.getSelectionStart());
                             String suffix = StringUtils.substring(sqlTextArea.getText(), sqlTextArea.getSelectionEnd());
@@ -4153,9 +4186,10 @@ public class FastDBQueryUI extends JFrame {
                             StringBuilder sb = new StringBuilder();
                             Pattern ptn = Pattern.compile("[\\w+\\.]+");
                             Matcher mth = ptn.matcher(selection);
+                            String space = JTextAreaUtil.getSpaceOfCaretPositionLine(sqlTextArea);
                             while (mth.find()) {
                                 String cond = mth.group();
-                                sb.append("\t [  and ").append(cond).append(" = :").append(cond).append("  ] \r\n");
+                                sb.append(space).append(" [  and ").append(cond).append(" = :").append(cond).append("  ] \r\n");
                             }
                             String prefix = StringUtils.substring(sqlTextArea.getText(), 0, sqlTextArea.getSelectionStart());
                             String suffix = StringUtils.substring(sqlTextArea.getText(), sqlTextArea.getSelectionEnd());
@@ -5954,9 +5988,10 @@ public class FastDBQueryUI extends JFrame {
         }
     }
 
-    private void startRecordWatcher(boolean isStart) {
+    private void startRecordWatcher() {
         boolean allOk = false;
-        if (isStart) {
+        // 啟動
+        if (ArrayUtils.contains(new String[] { "監聽", "監聽off" }, recordWatcherToggleBtn.getText())) {
             if (this.queryList != null) {
                 if (mRecordWatcher.get() != null && //
                         (mRecordWatcher.get().getState() == Thread.State.NEW)) {
@@ -5979,7 +6014,7 @@ public class FastDBQueryUI extends JFrame {
                             } else {
                                 mRecordWatcher.get().setPkIndexLst(pkIndexLst);
                                 mRecordWatcher.get().start();
-                                recordWatcherToggleBtn.setText("監聽on");
+                                recordWatcherToggleBtn.setText("監聽ing");
                             }
                         }
                     }, new ActionListener() {
@@ -5994,10 +6029,12 @@ public class FastDBQueryUI extends JFrame {
             if (!allOk) {
                 JCommonUtil._jOptionPane_showMessageDialog_error("請重新查詢");
             }
-        } else {
+        } else if (ArrayUtils.contains(new String[] { "監聽ing" }, recordWatcherToggleBtn.getText())) {
             if (mRecordWatcher.get() != null) {
                 mRecordWatcher.get().doStop(true);
             }
+        } else {
+            System.out.println("怪怪的....");
         }
     }
 
@@ -6017,7 +6054,6 @@ public class FastDBQueryUI extends JFrame {
         }, 1000, fileMiddleName, TAB_UI1.getSysTrayUtil(), new Transformer() {
             @Override
             public Object transform(Object input) {
-                recordWatcherToggleBtn.setSelected(false);
                 recordWatcherToggleBtn.setText("監聽off");
                 Map<String, Object> map = (Map<String, Object>) input;
                 Throwable ex = (Throwable) map.get("ex");

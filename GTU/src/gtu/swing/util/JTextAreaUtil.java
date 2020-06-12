@@ -337,6 +337,36 @@ public class JTextAreaUtil {
         DefaultCaret caret = (DefaultCaret) textArea.getCaret();
         caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
     }
+    
+    public static String getSpaceOfCaretPositionLine(final JTextComponent textArea) {
+        String prefixLine = "";
+        LineNumberReader reader = null;
+        try {
+            String text = StringUtils.substring(StringUtils.defaultString(textArea.getText()), 0, textArea.getCaretPosition());
+            reader = new LineNumberReader(new StringReader(text));
+            String lastLine = "";
+            int lastLineNumber = 0;
+            for (String line = null; (line = reader.readLine()) != null;) {
+                lastLine = line;
+                lastLineNumber = reader.getLineNumber();
+            }
+            System.out.println("換行 ： " + lastLineNumber);
+            Pattern ptn = Pattern.compile("^[\\s\t]+");
+            Matcher mth = ptn.matcher(lastLine);
+            if (mth.find()) {
+                prefixLine = mth.group();
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        } finally {
+            try {
+                reader.close();
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+        }
+        return prefixLine;
+    }
 
     public static void applyTextAreaPosition(final JTextComponent textArea, final JLabel lbl4Position) {
         final Callable<String> call = new Callable<String>() {
