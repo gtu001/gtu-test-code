@@ -62,7 +62,7 @@ public class SwingTabTemplateUI {
             callback.beforeInit(this);
         }
         // jframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//        jframe.setBounds(100, 100, 450, 300);
+        // jframe.setBounds(100, 100, 450, 300);
         contentPane = new JPanel();
         contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
         jframe.setContentPane(contentPane);
@@ -194,7 +194,7 @@ public class SwingTabTemplateUI {
         }
     }
 
-    public void setWindowCloseEvent(ActionListener closeListener) {
+    public void setWindowCloseEvent(final ActionListener closeListener) {
         jframe.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         jframe.addWindowListener(new WindowAdapter() {
             public void windowClosed(WindowEvent e) {
@@ -208,6 +208,7 @@ public class SwingTabTemplateUI {
                         closeListener.actionPerformed(new ActionEvent(SwingTabTemplateUI.this, -1, "doClose"));
                     }
                     JFrameUtil.setVisible(false, jframe);
+                    jframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                 }
             }
         });
@@ -271,6 +272,10 @@ public class SwingTabTemplateUI {
     public void setSize(int width, int height) {
         jframe.setSize(new Dimension(width, height));
         JCommonUtil.setJFrameCenter(jframe);
+    }
+
+    public void setPosition(int x, int y) {
+        jframe.setBounds(x, y, jframe.getBounds().width, jframe.getBounds().height);
     }
 
     public void addTab(String tabName) {

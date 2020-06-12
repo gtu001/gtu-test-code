@@ -171,7 +171,8 @@ public class JProgressBarHelper {
     }
 
     // 設定關閉事件
-    private void applyOnCloseEvent(JDialog dlg) {
+    private void applyOnCloseEvent(final JDialog dlg) {
+        dlg.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
         dlg.addWindowListener(new WindowAdapter() {
             public void windowClosed(WindowEvent e) {
                 System.out.println("jdialog window closed event received");
@@ -181,7 +182,7 @@ public class JProgressBarHelper {
                 boolean isDoClose = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("確定要取消 : " + title, "取消 : " + title);
                 if (isDoClose) {
                     closeListener.actionPerformed(new ActionEvent(JProgressBarHelper.this, -1, "doClose"));
-                    dismiss();
+                    dlg.setDefaultCloseOperation(JDialog.EXIT_ON_CLOSE);
                 }
             }
         });
@@ -241,7 +242,6 @@ public class JProgressBarHelper {
         if (this.closeListener == null) {
             dlg.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         } else {
-            dlg.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
             applyOnCloseEvent(dlg);
         }
         return this;

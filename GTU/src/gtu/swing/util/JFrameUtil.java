@@ -54,6 +54,7 @@ public class JFrameUtil {
         frame.setTitle(clz.getSimpleName());
         frame.setLayout(new FlowLayout());
         // frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(new Dimension(300, 150));
         JCommonUtil.setJFrameCenter(frame);
         return frame;
     }

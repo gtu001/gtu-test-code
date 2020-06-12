@@ -408,7 +408,7 @@ public class FastDBQueryUI extends JFrame {
             System.out.println("=====" + info.getClassName());
             // javax.swing.UIManager.setLookAndFeel(info.getClassName());
         }
-        SwingTabTemplateUI tabUI = SwingTabTemplateUI.newInstance(null, ICO_FILENAME, FastDBQueryUI.class, true, new SwingTabTemplateUI.SwingTabTemplateUI_Callback() {
+        final SwingTabTemplateUI tabUI = SwingTabTemplateUI.newInstance(null, ICO_FILENAME, FastDBQueryUI.class, true, new SwingTabTemplateUI.SwingTabTemplateUI_Callback() {
             @Override
             public void beforeInit(SwingTabTemplateUI self) {
                 if (jFrameRGBColorPanel.get() == null) {
@@ -433,10 +433,13 @@ public class FastDBQueryUI extends JFrame {
                 }
             }
         });
-        tabUI.getJframe().addComponentListener(new ComponentAdapter() {
-            public void componentResized(ComponentEvent evt) {
+        tabUI.setWindowCloseEvent(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
                 defaultConfig.getConfigProp().put("frame_w", String.valueOf(tabUI.getJframe().getBounds().width));
                 defaultConfig.getConfigProp().put("frame_h", String.valueOf(tabUI.getJframe().getBounds().height));
+                defaultConfig.getConfigProp().put("frame_x", String.valueOf(tabUI.getJframe().getBounds().x));
+                defaultConfig.getConfigProp().put("frame_y", String.valueOf(tabUI.getJframe().getBounds().y));
                 defaultConfig.store();
             }
         });
@@ -447,6 +450,11 @@ public class FastDBQueryUI extends JFrame {
         } else {
             java.awt.Dimension scr_size = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
             tabUI.setSize((int) (scr_size.width * 0.8), (int) (scr_size.height * 0.8));
+        }
+        if (defaultConfig.getConfigProp().containsKey("frame_x") && defaultConfig.getConfigProp().containsKey("frame_y")) {
+            int x = Integer.parseInt(defaultConfig.getConfigProp().getProperty("frame_x"));
+            int y = Integer.parseInt(defaultConfig.getConfigProp().getProperty("frame_y"));
+            tabUI.setPosition(x, y);
         }
 
         tabUI.startUI();
