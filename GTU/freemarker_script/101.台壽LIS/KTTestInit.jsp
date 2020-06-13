@@ -363,7 +363,6 @@
     	var config = {
     		gridId : gridId
     	}
-    	
     	var getMaxRowNo = function() {
     		var maxRow = 0;
     		var testInput = $("[name^=" + config.gridId + "]");
@@ -376,21 +375,34 @@
 	    	}
 	    	return maxRow;
     	};
-    	
     	var getMappingCellInput = function(rowNo, cellNo) {
     		return $("#" + config.gridId + cellNo + "r" + rowNo);
     	};
-    	
     	var getMappingCellInputFromObj = function(refElement, cellNo) {
     		var mth = /.*?r(\d+)/.exec($(refElement).attr("id"));
     		var rowNo = parseFloat(mth[1], 10);
     		return getMappingCellInput(rowNo, cellNo);
     	};
-    	
+    	var getCheckbox = function(rowNo) {
+    		return $("#" + config.gridId + "Chk" + rowNo);
+    	};
+    	var getSelectedRowNoArry = function() {
+    		var arry = new Array();
+    		for(var rowNo = 0 ; rowNo <= getMaxRowNo() ; rowNo ++) {
+    			if($("#" + config.gridId + "Sel" + rowNo).is(":checked")){
+    				arry.push(rowNo);
+    			}else if($("#" + config.gridId + "Chk" + rowNo).is(":checked")){
+    				arry.push(rowNo);
+    			}
+    		}
+    		return arry;
+    	};
     	return {
     		getMaxRowNo : getMaxRowNo,
     		getMappingCellInput : getMappingCellInput,
-    		getMappingCellInputFromObj : getMappingCellInputFromObj
+    		getMappingCellInputFromObj : getMappingCellInputFromObj,
+    		getCheckbox : getCheckbox,
+    		getSelectedRowNoArry : getSelectedRowNoArry
     	}
     }
 </script>
