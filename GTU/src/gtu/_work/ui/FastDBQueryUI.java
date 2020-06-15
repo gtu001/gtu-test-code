@@ -2740,9 +2740,13 @@ public class FastDBQueryUI extends JFrame {
         selectionBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                JTableUtil.newInstance(queryResultTable).setRowSelection();
-                String lbl = selectionBtn.isSelected() ? "選了" : "取消了";
-                System.out.println(lbl + "..." + selectionBtn.getText());
+                Triple<JToggleButton, Integer, Integer> triple = (Triple<JToggleButton, Integer, Integer>) e.getSource();
+                JToggleButton btn = triple.getLeft();
+                int row = triple.getMiddle();
+                int column = triple.getRight();
+                JTableUtil.newInstance(queryResultTable).setRowSelection(row);
+                String lbl = btn.isSelected() ? "選了" : "取消了";
+                System.out.println(lbl + "..." + btn.getText());
             }
         });
         return selectionBtn;

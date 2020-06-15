@@ -336,7 +336,13 @@ public class JTableUtil {
                 if (row < table.getRowCount() && row >= 0 && column < table.getColumnCount() && column >= 0) {
                     Object value = table.getValueAt(row, column);
                     if (value instanceof AbstractButton) {
-                        ((AbstractButton) value).doClick();
+                        // ((AbstractButton) value).doClick();
+                        ActionListener[] listeners = ((AbstractButton) value).getActionListeners();
+                        if (listeners != null && listeners.length > 0) {
+                            for (ActionListener listener : listeners) {
+                                listener.actionPerformed(new ActionEvent(Triple.of(value, row, column), -1, "btn_row_column"));
+                            }
+                        }
                     }
                 }
             }
@@ -348,7 +354,7 @@ public class JTableUtil {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 if (value == null || !(value instanceof AbstractButton)) {
-                    throw new RuntimeException("無法被設定為Button : " + value);
+                    throw new RuntimeException("無法被設定為Button : " + value + " , row " + row + " , column " + column + " , isSelected " + isSelected);
                 }
                 AbstractButton button = (AbstractButton) value;
                 return button;
@@ -2026,6 +2032,11 @@ public class JTableUtil {
             minPos = Math.min(minPos, i);
         }
         table.setRowSelectionInterval(minPos, maxPos);
+        table.setColumnSelectionInterval(0, table.getColumnCount() - 1);
+    }
+
+    public void setRowSelection(int rowIdx) {
+        table.setRowSelectionInterval(rowIdx, rowIdx);
         table.setColumnSelectionInterval(0, table.getColumnCount() - 1);
     }
 

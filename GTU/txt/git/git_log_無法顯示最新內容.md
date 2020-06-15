@@ -11,6 +11,6 @@
 在顯示log 顯示沒有任何 log 
 要重新 checkout branch
  
- $ git checkout -f --no-track -b <本地branch> <遠端branch>
+ $ git checkout -f --no-track -b <本地branch> <遠端branch> --
  Ex :
  $ git checkout -f --no-track -b feature/#NCSPOS-T028 remotes/origin/Feature/#NCSPOS-T028 --
