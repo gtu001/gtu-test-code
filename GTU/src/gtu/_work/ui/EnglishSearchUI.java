@@ -194,6 +194,7 @@ public class EnglishSearchUI extends JFrame {
     private DialogTitleUpdaterObervable dialogObervable = new DialogTitleUpdaterObervable();
     private EnglishIdDropdownHandler mEnglishIdDropdownHandler;
     private JFrameRGBColorPanel jFrameRGBColorPanel;
+    private SimpleCheckListDlg mSimpleCheckListDlg;
 
     /**
      * Launch the application.
@@ -1617,11 +1618,25 @@ public class EnglishSearchUI extends JFrame {
                             }
                         }
                         if (!wordMap.isEmpty()) {
-                            SimpleCheckListDlg.newInstance("相似單字", wordMap, new ActionListener() {
+                            if (mSimpleCheckListDlg != null) {
+                                mSimpleCheckListDlg.setVisible(false);
+                            }
+                            mSimpleCheckListDlg = SimpleCheckListDlg.newInstance("相似單字", wordMap, new ActionListener() {
                                 @Override
                                 public void actionPerformed(ActionEvent e) {
                                     List<String> wordLst2 = ((SimpleCheckListDlg) e.getSource()).getCheckedList();
                                     if (!wordLst2.isEmpty()) {
+                                        String deleteWord = StringUtils.trimToEmpty(searchEnglishIdText_auto.getTextComponent().getText());
+                                        try {
+                                            writeNewData2(deleteWord, true);
+                                        } catch (IOException e1) {
+                                            e1.printStackTrace();
+                                        }
+                                        try {
+                                            writeNewData2(wordLst2.get(0), false);
+                                        } catch (IOException e1) {
+                                            e1.printStackTrace();
+                                        }
                                         searchEnglishIdText_auto.getTextComponent().setText(wordLst2.get(0));
                                     }
                                 }

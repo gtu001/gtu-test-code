@@ -379,6 +379,7 @@ public class FastDBQueryUI extends JFrame {
     private JLabel columnXlsDefFindRowCountLbl;
     private JCheckBox radio_export_excel_ignoreNull;
     private UndoSaveHanlder mUndoSaveHanlder;
+    private FastDBQueryUI_RowDiffWatcherDlg mFastDBQueryUI_RowDiffWatcherDlg;
 
     private final Predicate IGNORE_PREDICT = new Predicate() {
         @Override
@@ -6004,7 +6005,10 @@ public class FastDBQueryUI extends JFrame {
                 if (mRecordWatcher.get() != null && //
                         (mRecordWatcher.get().getState() == Thread.State.NEW)) {
                     allOk = true;
-                    FastDBQueryUI_RowDiffWatcherDlg mFastDBQueryUI_RowDiffWatcherDlg = FastDBQueryUI_RowDiffWatcherDlg.newInstance(this.queryList.getLeft(), new ActionListener() {
+                    if (mFastDBQueryUI_RowDiffWatcherDlg != null) {
+                        mFastDBQueryUI_RowDiffWatcherDlg.setVisible(false);
+                    }
+                    mFastDBQueryUI_RowDiffWatcherDlg = FastDBQueryUI_RowDiffWatcherDlg.newInstance(this.queryList.getLeft(), new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
                             FastDBQueryUI_RowDiffWatcherDlg dlg = (FastDBQueryUI_RowDiffWatcherDlg) e.getSource();
