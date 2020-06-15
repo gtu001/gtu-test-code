@@ -59,7 +59,6 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
@@ -464,6 +463,21 @@ public class JTableUtil {
     public void setRowHeightByFontSize() {
         Dimension dim = JTextFieldUtil.getTextBoundary("測", table.getFont());
         table.setRowHeight((int) dim.getHeight());
+    }
+
+    /**
+     * 取得某筆資料
+     */
+    public static List<Object> getRowData(int realRowIdx, int[] ignoreColIdxs, JTable jtable) {
+        Vector vector = (Vector) (((DefaultTableModel) jtable.getModel()).getDataVector().get(realRowIdx));
+        List<Object> lst = new ArrayList<Object>();
+        for (int ii = 0; ii < vector.size(); ii++) {
+            if (ignoreColIdxs != null && ArrayUtils.contains(ignoreColIdxs, ii)) {
+                continue;
+            }
+            lst.add(vector.get(ii));
+        }
+        return lst;
     }
 
     public void columnIsComponent(int index, JComponent component) {
@@ -1675,6 +1689,19 @@ public class JTableUtil {
         for (int ii = 0; ii < titleModel.getColumnCount(); ii++) {
             TableColumn col = titleModel.getColumn(ii);
             titles.add(col.getHeaderValue());
+        }
+        return titles;
+    }
+
+    public List<String> getColumnTitleStringArray(int[] ignoreColIdxes) {
+        List<String> titles = new ArrayList<String>();
+        List<Object> titles2 = getColumnTitleArray();
+        for (int ii = 0; ii < titles2.size(); ii++) {
+            if (ignoreColIdxes != null && ArrayUtils.contains(ignoreColIdxes, ii)) {
+                continue;
+            }
+            Object t = titles2.get(ii);
+            titles.add(String.valueOf(t));
         }
         return titles;
     }

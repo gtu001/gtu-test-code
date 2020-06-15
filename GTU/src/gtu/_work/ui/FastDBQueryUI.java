@@ -8,8 +8,6 @@ import java.awt.EventQueue;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyAdapter;
@@ -70,7 +68,6 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.JToolTip;
-import javax.swing.SwingWorker;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.MenuKeyEvent;
@@ -380,6 +377,7 @@ public class FastDBQueryUI extends JFrame {
     private JCheckBox radio_export_excel_ignoreNull;
     private UndoSaveHanlder mUndoSaveHanlder;
     private FastDBQueryUI_RowDiffWatcherDlg mFastDBQueryUI_RowDiffWatcherDlg;
+    private FastDBQueryUI_RowCompareDlg_Ver2 mFastDBQueryUI_RowCompareDlg_Ver2;
 
     private final Predicate IGNORE_PREDICT = new Predicate() {
         @Override
@@ -2738,11 +2736,13 @@ public class FastDBQueryUI extends JFrame {
     }
 
     private JToggleButton createSelectionBtn(int serialNo) {
-        JToggleButton selectionBtn = new JToggleButton(String.valueOf((serialNo)));
+        final JToggleButton selectionBtn = new JToggleButton(String.valueOf((serialNo)));
         selectionBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 JTableUtil.newInstance(queryResultTable).setRowSelection();
+                String lbl = selectionBtn.isSelected() ? "選了" : "取消了";
+                System.out.println(lbl + "..." + selectionBtn.getText());
             }
         });
         return selectionBtn;
@@ -3337,6 +3337,44 @@ public class FastDBQueryUI extends JFrame {
                     public void actionPerformed(ActionEvent e) {
                         try {
                             d.openXLS_COMPARE();
+                        } catch (Exception ex) {
+                            JCommonUtil.handleException(ex);
+                        }
+                    }
+                });//
+
+                ppap.addJMenuItem("任兩筆資料比對", new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        try {
+                            List<String> rowLabelLst = new ArrayList<String>();
+                            List<List<Object>> rows = new ArrayList<List<Object>>();
+                            List<Integer> rowLst = new ArrayList<Integer>();
+                            for (int ii = 0; ii < queryResultTable.getRowCount(); ii++) {
+                                int rowIdx = JTableUtil.getRealRowPos(ii, queryResultTable);
+                                Object v = JTableUtil.newInstance(queryResultTable).getValueAt(false, rowIdx, 0);
+                                if (v instanceof JToggleButton && ((JToggleButton) v).isSelected()) {
+                                    rowLst.add(rowIdx);
+                                    rowLabelLst.add(((JToggleButton) v).getText());
+                                    rows.add(JTableUtil.getRowData(rowIdx, new int[] { 0 }, queryResultTable));
+                                }
+                            }
+                            if (rowLst.size() != 2) {
+                                JCommonUtil._jOptionPane_showMessageDialog_error("請選擇兩筆!");
+                                return;
+                            }
+                            List<String> titles = JTableUtil.newInstance(queryResultTable).getColumnTitleStringArray(new int[] { 0 });
+                            if (mFastDBQueryUI_RowCompareDlg_Ver2 != null) {
+                                mFastDBQueryUI_RowCompareDlg_Ver2.dispose();
+                            }
+                            mFastDBQueryUI_RowCompareDlg_Ver2 = FastDBQueryUI_RowCompareDlg_Ver2.newInstance(titles, //
+                                    "No." + rowLabelLst.get(0), "No." + rowLabelLst.get(1), //
+                                    rows.get(0), rows.get(1), //
+                                    new ActionListener() {
+                                        @Override
+                                        public void actionPerformed(ActionEvent e) {
+                                        }
+                                    }, FastDBQueryUI.this);
                         } catch (Exception ex) {
                             JCommonUtil.handleException(ex);
                         }

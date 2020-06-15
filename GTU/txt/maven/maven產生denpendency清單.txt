@@ -1,9 +1,15 @@
 
+產生階層樹: ＊＊重要＊＊
+mvn dependency:tree
+
+
 產生jar檔 :
 mvn dependency:copy-dependencies -DincludeScope=runtime
 
+
 列出jar檔清單 : 
 mvn dependency:build-classpath -DincludeScope=runtime -Dmdep.outputFile=d:/gtu_test_classpath.txt
+
 
 
  產生dependency jar檔清單  --> mvn generate-sources 
@@ -24,6 +30,8 @@ mvn dependency:build-classpath -DincludeScope=runtime -Dmdep.outputFile=d:/gtu_t
 		</execution>
 	</executions>
 </plugin>
+
+
 
 匯出dependency jar檔 
 <plugin>
