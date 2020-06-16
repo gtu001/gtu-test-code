@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -490,6 +491,12 @@ public class FastDBQueryUI extends JFrame {
             @Override
             public JToolTip createToolTip() {
                 return JTooltipUtil.createToolTip(null, null);
+            }
+
+            public Point getToolTipLocation(MouseEvent e) {
+                int row = locationToIndex(e.getPoint());
+                Rectangle r = getCellBounds(row, row);
+                return new Point(e.getPoint().x + 100, r.y);// r.width
             }
         };
         sqlList.addMouseListener(new MouseAdapter() {
