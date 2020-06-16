@@ -3362,7 +3362,7 @@ public class FastDBQueryUI extends JFrame {
                             List<List<Object>> rows = new ArrayList<List<Object>>();
                             List<Integer> rowLst = new ArrayList<Integer>();
 
-                            final int[] selectRowIdxArry = JTableUtil.newInstance(queryResultTable).getSelectedRows(true);
+                            final int[] selectRowIdxArry = JTableUtil.newInstance(queryResultTable).getSelectedRows(false);
                             if (selectRowIdxArry != null && selectRowIdxArry.length == 2) {
                                 for (int ii : selectRowIdxArry) {
                                     int rowIdx = JTableUtil.getRealRowPos(ii, queryResultTable);
@@ -3436,8 +3436,8 @@ public class FastDBQueryUI extends JFrame {
                 }
             }
 
-            final int[] selectRowIdxArry = JTableUtil.newInstance(queryResultTable).getSelectedRows(true);
-            final int[] selectColIdxArry = JTableUtil.newInstance(queryResultTable).getSelectedColumns(true);
+            final int[] selectRowIdxArry = JTableUtil.newInstance(queryResultTable).getSelectedRows(false);
+            final int[] selectColIdxArry = JTableUtil.newInstance(queryResultTable).getSelectedColumns(false);
             JMenuAppender chdMenu = JMenuAppender.newInstance("保留已選欄/列");
             chdMenu.addMenuItem("只保留已選列 :" + selectRowIdxArry.length, new ActionListener() {
                 @Override

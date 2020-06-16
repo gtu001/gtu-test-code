@@ -354,7 +354,7 @@ public class JTableUtil {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 if (value == null || !(value instanceof AbstractButton)) {
-                    throw new RuntimeException("無法被設定為Button : " + value + " , row " + row + " , column " + column + " , isSelected " + isSelected);
+                    System.err.println("Warning : 無法被設定為Button : " + value + " , row " + row + " , column " + column + " , isSelected " + isSelected);
                 }
                 AbstractButton button = (AbstractButton) value;
                 return button;
@@ -2059,12 +2059,17 @@ public class JTableUtil {
         protected JTableHeader createDefaultTableHeader() {
             return new JTableHeader(columnModel) {
                 public String getToolTipText(MouseEvent e) {
-                    String tip = null;
-                    java.awt.Point p = e.getPoint();
-                    int index = columnModel.getColumnIndexAtX(p.x);
-                    int realIndex = columnModel.getColumn(index).getModelIndex();
-                    Object headerValue = columnModel.getColumn(index).getHeaderValue();
-                    return getColumnTooltips(realIndex, headerValue);
+                    try {
+                        String tip = null;
+                        java.awt.Point p = e.getPoint();
+                        int index = columnModel.getColumnIndexAtX(p.x);
+                        int realIndex = columnModel.getColumn(index).getModelIndex();
+                        Object headerValue = columnModel.getColumn(index).getHeaderValue();
+                        return getColumnTooltips(realIndex, headerValue);
+                    } catch (Throwable ex) {
+                        // ex.printStackTrace();
+                        return null;
+                    }
                 }
             };
         }
