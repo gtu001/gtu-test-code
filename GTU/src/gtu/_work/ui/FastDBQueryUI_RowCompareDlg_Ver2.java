@@ -2,56 +2,41 @@ package gtu._work.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.sql.SQLException;
+import java.io.File;
 import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicReference;
 
-import javax.swing.AbstractButton;
-import javax.swing.ButtonGroup;
-import javax.swing.DefaultCellEditor;
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
 import javax.swing.JDialog;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
-import javax.swing.JTextArea;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumn;
 
 import org.apache.commons.lang.ObjectUtils;
+import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.commons.lang3.tuple.Triple;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.hssf.util.HSSFColor;
+import org.apache.poi.hssf.util.HSSFColor.PINK;
+import org.apache.poi.ss.usermodel.Row;
 
 import gtu._work.ui.FastDBQueryUI_CrudDlgUI.DataType;
-import gtu.collection.MapUtil;
-import gtu.db.JdbcDBUtil;
-import gtu.db.jdbc.util.DBDateUtil;
-import gtu.db.sqlMaker.DbSqlCreater.TableInfo;
-import gtu.swing.util.JButtonGroupUtil;
+import gtu.file.FileUtil;
+import gtu.poi.hssf.ExcelUtil_Xls97;
+import gtu.poi.hssf.ExcelWriter;
+import gtu.poi.hssf.ExcelWriter.CellStyleHandler;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JTableUtil;
-import gtu.swing.util.JTextAreaUtil;
 
 public class FastDBQueryUI_RowCompareDlg_Ver2 extends JDialog {
 
@@ -60,7 +45,11 @@ public class FastDBQueryUI_RowCompareDlg_Ver2 extends JDialog {
     private JTable importRowTable;
     private JTabbedPane tabbedPane;
     private FastDBQueryUI _parent;
-    private JTable queryResultTable;
+    List<String> titleLst;
+    String row1Label;
+    String row2Label;
+    List<Object> row1;
+    List<Object> row2;
 
     /**
      * Launch the application.
@@ -80,6 +69,13 @@ public class FastDBQueryUI_RowCompareDlg_Ver2 extends JDialog {
         final FastDBQueryUI_RowCompareDlg_Ver2 dialog = new FastDBQueryUI_RowCompareDlg_Ver2();
         try {
             dialog._parent = _parent;
+
+            dialog.titleLst = titleLst;
+            dialog.row1Label = row1Label;
+            dialog.row2Label = row2Label;
+            dialog.row1 = row1;
+            dialog.row2 = row2;
+
             dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
             dialog.setVisible(true);
             DefaultTableModel model = dialog.initImportRowTable(row1Label, row2Label);
@@ -156,6 +152,15 @@ public class FastDBQueryUI_RowCompareDlg_Ver2 extends JDialog {
             JPanel buttonPane = new JPanel();
             buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
             getContentPane().add(buttonPane, BorderLayout.SOUTH);
+            {
+                JButton excelExportBtn = new JButton("匯出excel");
+                excelExportBtn.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent arg0) {
+                        exportExcelAction();
+                    }
+                });
+                buttonPane.add(excelExportBtn);
+            }
             {
                 JButton okButton = new JButton("OK");
                 okButton.setActionCommand("OK");
@@ -255,5 +260,74 @@ public class FastDBQueryUI_RowCompareDlg_Ver2 extends JDialog {
         }
         JTableUtil.newInstance(importRowTable).setRowHeightByFontSize();
         System.out.println("-------------init size : " + model.getRowCount());
+    }
+
+    private void exportExcelAction() {
+        try {
+            List<String> titleLst = this.titleLst;
+            String row1Label = this.row1Label;
+            String row2Label = this.row2Label;
+            List<Object> row1 = this.row1;
+            List<Object> row2 = this.row2;
+
+            ExcelUtil_Xls97 util = ExcelUtil_Xls97.getInstance();
+            HSSFWorkbook wb = new HSSFWorkbook();
+            HSSFSheet sheet = wb.createSheet("比對結果");
+
+            CellStyleHandler row0Cs = ExcelWriter.CellStyleHandler.newInstance(wb.createCellStyle())//
+                    .setForegroundColor(new HSSFColor.LAVENDER());
+            CellStyleHandler leftChangeCs = ExcelWriter.CellStyleHandler.newInstance(wb.createCellStyle())//
+                    .setForegroundColor(new HSSFColor.PINK());
+            CellStyleHandler leftCs = ExcelWriter.CellStyleHandler.newInstance(wb.createCellStyle())//
+                    .setForegroundColor(new HSSFColor.AQUA());
+            CellStyleHandler changeCs = ExcelWriter.CellStyleHandler.newInstance(wb.createCellStyle())//
+                    .setForegroundColor(new HSSFColor.YELLOW());
+            CellStyleHandler nonChangeCs = ExcelWriter.CellStyleHandler.newInstance(wb.createCellStyle())//
+                    .setForegroundColor(new HSSFColor.WHITE());
+
+            row0Cs.setSheet(sheet);
+            leftCs.setSheet(sheet);
+            changeCs.setSheet(sheet);
+            leftChangeCs.setSheet(sheet);
+            nonChangeCs.setSheet(sheet);
+
+            Row row0 = sheet.createRow(0);
+            util.getCellChk(row0, 0).setCellValue("欄位");
+            util.getCellChk(row0, 1).setCellValue(row1Label);
+            util.getCellChk(row0, 2).setCellValue(row2Label);
+            row0Cs.applyStyle(0, 0);
+            row0Cs.applyStyle(0, 1);
+            row0Cs.applyStyle(0, 2);
+
+            for (int ii = 0; ii < titleLst.size(); ii++) {
+                String title = titleLst.get(ii);
+                String value1 = String.valueOf(row1.get(ii));
+                String value2 = String.valueOf(row2.get(ii));
+
+                Row rowx = sheet.createRow(ii + 1);
+                util.getCellChk(rowx, 0).setCellValue(title);
+                util.getCellChk(rowx, 1).setCellValue(value1);
+                util.getCellChk(rowx, 2).setCellValue(value2);
+
+                if (!StringUtils.equals(value1, value2)) {
+                    leftChangeCs.applyStyle(ii + 1, 0);
+                    changeCs.applyStyle(ii + 1, 1);
+                    changeCs.applyStyle(ii + 1, 2);
+                } else {
+                    leftCs.applyStyle(ii + 1, 0);
+                    nonChangeCs.applyStyle(ii + 1, 1);
+                    nonChangeCs.applyStyle(ii + 1, 2);
+                }
+            }
+
+            util.setSheetWidth(sheet, new short[] { 8000, 13000, 13000 });
+            // util.autoCellSize(sheet);
+            String filename = FastDBQueryUI.class.getSimpleName() + "_" + DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMddHHmmss") + ".xls";
+            File xlsFile = new File(FileUtil.DESKTOP_DIR, filename);
+            util.writeExcel(xlsFile, wb);
+            JCommonUtil._jOptionPane_showMessageDialog_info("產生比對檔:" + filename);
+        } catch (Exception ex) {
+            JCommonUtil.handleException(ex);
+        }
     }
 }
