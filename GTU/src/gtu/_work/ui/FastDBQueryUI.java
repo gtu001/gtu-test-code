@@ -6294,11 +6294,13 @@ public class FastDBQueryUI extends JFrame {
                             Map<String, String> codeValMap = new HashMap<String, String>();
                             String[] arry = coleValueString.split(" ", -1);
                             for (String keyVal : arry) {
-                                String[] arry2 = keyVal.split("=", -1);
-                                String code = StringUtils.trimToEmpty(arry2[0]);
-                                if (StringUtils.isNotBlank(code)) {
-                                    String value = StringUtils.trimToEmpty(arry2[1]);
-                                    codeValMap.put(code, value);
+                                if (keyVal.contains("=")) {
+                                    String[] arry2 = keyVal.split("=", -1);
+                                    String code = StringUtils.trimToEmpty(arry2[0]);
+                                    if (StringUtils.isNotBlank(code)) {
+                                        String value = StringUtils.trimToEmpty(arry2[1]);
+                                        codeValMap.put(code, value);
+                                    }
                                 }
                             }
                             columnCodeValueMap.put(column, codeValMap);
