@@ -336,7 +336,7 @@ public class JTableUtil {
                 if (row < table.getRowCount() && row >= 0 && column < table.getColumnCount() && column >= 0) {
                     Object value = table.getValueAt(row, column);
                     if (value instanceof AbstractButton) {
-                        // ((AbstractButton) value).doClick();
+                        ((AbstractButton) value).setSelected(!((AbstractButton) value).isSelected());
                         ActionListener[] listeners = ((AbstractButton) value).getActionListeners();
                         if (listeners != null && listeners.length > 0) {
                             for (ActionListener listener : listeners) {

@@ -174,7 +174,6 @@ public class SwingTabTemplateUI {
         });
         jframe.addComponentListener(new ComponentAdapter() {
             public void componentResized(ComponentEvent evt) {
-                System.out.println("resize ----");
             }
         });
         contentPane.add(tabbedPane, BorderLayout.CENTER);

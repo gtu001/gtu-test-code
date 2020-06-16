@@ -3354,15 +3354,30 @@ public class FastDBQueryUI extends JFrame {
                             List<String> rowLabelLst = new ArrayList<String>();
                             List<List<Object>> rows = new ArrayList<List<Object>>();
                             List<Integer> rowLst = new ArrayList<Integer>();
-                            for (int ii = 0; ii < queryResultTable.getRowCount(); ii++) {
-                                int rowIdx = JTableUtil.getRealRowPos(ii, queryResultTable);
-                                Object v = JTableUtil.newInstance(queryResultTable).getValueAt(false, rowIdx, 0);
-                                if (v instanceof JToggleButton && ((JToggleButton) v).isSelected()) {
-                                    rowLst.add(rowIdx);
-                                    rowLabelLst.add(((JToggleButton) v).getText());
-                                    rows.add(JTableUtil.getRowData(rowIdx, new int[] { 0 }, queryResultTable));
+
+                            final int[] selectRowIdxArry = JTableUtil.newInstance(queryResultTable).getSelectedRows(true);
+                            if (selectRowIdxArry != null && selectRowIdxArry.length == 2) {
+                                for (int ii : selectRowIdxArry) {
+                                    int rowIdx = JTableUtil.getRealRowPos(ii, queryResultTable);
+                                    Object v = JTableUtil.newInstance(queryResultTable).getValueAt(false, rowIdx, 0);
+                                    if (v instanceof JToggleButton) {
+                                        rowLst.add(rowIdx);
+                                        rowLabelLst.add(((JToggleButton) v).getText());
+                                        rows.add(JTableUtil.getRowData(rowIdx, new int[] { 0 }, queryResultTable));
+                                    }
+                                }
+                            } else {
+                                for (int ii = 0; ii < queryResultTable.getRowCount(); ii++) {
+                                    int rowIdx = JTableUtil.getRealRowPos(ii, queryResultTable);
+                                    Object v = JTableUtil.newInstance(queryResultTable).getValueAt(false, rowIdx, 0);
+                                    if (v instanceof JToggleButton && ((JToggleButton) v).isSelected()) {
+                                        rowLst.add(rowIdx);
+                                        rowLabelLst.add(((JToggleButton) v).getText());
+                                        rows.add(JTableUtil.getRowData(rowIdx, new int[] { 0 }, queryResultTable));
+                                    }
                                 }
                             }
+
                             if (rowLst.size() != 2) {
                                 JCommonUtil._jOptionPane_showMessageDialog_error("請選擇兩筆!");
                                 return;
