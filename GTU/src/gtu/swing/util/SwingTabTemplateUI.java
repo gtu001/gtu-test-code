@@ -1,8 +1,10 @@
 package gtu.swing.util;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
@@ -20,6 +22,7 @@ import java.util.TreeMap;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -89,21 +92,25 @@ public class SwingTabTemplateUI {
             @Override
             public void mouseClicked(MouseEvent e) {
                 try {
+                    final int idx = tabbedPane.getSelectedIndex();
+                    final int clickTabIdx = getClickTabIndex(e);
+                    System.out.println("tab clk " + idx + " / " + clickTabIdx);
+
                     if (JMouseEventUtil.buttonRightClick(1, e)) {
                         JPopupMenuUtil popupUtil = JPopupMenuUtil.newInstance(tabbedPane);//
-                        final int idx = tabbedPane.getSelectedIndex();
-
-                        popupUtil.addJMenuItem("新增分頁", new ActionListener() {
-                            @Override
-                            public void actionPerformed(ActionEvent e) {
-                                String newName = JCommonUtil._jOptionPane_showInputDialog("新增分頁", "New Tab" + tabbedPane.getTabCount());
-                                if (StringUtils.isBlank(newName)) {
-                                    newName = "New Tab" + tabbedPane.getTabCount();
+                        if (clickTabIdx == -1) {
+                            popupUtil.addJMenuItem("新增分頁", new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    String newName = JCommonUtil._jOptionPane_showInputDialog("新增分頁", "New Tab" + tabbedPane.getTabCount());
+                                    if (StringUtils.isBlank(newName)) {
+                                        newName = "New Tab" + tabbedPane.getTabCount();
+                                    }
+                                    addTab(newName, true);
                                 }
-                                addTab(newName);
-                            }
-                        });//
-                        if (idx != -1) {
+                            });//
+                        }
+                        if (idx == clickTabIdx) {
                             popupUtil.addJMenuItem("移除分頁", new ActionListener() {
                                 @Override
                                 public void actionPerformed(ActionEvent e) {
@@ -114,30 +121,31 @@ public class SwingTabTemplateUI {
                                     }
                                 }
                             });//
-                            /*
-                             * popupUtil.addJMenuItem("修改分頁名子", new
-                             * ActionListener() {
-                             * 
-                             * @Override public void actionPerformed(ActionEvent
-                             * e) { String newName =
-                             * JCommonUtil._jOptionPane_showInputDialog(
-                             * "修改分頁名子", tabbedPane.getTitleAt(idx)); if
-                             * (StringUtils.isBlank(newName)) { return; }
-                             * tabbedPane.setTitleAt(idx, newName); } });//
-                             */
                         }
+                        /*
+                         * popupUtil.addJMenuItem("修改分頁名子", new ActionListener()
+                         * {
+                         * 
+                         * @Override public void actionPerformed(ActionEvent e)
+                         * { String newName =
+                         * JCommonUtil._jOptionPane_showInputDialog( "修改分頁名子",
+                         * tabbedPane.getTitleAt(idx)); if
+                         * (StringUtils.isBlank(newName)) { return; }
+                         * tabbedPane.setTitleAt(idx, newName); } });//
+                         */
 
                         popupUtil.applyEvent(e);
                         popupUtil.show();
                     }
 
                     if (JMouseEventUtil.buttonLeftClick(2, e)) {
-                        final int idx = tabbedPane.getSelectedIndex();
-                        String newName = JCommonUtil._jOptionPane_showInputDialog("修改分頁名子", tabbedPane.getTitleAt(idx));
-                        if (StringUtils.isBlank(newName)) {
-                            return;
+                        if (idx == clickTabIdx) {
+                            String newName = JCommonUtil._jOptionPane_showInputDialog("修改分頁名子", tabbedPane.getTitleAt(idx));
+                            if (StringUtils.isBlank(newName)) {
+                                return;
+                            }
+                            tabbedPane.setTitleAt(idx, newName);
                         }
-                        tabbedPane.setTitleAt(idx, newName);
                     }
                 } catch (Exception ex) {
                     JCommonUtil.handleException(ex);
@@ -184,7 +192,7 @@ public class SwingTabTemplateUI {
             this.setIcon(iconPath);
             this.setUITitle(title);
             if (initOneTab) {
-                this.addTab("New Tab");
+                this.addTab("New Tab", true);
             }
         }
 
@@ -277,7 +285,7 @@ public class SwingTabTemplateUI {
         jframe.setBounds(x, y, jframe.getBounds().width, jframe.getBounds().height);
     }
 
-    public void addTab(String tabName) {
+    public void addTab(String tabName, boolean moveToNew) {
         try {
             JFrame childFrame = (JFrame) this.uiJframeClass.newInstance();
             JPanel panel = new JPanel();
@@ -285,6 +293,9 @@ public class SwingTabTemplateUI {
             panel.setLayout(new BorderLayout(0, 0));
             panel.add(childFrame.getContentPane(), BorderLayout.CENTER);
             jframeKeeperLst.add(childFrame);
+            if (moveToNew) {
+                tabbedPane.setSelectedIndex(tabbedPane.getTabCount() - 1);
+            }
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
         }
@@ -319,5 +330,9 @@ public class SwingTabTemplateUI {
             idx = tabbedPane.getSelectedIndex();
         }
         tabbedPane.setTitleAt(idx, title);
+    }
+
+    public int getClickTabIndex(MouseEvent e) {
+        return tabbedPane.indexAtLocation(e.getX(), e.getY());
     }
 }

@@ -5345,6 +5345,10 @@ public class FastDBQueryUI extends JFrame {
 
             initLoadSqlListConfig();
             JCommonUtil._jOptionPane_showMessageDialog_info("已修正為 : " + bean.getUniqueKey());
+
+            if (TAB_UI1 != null) {
+                TAB_UI1.setTabTitle(null, sqlId);
+            }
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
         }
