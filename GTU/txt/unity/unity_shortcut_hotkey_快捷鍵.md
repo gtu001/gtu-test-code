@@ -5,3 +5,9 @@ unity_shortcut_hotkey_快捷鍵
 	V 按著 選物件邊角 靠近貼邊  <--常用
 
 	edit -> snap settings 快速移動物件
+
+
+
+	R = scale
+	E = rotate
+	W = move
