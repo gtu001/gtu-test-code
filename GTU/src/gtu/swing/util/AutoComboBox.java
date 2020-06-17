@@ -299,8 +299,11 @@ public class AutoComboBox extends PlainDocument {
     }
 
     public AutoComboBox applyComboxBoxList(List<String> lst, String defaultText, boolean doSort) {
+        if (lst == null) {
+            lst = new ArrayList<String>();
+        }
         this.dropdownLst = lst;
-        
+
         LinkedList<String> cloneLst = new LinkedList<String>(lst);
         for (int ii = 0; ii < cloneLst.size(); ii++) {
             if (StringUtils.isBlank(cloneLst.get(ii))) {
