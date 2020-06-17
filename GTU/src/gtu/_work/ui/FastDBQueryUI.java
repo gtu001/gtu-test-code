@@ -379,6 +379,10 @@ public class FastDBQueryUI extends JFrame {
     private UndoSaveHanlder mUndoSaveHanlder;
     private FastDBQueryUI_RowDiffWatcherDlg mFastDBQueryUI_RowDiffWatcherDlg;
     private FastDBQueryUI_RowCompareDlg_Ver2 mFastDBQueryUI_RowCompareDlg_Ver2;
+    private JLabel lblNewLabel_20;
+    private JComboBox sqlIdCategoryComboBox4Tab1;
+    private AutoComboBox sqlIdCategoryComboBox4Tab1_Auto;
+    private JLabel lblNewLabel_21;
 
     private final Predicate IGNORE_PREDICT = new Predicate() {
         @Override
@@ -535,6 +539,13 @@ public class FastDBQueryUI extends JFrame {
         sqlQueryText.setToolTipText("SQL ID標籤過濾");
         sqlQueryText.setColumns(15);
 
+        lblNewLabel_21 = new JLabel("類別過濾");
+        newPanel1.add(lblNewLabel_21);
+
+        sqlIdCategoryComboBox4Tab1 = new JComboBox();
+        sqlIdCategoryComboBox4Tab1_Auto = AutoComboBox.applyAutoComboBox(sqlIdCategoryComboBox4Tab1);
+        newPanel1.add(sqlIdCategoryComboBox4Tab1);
+
         lblNewLabel_4 = new JLabel("SQL ID過濾");
         newPanel1.add(lblNewLabel_4);
         newPanel1.add(sqlQueryText);
@@ -561,7 +572,7 @@ public class FastDBQueryUI extends JFrame {
 
         newPanel1.add(sqlMappingFilterText);
 
-        for (JTextComponent text : new JTextComponent[] { sqlQueryText, sqlContentFilterText, sqlMappingFilterText_Auto.getTextComponent() }) {
+        for (JTextComponent text : new JTextComponent[] { sqlQueryText, sqlContentFilterText, sqlMappingFilterText_Auto.getTextComponent(), sqlIdCategoryComboBox4Tab1_Auto.getTextComponent() }) {
             text.addFocusListener(new FocusAdapter() {
                 @Override
                 public void focusLost(FocusEvent e) {
@@ -2107,6 +2118,7 @@ public class FastDBQueryUI extends JFrame {
         sqlIdConfigBeanHandler.init(sqlIdCategoryComboBox_Auto.getTextComponent().getText());
         sqlIdListDSMappingHandler.init();
 
+        String categoryTextFilter = StringUtils.trimToEmpty(sqlIdCategoryComboBox4Tab1_Auto.getTextComponent().getText()).toLowerCase();
         String queryText = StringUtils.trimToEmpty(sqlQueryText.getText()).toLowerCase();
         String contentFilterText = StringUtils.trimToEmpty(sqlContentFilterText.getText()).toLowerCase();
         String mappingFilterText = StringUtils.trimToEmpty(sqlMappingFilterText_Auto.getTextComponent().getText()).toLowerCase();
@@ -2143,6 +2155,16 @@ public class FastDBQueryUI extends JFrame {
                 if (findOk) {
                     if (StringUtils.isNotBlank(sqlIdListDSMappingHandler.getProperty(sqlId)) && //
                             sqlIdListDSMappingHandler.getProperty(sqlId).toLowerCase().contains(mappingFilterText)) {
+                    } else {
+                        findOk = false;
+                    }
+                }
+            }
+
+            if (StringUtils.isNotBlank(categoryTextFilter)) {
+                if (findOk) {
+                    if (StringUtils.isNotBlank(category) && //
+                            category.toLowerCase().contains(categoryTextFilter)) {
                     } else {
                         findOk = false;
                     }
@@ -2321,6 +2343,9 @@ public class FastDBQueryUI extends JFrame {
 
             // 儲存變更
             setSqlListSelection(bean);
+
+            // 更新sqlList查詢頁面 category 下拉
+            sqlIdConfigBeanHandler.updateSqlIdCategoryComboBox4Tab1();
         } catch (Throwable ex) {
             JCommonUtil.handleException(ex);
         }
@@ -3086,7 +3111,9 @@ public class FastDBQueryUI extends JFrame {
     }
 
     private void changeTabUITitile(String title) {
-        TAB_UI1.setTabTitle(null, title);
+        if (TAB_UI1 != null) {
+            TAB_UI1.setTabTitle(null, title);
+        }
     }
 
     private void loadSqlIdMappingDataSourceConfig() {
@@ -4560,6 +4587,10 @@ public class FastDBQueryUI extends JFrame {
             ListUtil.sortIgnoreCase(lst);
             sqlIdCategoryComboBox_Auto.applyComboxBoxList(new ArrayList<String>(categoryLst), category);
         }
+
+        private void updateSqlIdCategoryComboBox4Tab1() {
+            sqlIdCategoryComboBox4Tab1_Auto.applyComboxBoxList(sqlIdCategoryComboBox_Auto.getDropdownList());
+        }
     }
 
     public static class SqlIdConfigBean {
@@ -5353,9 +5384,8 @@ public class FastDBQueryUI extends JFrame {
             initLoadSqlListConfig();
             JCommonUtil._jOptionPane_showMessageDialog_info("已修正為 : " + bean.getUniqueKey());
 
-            if (TAB_UI1 != null) {
-                TAB_UI1.setTabTitle(null, sqlId);
-            }
+            // 改變TabUI標題
+            changeTabUITitile(sqlId);
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
         }
@@ -5556,7 +5586,7 @@ public class FastDBQueryUI extends JFrame {
                 return false;
             }
         }
-        sqlIdConfigBeanHandler.init("");
+        sqlIdConfigBeanHandler.init(sqlIdCategoryComboBox_Auto.getTextComponent().getText());
         List<SqlIdConfigBean> lst = sqlIdConfigBeanHandler.lst;
         for (SqlIdConfigBean b : lst) {
             if (StringUtils.equalsIgnoreCase(b.sqlId, currentBean.sqlId)) {
@@ -6215,7 +6245,6 @@ public class FastDBQueryUI extends JFrame {
             }
         }
     };
-    private JLabel lblNewLabel_20;
 
     private class JDlgHolderBringToFrontHandler {
         LRUMap map = new LRUMap(10);

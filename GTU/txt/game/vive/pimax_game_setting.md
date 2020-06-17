@@ -1,5 +1,9 @@
 https://docs.google.com/spreadsheets/d/11ljKyF0eMgY3qqZWjVVBvI0brfv9IxocXjroYtJyTlY/edit#gid=0
 
+光頭推薦
+Large FOV = PiTool SS 1.0  steamVR 50%
+Normal FOV = PiTool SS 1.0 steamVR 90%
+
 ======
 * 平行投影on
 	ss = 1.5

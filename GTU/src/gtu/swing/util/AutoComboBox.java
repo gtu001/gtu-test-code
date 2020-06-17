@@ -37,6 +37,7 @@ public class AutoComboBox extends PlainDocument {
     ComboBoxModel model;
     JTextComponent editor;
     AtomicInteger tempSelectIndex = new AtomicInteger(-1);
+    private List<String> dropdownLst;
     // flag to indicate if setSelectedItem has been called
     // subsequent calls to remove/insertString should be ignored
 
@@ -298,6 +299,8 @@ public class AutoComboBox extends PlainDocument {
     }
 
     public AutoComboBox applyComboxBoxList(List<String> lst, String defaultText, boolean doSort) {
+        this.dropdownLst = lst;
+        
         LinkedList<String> cloneLst = new LinkedList<String>(lst);
         for (int ii = 0; ii < cloneLst.size(); ii++) {
             if (StringUtils.isBlank(cloneLst.get(ii))) {
@@ -360,6 +363,10 @@ public class AutoComboBox extends PlainDocument {
     public AutoComboBox setMatchType(MatchType matchType) {
         this.matchType = matchType;
         return this;
+    }
+
+    public List<String> getDropdownList() {
+        return dropdownLst;
     }
 
     public static void main(String[] args) {
