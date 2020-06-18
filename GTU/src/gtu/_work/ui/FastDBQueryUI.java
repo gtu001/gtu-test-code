@@ -2790,20 +2790,42 @@ public class FastDBQueryUI extends JFrame {
         return handler.getModel();
     }
 
+    private static Pair<String, Map<Pair<Integer, Integer>, String>> getQuoteSQL_And_ReplaceMap(String sql) {
+        String REPLACE_CHAR = "#";
+        Map<Pair<Integer, Integer>, String> repMap = new LinkedHashMap<Pair<Integer, Integer>, String>();
+        StringBuffer sb = new StringBuffer();
+        Pattern ptnQuote = Pattern.compile("\\'.*?\\'");
+        Matcher mthq = ptnQuote.matcher(sql);
+        while (mthq.find()) {
+            String group = mthq.group();
+            repMap.put(Pair.of(mthq.start(), mthq.end()), group);
+            String tempReplace = StringUtils.leftPad("", group.length(), REPLACE_CHAR);
+            mthq.appendReplacement(sb, tempReplace);
+        }
+        mthq.appendTail(sb);
+        return Pair.of(sb.toString(), repMap);
+    }
+
     /**
      * parse Sql
      */
     private SqlParam parseSqlToParam(String sql) {
+        String orignSQL = sql.toString();
+
+        // 拿掉 註解
+        sql = SqlParam.getIgnoreCommonentSql(orignSQL);
+
         // 中括號特殊處理
         int matchCount = 0;
         if ((matchCount = StringUtils.countMatches(sql, "[")) == StringUtils.countMatches(sql, "]")) {
             if (matchCount != 0) {
-                SqlParam_IfExists sqlParam = SqlParam_IfExists.parseToSqlParam(sql);
+                SqlParam_IfExists sqlParam = SqlParam_IfExists.parseToSqlParam(sql, orignSQL);
                 sqlParam.parseToSqlInjectionMap(sql);
                 return sqlParam;
             }
         }
-        return SqlParam.parseToSqlParam(sql);
+
+        return SqlParam.parseToSqlParam(sql, orignSQL);
     }
 
     private static class SqlParam {
@@ -2858,7 +2880,7 @@ public class FastDBQueryUI extends JFrame {
             Pattern ptn1 = Pattern.compile("\\/\\*(?:.|\n)*?\\*\\/", Pattern.MULTILINE | Pattern.DOTALL);
             Matcher mth = ptn1.matcher(sql);
             while (mth.find()) {
-                mth.appendReplacement(sb, "");
+                mth.appendReplacement(sb, StringUtils.leftPad("", StringUtils.length(mth.group())));
             }
             mth.appendTail(sb);
 
@@ -2869,7 +2891,7 @@ public class FastDBQueryUI extends JFrame {
             while (mth2.find()) {
                 String tmp = mth2.group();
                 if (tmp.indexOf("]") == -1) {// 如果有對應參數設定則不拿掉
-                    mth2.appendReplacement(sb, "");
+                    mth2.appendReplacement(sb, StringUtils.leftPad("", StringUtils.length(tmp)));
                 } else {
                     mth2.appendReplacement(sb, tmp);
                 }
@@ -2878,10 +2900,16 @@ public class FastDBQueryUI extends JFrame {
             return sb.toString();
         }
 
-        public static SqlParam parseToSqlParam(String sql) {
+        public static SqlParam parseToSqlParam(String sql, String orignSQL) {
+            // 拖曳 字串部分 "'" 前置處理 ↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+            Pair<String, Map<Pair<Integer, Integer>, String>> pair = getQuoteSQL_And_ReplaceMap(sql);
+            sql = pair.getLeft();
+            Map<Pair<Integer, Integer>, String> repMap = pair.getRight();
+            // 拖曳 字串部分 "'" 前置處理 ↑↑↑↑↑↑↑↑↑↑↑↑↑↑
+
             // 一般處理
             Pattern ptn = Pattern.compile(SQL_PARAM_PTN);
-            Matcher mth = ptn.matcher(getIgnoreCommonentSql(sql));// <----------------
+            Matcher mth = ptn.matcher(sql);// <----------------
 
             List<String> paramList = new ArrayList<String>();
             Set<String> paramSet = new LinkedHashSet<String>();
@@ -2895,16 +2923,29 @@ public class FastDBQueryUI extends JFrame {
                 }
                 paramList.add(key);
                 paramSet.add(key);
-                mth.appendReplacement(sb2, "?");
+                String questMark = StringUtils.rightPad("?", key.length(), " ");
+                mth.appendReplacement(sb2, questMark);
             }
             mth.appendTail(sb2);
 
+            // -------------------------------------------------------------------------------------------------
+            // 拖曳 字串部分 "'" 後置處理 ↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+            String sqlForQuote = sb2.toString();
+            for (Pair<Integer, Integer> p : repMap.keySet()) {
+                String orignSqlGroup = repMap.get(p);
+                String before = StringUtils.substring(sqlForQuote, 0, p.getLeft());
+                String after = StringUtils.substring(sqlForQuote, p.getRight());
+                sqlForQuote = before + orignSqlGroup + after;
+            }
+            // 拖曳 字串部分 "'" 後置處理 ↑↑↑↑↑↑↑↑↑↑↑↑↑↑
+            // -------------------------------------------------------------------------------------------------
+
             SqlParam sqlParam = new SqlParam();
-            sqlParam.orginialSql = sql;
+            sqlParam.orginialSql = orignSQL;
             sqlParam.paramSet = paramSet;
-            sqlParam.questionSql = sb2.toString();
+            sqlParam.questionSql = sqlForQuote;
             sqlParam.paramList = paramList;
-            sqlParam.parseToSqlInjectionMap(sql);
+            sqlParam.parseToSqlInjectionMap(orignSQL);
             return sqlParam;
         }
 
@@ -2954,21 +2995,42 @@ public class FastDBQueryUI extends JFrame {
             return isOk;
         }
 
-        public static SqlParam_IfExists parseToSqlParam(String sql) {
+        public static SqlParam_IfExists parseToSqlParam(String sql, String orignSQL) {
             SqlParam_IfExists sqlParam = new SqlParam_IfExists();
-            sqlParam.orginialSql = sql;
+            sqlParam.orginialSql = orignSQL.toString();
 
+            // 拖曳 字串部分 "'" 前置處理 ↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+            String beforeSQL = sql.toString();
+            Pair<String, Map<Pair<Integer, Integer>, String>> pair = getQuoteSQL_And_ReplaceMap(sql);
+            sql = pair.getLeft();
+            Map<Pair<Integer, Integer>, String> repMap = pair.getRight();
+            // 拖曳 字串部分 "'" 前置處理 ↑↑↑↑↑↑↑↑↑↑↑↑↑↑
+
+            // 一般處理
             Pattern ptn = Pattern.compile("(\\[((?:.|\n)*?)\\]|" + SQL_PARAM_PTN + ")");
-            Matcher mth = ptn.matcher(getIgnoreCommonentSql(sql));
+            Matcher mth = ptn.matcher(sql);
 
             while (mth.find()) {
                 String quoteLine = mth.group(1);
+                // fix 修正回原來的 ↓↓↓↓↓↓↓
+                System.out.println("quote[0] : " + quoteLine);
+                quoteLine = StringUtils.substring(beforeSQL, mth.start(1), mth.end(1));
+                System.out.println("quote[1] : " + quoteLine);
+                // fix 修正回原來的 ↑↑↑↑↑↑↑
 
                 // 非必填檢查
                 if (quoteLine.matches("^\\[(.|\n)*\\]")) {
                     String realQuoteLine = mth.group(2);
+
+                    // fix 修正回原來的 ↓↓↓↓↓↓↓
+                    System.out.println("quote[0] : " + realQuoteLine);
+                    realQuoteLine = StringUtils.substring(beforeSQL, mth.start(2), mth.end(2));
+                    System.out.println("quote[1] : " + realQuoteLine);
+                    // fix 修正回原來的 ↑↑↑↑↑↑↑
+
                     Pattern ptn2 = Pattern.compile(SQL_PARAM_PTN);
-                    Pattern ptn3 = Pattern.compile("\\_\\#.*?\\#\\_");
+                    Pattern ptn3 = Pattern.compile("\\_\\#.*?\\#\\_");// -->
+                                                                      // _#整個字串替換#_
                     Matcher mth2 = ptn2.matcher(realQuoteLine);
                     Matcher mth3 = ptn3.matcher(realQuoteLine);
 
@@ -2993,9 +3055,15 @@ public class FastDBQueryUI extends JFrame {
                         sqlParam.paramListFix.add(Pair.of(params, new int[] { mth.start(), mth.end() }));
                     }
                 }
-                // 必填檢查
+                // 必填檢查 --> 也就是一班參數 :param
                 else {
                     String realQuoteLine = mth.group(3);
+                    // fix 修正回原來的 ↓↓↓↓↓↓↓
+                    System.out.println("quote[0] : " + realQuoteLine);
+                    realQuoteLine = StringUtils.substring(beforeSQL, mth.start(3), mth.end(3));
+                    System.out.println("quote[1] : " + realQuoteLine);
+                    // fix 修正回原來的 ↑↑↑↑↑↑↑
+
                     sqlParam.paramSet.add(realQuoteLine);
                     sqlParam.paramListFix.add(Pair.of(Arrays.asList(realQuoteLine), new int[] { mth.start(1), mth.end(1) }));
                 }
