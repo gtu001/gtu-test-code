@@ -497,9 +497,13 @@ public class JTextAreaUtil {
                     if (mth.find()) {
                         prefixLine = mth.group();
                     }
-                    
+
                     String beforeText = StringUtils.substring(textArea.getText(), 0, textArea.getCaretPosition());
                     String afterText = StringUtils.substring(textArea.getText(), textArea.getCaretPosition());
+                    if (!beforeText.endsWith("\n")) {
+                        beforeText += "\n";
+                    }
+
                     final String inserText = beforeText + prefixLine + afterText;
                     final int caretPos = beforeText.length() + prefixLine.length();
 
