@@ -17,18 +17,22 @@ import java.io.StringReader;
 import java.lang.reflect.Field;
 import java.util.TreeMap;
 import java.util.concurrent.Callable;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.swing.JLabel;
 import javax.swing.JTextArea;
 import javax.swing.JTextPane;
+import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.EventListenerList;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultCaret;
+import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.StyleConstants;
@@ -337,7 +341,7 @@ public class JTextAreaUtil {
         DefaultCaret caret = (DefaultCaret) textArea.getCaret();
         caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
     }
-    
+
     public static String getSpaceOfCaretPositionLine(final JTextComponent textArea) {
         String prefixLine = "";
         LineNumberReader reader = null;
@@ -455,20 +459,32 @@ public class JTextAreaUtil {
     }
 
     public static void applyEnterKeyFixPosition(final JTextComponent textArea) {
-        textArea.addKeyListener(new KeyListener() {
+        final AtomicReference<String> text = new AtomicReference<String>();
+        final AtomicReference<Integer> caretPosition = new AtomicReference<Integer>();
+        final AtomicBoolean ignoreInput = new AtomicBoolean(false);
+
+        textArea.getDocument().addDocumentListener(new DocumentListener() {
             @Override
-            public void keyTyped(KeyEvent e) {
+            public void removeUpdate(DocumentEvent e) {
             }
 
             @Override
-            public void keyReleased(final KeyEvent e) {
-                if (e.getKeyCode() != KeyEvent.VK_ENTER) {
+            public void insertUpdate(DocumentEvent e) {
+                if (ignoreInput.get()) {
+                    ignoreInput.set(false);
                     return;
                 }
+
+                String addChar = StringUtils.substring(textArea.getText(), e.getOffset(), e.getOffset() + e.getLength());
+                System.out.println("insertUpdate - [" + addChar + "]");
+                if (addChar.toCharArray()[0] != '\n') {
+                    return;
+                }
+
                 String prefixLine = "";
                 LineNumberReader reader = null;
                 try {
-                    reader = new LineNumberReader(new StringReader(text));
+                    reader = new LineNumberReader(new StringReader(text.get()));
                     String lastLine = "";
                     int lastLineNumber = 0;
                     for (String line = null; (line = reader.readLine()) != null;) {
@@ -481,10 +497,26 @@ public class JTextAreaUtil {
                     if (mth.find()) {
                         prefixLine = mth.group();
                     }
+                    
                     String beforeText = StringUtils.substring(textArea.getText(), 0, textArea.getCaretPosition());
                     String afterText = StringUtils.substring(textArea.getText(), textArea.getCaretPosition());
-                    textArea.setText(beforeText + prefixLine + afterText);
-                    textArea.setCaretPosition(beforeText.length() + prefixLine.length());
+                    final String inserText = beforeText + prefixLine + afterText;
+                    final int caretPos = beforeText.length() + prefixLine.length();
+
+                    Runnable runnable = new Runnable() {
+                        public void run() {
+                            try {
+                                ignoreInput.set(true);
+                                Document doc = textArea.getDocument();
+                                doc.remove(0, StringUtils.length(textArea.getText()));
+                                doc.insertString(0, inserText, null);
+                                textArea.setCaretPosition(caretPos);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    };
+                    SwingUtilities.invokeLater(runnable);
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 } finally {
@@ -496,13 +528,24 @@ public class JTextAreaUtil {
                 }
             }
 
-            String text = "";
-            int caretPosition = 0;
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+            }
+        });
+
+        textArea.addKeyListener(new KeyListener() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+            }
+
+            @Override
+            public void keyReleased(final KeyEvent e) {
+            }
 
             @Override
             public void keyPressed(KeyEvent e) {
-                caretPosition = textArea.getCaretPosition();
-                text = StringUtils.substring(StringUtils.defaultString(textArea.getText()), 0, caretPosition);
+                caretPosition.set(textArea.getCaretPosition());
+                text.set(StringUtils.substring(StringUtils.defaultString(textArea.getText()), 0, caretPosition.get()));
             }
         });
     }
