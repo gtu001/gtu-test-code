@@ -16,6 +16,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -32,14 +33,13 @@ import javax.swing.table.DefaultTableModel;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
-import gtu.clipboard.ClipboardUtil;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JCommonUtil.HandleDocumentEvent;
 import gtu.swing.util.JMouseEventUtil;
 import gtu.swing.util.JPopupMenuUtil;
 import gtu.swing.util.JTableUtil;
 
-public class FastDBQueryUI_RowDiffWatcherDlg extends JDialog {
+public class FastDBQueryUI_RowPKSettingDlg extends JDialog {
 
     private final JPanel contentPanel = new JPanel();
     private JTable table;
@@ -54,22 +54,22 @@ public class FastDBQueryUI_RowDiffWatcherDlg extends JDialog {
      * Launch the application.
      */
     public static void main(String[] args) {
-        final FastDBQueryUI_RowDiffWatcherDlg dlg = FastDBQueryUI_RowDiffWatcherDlg.newInstance(Arrays.asList("aa", "bb", "cc", "dd"), new ActionListener() {
+        final FastDBQueryUI_RowPKSettingDlg dlg = FastDBQueryUI_RowPKSettingDlg.newInstance(Arrays.asList("aa", "bb", "cc", "dd"), new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                System.out.println(((FastDBQueryUI_RowDiffWatcherDlg) e.getSource()).getPkLst());
+                System.out.println(((FastDBQueryUI_RowPKSettingDlg) e.getSource()).getPkLst());
             }
         }, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                System.out.println(((FastDBQueryUI_RowDiffWatcherDlg) e.getSource()).getPkLst());
+                System.out.println(((FastDBQueryUI_RowPKSettingDlg) e.getSource()).getPkLst());
             }
         });
     }
 
-    public static FastDBQueryUI_RowDiffWatcherDlg newInstance(List<String> titleLst, ActionListener okButtonAction, final ActionListener onCloseListener) {
+    public static FastDBQueryUI_RowPKSettingDlg newInstance(List<String> titleLst, ActionListener okButtonAction, final ActionListener onCloseListener) {
         try {
-            final FastDBQueryUI_RowDiffWatcherDlg dialog = new FastDBQueryUI_RowDiffWatcherDlg(titleLst);
+            final FastDBQueryUI_RowPKSettingDlg dialog = new FastDBQueryUI_RowPKSettingDlg(titleLst);
             dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
             dialog.setVisible(true);
             dialog.okButtonAction = okButtonAction;
@@ -110,7 +110,7 @@ public class FastDBQueryUI_RowDiffWatcherDlg extends JDialog {
     /**
      * Create the dialog.
      */
-    public FastDBQueryUI_RowDiffWatcherDlg(List<String> titleLst) {
+    public FastDBQueryUI_RowPKSettingDlg(List<String> titleLst) {
         setTitle("請設定主鍵");
         setBounds(100, 100, 450, 300);
         getContentPane().setLayout(new BorderLayout());
@@ -137,15 +137,15 @@ public class FastDBQueryUI_RowDiffWatcherDlg extends JDialog {
                                     .addJMenuItem("多行貼上", new ActionListener() {
                                         @Override
                                         public void actionPerformed(ActionEvent e) {
-                                            String text = ClipboardUtil.getInstance().getContents();
                                             try {
+                                                String text = StringUtils.defaultString(searchText.getText());
                                                 List<String> lst = new ArrayList<String>();
-                                                BufferedReader reader = new BufferedReader(new StringReader(text));
-                                                for (String line = null; (line = reader.readLine()) != null;) {
-                                                    lst.add(line);
+                                                Scanner scan = new Scanner(text);
+                                                while (scan.hasNext()) {
+                                                    lst.add("/^" + scan.next() + "$/");
                                                 }
+                                                scan.close();
                                                 searchText.setText(StringUtils.join(lst, "^"));
-                                                reader.close();
                                             } catch (Exception ex) {
                                             }
                                         }
@@ -268,7 +268,7 @@ public class FastDBQueryUI_RowDiffWatcherDlg extends JDialog {
                     public void actionPerformed(ActionEvent e) {
                         List<String> pkLst = getPkLst();
                         if (!pkLst.isEmpty()) {
-                            okButtonAction.actionPerformed(new ActionEvent(FastDBQueryUI_RowDiffWatcherDlg.this, -1, "this"));
+                            okButtonAction.actionPerformed(new ActionEvent(FastDBQueryUI_RowPKSettingDlg.this, -1, "this"));
                             dispose();
                         } else {
                             JCommonUtil._jOptionPane_showMessageDialog_error("請選擇主鍵!");

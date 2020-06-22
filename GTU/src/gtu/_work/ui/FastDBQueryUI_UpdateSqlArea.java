@@ -47,7 +47,7 @@ public class FastDBQueryUI_UpdateSqlArea extends JDialog {
         FastDBQueryUI_UpdateSqlArea.newInstance("XXXX", Arrays.asList("1111", "eeeee"), false, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                System.out.println(((FastDBQueryUI_RowDiffWatcherDlg) e.getSource()).getPkLst());
+                System.out.println(((FastDBQueryUI_RowPKSettingDlg) e.getSource()).getPkLst());
             }
         });
     }

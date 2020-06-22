@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -189,15 +190,15 @@ public class SimpleCheckListDlg extends JDialog {
                                     .addJMenuItem("多行貼上", new ActionListener() {
                                         @Override
                                         public void actionPerformed(ActionEvent e) {
-                                            String text = ClipboardUtil.getInstance().getContents();
                                             try {
+                                                String text = StringUtils.defaultString(searchText.getText());
                                                 List<String> lst = new ArrayList<String>();
-                                                BufferedReader reader = new BufferedReader(new StringReader(text));
-                                                for (String line = null; (line = reader.readLine()) != null;) {
-                                                    lst.add(line);
+                                                Scanner scan = new Scanner(text);
+                                                while (scan.hasNext()) {
+                                                    lst.add("/^" + scan.next() + "$/");
                                                 }
+                                                scan.close();
                                                 searchText.setText(StringUtils.join(lst, "^"));
-                                                reader.close();
                                             } catch (Exception ex) {
                                             }
                                         }
