@@ -3480,6 +3480,23 @@ public class FastDBQueryUI extends JFrame {
                                 }
                             }
 
+                            if (rowLst.size() == 0) {
+                                if (selectRowIdxArry != null && selectRowIdxArry.length == 1) {
+                                    for (int ii : selectRowIdxArry) {
+                                        int rowIdx = JTableUtil.getRealRowPos(ii, queryResultTable);
+                                        Object v = JTableUtil.newInstance(queryResultTable).getValueAt(false, rowIdx, 0);
+                                        if (v instanceof JToggleButton) {
+                                            rowLst.add(rowIdx);
+                                            rowLst.add(-1);
+                                            rowLabelLst.add(((JToggleButton) v).getText());
+                                            rowLabelLst.add("NA");
+                                            rows.add(JTableUtil.getRowData(rowIdx, new int[] { 0 }, queryResultTable));
+                                            rows.add(Arrays.asList(new Object[rows.get(0).size()]));
+                                        }
+                                    }
+                                }
+                            }
+
                             if (rowLst.size() != 2) {
                                 JCommonUtil._jOptionPane_showMessageDialog_error("請選擇兩筆!");
                                 return;
@@ -4167,322 +4184,345 @@ public class FastDBQueryUI extends JFrame {
 
     private void sqlTextAreaMouseClickedAction(MouseEvent e) {
         if (JMouseEventUtil.buttonRightClick(1, e)) {
-            JPopupMenuUtil jpopUtil = JPopupMenuUtil.newInstance(sqlTextArea)//
-                    .addJMenuItem("SQL 格式化", new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            if (StringUtils.isNotBlank(sqlTextArea.getSelectedText())) {
-                                String selection = sqlTextArea.getSelectedText();
-                                String prefix = StringUtils.substring(sqlTextArea.getText(), 0, sqlTextArea.getSelectionStart());
-                                String suffix = StringUtils.substring(sqlTextArea.getText(), sqlTextArea.getSelectionEnd());
-                                sqlTextArea.setText(prefix + formatSQL(selection) + suffix);
-                            } else {
-                                sqlTextArea.setText(formatSQL(sqlTextArea.getText()));
-                            }
+            JPopupMenuUtil jpopUtil = JPopupMenuUtil.newInstance(sqlTextArea);//
+
+            if (StringUtils.isNotBlank(sqlTextArea.getSelectedText())) {
+                jpopUtil.addJMenuItem("複製", new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        ClipboardUtil.getInstance().setContents(sqlTextArea.getSelectedText());
+                    }
+                });//
+            }
+
+            if (StringUtils.isNotBlank(ClipboardUtil.getInstance().getContents())) {
+                jpopUtil.addJMenuItem("貼上", new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        String selection = ClipboardUtil.getInstance().getContents();
+                        String prefix = StringUtils.substring(sqlTextArea.getText(), 0, sqlTextArea.getSelectionStart());
+                        String suffix = StringUtils.substring(sqlTextArea.getText(), sqlTextArea.getSelectionEnd());
+                        sqlTextArea.setText(prefix + selection + suffix);
+                        sqlTextArea.setCaretPosition(StringUtils.length(prefix + selection));
+                    }
+                });//
+            }
+
+            jpopUtil.addJMenuItem("SQL 格式化", new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    if (StringUtils.isNotBlank(sqlTextArea.getSelectedText())) {
+                        String selection = sqlTextArea.getSelectedText();
+                        String prefix = StringUtils.substring(sqlTextArea.getText(), 0, sqlTextArea.getSelectionStart());
+                        String suffix = StringUtils.substring(sqlTextArea.getText(), sqlTextArea.getSelectionEnd());
+                        sqlTextArea.setText(prefix + formatSQL(selection) + suffix);
+                    } else {
+                        sqlTextArea.setText(formatSQL(sqlTextArea.getText()));
+                    }
+                }
+
+                private String formatSQL(String sql) {
+                    sql = StringUtils.defaultString(sql);
+                    sql = getSqlFormater(sql);
+                    sql = getSelectColumnFormater(sql);
+                    return sql;
+                }
+
+                Pattern ptn = Pattern.compile("(\\[.*?\\]|\\swhere|\\sand|\\sor|\\sfrom|\\sunion|\\souter\\s+join|\\sinner\\s+join|\\sleft\\s+join|\\sright\\s+join|\\sjoin|\\son)",
+                        Pattern.CASE_INSENSITIVE);
+                Pattern ptn2 = Pattern.compile("select\\s+((?:.|\n)*?)from\\s+.*", Pattern.CASE_INSENSITIVE | Pattern.DOTALL | Pattern.MULTILINE);
+
+                private String getSqlFormater(String sql) {
+                    List<String> lst = StringUtil_.readContentToList(sql, true, false, false);
+                    sql = StringUtils.join(lst, "  ");
+                    StringBuffer sb = new StringBuffer();
+                    Matcher mth = ptn.matcher(sql);
+                    String space = JTextAreaUtil.getSpaceOfCaretPositionLine(sqlTextArea);
+                    while (mth.find()) {
+                        mth.appendReplacement(sb, "\r\n" + space + mth.group(1));
+                    }
+                    mth.appendTail(sb);
+                    return sb.toString();
+                }
+
+                private String getSelectColumnFormater(String sql) {
+                    StringBuffer sb = new StringBuffer();
+                    Matcher mth = ptn2.matcher(sql);
+                    int startPos = 0;
+                    if (mth.find()) {
+                        sb.append(sql.substring(startPos, mth.start(1)));
+                        startPos = mth.end(1);
+                        String selectDesc = mth.group(1);
+                        selectDesc = selectDesc.replaceAll(",", ",\r\n    ");
+                        sb.append(selectDesc);
+                    }
+                    sb.append(sql.substring(startPos));
+                    return sb.toString();
+                }
+            });//
+            jpopUtil.addJMenuItem("SQL 基礎 Select", new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    String tableName = sqlTextArea.getSelectedText();
+                    if (StringUtils.isBlank(tableName)) {
+                        tableName = "TABLE_NAME";
+                    }
+                    String space = JTextAreaUtil.getSpaceOfCaretPositionLine(sqlTextArea);
+                    StringBuilder sb = new StringBuilder();
+                    sb.append(space).append("\r\n");
+                    sb.append(space).append("\r\n");
+                    sb.append(space).append("select t.* \r\n");
+                    sb.append(space).append("from ").append(tableName).append(" t \r\n");
+                    sb.append(space).append("where 1=1 \r\n");
+                    sb.append(space).append("\r\n");
+                    String prefix = StringUtils.substring(sqlTextArea.getText(), 0, sqlTextArea.getSelectionStart());
+                    String suffix = StringUtils.substring(sqlTextArea.getText(), sqlTextArea.getSelectionEnd());
+                    sqlTextArea.setText(prefix + sb + suffix);
+                }
+            });//
+            jpopUtil.addJMenuItem("SQL 基礎 Select column append", new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    String fromAlias = StringUtils.trimToEmpty(JCommonUtil._jOptionPane_showInputDialog("輸入來源alias", "t"));
+                    if (StringUtils.isNotBlank(fromAlias)) {
+                        fromAlias = fromAlias + ".";
+                    }
+                    String selection = sqlTextArea.getSelectedText();
+                    if (StringUtils.isBlank(selection)) {
+                        return;
+                    }
+                    StringBuilder sb = new StringBuilder();
+                    Pattern ptn = Pattern.compile("[\\w+\\.]+");
+                    Matcher mth = ptn.matcher(selection);
+                    String space = JTextAreaUtil.getSpaceOfCaretPositionLine(sqlTextArea);
+                    while (mth.find()) {
+                        sb.append(space).append(fromAlias + mth.group()).append(" /**/, \r\n");
+                    }
+                    String prefix = StringUtils.substring(sqlTextArea.getText(), 0, sqlTextArea.getSelectionStart());
+                    String suffix = StringUtils.substring(sqlTextArea.getText(), sqlTextArea.getSelectionEnd());
+                    sqlTextArea.setText(prefix + sb + suffix);
+                }
+            });//
+            jpopUtil.addJMenuItem("SQL 基礎 Update", new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    String tableName = sqlTextArea.getSelectedText();
+                    if (StringUtils.isBlank(tableName)) {
+                        tableName = "TABLE_NAME";
+                    }
+                    String space = JTextAreaUtil.getSpaceOfCaretPositionLine(sqlTextArea);
+                    StringBuilder sb = new StringBuilder();
+                    sb.append(space).append("\r\n");
+                    sb.append(space).append("\r\n");
+                    sb.append(space).append("update ").append(tableName).append(" t \r\n");
+                    sb.append(space).append("set t.AAAAAAA = 'xxxxxx' ").append(" t \r\n");
+                    sb.append(space).append("where t.AAAAAAA = 'xxxxxx' \r\n");
+                    sb.append(space).append("\r\n");
+                    String prefix = StringUtils.substring(sqlTextArea.getText(), 0, sqlTextArea.getSelectionStart());
+                    String suffix = StringUtils.substring(sqlTextArea.getText(), sqlTextArea.getSelectionEnd());
+                    sqlTextArea.setText(prefix + sb + suffix);
+                }
+            });//
+            jpopUtil.addJMenuItem("SQL 基礎 left join", new ActionListener() {
+
+                private String getRandomAlias() {
+                    char a = (char) RandomUtil.rangeInteger((int) 'a', (int) 'z');
+                    int b = RandomUtil.rangeInteger(0, 9);
+                    return String.valueOf(a) + String.valueOf(b);
+                }
+
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    String fromAlias = StringUtils.trimToEmpty(JCommonUtil._jOptionPane_showInputDialog("輸入來源alias", "t"));
+                    if (StringUtils.isNotBlank(fromAlias)) {
+                        fromAlias = fromAlias + ".";
+                    }
+                    String selection = sqlTextArea.getSelectedText();
+                    if (StringUtils.isBlank(selection)) {
+                        return;
+                    }
+                    StringBuilder sb = new StringBuilder();
+                    Pattern ptn = Pattern.compile("[\\w+\\.]+");
+                    Matcher mth = ptn.matcher(selection);
+                    // String alais = getRandomAlias();
+                    List<String> condLst = new ArrayList<String>();
+                    List<String> orignLst = new ArrayList<String>();
+                    while (mth.find()) {
+                        orignLst.add(mth.group());
+                    }
+                    String alais = orignLst.get(1);
+                    String space = JTextAreaUtil.getSpaceOfCaretPositionLine(sqlTextArea);
+                    sb.append(space).append("left join " + orignLst.get(0) + " " + alais + " on ");//
+                    if (orignLst.size() >= 3) {
+                        for (int ii = 2; ii < orignLst.size(); ii++) {
+                            condLst.add(" " + alais + "." + orignLst.get(ii) + " = " + fromAlias + orignLst.get(ii));//
                         }
+                    }
+                    sb.append(StringUtils.join(condLst, " and ") + "\r\n");
+                    String prefix = StringUtils.substring(sqlTextArea.getText(), 0, sqlTextArea.getSelectionStart());
+                    String suffix = StringUtils.substring(sqlTextArea.getText(), sqlTextArea.getSelectionEnd());
+                    sqlTextArea.setText(prefix + sb + suffix);
+                }
+            });//
+            jpopUtil.addJMenuItem("SQL 基礎 Where[硬]", new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    String selection = sqlTextArea.getSelectedText();
+                    if (StringUtils.isBlank(selection)) {
+                        return;
+                    }
+                    StringBuilder sb = new StringBuilder();
+                    Pattern ptn = Pattern.compile("[\\w+\\.]+");
+                    Matcher mth = ptn.matcher(selection);
+                    String space = JTextAreaUtil.getSpaceOfCaretPositionLine(sqlTextArea);
+                    while (mth.find()) {
+                        String cond = mth.group();
+                        sb.append(space).append(" and ").append(cond).append(" = 'XXXXXXXXXX'   \r\n");
+                    }
+                    String prefix = StringUtils.substring(sqlTextArea.getText(), 0, sqlTextArea.getSelectionStart());
+                    String suffix = StringUtils.substring(sqlTextArea.getText(), sqlTextArea.getSelectionEnd());
+                    sqlTextArea.setText(prefix + sb + suffix);
+                }
+            });//
+            jpopUtil.addJMenuItem("SQL 基礎 Where[代]", new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    String selection = sqlTextArea.getSelectedText();
+                    if (StringUtils.isBlank(selection)) {
+                        return;
+                    }
+                    StringBuilder sb = new StringBuilder();
+                    Pattern ptn = Pattern.compile("[\\w+\\.]+");
+                    Matcher mth = ptn.matcher(selection);
+                    String space = JTextAreaUtil.getSpaceOfCaretPositionLine(sqlTextArea);
+                    while (mth.find()) {
+                        String cond = mth.group();
+                        sb.append(space).append(" [  and ").append(cond).append(" = :").append(cond).append("  ] \r\n");
+                    }
+                    String prefix = StringUtils.substring(sqlTextArea.getText(), 0, sqlTextArea.getSelectionStart());
+                    String suffix = StringUtils.substring(sqlTextArea.getText(), sqlTextArea.getSelectionEnd());
+                    sqlTextArea.setText(prefix + sb + suffix);
+                }
+            });//
+            jpopUtil.addJMenuItem("SQL 基礎 where [加]", new ActionListener() {
+                Pattern ptn = Pattern.compile("[\\w+\\.]+");
 
-                        private String formatSQL(String sql) {
-                            sql = StringUtils.defaultString(sql);
-                            sql = getSqlFormater(sql);
-                            sql = getSelectColumnFormater(sql);
-                            return sql;
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    String text = StringUtils.trimToEmpty(JCommonUtil._jOptionPane_showInputDialog("輸入alias", "t a"));
+                    Matcher mth = ptn.matcher(text);
+                    String fromAlias = "";
+                    String toAlias = "";
+                    while (mth.find()) {
+                        if (StringUtils.isBlank(fromAlias)) {
+                            fromAlias = mth.group();
+                        } else {
+                            toAlias = mth.group();
                         }
+                    }
 
-                        Pattern ptn = Pattern.compile("(\\[.*?\\]|\\swhere|\\sand|\\sor|\\sfrom|\\sunion|\\souter\\s+join|\\sinner\\s+join|\\sleft\\s+join|\\sright\\s+join|\\sjoin|\\son)",
-                                Pattern.CASE_INSENSITIVE);
-                        Pattern ptn2 = Pattern.compile("select\\s+((?:.|\n)*?)from\\s+.*", Pattern.CASE_INSENSITIVE | Pattern.DOTALL | Pattern.MULTILINE);
+                    String selection = sqlTextArea.getSelectedText();
+                    if (StringUtils.isBlank(selection)) {
+                        return;
+                    }
+                    StringBuilder sb = new StringBuilder();
+                    mth = ptn.matcher(selection);
+                    List<String> condLst = new ArrayList<String>();
+                    while (mth.find()) {
+                        String cond = mth.group();
+                        condLst.add(" " + fromAlias + "." + cond + " = " + toAlias + "." + cond);//
+                    }
+                    sb.append(StringUtils.join(condLst, " and ") + "\r\n");
+                    String prefix = StringUtils.substring(sqlTextArea.getText(), 0, sqlTextArea.getSelectionStart());
+                    String suffix = StringUtils.substring(sqlTextArea.getText(), sqlTextArea.getSelectionEnd());
+                    sqlTextArea.setText(prefix + sb + suffix);
+                }
+            });//
+            jpopUtil.addJMenuItem("插入系統日", new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    String column = sqlTextArea.getSelectedText();
 
-                        private String getSqlFormater(String sql) {
-                            List<String> lst = StringUtil_.readContentToList(sql, true, false, false);
-                            sql = StringUtils.join(lst, "  ");
-                            StringBuffer sb = new StringBuffer();
-                            Matcher mth = ptn.matcher(sql);
-                            String space = JTextAreaUtil.getSpaceOfCaretPositionLine(sqlTextArea);
-                            while (mth.find()) {
-                                mth.appendReplacement(sb, "\r\n" + space + mth.group(1));
-                            }
-                            mth.appendTail(sb);
-                            return sb.toString();
-                        }
+                    DBDateFormat e2 = (DBDateFormat) JCommonUtil._JOptionPane_showInputDialog("請選擇日期格式", "日期格式化", DBDateFormat.values(), null);
+                    if (e2 == null) {
+                        return;
+                    }
+                    String prefix = StringUtils.substring(sqlTextArea.getText(), 0, sqlTextArea.getSelectionStart());
+                    String suffix = StringUtils.substring(sqlTextArea.getText(), sqlTextArea.getSelectionEnd());
 
-                        private String getSelectColumnFormater(String sql) {
-                            StringBuffer sb = new StringBuffer();
-                            Matcher mth = ptn2.matcher(sql);
-                            int startPos = 0;
-                            if (mth.find()) {
-                                sb.append(sql.substring(startPos, mth.start(1)));
-                                startPos = mth.end(1);
-                                String selectDesc = mth.group(1);
-                                selectDesc = selectDesc.replaceAll(",", ",\r\n    ");
-                                sb.append(selectDesc);
-                            }
-                            sb.append(sql.substring(startPos));
-                            return sb.toString();
-                        }
-                    })//
-                    .addJMenuItem("SQL 基礎 Select", new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            String tableName = sqlTextArea.getSelectedText();
-                            if (StringUtils.isBlank(tableName)) {
-                                tableName = "TABLE_NAME";
-                            }
-                            String space = JTextAreaUtil.getSpaceOfCaretPositionLine(sqlTextArea);
-                            StringBuilder sb = new StringBuilder();
-                            sb.append(space).append("\r\n");
-                            sb.append(space).append("\r\n");
-                            sb.append(space).append("select t.* \r\n");
-                            sb.append(space).append("from ").append(tableName).append(" t \r\n");
-                            sb.append(space).append("where 1=1 \r\n");
-                            sb.append(space).append("\r\n");
-                            String prefix = StringUtils.substring(sqlTextArea.getText(), 0, sqlTextArea.getSelectionStart());
-                            String suffix = StringUtils.substring(sqlTextArea.getText(), sqlTextArea.getSelectionEnd());
-                            sqlTextArea.setText(prefix + sb + suffix);
-                        }
-                    })//
-                    .addJMenuItem("SQL 基礎 Select column append", new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            String fromAlias = StringUtils.trimToEmpty(JCommonUtil._jOptionPane_showInputDialog("輸入來源alias", "t"));
-                            if (StringUtils.isNotBlank(fromAlias)) {
-                                fromAlias = fromAlias + ".";
-                            }
-                            String selection = sqlTextArea.getSelectedText();
-                            if (StringUtils.isBlank(selection)) {
-                                return;
-                            }
-                            StringBuilder sb = new StringBuilder();
-                            Pattern ptn = Pattern.compile("[\\w+\\.]+");
-                            Matcher mth = ptn.matcher(selection);
-                            String space = JTextAreaUtil.getSpaceOfCaretPositionLine(sqlTextArea);
-                            while (mth.find()) {
-                                sb.append(space).append(fromAlias + mth.group()).append(" /**/, \r\n");
-                            }
-                            String prefix = StringUtils.substring(sqlTextArea.getText(), 0, sqlTextArea.getSelectionStart());
-                            String suffix = StringUtils.substring(sqlTextArea.getText(), sqlTextArea.getSelectionEnd());
-                            sqlTextArea.setText(prefix + sb + suffix);
-                        }
-                    })//
-                    .addJMenuItem("SQL 基礎 Update", new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            String tableName = sqlTextArea.getSelectedText();
-                            if (StringUtils.isBlank(tableName)) {
-                                tableName = "TABLE_NAME";
-                            }
-                            String space = JTextAreaUtil.getSpaceOfCaretPositionLine(sqlTextArea);
-                            StringBuilder sb = new StringBuilder();
-                            sb.append(space).append("\r\n");
-                            sb.append(space).append("\r\n");
-                            sb.append(space).append("update ").append(tableName).append(" t \r\n");
-                            sb.append(space).append("set t.AAAAAAA = 'xxxxxx' ").append(" t \r\n");
-                            sb.append(space).append("where t.AAAAAAA = 'xxxxxx' \r\n");
-                            sb.append(space).append("\r\n");
-                            String prefix = StringUtils.substring(sqlTextArea.getText(), 0, sqlTextArea.getSelectionStart());
-                            String suffix = StringUtils.substring(sqlTextArea.getText(), sqlTextArea.getSelectionEnd());
-                            sqlTextArea.setText(prefix + sb + suffix);
-                        }
-                    })//
-                    .addJMenuItem("SQL 基礎 left join", new ActionListener() {
+                    column = e2.sysdate();
 
-                        private String getRandomAlias() {
-                            char a = (char) RandomUtil.rangeInteger((int) 'a', (int) 'z');
-                            int b = RandomUtil.rangeInteger(0, 9);
-                            return String.valueOf(a) + String.valueOf(b);
-                        }
+                    sqlTextArea.setText(prefix + column + suffix);
+                }
+            });//
+            jpopUtil.addJMenuItem("Date 改為字串", new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    String column = sqlTextArea.getSelectedText();
 
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            String fromAlias = StringUtils.trimToEmpty(JCommonUtil._jOptionPane_showInputDialog("輸入來源alias", "t"));
-                            if (StringUtils.isNotBlank(fromAlias)) {
-                                fromAlias = fromAlias + ".";
-                            }
-                            String selection = sqlTextArea.getSelectedText();
-                            if (StringUtils.isBlank(selection)) {
-                                return;
-                            }
-                            StringBuilder sb = new StringBuilder();
-                            Pattern ptn = Pattern.compile("[\\w+\\.]+");
-                            Matcher mth = ptn.matcher(selection);
-                            // String alais = getRandomAlias();
-                            List<String> condLst = new ArrayList<String>();
-                            List<String> orignLst = new ArrayList<String>();
-                            while (mth.find()) {
-                                orignLst.add(mth.group());
-                            }
-                            String alais = orignLst.get(1);
-                            String space = JTextAreaUtil.getSpaceOfCaretPositionLine(sqlTextArea);
-                            sb.append(space).append("left join " + orignLst.get(0) + " " + alais + " on ");//
-                            if (orignLst.size() >= 3) {
-                                for (int ii = 2; ii < orignLst.size(); ii++) {
-                                    condLst.add(" " + alais + "." + orignLst.get(ii) + " = " + fromAlias + orignLst.get(ii));//
-                                }
-                            }
-                            sb.append(StringUtils.join(condLst, " and ") + "\r\n");
-                            String prefix = StringUtils.substring(sqlTextArea.getText(), 0, sqlTextArea.getSelectionStart());
-                            String suffix = StringUtils.substring(sqlTextArea.getText(), sqlTextArea.getSelectionEnd());
-                            sqlTextArea.setText(prefix + sb + suffix);
-                        }
-                    })//
-                    .addJMenuItem("SQL 基礎 Where[硬]", new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            String selection = sqlTextArea.getSelectedText();
-                            if (StringUtils.isBlank(selection)) {
-                                return;
-                            }
-                            StringBuilder sb = new StringBuilder();
-                            Pattern ptn = Pattern.compile("[\\w+\\.]+");
-                            Matcher mth = ptn.matcher(selection);
-                            String space = JTextAreaUtil.getSpaceOfCaretPositionLine(sqlTextArea);
-                            while (mth.find()) {
-                                String cond = mth.group();
-                                sb.append(space).append(" and ").append(cond).append(" = 'XXXXXXXXXX'   \r\n");
-                            }
-                            String prefix = StringUtils.substring(sqlTextArea.getText(), 0, sqlTextArea.getSelectionStart());
-                            String suffix = StringUtils.substring(sqlTextArea.getText(), sqlTextArea.getSelectionEnd());
-                            sqlTextArea.setText(prefix + sb + suffix);
-                        }
-                    })//
-                    .addJMenuItem("SQL 基礎 Where[代]", new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            String selection = sqlTextArea.getSelectedText();
-                            if (StringUtils.isBlank(selection)) {
-                                return;
-                            }
-                            StringBuilder sb = new StringBuilder();
-                            Pattern ptn = Pattern.compile("[\\w+\\.]+");
-                            Matcher mth = ptn.matcher(selection);
-                            String space = JTextAreaUtil.getSpaceOfCaretPositionLine(sqlTextArea);
-                            while (mth.find()) {
-                                String cond = mth.group();
-                                sb.append(space).append(" [  and ").append(cond).append(" = :").append(cond).append("  ] \r\n");
-                            }
-                            String prefix = StringUtils.substring(sqlTextArea.getText(), 0, sqlTextArea.getSelectionStart());
-                            String suffix = StringUtils.substring(sqlTextArea.getText(), sqlTextArea.getSelectionEnd());
-                            sqlTextArea.setText(prefix + sb + suffix);
-                        }
-                    })//
-                    .addJMenuItem("SQL 基礎 where [加]", new ActionListener() {
-                        Pattern ptn = Pattern.compile("[\\w+\\.]+");
+                    DBDateFormat e2 = (DBDateFormat) JCommonUtil._JOptionPane_showInputDialog("請選擇日期格式", "日期格式化", DBDateFormat.values(), null);
+                    if (e2 == null) {
+                        return;
+                    }
+                    String prefix = StringUtils.substring(sqlTextArea.getText(), 0, sqlTextArea.getSelectionStart());
+                    String suffix = StringUtils.substring(sqlTextArea.getText(), sqlTextArea.getSelectionEnd());
 
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            String text = StringUtils.trimToEmpty(JCommonUtil._jOptionPane_showInputDialog("輸入alias", "t a"));
-                            Matcher mth = ptn.matcher(text);
-                            String fromAlias = "";
-                            String toAlias = "";
-                            while (mth.find()) {
-                                if (StringUtils.isBlank(fromAlias)) {
-                                    fromAlias = mth.group();
-                                } else {
-                                    toAlias = mth.group();
-                                }
-                            }
+                    column = e2.date2Varchar(column);
 
-                            String selection = sqlTextArea.getSelectedText();
-                            if (StringUtils.isBlank(selection)) {
-                                return;
-                            }
-                            StringBuilder sb = new StringBuilder();
-                            mth = ptn.matcher(selection);
-                            List<String> condLst = new ArrayList<String>();
-                            while (mth.find()) {
-                                String cond = mth.group();
-                                condLst.add(" " + fromAlias + "." + cond + " = " + toAlias + "." + cond);//
-                            }
-                            sb.append(StringUtils.join(condLst, " and ") + "\r\n");
-                            String prefix = StringUtils.substring(sqlTextArea.getText(), 0, sqlTextArea.getSelectionStart());
-                            String suffix = StringUtils.substring(sqlTextArea.getText(), sqlTextArea.getSelectionEnd());
-                            sqlTextArea.setText(prefix + sb + suffix);
-                        }
-                    })//
-                    .addJMenuItem("插入系統日", new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            String column = sqlTextArea.getSelectedText();
+                    sqlTextArea.setText(prefix + column + suffix);
+                }
+            });//
+            jpopUtil.addJMenuItem("Timestamp 改為字串", new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    String column = sqlTextArea.getSelectedText();
 
-                            DBDateFormat e2 = (DBDateFormat) JCommonUtil._JOptionPane_showInputDialog("請選擇日期格式", "日期格式化", DBDateFormat.values(), null);
-                            if (e2 == null) {
-                                return;
-                            }
-                            String prefix = StringUtils.substring(sqlTextArea.getText(), 0, sqlTextArea.getSelectionStart());
-                            String suffix = StringUtils.substring(sqlTextArea.getText(), sqlTextArea.getSelectionEnd());
+                    DBDateFormat e2 = (DBDateFormat) JCommonUtil._JOptionPane_showInputDialog("請選擇日期格式", "日期格式化", DBDateFormat.values(), null);
+                    if (e2 == null) {
+                        return;
+                    }
+                    String prefix = StringUtils.substring(sqlTextArea.getText(), 0, sqlTextArea.getSelectionStart());
+                    String suffix = StringUtils.substring(sqlTextArea.getText(), sqlTextArea.getSelectionEnd());
 
-                            column = e2.sysdate();
+                    column = e2.timestamp2Varchar(column);
 
-                            sqlTextArea.setText(prefix + column + suffix);
-                        }
-                    })//
-                    .addJMenuItem("Date 改為字串", new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            String column = sqlTextArea.getSelectedText();
+                    sqlTextArea.setText(prefix + column + suffix);
+                }
+            });//
+            jpopUtil.addJMenuItem("字串改為 Date", new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    String column = sqlTextArea.getSelectedText();
 
-                            DBDateFormat e2 = (DBDateFormat) JCommonUtil._JOptionPane_showInputDialog("請選擇日期格式", "日期格式化", DBDateFormat.values(), null);
-                            if (e2 == null) {
-                                return;
-                            }
-                            String prefix = StringUtils.substring(sqlTextArea.getText(), 0, sqlTextArea.getSelectionStart());
-                            String suffix = StringUtils.substring(sqlTextArea.getText(), sqlTextArea.getSelectionEnd());
+                    DBDateFormat e2 = (DBDateFormat) JCommonUtil._JOptionPane_showInputDialog("請選擇日期格式", "日期格式化", DBDateFormat.values(), null);
+                    if (e2 == null) {
+                        return;
+                    }
+                    String prefix = StringUtils.substring(sqlTextArea.getText(), 0, sqlTextArea.getSelectionStart());
+                    String suffix = StringUtils.substring(sqlTextArea.getText(), sqlTextArea.getSelectionEnd());
 
-                            column = e2.date2Varchar(column);
+                    column = e2.varchar2Date(column);
 
-                            sqlTextArea.setText(prefix + column + suffix);
-                        }
-                    })//
-                    .addJMenuItem("Timestamp 改為字串", new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            String column = sqlTextArea.getSelectedText();
+                    sqlTextArea.setText(prefix + column + suffix);
+                }
+            });//
+            jpopUtil.addJMenuItem("字串改為 Timestamp", new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    String column = sqlTextArea.getSelectedText();
 
-                            DBDateFormat e2 = (DBDateFormat) JCommonUtil._JOptionPane_showInputDialog("請選擇日期格式", "日期格式化", DBDateFormat.values(), null);
-                            if (e2 == null) {
-                                return;
-                            }
-                            String prefix = StringUtils.substring(sqlTextArea.getText(), 0, sqlTextArea.getSelectionStart());
-                            String suffix = StringUtils.substring(sqlTextArea.getText(), sqlTextArea.getSelectionEnd());
+                    DBDateFormat e2 = (DBDateFormat) JCommonUtil._JOptionPane_showInputDialog("請選擇日期格式", "日期格式化", DBDateFormat.values(), null);
+                    if (e2 == null) {
+                        return;
+                    }
+                    String prefix = StringUtils.substring(sqlTextArea.getText(), 0, sqlTextArea.getSelectionStart());
+                    String suffix = StringUtils.substring(sqlTextArea.getText(), sqlTextArea.getSelectionEnd());
 
-                            column = e2.timestamp2Varchar(column);
+                    column = e2.varchar2Timestamp(column);
 
-                            sqlTextArea.setText(prefix + column + suffix);
-                        }
-                    })//
-                    .addJMenuItem("字串改為 Date", new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            String column = sqlTextArea.getSelectedText();
-
-                            DBDateFormat e2 = (DBDateFormat) JCommonUtil._JOptionPane_showInputDialog("請選擇日期格式", "日期格式化", DBDateFormat.values(), null);
-                            if (e2 == null) {
-                                return;
-                            }
-                            String prefix = StringUtils.substring(sqlTextArea.getText(), 0, sqlTextArea.getSelectionStart());
-                            String suffix = StringUtils.substring(sqlTextArea.getText(), sqlTextArea.getSelectionEnd());
-
-                            column = e2.varchar2Date(column);
-
-                            sqlTextArea.setText(prefix + column + suffix);
-                        }
-                    })//
-                    .addJMenuItem("字串改為 Timestamp", new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            String column = sqlTextArea.getSelectedText();
-
-                            DBDateFormat e2 = (DBDateFormat) JCommonUtil._JOptionPane_showInputDialog("請選擇日期格式", "日期格式化", DBDateFormat.values(), null);
-                            if (e2 == null) {
-                                return;
-                            }
-                            String prefix = StringUtils.substring(sqlTextArea.getText(), 0, sqlTextArea.getSelectionStart());
-                            String suffix = StringUtils.substring(sqlTextArea.getText(), sqlTextArea.getSelectionEnd());
-
-                            column = e2.varchar2Timestamp(column);
-
-                            sqlTextArea.setText(prefix + column + suffix);
-                        }
-                    });//
+                    sqlTextArea.setText(prefix + column + suffix);
+                }
+            });//
             if (mUndoSaveHanlder.hasRecord()) {
                 jpopUtil.addJMenuItem("儲存回復!!!", new ActionListener() {
                     @Override
