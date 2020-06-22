@@ -377,7 +377,7 @@ public class FastDBQueryUI extends JFrame {
     private JLabel columnXlsDefFindRowCountLbl;
     private JCheckBox radio_export_excel_ignoreNull;
     private UndoSaveHanlder mUndoSaveHanlder;
-    private FastDBQueryUI_RowDiffWatcherDlg mFastDBQueryUI_RowDiffWatcherDlg;
+    private FastDBQueryUI_RowPKSettingDlg mFastDBQueryUI_RowDiffWatcherDlg;
     private FastDBQueryUI_RowCompareDlg_Ver2 mFastDBQueryUI_RowCompareDlg_Ver2;
     private JLabel lblNewLabel_20;
     private JComboBox sqlIdCategoryComboBox4Tab1;
@@ -6214,10 +6214,10 @@ public class FastDBQueryUI extends JFrame {
                     if (mFastDBQueryUI_RowDiffWatcherDlg != null) {
                         mFastDBQueryUI_RowDiffWatcherDlg.setVisible(false);
                     }
-                    mFastDBQueryUI_RowDiffWatcherDlg = FastDBQueryUI_RowDiffWatcherDlg.newInstance(this.queryList.getLeft(), new ActionListener() {
+                    mFastDBQueryUI_RowDiffWatcherDlg = FastDBQueryUI_RowPKSettingDlg.newInstance(this.queryList.getLeft(), new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
-                            FastDBQueryUI_RowDiffWatcherDlg dlg = (FastDBQueryUI_RowDiffWatcherDlg) e.getSource();
+                            FastDBQueryUI_RowPKSettingDlg dlg = (FastDBQueryUI_RowPKSettingDlg) e.getSource();
                             List<Integer> pkIndexLst = new ArrayList<Integer>();
                             for (int ii = 0; ii < queryList.getLeft().size(); ii++) {
                                 String column = queryList.getLeft().get(ii);
@@ -6670,10 +6670,10 @@ public class FastDBQueryUI extends JFrame {
                 columnsAndChinese.set(mTableColumnDefTextHandler.getColumnsAndChinese(tableName));
             }
 
-            final FastDBQueryUI_RowDiffWatcherDlg mFastDBQueryUI_RowDiffWatcherDlg = (FastDBQueryUI_RowDiffWatcherDlg.newInstance(columnLst, new ActionListener() {
+            final FastDBQueryUI_RowPKSettingDlg mFastDBQueryUI_RowDiffWatcherDlg = (FastDBQueryUI_RowPKSettingDlg.newInstance(columnLst, new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    FastDBQueryUI_RowDiffWatcherDlg dlg = (FastDBQueryUI_RowDiffWatcherDlg) e.getSource();
+                    FastDBQueryUI_RowPKSettingDlg dlg = (FastDBQueryUI_RowPKSettingDlg) e.getSource();
                     try {
                         final List<Integer> pkIndexLst = new ArrayList<Integer>();
                         for (int ii = 0; ii < columnLst.size(); ii++) {
