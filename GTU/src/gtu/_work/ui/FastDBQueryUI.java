@@ -2985,6 +2985,9 @@ public class FastDBQueryUI extends JFrame {
                     paramBoolLst.add(Pair.of(col, false));
                 }
             }
+            if (paramBoolLst.isEmpty()) {
+                return false;
+            }
             boolean isOk = true;
             for (Pair<String, Boolean> param : paramBoolLst) {
                 System.out.println("param : " + param.getLeft() + "\t" + param.getRight());
@@ -3023,9 +3026,9 @@ public class FastDBQueryUI extends JFrame {
                     String realQuoteLine = mth.group(2);
 
                     // fix 修正回原來的 ↓↓↓↓↓↓↓
-                    System.out.println("quote[0] : " + realQuoteLine);
+                    System.out.println("quote[2] : " + realQuoteLine);
                     realQuoteLine = StringUtils.substring(beforeSQL, mth.start(2), mth.end(2));
-                    System.out.println("quote[1] : " + realQuoteLine);
+                    System.out.println("quote[3] : " + realQuoteLine);
                     // fix 修正回原來的 ↑↑↑↑↑↑↑
 
                     Pattern ptn2 = Pattern.compile(SQL_PARAM_PTN);
@@ -3051,17 +3054,17 @@ public class FastDBQueryUI extends JFrame {
                     }
                     sqlParam.paramSet.addAll(params);
 
-                    if (!params.isEmpty()) {
-                        sqlParam.paramListFix.add(Pair.of(params, new int[] { mth.start(), mth.end() }));
-                    }
+                    // if (!params.isEmpty()) {
+                    sqlParam.paramListFix.add(Pair.of(params, new int[] { mth.start(), mth.end() }));
+                    // }
                 }
                 // 必填檢查 --> 也就是一班參數 :param
                 else {
                     String realQuoteLine = mth.group(3);
                     // fix 修正回原來的 ↓↓↓↓↓↓↓
-                    System.out.println("quote[0] : " + realQuoteLine);
+                    System.out.println("quote[4] : " + realQuoteLine);
                     realQuoteLine = StringUtils.substring(beforeSQL, mth.start(3), mth.end(3));
-                    System.out.println("quote[1] : " + realQuoteLine);
+                    System.out.println("quote[5] : " + realQuoteLine);
                     // fix 修正回原來的 ↑↑↑↑↑↑↑
 
                     sqlParam.paramSet.add(realQuoteLine);
