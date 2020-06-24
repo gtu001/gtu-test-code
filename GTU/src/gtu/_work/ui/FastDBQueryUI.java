@@ -349,6 +349,7 @@ public class FastDBQueryUI extends JFrame {
     private JPanel panel_27;
     private JButton compareXlsExecuteBtn;
     private JButton compareXlsClearBtn;
+    private JButton compareTwoTableBtn;
     private JLabel lblNewLabel_17;
     private JTextField compareXlsMiddleNameText;
     private JTextField compareXlsColumnSettingTitleText;
@@ -1572,6 +1573,14 @@ public class FastDBQueryUI extends JFrame {
             }
         });
         panel_27.add(compareXlsClearBtn);
+
+        compareTwoTableBtn = new JButton("比較兩個表");
+        compareTwoTableBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                compareTwoTableBtnAction();
+            }
+        });
+        panel_27.add(compareTwoTableBtn);
 
         panel_28 = new JPanel();
         tabbedPane.addTab("Excel欄位定義", null, panel_28, null);
@@ -4013,10 +4022,48 @@ public class FastDBQueryUI extends JFrame {
                             }
                         }
 
+                        // 加入中文解釋
+                        int paddingCount = 1;
+                        try {
+                            if (mTableColumnDefTextHandler != null) {
+                                String table = tableColumnDefText_Auto.getTextComponent().getText();
+                                Map<String, String> chineseMap = mTableColumnDefTextHandler.getColumnsAndChinese(table, false);
+                                if (!chineseMap.isEmpty()) {
+                                    paddingCount = 2;
+                                    HSSFRow titleRow00 = sheet0.createRow(1);
+                                    HSSFRow titleRow11 = sheet1.createRow(1);
+                                    if (columnLst.isEmpty()) {
+                                        for (int ii = 0; ii < columns.size(); ii++) {
+                                            String chinese = StringUtils.trimToEmpty(chineseMap.get(columns.get(ii)));
+                                            exlUtl.setCellValue(exlUtl.getCellChk(titleRow00, ii), chinese);
+                                            titleCs.applyStyle(exlUtl.getCellChk(titleRow00, ii));
+                                        }
+                                        for (int ii = 0; ii < columns.size(); ii++) {
+                                            String chinese = StringUtils.trimToEmpty(chineseMap.get(columns.get(ii)));
+                                            exlUtl.setCellValue(exlUtl.getCellChk(titleRow11, ii), chinese);
+                                            titleCs.applyStyle(exlUtl.getCellChk(titleRow11, ii));
+                                        }
+                                    } else {
+                                        for (int ii = 0; ii < columnLst.size(); ii++) {
+                                            String chinese = StringUtils.trimToEmpty(chineseMap.get(columns.get(ii)));
+                                            exlUtl.setCellValue(exlUtl.getCellChk(titleRow00, ii), chinese);
+                                            titleCs.applyStyle(exlUtl.getCellChk(titleRow00, ii));
+                                        }
+                                        for (int ii = 0; ii < columnLst.size(); ii++) {
+                                            String chinese = StringUtils.trimToEmpty(chineseMap.get(columns.get(ii)));
+                                            exlUtl.setCellValue(exlUtl.getCellChk(titleRow11, ii), chinese);
+                                            titleCs.applyStyle(exlUtl.getCellChk(titleRow11, ii));
+                                        }
+                                    }
+                                }
+                            }
+                        } catch (Exception ex) {
+                        }
+
                         if (columnLst.isEmpty()) {
                             for (int ii = 0; ii < tmpQueryList.get().getRight().size(); ii++) {
-                                Row row_string = sheet0.createRow(ii + 1);
-                                Row row_orign$ = sheet1.createRow(ii + 1);
+                                Row row_string = sheet0.createRow(ii + paddingCount);
+                                Row row_orign$ = sheet1.createRow(ii + paddingCount);
 
                                 Object[] rows = tmpQueryList.get().getRight().get(ii);
                                 for (int jj = 0; jj < columns.size(); jj++) {
@@ -4036,8 +4083,8 @@ public class FastDBQueryUI extends JFrame {
                             }
                         } else {
                             for (int ii = 0; ii < tmpQueryList.get().getRight().size(); ii++) {
-                                Row row_string = sheet0.createRow(ii + 1);
-                                Row row_orign$ = sheet1.createRow(ii + 1);
+                                Row row_string = sheet0.createRow(ii + paddingCount);
+                                Row row_orign$ = sheet1.createRow(ii + paddingCount);
 
                                 Object[] rows = tmpQueryList.get().getRight().get(ii);
                                 for (int jj = 0; jj < columnLst.size(); jj++) {
@@ -4067,9 +4114,11 @@ public class FastDBQueryUI extends JFrame {
                         String filename = FastDBQueryUI.class.getSimpleName() + //
                         "_Export_" + //
                         "_" + StringUtils.trimToEmpty(sqlIdText.getText()) + "_" + //
-                        DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMdd_HHmmss") + //
-                        ".xls";
+                        DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMdd_HHmmss");
                         filename = JCommonUtil._jOptionPane_showInputDialog("儲存檔案", filename);
+                        if (!filename.toLowerCase().endsWith(".xls")) {
+                            filename += ".xls";
+                        }
                         if (StringUtils.isNotBlank(filename) || !filename.endsWith(".xls")) {
                             File exportFile = new File(FileUtil.DESKTOP_DIR, filename);
                             exlUtl.writeExcel(exportFile, wk);
@@ -6539,7 +6588,7 @@ public class FastDBQueryUI extends JFrame {
             return false;
         }
 
-        private void init2() {
+        private void init2(boolean showErrMsg) {
             File dir = new File(FileUtil.DESKTOP_DIR, "FastColumnDef");
             if (!dir.exists()) {
                 dir.mkdirs();
@@ -6548,7 +6597,9 @@ public class FastDBQueryUI extends JFrame {
                 checkXlsLoader(false);
             }
             if (mXlsColumnDefDlg.getConfig() == null) {
-                Validate.isTrue(false, "請先按設定");
+                if (showErrMsg) {
+                    Validate.isTrue(false, "請先按設定");
+                }
             }
             xlsLoader.setMappingConfig(mXlsColumnDefDlg.getConfig());
         }
@@ -6593,6 +6644,9 @@ public class FastDBQueryUI extends JFrame {
                     String table = String.valueOf(tableColumnDefText.getSelectedItem());
                     String tableAlias = getTableAlias(table, true);
                     List<String> colLst = xlsLoader.getColumnLst(table);
+                    if (colLst == null) {
+                        colLst = Collections.EMPTY_LIST;
+                    }
                     for (Object tit : JTableUtil.newInstance(queryResultTable).getColumnTitleArray()) {
                         String column = (String) tit;
                         if (ListUtil.constainIgnorecase(column, colLst)) {
@@ -6607,11 +6661,14 @@ public class FastDBQueryUI extends JFrame {
             return sb.toString();
         }
 
-        public Map<String, String> getColumnsAndChinese(String table) {
+        public Map<String, String> getColumnsAndChinese(String table, boolean showErrMsg) {
             Map<String, String> rtnMap = new LinkedHashMap<String, String>();
             try {
-                init2();
+                init2(showErrMsg);
                 List<String> colLst = xlsLoader.getColumnLst(table);
+                if (colLst == null) {
+                    colLst = Collections.EMPTY_LIST;
+                }
                 for (String column : colLst) {
                     if (ListUtil.constainIgnorecase(column, colLst)) {
                         String chinese = xlsLoader.getDBColumnChinese(column, false, table);
@@ -6637,7 +6694,7 @@ public class FastDBQueryUI extends JFrame {
         }
 
         public Triple<DefaultTableModel, Integer, ActionListener> query(String tableQry, String columnQry, String otherQry, boolean hasChinese, JTable jtable, JFrame jframe) {
-            init2();
+            init2(true);
             return xlsLoader.query(tableQry, columnQry, otherQry, hasChinese, jtable, jframe);
         }
     }
@@ -6659,6 +6716,14 @@ public class FastDBQueryUI extends JFrame {
         return columnLst;
     }
 
+    private void compareTwoTableBtnAction() {
+        try {
+//xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+        } catch (Exception ex) {
+            JCommonUtil.handleException(ex);
+        }
+    }
+
     private void compareXlsExecuteBtnAction() {
         try {
             final String fileMiddleName = StringUtils.trimToEmpty(compareXlsMiddleNameText.getText());
@@ -6670,7 +6735,7 @@ public class FastDBQueryUI extends JFrame {
             final AtomicReference<Map<String, String>> columnsAndChinese = new AtomicReference<Map<String, String>>();
             if (StringUtils.isNotBlank(compareXlsColumnSettingTitleText.getText())) {
                 String tableName = compareXlsColumnSettingTitleText.getText();
-                columnsAndChinese.set(mTableColumnDefTextHandler.getColumnsAndChinese(tableName));
+                columnsAndChinese.set(mTableColumnDefTextHandler.getColumnsAndChinese(tableName, true));
             }
 
             final FastDBQueryUI_RowPKSettingDlg mFastDBQueryUI_RowDiffWatcherDlg = (FastDBQueryUI_RowPKSettingDlg.newInstance(columnLst, new ActionListener() {

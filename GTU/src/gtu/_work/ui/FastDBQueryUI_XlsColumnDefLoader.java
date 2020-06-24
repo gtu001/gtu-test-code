@@ -4,6 +4,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -105,6 +106,9 @@ public class FastDBQueryUI_XlsColumnDefLoader {
     }
 
     public void setMappingConfig(List<XlsColumnDefClz> configLst) {
+        if (configLst == null) {
+            configLst = Collections.EMPTY_LIST;
+        }
         this.configLst = configLst;
         for (XlsColumnDefClz c1 : this.configLst) {
             if (c1.type == XlsColumnDefType.CHINESE) {
