@@ -13,7 +13,7 @@ public class DBConnection extends SQLiteOpenHelper {
     private static final String TAG = DBConnection.class.getSimpleName();
 
     static final String DATABASE_NAME = "ExamBook";
-    static final int DATABASE_VERSION = 16;
+    static final int DATABASE_VERSION = 25;
 
     public DBConnection(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -88,6 +88,17 @@ public class DBConnection extends SQLiteOpenHelper {
         sb.append("     full_path  text not null                       ");
         sb.append(" );                                                 ");
         Log.i("haiyang:createDB 1=", sb.toString());
+
+        sb.setLength(0);
+        sb.append(" create table recent_book_open_history (                        ");
+        sb.append("     book_name  text  primary key not null,         ");
+        sb.append("     file_path  text  ,                    ");
+        sb.append("     sub_name  text  ,                    ");
+        sb.append("     open_times  int ,                    ");
+        sb.append("     latest_open_datetime  long                       ");
+        sb.append(" );                                                 ");
+        Log.i("haiyang:createDB 1=", sb.toString());
+
         db.execSQL(sb.toString());
     }
 
@@ -95,12 +106,30 @@ public class DBConnection extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         StringBuilder sb = new StringBuilder();
 
-        if (newVersion == 16) {
+        if (newVersion == 25) {
             // txt查單字紀錄表
             sb = new StringBuilder();
-//            sb.append("  alter table recent_txt_mark add insert_Date_Dtype DATETIME   ");//add column
+
+
+            sb.setLength(0);
+            sb.append("  DROP table recent_book_open_history ;   ");//add column
+            Log.i("haiyang:createDB 1=", sb.toString());
+            db.execSQL(sb.toString());
+
+//            sb.append("  DROP table recent_book_open_history ;   ");//add column
+//            sb.append("  alter table recent_book_open_history add  file_path  text   ");//add column
 //            sb.append("  DROP table recent_txt_mark ;   ");//add column
 //            sb.append("  alter table recent_search add sentance text    ");//add column
+
+
+            sb.setLength(0);
+            sb.append(" create table recent_book_open_history (                        ");
+            sb.append("     book_name  text  primary key not null,         ");
+            sb.append("     file_path  text  ,                    ");
+            sb.append("     sub_name  text  ,                    ");
+            sb.append("     open_times  int ,                    ");
+            sb.append("     latest_open_datetime  long                       ");
+            sb.append(" );                                                 ");
 
             Log.i("haiyang:createDB 1=", sb.toString());
             db.execSQL(sb.toString());

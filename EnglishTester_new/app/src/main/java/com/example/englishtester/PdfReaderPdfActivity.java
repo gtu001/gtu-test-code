@@ -106,6 +106,7 @@ public class PdfReaderPdfActivity extends FragmentActivity implements FloatViewS
     ReaderCommonHelper.LineSpacingAdjuster mLineSpacingAdjuster;
     ReaderCommonHelper.FloatViewServiceOpenStatusReceiverHelper floatViewServiceOpenStatusReceiverHelper;
     ReaderCommonHelper.BookmarkShowWordListHandler mBookmarkShowWordListHandler;
+    RecentBookHistoryService mRecentBookHistoryService;
 
     TextView txtReaderView;
     TextView translateView;
@@ -143,6 +144,14 @@ public class PdfReaderPdfActivity extends FragmentActivity implements FloatViewS
             // 正常執行要做的
             Log.v(TAG, "### initial ###");
             this.initServices();
+        }
+
+        // 直接開啟檔案
+        if (getIntent().getExtras().containsKey(RecentBookHistoryService.RECENT_OPEN_BOOK)) {
+            String path = getIntent().getExtras().getString(RecentBookHistoryService.RECENT_OPEN_BOOK);
+            if (StringUtils.isNotBlank(path)) {
+                setTxtContentFromFile(new File(path), null, null);
+            }
         }
     }
 
@@ -372,6 +381,8 @@ public class PdfReaderPdfActivity extends FragmentActivity implements FloatViewS
         mLineSpacingAdjuster = new ReaderCommonHelper.LineSpacingAdjuster(this);
         mBookmarkShowWordListHandler = new ReaderCommonHelper.BookmarkShowWordListHandler(this, this, this);
 
+        mRecentBookHistoryService = new RecentBookHistoryService(this);
+
         this.doOnoffService(true);
     }
 
@@ -475,6 +486,8 @@ public class PdfReaderPdfActivity extends FragmentActivity implements FloatViewS
 
                         //設定書籍 及 初始化
                         epubViewerMainHandler.initBook(file, PdfReaderPdfActivity.this);
+                        // 紀錄開啟書籍
+                        mRecentBookHistoryService.recordOpenBook(file);
 
                         //註冊開啟檔案
                         String fileName = PdfViewerMainHandler.PdfPageTitleHandler.fixNameToTitle(file.getName());

@@ -182,6 +182,9 @@
         <activity
             android:name=".DropboxHtmlListActivity"
             android:label="開啟Dropbox檔案" />
+        <activity
+            android:name=".RecentBookHistoryActivity"
+            android:label="開啟最近文檔" />
         <!-- for AdMob ↓↓↓↓↓↓ -->
         <activity
             android:name="com.google.android.gms.ads.AdActivity"

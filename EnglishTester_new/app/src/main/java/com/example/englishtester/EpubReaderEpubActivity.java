@@ -110,6 +110,7 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
     ReaderCommonHelper.LineSpacingAdjuster mLineSpacingAdjuster;
     ReaderCommonHelper.FloatViewServiceOpenStatusReceiverHelper floatViewServiceOpenStatusReceiverHelper;
     ReaderCommonHelper.BookmarkShowWordListHandler mBookmarkShowWordListHandler;
+    RecentBookHistoryService mRecentBookHistoryService;
 
     TextView txtReaderView;
     TextView translateView;
@@ -147,6 +148,14 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
             // 正常執行要做的
             Log.v(TAG, "### initial ###");
             this.initServices();
+        }
+
+        // 直接開啟檔案
+        if (getIntent().getExtras().containsKey(RecentBookHistoryService.RECENT_OPEN_BOOK)) {
+            String path = getIntent().getExtras().getString(RecentBookHistoryService.RECENT_OPEN_BOOK);
+            if (StringUtils.isNotBlank(path)) {
+                setTxtContentFromFile(new File(path), null, null);
+            }
         }
     }
 
@@ -376,6 +385,8 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
         mLineSpacingAdjuster = new ReaderCommonHelper.LineSpacingAdjuster(this);
         mBookmarkShowWordListHandler = new ReaderCommonHelper.BookmarkShowWordListHandler(this, this, this);
 
+        mRecentBookHistoryService = new RecentBookHistoryService(this);
+
         this.doOnoffService(true);
     }
 
@@ -468,6 +479,8 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
 
                         //設定書籍 及 初始化
                         epubViewerMainHandler.initBook(file);
+                        // 紀錄開啟書籍
+                        mRecentBookHistoryService.recordOpenBook(file);
 
                         //註冊開啟檔案
                         String fileName = EpubViewerMainHandler.EpubPageTitleHandler.fixNameToTitle(file.getName());
@@ -1055,7 +1068,7 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
     static int MENU_FIRST = Menu.FIRST;
 
     enum TaskInfo {
-//        BOOKMARK_SHOWWORD_LIST("單字清單", MENU_FIRST++, REQUEST_CODE++, null) {
+        //        BOOKMARK_SHOWWORD_LIST("單字清單", MENU_FIRST++, REQUEST_CODE++, null) {
 //            protected void onActivityResult(EpubReaderEpubActivity activity, Intent intent, Bundle bundle) {
 //            }
 //

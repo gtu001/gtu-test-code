@@ -111,6 +111,7 @@ public class TxtReaderBufferActivity extends FragmentActivity implements FloatVi
     ReaderCommonHelper.FloatViewServiceOpenStatusReceiverHelper floatViewServiceOpenStatusReceiverHelper;
     IDropboxFileLoadService dropboxFileLoadService;
     ReaderCommonHelper.BookmarkShowWordListHandler mBookmarkShowWordListHandler;
+    RecentBookHistoryService mRecentBookHistoryService;
 
     TextView txtReaderView;
     TextView translateView;
@@ -148,6 +149,14 @@ public class TxtReaderBufferActivity extends FragmentActivity implements FloatVi
             // 正常執行要做的
             Log.v(TAG, "### initial ###");
             this.initServices();
+        }
+
+        // 直接開啟檔案
+        if (getIntent().getExtras().containsKey(RecentBookHistoryService.RECENT_OPEN_BOOK)) {
+            String path = getIntent().getExtras().getString(RecentBookHistoryService.RECENT_OPEN_BOOK);
+            if (StringUtils.isNotBlank(path)) {
+                setTxtContentFromFile(new File(path), null, null);
+            }
         }
     }
 
@@ -379,6 +388,8 @@ public class TxtReaderBufferActivity extends FragmentActivity implements FloatVi
         mLineSpacingAdjuster = new ReaderCommonHelper.LineSpacingAdjuster(this);
         mBookmarkShowWordListHandler = new ReaderCommonHelper.BookmarkShowWordListHandler(this, this, this);
 
+        mRecentBookHistoryService = new RecentBookHistoryService(this);
+
         this.doOnoffService(true);
     }
 
@@ -539,6 +550,8 @@ public class TxtReaderBufferActivity extends FragmentActivity implements FloatVi
                         if (txtFileGetterCall != null) {
                             txtFileZ.set(txtFileGetterCall.call());
                         }
+                        // 紀錄開啟書籍
+                        mRecentBookHistoryService.recordOpenBook(txtFileZ.get());
 
                         setTitleNameProcess();
 

@@ -165,7 +165,10 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
      * 查詢單字處理
      */
     ReaderCommonHelper.BookmarkShowWordListHandler mBookmarkShowWordListHandler;
-
+    /**
+     * 開啟紀錄
+     */
+    RecentBookHistoryService mRecentBookHistoryService;
 
     EditText editText1;
     Button clearBtn;
@@ -250,6 +253,14 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
                 }
             } catch (Exception ex) {
                 throw new RuntimeException("onCreate ERR : " + ex.getMessage(), ex);
+            }
+        }
+
+        // 直接開啟檔案
+        if (getIntent().getExtras().containsKey(RecentBookHistoryService.RECENT_OPEN_BOOK)) {
+            String path = getIntent().getExtras().getString(RecentBookHistoryService.RECENT_OPEN_BOOK);
+            if (StringUtils.isNotBlank(path)) {
+                setTxtContentFromFile(new File(path), null, null);
             }
         }
     }
@@ -557,6 +568,8 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
 
         mLineSpacingAdjuster = new ReaderCommonHelper.LineSpacingAdjuster(this);
         mBookmarkShowWordListHandler = new ReaderCommonHelper.BookmarkShowWordListHandler(this, this, this);
+
+        mRecentBookHistoryService = new RecentBookHistoryService(this);
 
         doOnoffService(true);
     }
@@ -1164,6 +1177,9 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
                         }
 
                         setTitleNameProcess();
+
+                        // 紀錄開啟書籍
+                        mRecentBookHistoryService.recordOpenBook(txtFileZ.get());
 
                         if (txtFileZ.get().getName().endsWith(".htm") || txtFileZ.get().getName().endsWith(".html")) {
                             htmlProcess();

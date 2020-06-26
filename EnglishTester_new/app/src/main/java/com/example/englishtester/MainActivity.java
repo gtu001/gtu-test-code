@@ -58,6 +58,13 @@ public class MainActivity extends Activity implements ActivityCompat.OnRequestPe
 
         //----------------------------------------------------------------
         contentView.addView(createLabel(""));
+        contentView.addView(createLabel("開啟最近看的文檔"));
+        contentView.addView(createButton("最近開啟文件",//
+                createOnClickListener(RecentBookHistoryActivity.class, new Bundle(), null),
+                R.drawable.answer_button_lightblue));
+
+        //----------------------------------------------------------------
+        contentView.addView(createLabel(""));
         contentView.addView(createLabel("純文字閱讀器,可開啟剪貼簿內容或Dropbox內容"));
         contentView.addView(createButton("文字閱讀器",//
                 createOnClickListener(TxtReaderActivity.class, new Bundle(), null),
