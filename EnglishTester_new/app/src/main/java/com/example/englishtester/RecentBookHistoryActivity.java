@@ -9,6 +9,7 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 
 import java.util.ArrayList;
@@ -78,7 +79,21 @@ public class RecentBookHistoryActivity extends ListActivity {
 
         bundle.putString(RecentBookHistoryService.RECENT_OPEN_BOOK, vo.filePath);
 
-        intent.setClass(RecentBookHistoryActivity.this, EpubReaderEpubActivity.class);
+        switch (StringUtils.trimToEmpty(vo.subName)) {
+            case "epub":
+                intent.setClass(RecentBookHistoryActivity.this, EpubReaderEpubActivity.class);
+                break;
+            case "pdf":
+                intent.setClass(RecentBookHistoryActivity.this, PdfReaderPdfActivity.class);
+                break;
+            case "mobi":
+                intent.setClass(RecentBookHistoryActivity.this, MobiReaderMobiActivity.class);
+                break;
+            default:
+                intent.setClass(RecentBookHistoryActivity.this, TxtReaderBufferActivity.class);
+                break;
+        }
+
         intent.putExtras(bundle);
         startActivityForResult(intent, 9999);
     }
