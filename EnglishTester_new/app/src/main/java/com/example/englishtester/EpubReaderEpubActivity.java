@@ -425,6 +425,11 @@ public class EpubReaderEpubActivity extends FragmentActivity implements FloatVie
     }
 
     @Override
+    public Context getContext() {
+        return this;
+    }
+
+    @Override
     public IFloatServiceAidlInterface getFloatService() {
         return mService;
     }

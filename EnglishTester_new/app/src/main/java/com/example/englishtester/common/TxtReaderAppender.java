@@ -1,5 +1,8 @@
 package com.example.englishtester.common;
 
+import android.content.Context;
+import android.content.DialogInterface;
+import android.os.Handler;
 import android.os.RemoteException;
 import android.text.SpannableString;
 import android.text.Spanned;
@@ -11,6 +14,7 @@ import com.example.englishtester.BuildConfig;
 import com.example.englishtester.FloatViewService;
 import com.example.englishtester.RecentTxtMarkDAO;
 import com.example.englishtester.RecentTxtMarkService;
+import com.example.englishtester.TxtReaderActivity;
 import com.example.englishtester.common.epub.base.EpubViewerMainHandler;
 import com.example.englishtester.common.interf.ITxtReaderActivity;
 import com.example.englishtester.common.interf.ITxtReaderActivityDTO;
@@ -22,10 +26,14 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -68,13 +76,15 @@ public class TxtReaderAppender {
         List<Pair<Integer, Integer>> normalIgnoreLst = new ArrayList<>();
         String dtoFileName;
         Map<Integer, TxtReaderAppenderSpanClass.WordSpan> bookmarkMap = new HashMap<Integer, TxtReaderAppenderSpanClass.WordSpan>();
+        Context context;
 
-        TxtAppenderProcess(String txtContent, boolean isWordHtml, int maxPicWidth, String dtoFileName) {
+        TxtAppenderProcess(String txtContent, boolean isWordHtml, int maxPicWidth, String dtoFileName, Context context) {
             this.txtContent = txtContent;
             this.isWordHtml = isWordHtml;
             this.ss = new SpannableString(txtContent);
             this.maxPicWidth = maxPicWidth;
             this.dtoFileName = dtoFileName;
+            this.context = context;
         }
 
         public SpannableString getResult() {
@@ -172,6 +182,7 @@ public class TxtReaderAppender {
                         activity.onWordClickBefore_TxtReaderAppender(txtNow);
 
                         boolean isClickBookmark = false;
+                        boolean isAskRemark = false;
 
                         if (!dto.getBookmarkMode()) {
                             //myService.searchWordForActivity(txtNow);
@@ -187,6 +198,11 @@ public class TxtReaderAppender {
                             setMarking(true);
                         } else {
                             isClickBookmark = true;
+
+                            if (!this.isBookmarking()) {
+                                isAskRemark = true;
+                            }
+
                             setBookmarking(!this.isBookmarking());
                             putToBookmarkHolder(this);
 
@@ -194,7 +210,22 @@ public class TxtReaderAppender {
                         }
 
                         // 新增單字
-                        RecentTxtMarkDAO.RecentTxtMark clickVo = recentTxtMarkService.addMarkWord(dto.getFileName().toString(), txtNow, this.id, dto.getPageIndex(), isClickBookmark);
+                        RecentTxtMarkDAO.RecentTxtMark clickVo = null;
+                        //詢問是否加入註解
+                        if (isAskRemark) {
+                            final boolean _isClickBookmark = isClickBookmark;
+                            final SingleInputDialog dlg = new SingleInputDialog(context, "", "請輸入標籤的註解", "請輸入標籤的註解，可空白");
+                            dlg.confirmButton(new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    String remark = dlg.getEditText(true, true);
+                                    recentTxtMarkService.addMarkWord(dto.getFileName().toString(), txtNow, id, dto.getPageIndex(), _isClickBookmark, remark);
+                                }
+                            });
+                            dlg.show();
+                        } else {
+                            recentTxtMarkService.addMarkWord(dto.getFileName().toString(), txtNow, this.id, dto.getPageIndex(), isClickBookmark, "");
+                        }
 
                         //debug ↓↓↓↓↓↓↓↓↓↓
                         if (BuildConfig.DEBUG) {
@@ -264,23 +295,23 @@ public class TxtReaderAppender {
     /**
      * 建立可點擊文件
      */
-    public SpannableString getAppendTxt(String txtContent, String dtoFileName) {
-        TxtAppenderProcess appender = new TxtAppenderProcess(txtContent, false, -1, dtoFileName);
+    public SpannableString getAppendTxt(String txtContent, String dtoFileName, Context context) {
+        TxtAppenderProcess appender = new TxtAppenderProcess(txtContent, false, -1, dtoFileName, context);
         return appender.getResult();
     }
 
     /**
      * 建立可點擊文件
      */
-    public SpannableString getAppendTxt_HtmlFromWord(String txtContent, int maxPicWidth, String dtoFileName) {
-        TxtAppenderProcess appender = new TxtAppenderProcess(txtContent, true, maxPicWidth, dtoFileName);
+    public SpannableString getAppendTxt_HtmlFromWord(String txtContent, int maxPicWidth, String dtoFileName, Context context) {
+        TxtAppenderProcess appender = new TxtAppenderProcess(txtContent, true, maxPicWidth, dtoFileName, context);
         return appender.getResult();
     }
 
     /**
      * 建立可點擊文件
      */
-    public Triple<List<TxtAppenderProcess>, List<String>, List<String>> getAppendTxt_HtmlFromWord_4Epub(int spinePos, String txtContent, int maxPicWidth) {
+    public Triple<List<TxtAppenderProcess>, List<String>, List<String>> getAppendTxt_HtmlFromWord_4Epub(int spinePos, String txtContent, int maxPicWidth, Context context) {
         long startTime = System.currentTimeMillis();
 
         List<TxtAppenderProcess> pageDividLst = new ArrayList<>();
@@ -305,7 +336,7 @@ public class TxtReaderAppender {
 
             dto.setFileName(titleHandler.getTitle(ii));
 
-            TxtAppenderProcess appender = new TxtAppenderProcess(page, true, maxPicWidth, dto.getFileName().toString());
+            TxtAppenderProcess appender = new TxtAppenderProcess(page, true, maxPicWidth, dto.getFileName().toString(), context);
             pageDividLst.add(appender);
         }
 
@@ -318,7 +349,7 @@ public class TxtReaderAppender {
     /**
      * 建立可點擊文件
      */
-    public Triple<List<TxtAppenderProcess>, List<String>, List<String>> getAppendTxt_HtmlFromWord_4Mobi(int spinePos, String txtContent, int maxPicWidth) {
+    public Triple<List<TxtAppenderProcess>, List<String>, List<String>> getAppendTxt_HtmlFromWord_4Mobi(int spinePos, String txtContent, int maxPicWidth, Context context) {
         long startTime = System.currentTimeMillis();
 
         List<TxtAppenderProcess> pageDividLst = new ArrayList<>();
@@ -343,7 +374,7 @@ public class TxtReaderAppender {
 
             dto.setFileName(titleHandler.getTitle(ii));
 
-            TxtAppenderProcess appender = new TxtAppenderProcess(page, true, maxPicWidth, dto.getFileName().toString());
+            TxtAppenderProcess appender = new TxtAppenderProcess(page, true, maxPicWidth, dto.getFileName().toString(), context);
             pageDividLst.add(appender);
         }
 
@@ -356,7 +387,7 @@ public class TxtReaderAppender {
     /**
      * 建立可點擊文件
      */
-    public Triple<List<TxtAppenderProcess>, List<String>, List<String>> getAppendTxt_HtmlFromWord_4Pdf(int spinePos, String txtContent, int maxPicWidth) {
+    public Triple<List<TxtAppenderProcess>, List<String>, List<String>> getAppendTxt_HtmlFromWord_4Pdf(int spinePos, String txtContent, int maxPicWidth, Context context) {
         long startTime = System.currentTimeMillis();
 
         List<TxtAppenderProcess> pageDividLst = new ArrayList<>();
@@ -381,7 +412,7 @@ public class TxtReaderAppender {
 
             dto.setFileName(titleHandler.getTitle(ii));
 
-            TxtAppenderProcess appender = new TxtAppenderProcess(page, true, maxPicWidth, dto.getFileName().toString());
+            TxtAppenderProcess appender = new TxtAppenderProcess(page, true, maxPicWidth, dto.getFileName().toString(), context);
             pageDividLst.add(appender);
         }
 
@@ -395,7 +426,7 @@ public class TxtReaderAppender {
     /**
      * 建立可點擊文件
      */
-    public Triple<List<TxtAppenderProcess>, List<String>, List<String>> getAppendTxt_HtmlFromWord_4TxtBuffer(int spinePos, String txtContent, int maxPicWidth) {
+    public Triple<List<TxtAppenderProcess>, List<String>, List<String>> getAppendTxt_HtmlFromWord_4TxtBuffer(int spinePos, String txtContent, int maxPicWidth, Context context) {
         long startTime = System.currentTimeMillis();
 
         List<TxtAppenderProcess> pageDividLst = new ArrayList<>();
@@ -420,7 +451,7 @@ public class TxtReaderAppender {
 
             dto.setFileName(titleHandler.getTitle(ii));
 
-            TxtAppenderProcess appender = new TxtAppenderProcess(page, true, maxPicWidth, dto.getFileName().toString());
+            TxtAppenderProcess appender = new TxtAppenderProcess(page, true, maxPicWidth, dto.getFileName().toString(), context);
             pageDividLst.add(appender);
         }
 

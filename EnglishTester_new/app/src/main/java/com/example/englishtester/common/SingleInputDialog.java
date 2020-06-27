@@ -52,6 +52,8 @@ public class SingleInputDialog {
 
         builder.setTitle(title);
         builder.setMessage(message);
+
+        builder.setCancelable(false);
     }
 
     public static String getFixText(String fromText, boolean isTrimToEmpty, boolean isSingleLine) {

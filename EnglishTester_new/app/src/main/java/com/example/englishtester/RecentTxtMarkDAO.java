@@ -228,6 +228,7 @@ public class RecentTxtMarkDAO {
         word.insertDate = c.getLong(c.getColumnIndex(RecentTxtMarkSchmea.INSERT_DATE));
         word.scrollYPos = c.getInt(c.getColumnIndex(RecentTxtMarkSchmea.SCROLL_Y_POS));
         word.bookmarkType = c.getInt(c.getColumnIndex(RecentTxtMarkSchmea.BOOKMARK_TYPE));
+        word.remark = c.getString(c.getColumnIndex(RecentTxtMarkSchmea.REMARK));
         return word;
     }
 
@@ -241,6 +242,7 @@ public class RecentTxtMarkDAO {
         values.put(RecentTxtMarkSchmea.SCROLL_Y_POS, word.scrollYPos);
         values.put(RecentTxtMarkSchmea.BOOKMARK_TYPE, word.bookmarkType);
         values.put(RecentTxtMarkSchmea.PAGE_INDEX, word.pageIndex);
+        values.put(RecentTxtMarkSchmea.REMARK, word.remark);
         return values;
     }
 
@@ -262,6 +264,7 @@ public class RecentTxtMarkDAO {
         int scrollYPos = 0;
         int bookmarkType;//0:不適書籤 | 1:是書籤
         int pageIndex = -1;//頁碼
+        String remark;
 
         public Long getListId() {
             return listId;
@@ -318,6 +321,14 @@ public class RecentTxtMarkDAO {
         public void setBookmarkType(int bookmarkType) {
             this.bookmarkType = bookmarkType;
         }
+
+        public String getRemark() {
+            return remark;
+        }
+
+        public void setRemark(String remark) {
+            this.remark = remark;
+        }
     }
 
     public interface RecentTxtMarkSchmea {
@@ -330,7 +341,8 @@ public class RecentTxtMarkDAO {
         String SCROLL_Y_POS = "scroll_y_pos";
         String BOOKMARK_TYPE = "bookmark_type";
         String PAGE_INDEX = "page_index";
-        final String[] FROM = {LIST_ID, FILE_NAME, MARK_INDEX, MARK_ENGLISH, INSERT_DATE, SCROLL_Y_POS, BOOKMARK_TYPE, PAGE_INDEX};
+        String REMARK = "remark";
+        final String[] FROM = {LIST_ID, FILE_NAME, MARK_INDEX, MARK_ENGLISH, INSERT_DATE, SCROLL_Y_POS, BOOKMARK_TYPE, PAGE_INDEX, REMARK};
     }
 
     public enum BookmarkTypeEnum {

@@ -363,6 +363,11 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
     }
 
     @Override
+    public Context getContext() {
+        return this;
+    }
+
+    @Override
     public String getFileName() {
         return dto.getFileName().toString();
     }
@@ -838,12 +843,12 @@ public class TxtReaderActivity extends Activity implements FloatViewService.Call
         //init
         this.dto.setBookmarkHolder(new TreeMap());
         if (!isHtmlFromWord) {
-            SpannableString spannableHolder = appender.getAppendTxt(content, dto.getFileName().toString());
+            SpannableString spannableHolder = appender.getAppendTxt(content, dto.getFileName().toString(), this);
             this.dto.setSpannableHolder(spannableHolder);
             txtView.setText(spannableHolder);
             this.dto.content = content;
         } else {
-            SpannableString spannableHolder = appender.getAppendTxt_HtmlFromWord(content, paddingAdjuster.getMaxWidth() - 10, dto.getFileName().toString());
+            SpannableString spannableHolder = appender.getAppendTxt_HtmlFromWord(content, paddingAdjuster.getMaxWidth() - 10, dto.getFileName().toString(), this);
             this.dto.setSpannableHolder(spannableHolder);
             txtView.setText(spannableHolder);
             if (dto.currentHtmlFile != null) {

@@ -9,7 +9,9 @@ import com.example.englishtester.RecentTxtMarkDAO.RecentTxtMarkSchmea;
 import com.google.common.reflect.Reflection;
 
 import org.apache.commons.collections4.Transformer;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 
 import java.util.Calendar;
 import java.util.Collections;
@@ -63,7 +65,7 @@ public class RecentTxtMarkService {
     /**
      * 新增查詢單字
      */
-    public RecentTxtMark addMarkWord(final String fileName, final String word, final int index, int pageIndex, boolean clickBookmark) {
+    public RecentTxtMark addMarkWord(final String fileName, final String word, final int index, int pageIndex, boolean clickBookmark, String remark) {
 //        Log.line(TAG, "fileName = " + fileName + " , word = " + word + " , index = " + index + " , pageIndex = " + pageIndex + " , clickBookmark = " + clickBookmark);
         long currentTime = System.currentTimeMillis();
         RecentTxtMark bo = new RecentTxtMark();
@@ -73,6 +75,7 @@ public class RecentTxtMarkService {
         bo.markIndex = index;
         bo.bookmarkType = getBookmarkType(null, clickBookmark);
         bo.pageIndex = pageIndex;
+        bo.remark = StringUtils.trimToEmpty(remark);
 
         List<RecentTxtMark> list = recentTxtMarkDAO.query(//
                 RecentTxtMarkSchmea.FILE_NAME + "=? and " + //
@@ -90,6 +93,7 @@ public class RecentTxtMarkService {
             int result = recentTxtMarkDAO.updateByVO(bo);
             Log.v(TAG, "update [" + result + "]" + ReflectionToStringBuilder.toString(bo));
         }
+        Log.v(TAG, "AddMarkWord -- " + ReflectionToStringBuilder.toString(bo, ToStringStyle.MULTI_LINE_STYLE));
         return bo;
     }
 

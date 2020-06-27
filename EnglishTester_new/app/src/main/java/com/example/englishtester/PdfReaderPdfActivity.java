@@ -421,6 +421,11 @@ public class PdfReaderPdfActivity extends FragmentActivity implements FloatViewS
         this.actionBarCustomTitleHandler.setText(titleVal);
     }
 
+    @Override
+    public Context getContext() {
+        return this;
+    }
+
     public String getFileName() {
         String fileName = PdfViewerMainHandler.PdfPageTitleHandler.fixNameToTitle(this.epubViewerMainHandler.getDto().getBookFile().getName());
         return fileName;

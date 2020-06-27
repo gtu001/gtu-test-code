@@ -428,6 +428,11 @@ public class TxtReaderBufferActivity extends FragmentActivity implements FloatVi
     }
 
     @Override
+    public Context getContext() {
+        return this;
+    }
+
+    @Override
     public String getFileName() {
         String fileName = TxtBufferViewerMainHandler.TxtPageTitleHandler.fixNameToTitle(txtBufferViewerMainHandler.getDto().getBookFile().getName());
         return fileName;

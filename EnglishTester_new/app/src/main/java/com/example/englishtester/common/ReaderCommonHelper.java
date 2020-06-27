@@ -68,6 +68,8 @@ import static java.lang.Thread.sleep;
 
 public class ReaderCommonHelper {
 
+    private static final String TAG = ReaderCommonHelper.class.getSimpleName();
+
     private static final ReaderCommonHelper _INST = new ReaderCommonHelper();
 
     private ReaderCommonHelper() {
@@ -711,6 +713,17 @@ public class ReaderCommonHelper {
             int bookmark_type;
             long insert_date;
             int page_index;
+            String remark;
+            String file_name_fix;
+
+            private String getFixNameFix(String file_name) {
+                Pattern ptn = Pattern.compile("^.*(\\[.*?\\])$");
+                Matcher mth = ptn.matcher(file_name);
+                if (mth.find()) {
+                    return "頁" + mth.group(1);
+                }
+                return file_name;
+            }
 
             private Row(Map<String, Object> map) {
 //                {file_name=Everybody Lies Big Data, New Data, and What the Internet - Seth Stephens-Davidowitz[4], bookmark_type=2, insert_date=496398149}
@@ -718,11 +731,19 @@ public class ReaderCommonHelper {
                 bookmark_type = (Integer) map.get("bookmark_type");
                 insert_date = (Integer) map.get("insert_date");
                 page_index = (Integer) map.get("page_index");
+                remark = (String) map.get("remark");
+                file_name_fix = getFixNameFix(file_name);
+
+                String remark = "";
+                if (StringUtils.isNotBlank(this.remark)) {
+                    remark = "  「" + StringUtils.trimToEmpty(this.remark) + "」";
+                }
+                file_name_fix += remark;
             }
 
             private Map<String, Object> toAdapterMap() {
                 Map<String, Object> map = new HashMap<>();
-                map.put("ItemTitle", file_name);
+                map.put("ItemTitle", file_name_fix);
                 map.put("ItemDetail", "page " + (page_index + 1));
                 map.put("ItemDetailRight", DateFormatUtils.format(insert_date, "yyyy/MM/dd HH:mm:ss"));
                 map.put("ItemDetail2", "");
@@ -735,10 +756,10 @@ public class ReaderCommonHelper {
             fileName = fileName.replaceAll("'", "''");
 
             StringBuilder sb = new StringBuilder();
-            sb.append(" select file_name , bookmark_type, max(insert_date) as insert_date, page_index      ");
+            sb.append(" select file_name , bookmark_type, max(insert_date) as insert_date, page_index , remark                ");
             sb.append(" from recent_txt_mark                                                              ");
             sb.append(" where bookmark_type in (%s) and file_name like '%s%%'  and page_index != -1       ");
-            sb.append("  group by file_name                                                               ");
+            sb.append("  group by file_name, bookmark_type, remark, page_index                            ");
             sb.append("  order by 3 desc                                                                  ");
 
             String bookmarkTypeStr = StringUtils.join(Arrays.asList(RecentTxtMarkDAO.BookmarkTypeEnum.BOOKMARK.getType(), RecentTxtMarkDAO.BookmarkTypeEnum.SCROLL_Y_POS.getType()), ",");

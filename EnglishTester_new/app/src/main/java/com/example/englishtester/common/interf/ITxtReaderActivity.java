@@ -20,4 +20,6 @@ public interface ITxtReaderActivity extends ITxtReaderFileName{
     String getCurrentTitle(int page_index);
 
     void setTitle(String currentTitle);
+
+    Context getContext();
 }

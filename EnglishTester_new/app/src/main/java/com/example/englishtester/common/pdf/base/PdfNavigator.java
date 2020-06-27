@@ -59,7 +59,7 @@ public class PdfNavigator {
 
 
             TxtReaderAppender txtReaderAppender = new TxtReaderAppender(epubActivityInterface, epubActivityInterface.getRecentTxtMarkService(), dto, this.dto.getTxtView());
-            Triple<List<TxtReaderAppender.TxtAppenderProcess>, List<String>, List<String>> pageHolder = txtReaderAppender.getAppendTxt_HtmlFromWord_4Pdf(currentInitSpinePos, $tempResultContent, epubActivityInterface.getFixScreenWidth());
+            Triple<List<TxtReaderAppender.TxtAppenderProcess>, List<String>, List<String>> pageHolder = txtReaderAppender.getAppendTxt_HtmlFromWord_4Pdf(currentInitSpinePos, $tempResultContent, epubActivityInterface.getFixScreenWidth(), epubActivityInterface.getContext());
 
             dto.setFileName(dto.getBookFile().getName());
             pageContentHolder.setPages(pageHolder.getLeft(), pageHolder.getMiddle(), pageHolder.getRight());

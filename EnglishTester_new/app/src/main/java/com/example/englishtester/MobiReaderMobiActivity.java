@@ -422,6 +422,11 @@ public class MobiReaderMobiActivity extends FragmentActivity implements FloatVie
     }
 
     @Override
+    public Context getContext() {
+        return this;
+    }
+
+    @Override
     public IFloatServiceAidlInterface getFloatService() {
         return mService;
     }

@@ -1,5 +1,6 @@
 package com.example.englishtester.common.epub.base;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 
 import java.util.Stack;
@@ -81,7 +82,7 @@ public class EpubViewerMainHandler {
 
     public EpubViewerMainHandler(EpubActivityInterface epubActivityInterface) {
         this.myHtmlEditorKit = new MyHtmlEditorKit();
-        this.epubSpannableTextHandler = new EpubSpannableTextHandler();
+        this.epubSpannableTextHandler = new EpubSpannableTextHandler(epubActivityInterface.getContext());
         this.self = this;
         this.epubActivityInterface = epubActivityInterface;
         this.dto = new EpubDTO(epubActivityInterface, this);
@@ -177,7 +178,9 @@ public class EpubViewerMainHandler {
     private class EpubSpannableTextHandler implements NavigationEventListener {
         private final String TAG = EpubSpannableTextHandler.class.getSimpleName();
 
-        private EpubSpannableTextHandler() {
+        private Context context;
+        private EpubSpannableTextHandler(Context context) {
+            this.context = context;
         }
 
         private Pair<Integer, Integer> settingPageContext(Resource resource, int currentSpinePos) {
@@ -195,7 +198,7 @@ public class EpubViewerMainHandler {
 
             dto.setFileName(dto.getBookFile().getName());
             TxtReaderAppender txtReaderAppender = new TxtReaderAppender(epubActivityInterface, epubActivityInterface.getRecentTxtMarkService(), dto, EpubViewerMainHandler.this.dto.textView);
-            Triple<List<TxtReaderAppender.TxtAppenderProcess>, List<String>, List<String>> pageHolder = txtReaderAppender.getAppendTxt_HtmlFromWord_4Epub(currentSpinePos, pageContentHolder.customContent.get(), epubActivityInterface.getFixScreenWidth());
+            Triple<List<TxtReaderAppender.TxtAppenderProcess>, List<String>, List<String>> pageHolder = txtReaderAppender.getAppendTxt_HtmlFromWord_4Epub(currentSpinePos, pageContentHolder.customContent.get(), epubActivityInterface.getFixScreenWidth(), context);
 
             pageContentHolder.setPages(pageHolder.getLeft(), pageHolder.getMiddle(), pageHolder.getRight());
             pageContentHolder.setSpinePos(currentSpinePos);

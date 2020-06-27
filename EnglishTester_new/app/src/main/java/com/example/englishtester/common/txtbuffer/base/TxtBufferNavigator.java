@@ -64,7 +64,7 @@ public class TxtBufferNavigator {
             //-------------------------------------------------- 取得 dropbox dir images ↑↑↑↑↑↑
 
             TxtReaderAppender txtReaderAppender = new TxtReaderAppender(txtBufferActivityInterface, txtBufferActivityInterface.getRecentTxtMarkService(), dto, this.dto.getTxtView());
-            Triple<List<TxtReaderAppender.TxtAppenderProcess>, List<String>, List<String>> pageHolder = txtReaderAppender.getAppendTxt_HtmlFromWord_4TxtBuffer(currentInitSpinePos, $tempResultContent, txtBufferActivityInterface.getFixScreenWidth());
+            Triple<List<TxtReaderAppender.TxtAppenderProcess>, List<String>, List<String>> pageHolder = txtReaderAppender.getAppendTxt_HtmlFromWord_4TxtBuffer(currentInitSpinePos, $tempResultContent, txtBufferActivityInterface.getFixScreenWidth(), txtBufferActivityInterface.getContext());
 
             dto.setFileName(dto.getBookFile().getName());
             pageContentHolder.setPages(pageHolder.getLeft(), pageHolder.getMiddle(), pageHolder.getRight());
