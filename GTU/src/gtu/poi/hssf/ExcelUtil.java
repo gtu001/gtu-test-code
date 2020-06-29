@@ -20,6 +20,7 @@ import java.util.TreeMap;
 
 import org.apache.commons.collections.Transformer;
 import org.apache.commons.lang.time.DateFormatUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.hssf.usermodel.HSSFRichTextString;
@@ -35,6 +36,7 @@ import org.apache.poi.xssf.usermodel.XSSFRichTextString;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import gtu.file.FileUtil;
+import gtu.regex.RegExpUtil;
 
 public class ExcelUtil {
 
@@ -460,7 +462,7 @@ public class ExcelUtil {
      */
     public String readCell(Cell cell) {
         if (cell == null) {
-//            System.out.println("cell 為 null");
+            // System.out.println("cell 為 null");
             return "";
         }
         final DecimalFormat df = new DecimalFormat("####################0.##########");
@@ -491,7 +493,7 @@ public class ExcelUtil {
      */
     public Object readCell2(Cell cell) {
         if (cell == null) {
-//            System.out.println("cell 為 null");
+            // System.out.println("cell 為 null");
             return "";
         }
         switch (cell.getCellType()) {
@@ -816,6 +818,21 @@ public class ExcelUtil {
     public void autoCellSize(Sheet sheet) {
         for (int jj = 0; jj < sheet.getRow(0).getLastCellNum(); jj++) {
             sheet.autoSizeColumn(jj);
+        }
+    }
+
+    public Cell getCellByExcelPos(String columnRowEng, Sheet sheet) {
+        try {
+            String cellPos = StringUtils.trimToEmpty(columnRowEng);
+            String column = RegExpUtil.find("([a-zA-Z]+)", cellPos, 1, true);
+            int rowIdx = Integer.parseInt(RegExpUtil.find("(\\d+)", cellPos, 1, true)) - 1;
+            int columnIdx = ExcelUtil.cellEnglishToPos(column);
+            Row row = ExcelUtil_Xls97.getInstance().getRowChk(sheet, rowIdx);
+            org.apache.poi.ss.usermodel.Cell cell = ExcelUtil.getInstance().getCellChk(row, columnIdx);
+            return cell;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
         }
     }
 

@@ -246,7 +246,10 @@ public class FastDBQueryUI_XlsColumnDefLoader {
                         HSSFWorkbook wk = ExcelUtil_Xls97.getInstance().readExcel(f);
                         for (int ii = 0; ii < wk.getNumberOfSheets(); ii++) {
                             HSSFSheet sheet = wk.getSheetAt(ii);
-                            this.processColumnDefMap_ForTableDef(mTempTableHolder, sheet, tableDef);
+                            // =====================================
+                            String tableName = getTableNameFromSheet(sheet, tableDef);
+                            // =====================================
+                            this.processColumnDefMap_ForTableDef(mTempTableHolder, sheet, tableDef, tableName);
                         }
                         for (String tableName : mTempTableHolder.getTables()) {
                             TableDef tb = new TableDef();
@@ -261,6 +264,17 @@ public class FastDBQueryUI_XlsColumnDefLoader {
             }
             System.out.println("欄位定義目錄找到table數 : " + tabLst.size());
         }
+    }
+
+    private String getTableNameFromSheet(HSSFSheet sheet, XlsColumnDefClz tableDef) {
+        if (StringUtils.isBlank(tableDef.containText)) {
+            return null;
+        }
+        org.apache.poi.ss.usermodel.Cell cell = ExcelUtil_Xls97.getInstance().getCellByExcelPos(tableDef.containText, sheet);
+        if (cell == null) {
+            return null;
+        }
+        return StringUtils.trimToEmpty(cell.getStringCellValue());
     }
 
     private class TempTableHolder {
@@ -315,7 +329,7 @@ public class FastDBQueryUI_XlsColumnDefLoader {
         }
     }
 
-    private void processColumnDefMap_ForTableDef(TempTableHolder mTempTableHolder, HSSFSheet sheet, XlsColumnDefClz tableDef) {
+    private void processColumnDefMap_ForTableDef(TempTableHolder mTempTableHolder, HSSFSheet sheet, XlsColumnDefClz tableDef, String tableName) {
         for (int ii = 0; ii <= sheet.getLastRowNum(); ii++) {
             Row row = sheet.getRow(ii);
             if (row == null) {
@@ -326,8 +340,9 @@ public class FastDBQueryUI_XlsColumnDefLoader {
                 String value = ExcelUtil_Xls97.getInstance().readCell(row.getCell(jj));
                 map.put(jj, value);
             }
-
-            String tableName = map.get(tableDef.index);
+            if (StringUtils.isBlank(tableName)) {
+                tableName = map.get(tableDef.index);
+            }
             if (StringUtils.isBlank(tableName)) {
                 continue;
             }

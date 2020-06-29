@@ -18,8 +18,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.apache.commons.collections.Transformer;
 import org.apache.commons.lang.time.DateFormatUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.hssf.usermodel.HSSFRichTextString;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -30,6 +30,8 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellRangeAddress;
+
+import gtu.regex.RegExpUtil;
 
 public class ExcelUtil_Xls97 {
 
@@ -349,7 +351,7 @@ public class ExcelUtil_Xls97 {
      */
     public String readCell(Cell cell) {
         if (cell == null) {
-//            System.out.println("cell 為 null");
+            // System.out.println("cell 為 null");
             return "";
         }
         final DecimalFormat df = new DecimalFormat("####################0.##########");
@@ -380,7 +382,7 @@ public class ExcelUtil_Xls97 {
      */
     public Object readCell2(Cell cell) {
         if (cell == null) {
-//            System.out.println("cell 為 null");
+            // System.out.println("cell 為 null");
             return "";
         }
         switch (cell.getCellType()) {
@@ -676,6 +678,21 @@ public class ExcelUtil_Xls97 {
     public void autoCellSize(Sheet sheet) {
         for (int jj = 0; jj < sheet.getRow(0).getLastCellNum(); jj++) {
             sheet.autoSizeColumn(jj);
+        }
+    }
+
+    public Cell getCellByExcelPos(String columnRowEng, Sheet sheet) {
+        try {
+            String cellPos = StringUtils.trimToEmpty(columnRowEng);
+            String column = RegExpUtil.find("([a-zA-Z]+)", cellPos, 1, true);
+            int rowIdx = Integer.parseInt(RegExpUtil.find("(\\d+)", cellPos, 1, true)) - 1;
+            int columnIdx = ExcelUtil_Xls97.cellEnglishToPos(column);
+            Row row = ExcelUtil_Xls97.getInstance().getRowChk(sheet, rowIdx);
+            org.apache.poi.ss.usermodel.Cell cell = ExcelUtil_Xls97.getInstance().getCellChk(row, columnIdx);
+            return cell;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
         }
     }
 
