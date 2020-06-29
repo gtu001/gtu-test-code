@@ -679,6 +679,7 @@ public class FastDBQueryUI extends JFrame {
         }));
 
         JTextAreaUtil.applyEnterKeyFixPosition(sqlTextArea);
+        JTextAreaUtil.applyCloneLine(sqlTextArea);
 
         mSqlTextAreaJTextAreaSelectPositionHandler = JTextComponentSelectPositionHandler.newInst(sqlTextArea);
 
@@ -6885,7 +6886,7 @@ public class FastDBQueryUI extends JFrame {
                     lst.add(cx);
                 }
             }
-            DefaultTableModel model = JTableUtil.createModel(false, "類型", "標籤字", "index", "含有文字", "顏色");
+            DefaultTableModel model = JTableUtil.createModel(false, "類型", "標籤字", "index", "含有文字", "顏色", "refIndex");
             for (XlsColumnDefClz cx : lst) {
                 model.addRow(cx.toArray());
             }
@@ -6904,6 +6905,7 @@ public class FastDBQueryUI extends JFrame {
                 c1.index = (Integer) model.getValueAt(ii, 2);
                 c1.containText = (String) model.getValueAt(ii, 3);
                 c1.color = (String) model.getValueAt(ii, 4);
+                c1.refIndex = (Integer) model.getValueAt(ii, 5);
                 if (c1.type == XlsColumnDefType.COLUMN) {
                     prop.setProperty("column", c1.toConfig());
                 } else if (c1.type == XlsColumnDefType.CHINESE) {

@@ -29,6 +29,7 @@ import org.apache.poi.ss.usermodel.Row;
 
 import gtu.file.FileUtil;
 import gtu.poi.hssf.ExcelUtil_Xls97;
+import gtu.regex.RegExpUtil;
 import gtu.runtime.DesktopUtil;
 import gtu.string.StringUtil_;
 import gtu.swing.util.JTableUtil;
@@ -61,7 +62,9 @@ public class FastDBQueryUI_XlsColumnDefLoader {
             for (Map<Integer, String> map : tb.columnLst) {
                 String column = map.get(columnDef.index);
                 if (StringUtils.isNotBlank(column) && !colLst.contains(column)) {
-                    colLst.add(column);
+                    if (isColumnValid(columnDef, map)) {
+                        colLst.add(column);
+                    }
                 }
             }
         }
@@ -94,11 +97,7 @@ public class FastDBQueryUI_XlsColumnDefLoader {
             if (StringUtils.isBlank(pkLabel)) {
                 pkLabel = pkText;
             }
-            if (StringUtils.isNotBlank(pkDef.containText)) {
-                if (pkText.toLowerCase().contains(StringUtils.trimToEmpty(pkDef.containText).toLowerCase())) {
-                    pk = map.get(columnDef.index);
-                }
-            } else {
+            if (isColumnValid(pkDef, map)) {
                 pk = map.get(columnDef.index);
             }
         }
@@ -131,6 +130,9 @@ public class FastDBQueryUI_XlsColumnDefLoader {
         }
         for (TableDef tb : tbs) {
             for (Map<Integer, String> map : tb.columnLst) {
+                if (!isColumnValid(columnDef, map)) {
+                    continue;
+                }
                 if (StringUtils.equalsIgnoreCase(StringUtils.trimToEmpty(map.get(columnDef.index)), StringUtils.trimToEmpty(column)) && //
                         StringUtils.isNotBlank(map.get(chineseDef.index))) {
                     return getTooltipFormat(map, forTooltip);
@@ -149,11 +151,7 @@ public class FastDBQueryUI_XlsColumnDefLoader {
             if (StringUtils.isBlank(pkLabel)) {
                 pkLabel = pkText;
             }
-            if (StringUtils.isNotBlank(pkDef.containText)) {
-                if (pkText.toLowerCase().contains(StringUtils.trimToEmpty(pkDef.containText).toLowerCase())) {
-                    pk = "<font color='" + pkDef.color + "'>　" + pkLabel + "</font>";
-                }
-            } else {
+            if (isColumnValid(pkDef, map)) {
                 pk = "<font color='" + pkDef.color + "'>　" + pkLabel + "</font>";
             }
         }
@@ -287,8 +285,16 @@ public class FastDBQueryUI_XlsColumnDefLoader {
             if (colLstMap.containsKey(tableName)) {
                 colLst = colLstMap.get(tableName);
             }
-            colLst.add(map);
-            colLstMap.put(tableName, colLst);
+            // =====================================
+            boolean addOk = false;
+            if (columnDef != null && isColumnValid(columnDef, map)) {
+                addOk = true;
+            }
+            // =====================================
+            if (addOk) {
+                colLst.add(map);
+                colLstMap.put(tableName, colLst);
+            }
         }
 
         public void appendColumnLstMappingToRowIndexMap(String tableName, Map<Integer, String> map, int index) {
@@ -296,8 +302,16 @@ public class FastDBQueryUI_XlsColumnDefLoader {
             if (columnLstMappingToRowIndexMapMap.containsKey(tableName)) {
                 columnLstMappingToRowIndexMap = columnLstMappingToRowIndexMapMap.get(tableName);
             }
-            columnLstMappingToRowIndexMap.put(map, index);
-            columnLstMappingToRowIndexMapMap.put(tableName, columnLstMappingToRowIndexMap);
+            // =====================================
+            boolean addOk = false;
+            if (columnDef != null && isColumnValid(columnDef, map)) {
+                addOk = true;
+            }
+            // =====================================
+            if (addOk) {
+                columnLstMappingToRowIndexMap.put(map, index);
+                columnLstMappingToRowIndexMapMap.put(tableName, columnLstMappingToRowIndexMap);
+            }
         }
     }
 
@@ -335,8 +349,16 @@ public class FastDBQueryUI_XlsColumnDefLoader {
                 String value = ExcelUtil_Xls97.getInstance().readCell(row.getCell(jj));
                 map.put(jj, value);
             }
-            colLst.add(map);
-            columnLstMappingToRowIndexMap.put(map, ii);
+            // =====================================
+            boolean addOk = false;
+            if (columnDef != null && isColumnValid(columnDef, map)) {
+                addOk = true;
+            }
+            // =====================================
+            if (addOk) {
+                colLst.add(map);
+                columnLstMappingToRowIndexMap.put(map, ii);
+            }
         }
         return new Object[] { colLst, columnLstMappingToRowIndexMap };
     }
@@ -351,7 +373,12 @@ public class FastDBQueryUI_XlsColumnDefLoader {
     }
 
     public enum XlsColumnDefType {
-        TABLE("", -1, "", "BLACK"), COLUMN("", 0, "", "BLACK"), CHINESE("", 1, "", "BLACK"), PK("", -1, "", "RED"), LABEL("", -1, "", "BLACK");
+        TABLE("", -1, "", "BLACK"), //
+        COLUMN("", 0, "", "BLACK"), //
+        CHINESE("", 1, "", "BLACK"), //
+        PK("", -1, "", "RED"), //
+        LABEL("", -1, "", "BLACK"),//
+        ;
 
         String label;
         int index;
@@ -544,12 +571,12 @@ public class FastDBQueryUI_XlsColumnDefLoader {
 
         private void afterSetToModel(JTable jtable, JFrame jframe) {
             JTableUtil.newInstance(jtable).columnIsButton("file");
-
             Map<String, Object> preferences = new HashMap<String, Object>();
             Map<Integer, Integer> presetColumns = new HashMap<Integer, Integer>();
             presetColumns.put(0, 150);
             preferences.put("presetColumns", presetColumns);
-            JTableUtil.setColumnWidths_ByDataContent(jtable, preferences, jframe.getInsets());
+            preferences.put("maxWidth", 500);
+            JTableUtil.setColumnWidths_ByDataContent(jtable, preferences, jframe.getInsets());//
         }
 
         private Pair<String[], Pattern[]> toSearchCondition(String text) {
@@ -612,6 +639,7 @@ public class FastDBQueryUI_XlsColumnDefLoader {
         XlsColumnDefType type;// 類型
         String label = ""; // 標籤字
         int index = -1;// index
+        int refIndex = -1;// ref index
         String containText = "";// 含有文字
         String color = "BLACK";// 顏色
 
@@ -620,7 +648,8 @@ public class FastDBQueryUI_XlsColumnDefLoader {
                     StringUtils.trimToEmpty(label) + "^" + //
                     String.valueOf(index) + "^" + //
                     StringUtils.trimToEmpty(containText) + "^" + //
-                    StringUtils.trimToEmpty(color) + //
+                    StringUtils.trimToEmpty(color) + "^" + //
+                    String.valueOf(refIndex) + "^" + //
                     "";
         }
 
@@ -637,7 +666,8 @@ public class FastDBQueryUI_XlsColumnDefLoader {
                     StringUtils.trimToEmpty(label), //
                     index, //
                     StringUtils.trimToEmpty(containText), //
-                    StringUtils.trimToEmpty(color) //
+                    StringUtils.trimToEmpty(color), //
+                    refIndex, //
             };
         }
 
@@ -648,6 +678,92 @@ public class FastDBQueryUI_XlsColumnDefLoader {
             index = Integer.parseInt(getArryStr(arry, 2));
             containText = getArryStr(arry, 3);
             color = getArryStr(arry, 4);
+            refIndex = Integer.parseInt(getArryStr(arry, 2));
         }
+    }
+
+    private boolean isColumnValid(XlsColumnDefClz pkDef, Map<Integer, String> map) {
+        if (StringUtils.isBlank(pkDef.containText)) {
+            return true;
+        } else {
+            String pkText = StringUtils.trimToEmpty(map.get(pkDef.index));
+            if (pkDef.refIndex != -1) {
+                pkText = StringUtils.trimToEmpty(map.get(pkDef.refIndex));
+            }
+            String text = StringUtils.trimToEmpty(pkDef.containText);
+            {
+                // 下列欄位都不為空 則成立
+                String hasText = RegExpUtil.find("isNot(?:Blank|Empty)\\((.*?)\\)", text, 1, false);
+                if (hasText != null) {
+                    String[] arry = hasText.split("\\,", -1);
+                    for (String hText : arry) {
+                        int excelPos = ExcelUtil_Xls97.cellEnglishToPos(hText);
+                        if (StringUtils.isBlank(map.get(excelPos))) {
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+            }
+            {
+                // 下列欄位都為空 則成立
+                String hasText = RegExpUtil.find("is(?:Blank|Empty)\\((.*?)\\)", text, 1, false);
+                if (hasText != null) {
+                    String[] arry = hasText.split("\\,", -1);
+                    for (String hText : arry) {
+                        int excelPos = ExcelUtil_Xls97.cellEnglishToPos(hText);
+                        if (StringUtils.isNotBlank(map.get(excelPos))) {
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+            }
+            {
+                // 若有資料 則成立
+                String hasText = RegExpUtil.find("has\\((.*?)\\)", text, 1, false);
+                if (hasText != null) {
+                    String[] arry = hasText.split("\\,", -1);
+                    for (String hText : arry) {
+                        if (StringUtils.isNotBlank(hText) && pkText.toLowerCase().contains(StringUtils.trimToEmpty(hText).toLowerCase())) {
+                            return true;
+                        }
+                    }
+                }
+            }
+            {
+                // 若無資料 則成立
+                String hasText = RegExpUtil.find("\\!has\\((.*?)\\)", text, 1, false);
+                if (hasText != null) {
+                    String[] arry = hasText.split("\\,", -1);
+                    for (String hText : arry) {
+                        if (StringUtils.isNotBlank(hText) && pkText.toLowerCase().contains(StringUtils.trimToEmpty(hText).toLowerCase())) {
+                            return false;
+                        }
+                    }
+                }
+            }
+            {
+                // 若符合pattern 則成立
+                String hasText = RegExpUtil.find("pattern\\((.*?)\\)", text, 1, false);
+                if (hasText != null) {
+                    try {
+                        Pattern ptn = Pattern.compile(hasText, Pattern.DOTALL | Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
+                        Matcher mth = ptn.matcher(pkText);
+                        if (mth.find()) {
+                            return true;
+                        }
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            }
+            {
+                if (pkText.toLowerCase().contains(StringUtils.trimToEmpty(text).toLowerCase())) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

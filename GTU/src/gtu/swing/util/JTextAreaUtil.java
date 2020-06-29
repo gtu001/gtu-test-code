@@ -462,6 +462,7 @@ public class JTextAreaUtil {
         final AtomicReference<String> text = new AtomicReference<String>();
         final AtomicReference<Integer> caretPosition = new AtomicReference<Integer>();
         final AtomicBoolean ignoreInput = new AtomicBoolean(false);
+        final AtomicBoolean isEnter = new AtomicBoolean(false);
 
         textArea.getDocument().addDocumentListener(new DocumentListener() {
             @Override
@@ -470,6 +471,9 @@ public class JTextAreaUtil {
 
             @Override
             public void insertUpdate(DocumentEvent e) {
+                if (!isEnter.get()) {
+                    return;
+                }
                 if (ignoreInput.get()) {
                     ignoreInput.set(false);
                     return;
@@ -502,6 +506,9 @@ public class JTextAreaUtil {
                     String afterText = StringUtils.substring(textArea.getText(), caretPosition.get());
                     if (!beforeText.endsWith("\n")) {
                         beforeText += "\n";
+                    }
+                    if (afterText.startsWith("\n") && StringUtils.isNotBlank(afterText)) {
+                        afterText = afterText.replaceFirst("\n", "");
                     }
 
                     final String inserText = beforeText + prefixLine + afterText;
@@ -548,8 +555,78 @@ public class JTextAreaUtil {
 
             @Override
             public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    isEnter.set(true);
+                } else {
+                    isEnter.set(false);
+                }
                 caretPosition.set(textArea.getCaretPosition());
                 text.set(StringUtils.substring(StringUtils.defaultString(textArea.getText()), 0, caretPosition.get()));
+            }
+        });
+    }
+
+    public static void applyCloneLine(final JTextComponent textArea) {
+        textArea.addKeyListener(new KeyListener() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+            }
+
+            @Override
+            public void keyReleased(final KeyEvent e) {
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (!(KeyEventUtil.isMaskKeyPress(e, "ca") && (e.getKeyCode() == KeyEvent.VK_UP || e.getKeyCode() == KeyEvent.VK_DOWN))) {
+                    return;
+                }
+
+                LineNumberReader reader = null;
+                try {
+                    String text = StringUtils.defaultString(textArea.getText());
+                    reader = new LineNumberReader(new StringReader(text));
+
+                    int caretPosition = textArea.getCaretPosition();
+                    int afterCaretPosition = 0;
+
+                    boolean isCopyOk = false;
+                    StringBuffer sb = new StringBuffer();
+                    for (String line = null; (line = reader.readLine()) != null;) {
+                        sb.append(line + "\n");
+                        if (!isCopyOk && sb.length() > caretPosition) {
+                            if (e.getKeyCode() == KeyEvent.VK_UP) {
+                                afterCaretPosition = sb.length() - 1;
+                            }
+                            isCopyOk = true;
+                            sb.append(line + "\n");
+                            if (e.getKeyCode() == KeyEvent.VK_DOWN) {
+                                afterCaretPosition = sb.length() - 1;
+                            }
+                        }
+                    }
+
+                    // 空白行判斷
+                    if (StringUtils.length(text) == caretPosition) {
+                        sb.append("" + "\n");
+                        if (e.getKeyCode() == KeyEvent.VK_UP) {
+                            afterCaretPosition = sb.length() - 1;
+                        } else if (e.getKeyCode() == KeyEvent.VK_DOWN) {
+                            afterCaretPosition = sb.length();
+                        }
+                    }
+
+                    textArea.setText(sb.toString());
+                    textArea.setCaretPosition(afterCaretPosition);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                } finally {
+                    try {
+                        reader.close();
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
+                }
             }
         });
     }
