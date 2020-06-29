@@ -7,7 +7,11 @@ using static Vector3Util;
 
 public class Bird : MonoBehaviour {
 
-	Vector3 _initialPosition;
+	private Vector3 _initialPosition;
+	private bool _birdWasLaunched;
+	private float _timeSittingAround;
+	[SerializeField] private float _launchPower = 500;
+	
 
 	private void Awake() {
 		Log.debug("#Awake --" + "start");
@@ -25,9 +29,11 @@ public class Bird : MonoBehaviour {
 
 
 		Vector2 directionToInitialPosition = _initialPosition - transform.position;
-		directionToInitialPosition = directionToInitialPosition * 100;
+		directionToInitialPosition = directionToInitialPosition * _launchPower;
 		GetComponent<Rigidbody2D>().AddForce(directionToInitialPosition);
 		GetComponent<Rigidbody2D>().gravityScale = 1;
+
+		_birdWasLaunched = true;
 	}
 
 	private void OnMouseDrag() {
@@ -41,10 +47,29 @@ public class Bird : MonoBehaviour {
 		Log.debug("#Start --" + "start");
 	}
 
+	void UpdateName() {
+		this.name = "GameBird " + "x : " + 
+			transform.position.x.ToString("N2") + ", y : " + transform.position.y.ToString("N2");
+	}
+
     // 每一禎執行一次  ====>  https://www.youtube.com/watch?v=OR0e-1UBEOU&t=3408s   1:27
 	void Update () {
 		Log.debug("#Update --" + "start");
-		if (transform.position.y > 3) {
+		UpdateName();
+
+		if(_birdWasLaunched && 
+			GetComponent<Rigidbody2D>().velocity.magnitude <= 0.1 //動能 
+			) {
+			_timeSittingAround += Time.deltaTime;
+		}
+
+		float outterPos = 10;
+		if (transform.position.x > _initialPosition.x + outterPos ||
+			transform.position.y > _initialPosition.y + outterPos ||
+			transform.position.x < _initialPosition.x + outterPos * -1 ||
+			transform.position.y < _initialPosition.y + outterPos * -1 || 
+			_timeSittingAround > 3 //超過三秒靜止
+			) {
 			//復位
 			string currentSceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
 			UnityEngine.SceneManagement.SceneManager.LoadScene(currentSceneName); 
