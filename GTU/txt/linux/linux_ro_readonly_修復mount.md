@@ -1,0 +1,31 @@
+顯示硬碟狀態
+---
+	df -h
+
+
+顯示硬碟目前mount狀態
+---
+	cat /etc/mtab 
+	cat /proc/mounts
+
+
+顯示錯誤報告
+---
+	dmesg |  grep  sdb1  -B 5 -A 5 -n
+	dmesg |  sed '794,801!d' > xxxxxx.txt
+
+
+修理硬碟
+---
+	sudo fsck -y /dev/sdc1
+
+
+查詢目前掛載清單
+---
+	mount -v | grep "^/" | awk '{print "\nPartition identifier: " $1  "\n Mountpoint: "  $3}'
+
+重新掛載指令
+---
+	sudo mount -o remount,rw /partition/identifier /mount/point
+	Ex : 
+		sudo mount -o remount,rw  /dev/sdb1  /media/gtu001/OLD_D 
