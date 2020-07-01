@@ -12,9 +12,20 @@ public class Log {
         Console.WriteLine ("-----------------------------------------------");
         Type myType = obj.GetType (); //(typeof(obj));
         MethodInfo[] mths = myType.GetMethods (BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
-        Console.WriteLine ("Object Info : " + myType);
+        Console.WriteLine ("Object Info : " + myType + "\t" + mths.Length);
         for (int ii = 0; ii < mths.Length; ii++) {
             Console.WriteLine (ii + "\t" + mths[ii]);
+        }
+        Console.WriteLine ("-----------------------------------------------");
+    }
+
+    public static void showPublicFields (System.Object obj, System.String label = null) {
+        Console.WriteLine ("-----------------------------------------------");
+        Type myType = obj.GetType (); //(typeof(obj));
+        FieldInfo[] myField = myType.GetFields(BindingFlags.Public | BindingFlags.Static);
+        Console.WriteLine ("Object Info : " + myType + "\t" + myField.Length);
+        for(int i = 0; i < myField.Length; i++){
+            Console.WriteLine (i + "\t" + myField[i].Name + "\t" + myField[i].IsSpecialName);
         }
         Console.WriteLine ("-----------------------------------------------");
     }
