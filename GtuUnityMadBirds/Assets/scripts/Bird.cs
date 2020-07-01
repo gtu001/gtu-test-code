@@ -52,7 +52,7 @@ public class Bird : MonoBehaviour {
 			transform.position.x.ToString("N2") + ", y : " + transform.position.y.ToString("N2");
 	}
 
-    // 每一禎執行一次  ====>  https://www.youtube.com/watch?v=OR0e-1UBEOU&t=3408s   1:27
+    // 每一禎執行一次  ====>  https://www.youtube.com/watch?v=OR0e-1UBEOU&t=3408s   1:56:27
 	void Update () {
 		Log.debug("#Update --" + "start");
 		UpdateName();

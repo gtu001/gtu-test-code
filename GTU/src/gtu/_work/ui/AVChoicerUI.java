@@ -1497,9 +1497,9 @@ public class AVChoicerUI extends JFrame {
                         file.moveStateChs = "Completed...";
                         file.moveStateColor = "GREEN";
                     }
-                    readyMoveLst.updateUI();
+                    readyMoveLst.repaint();
                 }
-                readyMoveLst.updateUI();
+                readyMoveLst.repaint();
                 JCommonUtil._jOptionPane_showMessageDialog_info("全部完成!!");
                 readyMoveBtn.setText("開始移動");
             }

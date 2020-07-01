@@ -115,6 +115,7 @@ public class ${ct.getBlObj()['blClass']} implements BusinessService {
 
         // 数据提交、保存
         logger.debug("---commitData---");
+        PubSubmit tPubSubmit = new PubSubmit();
         if (!tPubSubmit.submitData(mResult, mOperate)) {
             // @@错误处理
             this.mErrors.copyAllErrors(tPubSubmit.mErrors);
@@ -240,6 +241,16 @@ public class ${ct.getBlObj()['blClass']} implements BusinessService {
         mInputData.add(m${ct.getBlObj()['table']}Schema);
     }
 
+    @Override
+    public VData getResult() {
+        return mResult;
+    }
+
+    @Override
+    public CErrors getErrors() {
+        return mErrors;
+    }
+
 
     private ${ct.getBlObj()['table']}Schema getVO(TransferData tData) {
         <#list columnLst as col>
@@ -328,6 +339,20 @@ public class ${ct.getBlObj()['blClass']} implements BusinessService {
             return t${ct.getBlObj()['table']}Set.get(1);
         }
         return null;
+    }
+
+    private void queryCustom001() {
+        StringBuffer tSBSql = new StringBuffer();
+        tSBSql.append("select polno, mainpolno from ${ct.getBlObj()['table']} where contno='?CONTNO?' and appflag='1'");
+        SQLwithBindVariables tSBV = new SQLwithBindVariables();
+        tSBV.sql(tSBSql.toString());
+        tSBV.put("CONTNO", tContNo);
+        ExeSQL tExeSQL = new ExeSQL();
+        SSRS tResult = tExeSQL.execSQL(tSBV);
+        for (int i = 0; i < tResult.getMaxRow(); i++) {
+            String PolNo = tResult.GetText(i + 1, 1);
+            String MainPolNo = tResult.GetText(i + 1, 2);
+        }
     }
 
     /////////////////////////////////////////////////////////////////////////

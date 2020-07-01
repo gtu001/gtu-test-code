@@ -497,7 +497,7 @@ public class FastDBQueryUI extends JFrame {
         sqlList = new JList() {
             @Override
             public JToolTip createToolTip() {
-                return JTooltipUtil.createToolTip(null, null);
+                return JTooltipUtil.createToolTip(null, null, 100);
             }
 
             public Point getToolTipLocation(MouseEvent e) {
@@ -518,6 +518,30 @@ public class FastDBQueryUI extends JFrame {
                 sqlListKeyPressAction(e);
             }
         });
+
+        JCommonUtil.applyDropFiles(sqlList, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    List<File> lst = (List<File>) e.getSource();
+                    if (!lst.isEmpty()) {
+                        File file = lst.get(0);
+                        if (file.getName().endsWith(".yml")) {
+                            sqlIdConfigBeanHandler.saveYamlToProp(file, true);
+                            initLoadSqlListConfig();
+                        } else if (file.getName().endsWith(".properties")) {
+                            sqlIdConfigBeanHandler.saveYamlToProp2(file, true);
+                            initLoadSqlListConfig();
+                        } else {
+                            JCommonUtil._jOptionPane_showMessageDialog_error("檔案格式有誤!");
+                        }
+                    }
+                } catch (Exception e1) {
+                    JCommonUtil.handleException(e1);
+                }
+            }
+        });
+
         JListUtil.newInstance(sqlList).applyOnHoverEvent(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -1701,7 +1725,7 @@ public class FastDBQueryUI extends JFrame {
 
         mDBNameIdTextHandler = new DBNameIdTextHandler();
         mDBNameIdTextHandler.reload_DataSourceConfig_autoComplete();
-        
+
         panel_6.add(dbNameIdText, "10, 2, fill, default");
         dbNameIdText.addActionListener(new ActionListener() {
             @Override
@@ -1862,13 +1886,14 @@ public class FastDBQueryUI extends JFrame {
         importYamlConfigBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 try {
+                    JCommonUtil._jOptionPane_showMessageDialog_info("匯入成功!");
                     File yamlFile = JCommonUtil._jFileChooser_selectFileOnly();
                     if (!(yamlFile != null && yamlFile.exists() && yamlFile.getName().endsWith("yml"))) {
                         JCommonUtil._jOptionPane_showMessageDialog_error("請選擇yml檔");
                         return;
                     }
                     sqlIdConfigBeanHandler.saveYamlToProp(yamlFile, true);
-                    JCommonUtil._jOptionPane_showMessageDialog_info("匯入成功!");
+                    initLoadSqlListConfig();
                 } catch (Exception ex) {
                     JCommonUtil.handleException(ex);
                 }
@@ -1977,8 +2002,8 @@ public class FastDBQueryUI extends JFrame {
             }, new Component[] {});
 
             editColumnHistoryHandler = new EditColumnHistoryHandler();
-            
-            //初始化上次選的datasource
+
+            // 初始化上次選的datasource
             mDBNameIdTextHandler.init_setup();
 
             JCommonUtil.setJFrameCenter(this);
@@ -4727,6 +4752,14 @@ public class FastDBQueryUI extends JFrame {
             init(b.category);
         }
 
+        private void saveYamlToProp2(File otherPropFile, boolean replaceCurrentConfigFile) {
+            if (replaceCurrentConfigFile) {
+                sqlIdListFile = otherPropFile;
+                sqlIdListProp = PropertiesUtil.loadProperties(otherPropFile, null, false);
+                init("");
+            }
+        }
+
         private void saveYamlToProp(File yamlFile, boolean replaceCurrentConfigFile) {
             File propFile = new File(FileUtil.DESKTOP_DIR, "sqlList.properties");
             if (propFile.exists()) {
@@ -6506,7 +6539,7 @@ public class FastDBQueryUI extends JFrame {
             final List<Object> titles = JTableUtil.newInstance(queryResultTable).getColumnTitleArray();
             for (Object tit : titles) {
                 String column = (String) tit;
-                Pattern ptn = Pattern.compile(column + "[\\]\\'\"]?[\\s\\t\n\r]*\\/\\*(.*?)\\*\\/", Pattern.DOTALL | Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
+                Pattern ptn = Pattern.compile(Pattern.quote(column) + "[\\]\\'\"]?[\\s\\t\n\r]*\\/\\*(.*?)\\*\\/", Pattern.DOTALL | Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
                 Matcher mth = ptn.matcher(sql);
                 String tmpTip = null;
                 while (mth.find()) {

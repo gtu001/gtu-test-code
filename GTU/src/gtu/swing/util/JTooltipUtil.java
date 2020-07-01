@@ -18,7 +18,7 @@ public class JTooltipUtil {
         return StringUtils.join(tmpStr.split("\n"), "<br/>");
     }
 
-    public static JToolTip createToolTip(Float widthPercent, Float heightPercent) {
+    public static JToolTip createToolTip(Float widthPercent, Float heightPercent, final int offsetWidthSize) {
         if (widthPercent == null || widthPercent > 1) {
             widthPercent = 0.7F;
         }
@@ -30,7 +30,7 @@ public class JTooltipUtil {
         JToolTip t = new JToolTip() {
             @Override
             public Dimension getPreferredSize() {
-                int mouseRelativeWidth = scr_size.width - MouseInfo.getPointerInfo().getLocation().x;
+                int mouseRelativeWidth = scr_size.width - MouseInfo.getPointerInfo().getLocation().x - offsetWidthSize;
                 
                 Dimension d = super.getPreferredSize();
                 int newWidth = d.width;
