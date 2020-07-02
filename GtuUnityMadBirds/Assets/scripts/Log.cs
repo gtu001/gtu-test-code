@@ -30,6 +30,11 @@ public class Log {
         Console.WriteLine ("-----------------------------------------------");
     }
 
+    public static void showAll(System.Object obj, System.String label = null) {
+        showPublicFields(obj, label);
+        showPublicMethods(obj, label);
+    }
+
     String getClassName (String fileName) {
         if (fileName != null) {
             MatchCollection matches = CLASS_NAME_REGEX.Matches (fileName);

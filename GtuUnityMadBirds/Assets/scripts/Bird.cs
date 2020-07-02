@@ -11,10 +11,10 @@ public class Bird : MonoBehaviour {
 	private bool _birdWasLaunched;
 	private float _timeSittingAround;
 	[SerializeField] private float _launchPower = 500;
-	private CaculateMaterialTiling mCaculateMaterialTiling;
+	private Bird.CaculateMaterialTiling mCaculateMaterialTiling;
 
 	//改material tiling.x 
-	public class CaculateMaterialTiling {
+	private class CaculateMaterialTiling {
 		Bird self;
 		bool mouseState;
 		public CaculateMaterialTiling(Bird mBird) {
@@ -50,8 +50,6 @@ public class Bird : MonoBehaviour {
 		Log.debug("#Bird --" + "OnMouseDown");
 		GetComponent<SpriteRenderer>().color = Color.red;
 		GetComponent<LineRenderer>().enabled = true;
-
-		CaculateMaterialTiling();
 
 		mCaculateMaterialTiling.mouseDown();
 	}
@@ -92,8 +90,8 @@ public class Bird : MonoBehaviour {
 		Log.debug("#Update --" + "start");
 		UpdateName();
 
-		GetComponent<LineRenderer>().SetPosition(0, _initialPosition);
-		GetComponent<LineRenderer>().SetPosition(1, transform.position);
+		GetComponent<LineRenderer>().SetPosition(1, _initialPosition);
+		GetComponent<LineRenderer>().SetPosition(0, transform.position);
 
 		if(_birdWasLaunched && 
 			GetComponent<Rigidbody2D>().velocity.magnitude <= 0.1 //動能 

@@ -2346,6 +2346,7 @@ public class FastDBQueryUI extends JFrame {
         sqlIdCommentArea.setText("");
         this.sqlBean = null;
         setSqlListSelection(this.sqlBean);
+        changeTabUITitile("未命名");
     }
 
     /**
@@ -4879,6 +4880,7 @@ public class FastDBQueryUI extends JFrame {
             final int prime = 31;
             int result = 1;
             result = prime * result + ((sql == null) ? 0 : sql.hashCode());
+            result = prime * result + ((sqlId == null) ? 0 : sqlId.hashCode());
             return result;
         }
 
@@ -4895,6 +4897,11 @@ public class FastDBQueryUI extends JFrame {
                 if (other.sql != null)
                     return false;
             } else if (!sql.equals(other.sql))
+                return false;
+            if (sqlId == null) {
+                if (other.sqlId != null)
+                    return false;
+            } else if (!sqlId.equals(other.sqlId))
                 return false;
             return true;
         }
