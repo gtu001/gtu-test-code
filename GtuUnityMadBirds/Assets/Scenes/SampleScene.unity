@@ -653,7 +653,7 @@ Camera:
   far clip plane: 5000
   field of view: 40
   orthographic: 1
-  orthographic size: 3.99375
+  orthographic size: 4.2258782
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -1293,6 +1293,7 @@ GameObject:
   - component: {fileID: 1070692328}
   - component: {fileID: 1070692327}
   - component: {fileID: 1070692329}
+  - component: {fileID: 1070692330}
   m_Layer: 0
   m_Name: Full-Background
   m_TagString: Untagged
@@ -1390,6 +1391,22 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 30.719997, y: 1.9692116}
   m_EdgeRadius: 0
+--- !u!114 &1070692330
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1070692326}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 46688a1598393594c8e97530d366695c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  levels:
+  - {fileID: 1070692326}
+  choke: 0
+  scrollSpeed: 0
 --- !u!1 &1071201553
 GameObject:
   m_ObjectHideFlags: 3
