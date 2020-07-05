@@ -55,20 +55,10 @@ public class BackgroundLoop : MonoBehaviour {
     }
 
     void Update () {
-        /*
         Vector3 velocity = Vector3.zero;
         Vector3 desiredPosition = transform.position + new Vector3 (scrollSpeed, 0, 0);
         Vector3 smoothPosition = Vector3.SmoothDamp (transform.position, desiredPosition, ref velocity, 0.3f);
         transform.position = smoothPosition;
-         */
-
-        //顯示螢幕占比
-        Camera mainCamera = Camera.main;
-        
-        screenBounds = mainCamera.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, mainCamera.transform.position.z));
-        Log.debug("screenBounds " + screenBounds);
-
-        LateUpdate();
     }
 
     void LateUpdate () {

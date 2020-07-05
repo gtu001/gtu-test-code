@@ -42,6 +42,7 @@ public class CameraBackgroundCtl : MonoBehaviour {
 
         
         Vector2 screenBounds = mainCamera.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, mainCamera.transform.position.z));
+        Vector2 cameraPos = mainCamera.transform.position;
         string posString = "[X : " + mainCamera.transform.position.x.ToString("N2") + ", Y : " + mainCamera.transform.position.y.ToString("N2") + "]";
         this.name = "" + posString + ", Bound: " + screenBounds;
         // Log.debug("screenBounds " + screenBounds);
