@@ -18,7 +18,7 @@ public class CameraBackgroundCtl : MonoBehaviour {
 
     // Update is called once per frame
     void Update() {
-        Log.debug("Update --- start ");
+        //Log.debug("Update --- start ");
 
 
         Vector3 pos = transform.position;
@@ -40,6 +40,5 @@ public class CameraBackgroundCtl : MonoBehaviour {
         // RectTransform rt = backGround.transform.GetComponent<RectTransform>();
         //GameObjectUtil.showWidthHeight1(backGround);
     }
-
-
 }
+

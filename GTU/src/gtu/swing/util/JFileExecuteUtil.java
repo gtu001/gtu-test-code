@@ -22,8 +22,8 @@ import org.apache.commons.collections4.Predicate;
 import org.apache.commons.collections4.Transformer;
 import org.apache.commons.lang.StringUtils;
 
-
 import gtu.collection.ListUtil;
+import gtu.file.FileCopyOverwrite;
 import gtu.file.FileUtil;
 import gtu.properties.PropertiesUtilBean;
 import gtu.runtime.DesktopUtil;
@@ -388,6 +388,20 @@ public class JFileExecuteUtil {
             return rtnLst;
         }
 
+        private static boolean fileMove(String soucepath, String despath) {
+            File f = new File(soucepath);
+            File des = new File(despath);
+            if (des.exists()) {
+                boolean overwrite = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("是否要覆蓋檔案 : " + des.getName(), "覆蓋檔案");
+                if (overwrite) {
+                    return FileCopyOverwrite.doCopy(f, des);
+                }
+            } else {
+                return FileCopyOverwrite.doCopy(f, des);
+            }
+            return false;
+        }
+
         public static boolean revertLogFile() {
             try {
                 final File choiceDir = JCommonUtil._jFileChooser_selectDirectoryOnly();
@@ -412,7 +426,7 @@ public class JFileExecuteUtil {
                                 return StringUtils.equals(object.getName(), input.getName());
                             }
                         });
-                        boolean moveOk = FileUtil.fileMove(input.getAbsolutePath(), toFile.getAbsolutePath());
+                        boolean moveOk = fileMove(toFile.getAbsolutePath(), input.getAbsolutePath());
                         if (!moveOk) {
                             mvLst.add(input.getName());
                         }

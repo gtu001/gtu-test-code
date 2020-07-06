@@ -26,6 +26,6 @@
 
 重新掛載指令
 ---
-	sudo mount -o remount,rw /partition/identifier /mount/point
+	sudo mount -o remount,bind,rw  <partition_identifier>  <mount_point>
 	Ex : 
-		sudo mount -o remount,rw  /dev/sdb1  /media/gtu001/OLD_D 
+		sudo mount -o  remount,bind,rw  /dev/sdb1  /media/gtu001/OLD_D
