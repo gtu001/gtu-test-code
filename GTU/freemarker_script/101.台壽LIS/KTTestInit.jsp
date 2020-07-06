@@ -147,6 +147,17 @@
         }
     }
 
+    function showSelectionArry() {
+    	for(var i=0;i<${ct.getGridName()}.mulLineCount;i++){
+			if (${ct.getGridName()}.getChkNo(i)){
+				alert("第"+parseInt(i+1)+"行被選中");
+			}
+		}
+		if(${ct.getGridName()}.getSelNo() != "0"){
+			alert("選中第"+${ct.getGridName()}.getSelNo()+"行");
+		}
+    }
+
 	// 提交后操作,服务器数据返回后执行的操作
 	function afterSubmit(FlagStr, Content) {
 		showInfo.close();
@@ -156,6 +167,24 @@
 		} else {
 			showMessagePage("處理失敗", Content);
 		}
+	}
+
+	function doSubmitAndAfterSubmit() {
+		for(var i=0;i<${ct.getGridName()}.mulLineCount;i++){
+			if (${ct.getGridName()}.getChkNo(i)){
+	           var para0 = ${ct.getGridName()}.getRowColData(i, 0);
+	           //alert(para9);
+			}
+		}
+		if(showInfo != null) {
+			showInfo.close();
+		}
+		showInfo = showNoticeWindow('Warn');
+		fm.action = "../API/${ct.getFunObj()['module']}/${ct.getFunObj()['pkg']}/${ct.getFunObj()['controllerClass']}/UPDATE";
+		ajaxSubmit(document.getElementById("fm"), function( FlagStr, content ) {
+			showInfo = showMessagePage("儲存成功", "更新完成!");
+			window.location.reload();
+		});
 	}
 
 	function cancelClick() {

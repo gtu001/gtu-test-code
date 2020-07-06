@@ -814,6 +814,12 @@ public class FastDBQueryUI extends JFrame {
                                 deleteSqlIdConfigBean(getCurrentEditSqlIdConfigBean());
                             }
                         })//
+                        .addJMenuItem("還原", new ActionListener() {
+                            @Override
+                            public void actionPerformed(ActionEvent e) {
+                                sqlListMouseClicked(null);
+                            }
+                        })//
                         .applyEvent(e)//
                         .show();
             }
@@ -2618,7 +2624,7 @@ public class FastDBQueryUI extends JFrame {
             // 儲存最後一個使用的dataSource
             mDBNameIdTextHandler.saveFinalQueryDataSourceUsage();
 
-            //紀錄sql執行類型
+            // 紀錄sql執行類型
             mSqlIdExecuteTypeHandler.logExecuteType();
 
             // 設定新開視窗預設值
@@ -3229,6 +3235,7 @@ public class FastDBQueryUI extends JFrame {
         // return;
         // }
         sqlBean = (SqlIdConfigBean) JListUtil.getLeadSelectionObject(sqlList);
+
         System.out.println("sqlId : " + sqlBean.getUniqueKey());
 
         sqlIdText.setText(sqlBean.sqlId);
@@ -3252,8 +3259,8 @@ public class FastDBQueryUI extends JFrame {
 
         // 設定 tab標題
         changeTabUITitile(sqlBean.sqlId);
-        
-        //取得sql執行類型
+
+        // 取得sql執行類型
         mSqlIdExecuteTypeHandler.processExecuteType(sqlBean.sqlId);
     }
 
@@ -5638,27 +5645,27 @@ public class FastDBQueryUI extends JFrame {
         private void logExecuteType() {
             String sqlId = StringUtils.trimToEmpty(sqlIdText.getText());
             if (StringUtils.isBlank(sqlId)) {
-//                if (getCurrentEditSqlIdConfigBean() != null) {
-//                    sqlId = getCurrentEditSqlIdConfigBean().getSqlId();
-//                }
+                // if (getCurrentEditSqlIdConfigBean() != null) {
+                // sqlId = getCurrentEditSqlIdConfigBean().getSqlId();
+                // }
             }
             if (StringUtils.isBlank(sqlId)) {
                 return;
             }
-            if (querySqlRadio.isSelected()) {
-                config.getConfigProp().setProperty(sqlId, "query");
-            } else {
+            if (updateSqlRadio.isSelected()) {
                 config.getConfigProp().setProperty(sqlId, "insert");
+            } else {
+                config.getConfigProp().setProperty(sqlId, "query");
             }
             config.store();
         }
 
         private void processExecuteType(String sqlId) {
             if (config.getConfigProp().containsKey(sqlId)) {
-                if ("query".equals(config.getConfigProp().getProperty(sqlId))) {
-                    querySqlRadio.setSelected(true);
-                } else {
+                if ("insert".equals(config.getConfigProp().getProperty(sqlId))) {
                     updateSqlRadio.setSelected(true);
+                } else {
+                    querySqlRadio.setSelected(true);
                 }
             }
         }

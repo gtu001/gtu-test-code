@@ -55,7 +55,17 @@ public class ${ct.getFunObj()['controllerClass']} extends AbstractController {
 
     private ResponseInfo common_process(@RequestBody RequestInfo request, HttpSession session, String operation) {
         ResponseInfo tResponseInfo = new ResponseInfo();
+        String FlagStr = "";
         try {
+            logger.info("參數清單 parameters ↓↓↓↓↓↓ ========================================================================");
+            for(Enumeration enu = request.getParameterNames(); enu.hasMoreElements(); ) {
+                String key = (String)enu.nextElement();
+                String[] values = request.getParameterValues(key);
+                logger.info("\t" + key + "\tvalue : " + Arrays.asList(values));
+            }
+            logger.info("參數清單 parameters ↑↑↑↑↑↑ ========================================================================");
+
+
             // 封装返回值
             ResponseInfo response = new ResponseInfo();
             String Content = "";
@@ -77,16 +87,21 @@ public class ${ct.getFunObj()['controllerClass']} extends AbstractController {
             // {
 
             ${ct.getFunObj()['uiClass']} t${ct.getFunObj()['uiClass']} = new ${ct.getFunObj()['uiClass']}();
-            if (!t${ct.getFunObj()['uiClass']}.submitData(tVData, operation)) {
-                logger.debug("###確認失敗!");
-                Content = new I18nMessage("确认失败，原因是:", "tai156646168644517shou").getMessage() + t${ct.getFunObj()['uiClass']}.getErrors().getError(0).errorMessage();
-                response.fail();
-                response.setContent(Content);
+
+            t${ct.getFunObj()['uiClass']}.submitData(tVData, operation);
+
+            tError = ${ct.getFunObj()['uiClass']}.mErrors;
+            //tError = tBusinessDelegate.getCErrors();
+            if (!tError.needDealError())
+                Content =new I18nMessage("保存成功。","tai156646161419992shou").getMessage();
+                FlagStr = "Succ";
+                responseInfo.succ();
+                responseInfo.setContent(Content);
             } else {
-                logger.debug("###保存成功!");
-                Content = new I18nMessage("保存成功。", "tai156646161419992shou").getMessage();
-                response.succ();
-                response.setContent(Content);
+                Content = new I18nMessage("保存失败，原因是:","tai156646160833412shou").getMessage() + tError.getFirstError();
+                FlagStr = "Fail";
+                responseInfo.fail();
+                responseInfo.setContent(Content);
             }
             VData result = t${ct.getFunObj()['uiClass']}.getResult();
             logger.debug("UnionConfirmSave", "-------------------end workflow---------------------");
