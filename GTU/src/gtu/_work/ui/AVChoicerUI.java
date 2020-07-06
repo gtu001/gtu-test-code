@@ -13,7 +13,6 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -50,6 +49,8 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -81,6 +82,7 @@ import gtu.swing.util.JFrameRGBColorPanel;
 import gtu.swing.util.JFrameUtil;
 import gtu.swing.util.JListUtil;
 import gtu.swing.util.JMouseEventUtil;
+import gtu.swing.util.JPopupMenuUtil;
 import gtu.swing.util.JSwingCommonConfigUtil;
 import gtu.swing.util.JTabbedPaneUtil;
 import taobe.tec.jcc.JChineseConvertor;
@@ -139,6 +141,8 @@ public class AVChoicerUI extends JFrame {
     private JTextField historyBetweenConfigText;
     private JCheckBox ignoreHistoryConfigChk;
 
+    private static AVChoicerUI mAVChoicerUI;
+
     /**
      * Launch the application.
      */
@@ -149,8 +153,8 @@ public class AVChoicerUI extends JFrame {
         EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
-                    AVChoicerUI frame = new AVChoicerUI();
-                    gtu.swing.util.JFrameUtil.setVisible(true, frame);
+                    mAVChoicerUI = new AVChoicerUI();
+                    gtu.swing.util.JFrameUtil.setVisible(true, mAVChoicerUI);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -211,9 +215,27 @@ public class AVChoicerUI extends JFrame {
         JButton renameBtn = new JButton("改名");
         renameBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                currentFileHandler.rename();
+                // currentFileHandler.rename();
             }
         });
+        renameBtn.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent arg0) {
+                if (JMouseEventUtil.buttonLeftClick(1, arg0)) {
+                    currentFileHandler.rename();
+                } else {
+                    JPopupMenuUtil.newInstance(renameBtn)//
+                            .addJMenuItem("超棒", new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent arg0) {
+                                    currentFileHandler.awsomeRename();
+                                }
+                            })//
+                            .applyEvent(arg0).show();
+                }
+            }
+        });
+
         panel_7.add(renameBtn);
         panel_7.add(replayBtn);
 
@@ -514,6 +536,7 @@ public class AVChoicerUI extends JFrame {
         panel_18.add(panel_22, BorderLayout.SOUTH);
 
         dirCheckList = new JList();
+        dirCheckList.setModel(JListUtil.createModel());
         dirCheckList.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent arg0) {
@@ -538,6 +561,19 @@ public class AVChoicerUI extends JFrame {
                         }
                     }
                 });
+            }
+        });
+        tabbedPane.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent arg0) {
+                dirCheckList.repaint();
+            }
+        });
+        JCommonUtil.applyDropFiles(dirCheckList, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                List<File> files = (List<File>) arg0.getSource();
+                dirCheckTextActionPerformed(files);
             }
         });
 
@@ -1160,6 +1196,7 @@ public class AVChoicerUI extends JFrame {
                     return tempFile.get();
                 }
             }));
+            dirCheckList.repaint();
         }
 
         private void rename() {
@@ -1176,6 +1213,39 @@ public class AVChoicerUI extends JFrame {
                 String name = FileUtil.getNameNoSubName(file);
                 String subName = FileUtil.getSubName(file);
                 name = JCommonUtil._jOptionPane_showInputDialog("改名", name);
+                if (StringUtils.isNotBlank(name)) {
+                    name = JChineseConvertor.getInstance().s2t(name);
+                    File renmaeToFile = new File(file.getParentFile(), name + "." + subName);
+                    if (JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("確定改名為\n" + renmaeToFile.getAbsolutePath(), renmaeToFile.getName())) {
+                        boolean result = file.renameTo(renmaeToFile);
+                        JCommonUtil._jOptionPane_showMessageDialog_info("改名 " + (result ? "成功" : "失敗") + " : " + renmaeToFile);
+                        if (result) {
+                            tempFile.set(renmaeToFile);
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                JCommonUtil.handleException(e);
+            }
+        }
+
+        private void awsomeRename() {
+            try {
+                if (tempFile == null) {
+                    JCommonUtil._jOptionPane_showMessageDialog_error("檔案不存在!");
+                    return;
+                }
+                File file = tempFile.get();
+                if (file == null || !file.exists()) {
+                    JCommonUtil._jOptionPane_showMessageDialog_error("檔案不存在!");
+                    return;
+                }
+                String name = FileUtil.getNameNoSubName(file);
+                String subName = FileUtil.getSubName(file);
+                if (name.startsWith("超棒_")) {
+                    return;
+                }
+                name = "超棒_" + name;
                 if (StringUtils.isNotBlank(name)) {
                     name = JChineseConvertor.getInstance().s2t(name);
                     File renmaeToFile = new File(file.getParentFile(), name + "." + subName);
@@ -1215,6 +1285,7 @@ public class AVChoicerUI extends JFrame {
                 return getRandomAvFile();
             }
         }));
+        dirCheckList.repaint();
     }
 
     private class HistoryConfigHandler {
@@ -1371,6 +1442,16 @@ public class AVChoicerUI extends JFrame {
         List<File> forReturnLst = new ArrayList<File>();
         List<File> imgReturnLst = new ArrayList<File>();
 
+        private List<File> getExistsLst() {
+            List<File> lst = new ArrayList<File>();
+            DefaultListModel model = (DefaultListModel) dirCheckList.getModel();
+            for (int ii = 0; ii < model.getSize(); ii++) {
+                FileZ f = (FileZ) model.getElementAt(ii);
+                lst.add(f.file);
+            }
+            return lst;
+        }
+
         DropFileChecker(List<File> fileLst) {
             if (fileLst == null) {
                 File dirFile = new File(dirCheckText.getText());
@@ -1378,6 +1459,9 @@ public class AVChoicerUI extends JFrame {
                 gtu.file.FileUtil.searchFileMatchs(dirFile, ".*\\." + PatternCollection.VIDEO_PATTERN, fileLst);
                 gtu.file.FileUtil.searchFileMatchs(dirFile, ".*\\." + PatternCollection.PICTURE_PATTERN, imgReturnLst);
             }
+
+            List<File> existsLst = getExistsLst();
+            forReturnLst.addAll(existsLst);
 
             for (File f : fileLst) {
                 appendFile(f, forReturnLst);
@@ -1403,7 +1487,7 @@ public class AVChoicerUI extends JFrame {
                         appendFile(f, appendLst);
                     }
                 }
-            } else if (startFile.getName().matches(".*\\." + PatternCollection.VIDEO_PATTERN)) {
+            } else if (startFile.getName().matches(".*\\." + PatternCollection.VIDEO_PATTERN) && !appendLst.contains(startFile)) {
                 appendLst.add(startFile);
             }
         }
@@ -1455,6 +1539,7 @@ public class AVChoicerUI extends JFrame {
                 }
             }));
         }
+        dirCheckList.repaint();
     }
 
     private void readyMoveBtnAction() {
@@ -1576,7 +1661,11 @@ public class AVChoicerUI extends JFrame {
         public String toString() {
             String fontColor = "black";
             checkColor(file);
-            return String.format("<html><span style='color : %s ; background-color : %s;'>%s</span></html>", fontColor, bgColor, name);
+            String viewOk = "";
+            if (mAVChoicerUI != null) {
+                viewOk = mAVChoicerUI.historyConfigHandler.isAlreadyPlayInRecent(file) ? "<font color=red>閱</font>" : "";
+            }
+            return String.format("<html><span style='color : %s ; background-color : %s;'>" + viewOk + "%s</span></html>", fontColor, bgColor, name);
         }
     }
 }

@@ -1580,12 +1580,12 @@ public class BrowserHistoryHandlerUI extends JFrame {
                         for (String _singleText : searchArry) {
                             _singleText = StringUtils.trimToEmpty(_singleText);
                             if (StringUtils.isNotBlank(_singleText)) {
-                                if (isNormalMatch_detail(_singleText)) {
-                                    return true;
+                                if (!isNormalMatch_detail(_singleText)) {
+                                    return false;
                                 }
                             }
                         }
-                        return false;
+                        return true;
                     }
 
                     private boolean isNotHiddenObj(UrlConfig d) {
