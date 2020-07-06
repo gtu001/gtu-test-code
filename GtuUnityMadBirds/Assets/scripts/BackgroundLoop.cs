@@ -4,7 +4,6 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using static Log;
 using static Vector3Util;
-using static GameObjectUtil;
 
 
 public class BackgroundLoop : MonoBehaviour {
