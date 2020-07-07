@@ -134,7 +134,7 @@ public class GitConflictDetectUI extends JFrame {
     private JList gitHistoryList;
     private JButton gitHistoryClearBtn;
     private JButton gitHistorySearchBtn;
-    
+
     private static SwingTabTemplateUI tabUI;
 
     /**
@@ -440,7 +440,7 @@ public class GitConflictDetectUI extends JFrame {
             this.applyAppMenu();
             JCommonUtil.defaultToolTipDelay();
             this.setTitle("You Set My World On Fire");
-            
+
             gitExePathText.setText("TortoiseGitMerge.exe  /base:\"%s\" /theirs:\"%s\"");
         }
     }
@@ -544,6 +544,30 @@ public class GitConflictDetectUI extends JFrame {
                                     if (confirm) {
                                         for (GitFile gitFile : gitFileArry) {
                                             GitUtil.discardChange(projectDir, gitFile.orignName);
+                                        }
+                                        new GitCheckProc(projectDir, _MyGitTestUtil.getOrignNames(gitFileArry));
+                                    }
+                                }
+                            })//
+                            .addJMenuItem("use theirs", new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    boolean confirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("是否要回覆到未改變：" + _MyGitTestUtil.getFileNames(gitFileArry), "回覆到未改變");
+                                    if (confirm) {
+                                        for (GitFile gitFile : gitFileArry) {
+                                            GitUtil.useTheirs(projectDir, gitFile.orignName);
+                                        }
+                                        new GitCheckProc(projectDir, _MyGitTestUtil.getOrignNames(gitFileArry));
+                                    }
+                                }
+                            })//
+                            .addJMenuItem("use ours", new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    boolean confirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("是否要回覆到未改變：" + _MyGitTestUtil.getFileNames(gitFileArry), "回覆到未改變");
+                                    if (confirm) {
+                                        for (GitFile gitFile : gitFileArry) {
+                                            GitUtil.useOurs(projectDir, gitFile.orignName);
                                         }
                                         new GitCheckProc(projectDir, _MyGitTestUtil.getOrignNames(gitFileArry));
                                     }
@@ -1248,6 +1272,26 @@ public class GitConflictDetectUI extends JFrame {
             RuntimeBatPromptModeUtil run = RuntimeBatPromptModeUtil.newInstance();
             addProjectCommand(projectDir, run);
             run.command(String.format("git checkout HEAD \"%s\"", fileGitPath));
+            ProcessWatcher p = ProcessWatcher.newInstance(run.apply());
+            p.getStreamSync();
+        }
+
+        private static void useTheirs(File projectDir, String gitOrignPathName) {
+            String fileGitPath = getGitOrignPathName(gitOrignPathName);// 檔名(為git目錄後開始)
+            RuntimeBatPromptModeUtil run = RuntimeBatPromptModeUtil.newInstance();
+            addProjectCommand(projectDir, run);
+            run.command(String.format("git reset -- \"%s\"", fileGitPath));
+            run.command(String.format("git checkout MERGE_HEAD -- \"%s\"", fileGitPath));
+            ProcessWatcher p = ProcessWatcher.newInstance(run.apply());
+            p.getStreamSync();
+        }
+
+        private static void useOurs(File projectDir, String gitOrignPathName) {
+            String fileGitPath = getGitOrignPathName(gitOrignPathName);// 檔名(為git目錄後開始)
+            RuntimeBatPromptModeUtil run = RuntimeBatPromptModeUtil.newInstance();
+            addProjectCommand(projectDir, run);
+            run.command(String.format("git reset -- \"%s\"", fileGitPath));
+            run.command(String.format("git checkout ORIG_HEAD -- \"%s\"", fileGitPath));
             ProcessWatcher p = ProcessWatcher.newInstance(run.apply());
             p.getStreamSync();
         }

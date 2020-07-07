@@ -5661,11 +5661,10 @@ public class FastDBQueryUI extends JFrame {
         }
 
         private void processExecuteType(String sqlId) {
+            querySqlRadio.setSelected(true);
             if (config.getConfigProp().containsKey(sqlId)) {
                 if ("insert".equals(config.getConfigProp().getProperty(sqlId))) {
                     updateSqlRadio.setSelected(true);
-                } else {
-                    querySqlRadio.setSelected(true);
                 }
             }
         }

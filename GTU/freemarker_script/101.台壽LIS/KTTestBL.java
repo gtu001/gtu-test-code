@@ -355,6 +355,24 @@ public class ${ct.getBlObj()['blClass']} implements BusinessService {
         }
     }
 
+    private LPPolSchema findByPk3_transform(${ct.getBlObj()['table']}Schema schema) {
+        ${ct.getBlObj()['table']}DB t${ct.getBlObj()['table']}DB = new ${ct.getBlObj()['table']}DB();
+        String sql = "select * from ${ct.getBlObj()['table']} where ${ct.getPkWhereCondition2()}";
+        SQLwithBindVariables sqlbv = new SQLwithBindVariables();
+        sqlbv.sql(sql);
+        <#list pkColumnLst2 as col>
+        sqlbv.put("${col}", schema.get${col?cap_first}());
+        </#list>
+        ${ct.getBlObj()['table']}Set t${ct.getBlObj()['table']}Set = t${ct.getBlObj()['table']}DB.executeQuery(sqlbv);
+        if (t${ct.getBlObj()['table']}Set.size() != 0) {
+            ${ct.getBlObj()['table']}Schema schema = t${ct.getBlObj()['table']}Set.get(1);
+            LPPolSchema lp = new LPPolSchema();
+            new Reflections().transFields(lp, schema);
+            return lp;
+        }
+        return null;
+    }
+
     /////////////////////////////////////////////////////////////////////////
 
     private boolean sbmtData(VData data) {
@@ -411,6 +429,30 @@ public class ${ct.getBlObj()['blClass']} implements BusinessService {
         ExeSQL tExeSQL = new ExeSQL();
         double dd = Double.parseDouble(tExeSQL.getOneValue(tSql));
         return dd;
+    }
+
+    private void showVDataInfo(VData mInputData) {
+        try {
+            logger.info("///////////////////////////////////////////////");
+            VData mVData = mInputData;
+            Map<String, List<Integer>> objNamePosMap = (Map<String, List<Integer>>) FieldUtils.readDeclaredField(mVData, "objNamePosMap", true);
+            // elementData
+            for (String key : objNamePosMap.keySet()) {
+                logger.info("\t" + key + " \t" + objNamePosMap.get(key));
+            }
+            logger.info("///////////////////////////////////////////////");
+            Field f1 = Vector.class.getDeclaredField("elementData");
+            f1.setAccessible(true);
+            Object[] elementData = (Object[]) org.apache.commons.lang3.reflect.FieldUtils.readField(f1, mVData);
+            for (int ii = 0; ii < elementData.length; ii++) {
+                Object v = elementData[ii];
+                logger.info("\t" + ii + " \t" + v);
+                ii++;
+            }
+            logger.info("///////////////////////////////////////////////");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
 
