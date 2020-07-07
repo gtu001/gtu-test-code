@@ -226,6 +226,10 @@ public class FastDBQueryUI_XlsColumnDefLoader {
     }
 
     public void execute() {
+        if (configLst == null || configLst.isEmpty()) {
+            System.out.println(this.getClass().getSimpleName() + " 初始化未完成！...");
+            return;
+        }
         File dir = new File(FileUtil.DESKTOP_DIR, "FastColumnDef");
         if (customDir != null) {
             dir = customDir;
@@ -561,7 +565,7 @@ public class FastDBQueryUI_XlsColumnDefLoader {
         private DefaultTableModel toModel() {
             Object[] titles = new Object[DEFAULT_EXCEL_TITLES_COUNT];
             titles[0] = "file";
-            titles[1] = "sheet";
+            titles[1] = "sheet(table)";
             titles[2] = "row";
             for (int ii = 3; ii < titles.length; ii++) {
                 titles[ii] = ExcelUtil_Xls97.getInstance().cellEnglishToPos(ii - 3 + 1);
