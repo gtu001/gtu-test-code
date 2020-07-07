@@ -552,7 +552,7 @@ public class GitConflictDetectUI extends JFrame {
                             .addJMenuItem("use theirs", new ActionListener() {
                                 @Override
                                 public void actionPerformed(ActionEvent e) {
-                                    boolean confirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("是否要回覆到未改變：" + _MyGitTestUtil.getFileNames(gitFileArry), "回覆到未改變");
+                                    boolean confirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("是否要使用遠端版本：" + _MyGitTestUtil.getFileNames(gitFileArry), "回覆到未改變");
                                     if (confirm) {
                                         for (GitFile gitFile : gitFileArry) {
                                             GitUtil.useTheirs(projectDir, gitFile.orignName);
@@ -564,7 +564,7 @@ public class GitConflictDetectUI extends JFrame {
                             .addJMenuItem("use ours", new ActionListener() {
                                 @Override
                                 public void actionPerformed(ActionEvent e) {
-                                    boolean confirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("是否要回覆到未改變：" + _MyGitTestUtil.getFileNames(gitFileArry), "回覆到未改變");
+                                    boolean confirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("是否要使用你的版本：" + _MyGitTestUtil.getFileNames(gitFileArry), "回覆到未改變");
                                     if (confirm) {
                                         for (GitFile gitFile : gitFileArry) {
                                             GitUtil.useOurs(projectDir, gitFile.orignName);
