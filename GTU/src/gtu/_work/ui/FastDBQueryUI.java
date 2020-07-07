@@ -1191,14 +1191,14 @@ public class FastDBQueryUI extends JFrame {
         tableColumnDefText_Auto.getTextComponent().addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
-                mTableColumnDefTextHandler.action(false);
+                mTableColumnDefTextHandler.action(false, null);
             }
         });
 
         tableColumnDefText.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                mTableColumnDefTextHandler.action(false);
+                mTableColumnDefTextHandler.action(false, null);
             }
         });
 
@@ -1575,7 +1575,7 @@ public class FastDBQueryUI extends JFrame {
                         mTableColumnDefTextHandler = new TableColumnDefTextHandler();
                     }
                     if (mTableColumnDefTextHandler != null) {
-                        mTableColumnDefTextHandler.init(true);
+                        mTableColumnDefTextHandler.init(true, null);
                     }
                     if (mXlsColumnDefDlg == null) {
                         mXlsColumnDefDlg = new XlsColumnDefDlg();
@@ -1659,9 +1659,9 @@ public class FastDBQueryUI extends JFrame {
             textField.getDocument().addDocumentListener(JCommonUtil.getDocumentListener(new HandleDocumentEvent() {
                 @Override
                 public void process(DocumentEvent event) {
-                    if (columnXlsDefTableQryText == textField) {
-                        initColumnXlsDefTableColumnQryTable();
-                    }
+                    // if (columnXlsDefTableQryText == textField) {
+                    // initColumnXlsDefTableColumnQryTable();
+                    // }
                 }
             }));
             textField.addFocusListener(new FocusAdapter() {
@@ -6689,7 +6689,7 @@ public class FastDBQueryUI extends JFrame {
             }
         }
 
-        private boolean init(boolean reset) {
+        private boolean init(boolean reset, ActionListener loadingInfoListener) {
             File dir = new File(FileUtil.DESKTOP_DIR, "FastColumnDef");
             if (!dir.exists()) {
                 dir.mkdirs();
@@ -6702,6 +6702,7 @@ public class FastDBQueryUI extends JFrame {
                     Validate.isTrue(false, "請先按設定");
                 }
                 xlsLoader.setMappingConfig(mXlsColumnDefDlg.getConfig());
+                xlsLoader.setLoadingInfoListener(loadingInfoListener);
                 return true;
             }
             return false;
@@ -6723,9 +6724,9 @@ public class FastDBQueryUI extends JFrame {
             xlsLoader.setMappingConfig(mXlsColumnDefDlg.getConfig());
         }
 
-        public void action(boolean reset) {
+        public void action(boolean reset, ActionListener loadingInfoListener) {
             try {
-                if (init(reset)) {
+                if (init(reset, loadingInfoListener)) {
                     String table = String.valueOf(tableColumnDefText.getSelectedItem());
                     queryResultTable.setTitleTooltipTransformer(xlsLoader.getTableTitleTransformer(table));
                 }
@@ -6736,7 +6737,7 @@ public class FastDBQueryUI extends JFrame {
 
         public String getChinese(String column) {
             try {
-                if (init(false)) {
+                if (init(false, null)) {
                     String table = String.valueOf(tableColumnDefText.getSelectedItem());
                     return xlsLoader.getDBColumnChinese(column, true, table);
                 }
@@ -6759,7 +6760,7 @@ public class FastDBQueryUI extends JFrame {
         public String getSelectColumns() {
             StringBuffer sb = new StringBuffer();
             try {
-                if (init(false)) {
+                if (init(false, null)) {
                     String table = String.valueOf(tableColumnDefText.getSelectedItem());
                     String tableAlias = getTableAlias(table, true);
                     List<String> colLst = xlsLoader.getColumnLst(table);
@@ -6802,7 +6803,7 @@ public class FastDBQueryUI extends JFrame {
 
         public List<String> getPkLst() {
             try {
-                if (init(false)) {
+                if (init(false, null)) {
                     String table = String.valueOf(tableColumnDefText.getSelectedItem());
                     return xlsLoader.getPkList(table);
                 }
@@ -7057,7 +7058,28 @@ public class FastDBQueryUI extends JFrame {
 
                     // 重設
                     if (mTableColumnDefTextHandler != null) {
-                        mTableColumnDefTextHandler.action(true);
+                        JProgressBarHelper prog = JProgressBarHelper.newInstance(FastDBQueryUI.this, "開始讀取xls欄位設定");
+                        prog.indeterminate(true);
+                        prog.build();
+                        prog.show();
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                mTableColumnDefTextHandler.action(true, new ActionListener() {
+                                    @Override
+                                    public void actionPerformed(ActionEvent e) {
+                                        Map<String, Object> info = (Map<String, Object>) e.getSource();
+                                        String message = "";
+                                        if (info.get("file") != null) {
+                                            message += ((File) info.get("file")).getName();
+                                        }
+                                        message += info.get("message");
+                                        prog.setStateText(message);
+                                    }
+                                });
+                                prog.dismiss();
+                            }
+                        }).start();
                     }
                 }
             });
@@ -7072,7 +7094,7 @@ public class FastDBQueryUI extends JFrame {
     private void initColumnXlsDefTableColumnQryTable() {
         try {
             if (mTableColumnDefTextHandler == null) {
-                mTableColumnDefTextHandler.init(false);
+                mTableColumnDefTextHandler.init(false, null);
             }
             String tableQry = columnXlsDefTableQryText.getText();
             String columnQry = columnXlsDefColumnQryText.getText();

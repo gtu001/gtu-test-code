@@ -44,6 +44,9 @@ public class FastDBQueryUI_XlsColumnDefLoader {
     XlsColumnDefClz pkDef;
     XlsColumnDefClz tableDef;
 
+    List<TableDef> tabLst = new ArrayList<TableDef>();
+    private ActionListener loadingInfoListener;
+
     public FastDBQueryUI_XlsColumnDefLoader(File customDir, List<XlsColumnDefClz> configLst) {
         this.customDir = customDir;
         if (configLst != null) {
@@ -212,7 +215,15 @@ public class FastDBQueryUI_XlsColumnDefLoader {
         return rtnLst;
     }
 
-    List<TableDef> tabLst = new ArrayList<TableDef>();
+    private void setLoadingInfo(File file, String message) {
+        if (loadingInfoListener != null) {
+            Map<String, Object> info = new HashMap<String, Object>();
+            info.put("file", file);
+            info.put("message", message);
+            loadingInfoListener.actionPerformed(new ActionEvent(info, -1, "info"));
+        }
+        System.out.println("[setLoadingInfo] file : " + (file != null ? file.getName() : "NA") + " -- " + message);
+    }
 
     public void execute() {
         File dir = new File(FileUtil.DESKTOP_DIR, "FastColumnDef");
@@ -225,6 +236,7 @@ public class FastDBQueryUI_XlsColumnDefLoader {
         } else {
             for (File f : lst) {
                 if (f.getName().endsWith(".xls")) {
+                    setLoadingInfo(f, "");
                     HSSFWorkbook wk = ExcelUtil_Xls97.getInstance().readExcel(f);
                     for (int ii = 0; ii < wk.getNumberOfSheets(); ii++) {
                         HSSFSheet sheet = wk.getSheetAt(ii);
@@ -236,6 +248,7 @@ public class FastDBQueryUI_XlsColumnDefLoader {
                         tb.columnLst = (List<Map<Integer, String>>) objs[0];
                         tb.columnLstMappingToRowIndexMap = (Map<Map<Integer, String>, Integer>) objs[1];
                         tabLst.add(tb);
+                        setLoadingInfo(f, "...表 : " + table);
                     }
                 }
             }
@@ -248,6 +261,7 @@ public class FastDBQueryUI_XlsColumnDefLoader {
                             HSSFSheet sheet = wk.getSheetAt(ii);
                             // =====================================
                             String tableName = getTableNameFromSheet(sheet, tableDef);
+                            setLoadingInfo(f, "...表 : " + StringUtils.trimToEmpty(tableName));
                             // =====================================
                             this.processColumnDefMap_ForTableDef(mTempTableHolder, sheet, tableDef, tableName);
                         }
@@ -329,7 +343,7 @@ public class FastDBQueryUI_XlsColumnDefLoader {
         }
     }
 
-    private void processColumnDefMap_ForTableDef(TempTableHolder mTempTableHolder, HSSFSheet sheet, XlsColumnDefClz tableDef, String tableName) {
+    private void processColumnDefMap_ForTableDef(TempTableHolder mTempTableHolder, HSSFSheet sheet, XlsColumnDefClz tableDef, String tableNameRef) {
         for (int ii = 0; ii <= sheet.getLastRowNum(); ii++) {
             Row row = sheet.getRow(ii);
             if (row == null) {
@@ -340,12 +354,14 @@ public class FastDBQueryUI_XlsColumnDefLoader {
                 String value = ExcelUtil_Xls97.getInstance().readCell(row.getCell(jj));
                 map.put(jj, value);
             }
+            String tableName = tableNameRef;
             if (StringUtils.isBlank(tableName)) {
                 tableName = map.get(tableDef.index);
             }
             if (StringUtils.isBlank(tableName)) {
                 continue;
             }
+            setLoadingInfo(null, "...表 : " + StringUtils.trimToEmpty(tableName));
             mTempTableHolder.appendColLst(tableName, map);
             mTempTableHolder.appendColumnLstMappingToRowIndexMap(tableName, map, ii);
         }
@@ -780,5 +796,9 @@ public class FastDBQueryUI_XlsColumnDefLoader {
             }
         }
         return false;
+    }
+
+    public void setLoadingInfoListener(ActionListener loadingInfoListener) {
+        this.loadingInfoListener = loadingInfoListener;
     }
 }

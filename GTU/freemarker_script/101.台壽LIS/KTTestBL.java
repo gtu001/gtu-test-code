@@ -454,7 +454,26 @@ public class ${ct.getBlObj()['blClass']} implements BusinessService {
             e.printStackTrace();
         }
     }
+
+    private void showMMapInfo(MMap map) {
+        logger.info("//////////////////////////////////////////////////////////////////////");
+        for (Object item : map.keySet()) {
+            Object operation = map.get(item);
+            if (com.sinosoft.persistence.Schema.class.isAssignableFrom(item.getClass())) {
+                com.sinosoft.persistence.Schema schema = (com.sinosoft.persistence.Schema) item;
+                logger.info("\t" + operation + "\t" + ReflectionToStringBuilder.toString(schema));
+            }
+            if (com.sinosoft.persistence.Set.class.isAssignableFrom(item.getClass())) {
+                com.sinosoft.persistence.Set schSet = (com.sinosoft.persistence.Set) item;
+                logger.info("\t" + operation + "\t[Set]" + schSet + "-------start");
+                for (int ii = 1; ii <= schSet.size(); ii++) {
+                    com.sinosoft.persistence.Schema schema = (com.sinosoft.persistence.Schema) schSet.get(ii);
+                    logger.info("\t" + operation + "\t" + ReflectionToStringBuilder.toString(schema));
+                }
+                logger.info("\t" + operation + "\t[Set]" + schSet + "-------end");
+            }
+        }
+        logger.info("//////////////////////////////////////////////////////////////////////");
+    }
 }
-
-
 ////////////////////////////////////////////////////
