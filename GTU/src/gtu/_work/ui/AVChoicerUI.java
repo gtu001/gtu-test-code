@@ -110,7 +110,7 @@ public class AVChoicerUI extends JFrame {
     private static final String AV_LIST_KEY = "avDirList";
     private static final String AV_EXE_KEY = "avExeText";
 
-    private PropertiesUtilBean config = new PropertiesUtilBean(AVChoicerUI.class);// xxxxxxxxxxxxxxxxxxxxxxx
+    private PropertiesUtilBean config = new PropertiesUtilBean(AVChoicerUI.class);// 
     {
         config = JSwingCommonConfigUtil.checkTestingPropertiesUtilBean(config, getClass(), AVChoicerUI.class.getSimpleName());
     }
@@ -495,6 +495,9 @@ public class AVChoicerUI extends JFrame {
                 if (JMouseEventUtil.buttonLeftClick(2, paramMouseEvent)) {
                     File dir = new File((String) JListUtil.getLeadSelectionObject(moveToList));
                     DesktopUtil.openDir(dir);
+                    
+                    //設定目的 dir
+                    readyMoveToDirText.setText(dir.getAbsolutePath());
                 }
             }
         });
@@ -548,6 +551,15 @@ public class AVChoicerUI extends JFrame {
 
         dirCheckList.addKeyListener(new KeyAdapter() {
             public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == 127) {
+                    if (dirCheckList.getSelectedIndices() != null && dirCheckList.getSelectedIndices().length > 1) {
+                        DefaultListModel model = (DefaultListModel) dirCheckList.getModel();
+                        for (int ii = 0; ii < model.getSize(); ii++) {
+                            model.removeElementAt(ii);
+                        }
+                        return;
+                    }
+                }
                 JListUtil.newInstance(dirCheckList).defaultJListKeyPressed(e, new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
@@ -567,13 +579,6 @@ public class AVChoicerUI extends JFrame {
             @Override
             public void stateChanged(ChangeEvent arg0) {
                 dirCheckList.repaint();
-            }
-        });
-        JCommonUtil.applyDropFiles(dirCheckList, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent arg0) {
-                List<File> files = (List<File>) arg0.getSource();
-                dirCheckTextActionPerformed(files);
             }
         });
 
@@ -668,6 +673,14 @@ public class AVChoicerUI extends JFrame {
                         DesktopUtil.browseFileDirectory(openToFile);
                     }
                 }
+            }
+        });
+
+        JCommonUtil.applyDropFiles(dirCheckList, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                List<File> files = (List<File>) arg0.getSource();
+                dirCheckTextActionPerformed(files);
             }
         });
 
