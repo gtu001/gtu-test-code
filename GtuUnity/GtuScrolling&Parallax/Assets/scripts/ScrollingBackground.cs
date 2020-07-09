@@ -1,10 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static Log;
 
 //https://www.youtube.com/watch?v=QkisHNmcK7Y
 public class ScrollingBackground : MonoBehaviour {
     public float backgroundSize;
+    public float paralaxSpeed;
 
     private Transform cameraTransform;
     private Transform[] layers;
@@ -15,6 +17,7 @@ public class ScrollingBackground : MonoBehaviour {
 
     // Start is called before the first frame update
     void Start () {
+        Log.info("Update ------ start");
         cameraTransform = Camera.main.transform;
         lastCameraX = cameraTransform.position.x;
         layers = new Transform[transform.childCount];
@@ -37,7 +40,7 @@ public class ScrollingBackground : MonoBehaviour {
          */
 
         float deltaX = cameraTransform.position.x - lastCameraX;
-        transform.position += Vector3.right * 
+        transform.position += Vector3.right * (deltaX * paralaxSpeed);
         lastCameraX = cameraTransform.position.x;
 
         if(cameraTransform.position.x < (layers[leftIndex].transform.position.x + viewZone)) {
