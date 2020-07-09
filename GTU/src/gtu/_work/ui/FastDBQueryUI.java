@@ -7064,7 +7064,7 @@ public class FastDBQueryUI extends JFrame {
 
                     // 重設
                     if (mTableColumnDefTextHandler != null) {
-                        JProgressBarHelper prog = JProgressBarHelper.newInstance(FastDBQueryUI.this, "開始讀取xls欄位設定");
+                        final JProgressBarHelper prog = JProgressBarHelper.newInstance(FastDBQueryUI.this, "開始讀取xls欄位設定");
 
                         loadingInfoListener = new ActionListener() {
                             @Override

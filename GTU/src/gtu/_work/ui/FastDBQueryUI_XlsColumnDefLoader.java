@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -215,14 +216,20 @@ public class FastDBQueryUI_XlsColumnDefLoader {
         return rtnLst;
     }
 
+    AtomicReference<String> loadingInfoHoldler = new AtomicReference<String>();
+
     private void setLoadingInfo(File file, String message) {
-        if (loadingInfoListener != null) {
-            Map<String, Object> info = new HashMap<String, Object>();
-            info.put("file", file);
-            info.put("message", message);
-            loadingInfoListener.actionPerformed(new ActionEvent(info, -1, "info"));
+        String allMessage = "[setLoadingInfo] file : " + (file != null ? file.getName() : "NA") + " -- " + message;
+        if (loadingInfoHoldler.get() == null || !StringUtils.equals(allMessage, loadingInfoHoldler.get())) {
+            if (loadingInfoListener != null) {
+                Map<String, Object> info = new HashMap<String, Object>();
+                info.put("file", file);
+                info.put("message", message);
+                loadingInfoListener.actionPerformed(new ActionEvent(info, -1, "info"));
+            }
+            System.out.println(allMessage);
+            loadingInfoHoldler.set(allMessage);
         }
-        System.out.println("[setLoadingInfo] file : " + (file != null ? file.getName() : "NA") + " -- " + message);
     }
 
     public void execute() {
@@ -483,16 +490,17 @@ public class FastDBQueryUI_XlsColumnDefLoader {
             for (TableDef tab : tabLst) {
                 tab.qryMatchMarkLst = new TreeSet<Integer>();
             }
-            if (tableQryText != null && tableQryText.length > 0) {
+            if (isConditionOk(tableQryText, tableQryPtn)) {
                 A: for (TableDef tab : tabLst) {
                     for (String tabName : tableQryText) {
                         if (tab.table.toLowerCase().contains(tabName.toLowerCase())) {
                             tabLst2.add(tab);
                             continue A;
-                        } else if (isRegexMatch(tab.table, tableQryPtn)) {
-                            tabLst2.add(tab);
-                            continue A;
                         }
+                    }
+                    if (isRegexMatch(tab.table, tableQryPtn)) {
+                        tabLst2.add(tab);
+                        continue A;
                     }
                 }
             } else {
