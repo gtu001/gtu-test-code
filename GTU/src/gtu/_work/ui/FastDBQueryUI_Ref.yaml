@@ -1,74 +1,38 @@
 ---
-- "category": |-
-    DB2 ErrorCode
-  "categoryColor": |-
-    RED
-  "content": |-
-    這個schema 沒有此表
-  "searchKey": |-
-    SQLCODE=-204, SQLSTATE=42704
-- "category": |-
-    DB2 ErrorCode
-  "categoryColor": |-
-    RED
-  "content": |-
-    參數索引超出範圍
-  "searchKey": |-
-    ERRORCODE=-4461, SQLSTATE=42815
-- "category": |-
-    DB2 ErrorCode
-  "categoryColor": |-
-    RED
-  "content": |-
-    欄位或參數未定義
-  "searchKey": |-
-    SQLCODE=-206, SQLSTATE=42703
-- "category": |-
-    DB2 ErrorCode
-  "categoryColor": |-
-    RED
-  "content": |-
-    PK衝突
-  "searchKey": |-
-    SQLCODE=-803, SQLSTATE=23505
-- "category": |-
-    DB2 ErrorCode
-  "categoryColor": |-
-    RED
-  "content": |-
-    SQL 語法錯誤
-  "searchKey": |-
-    SQLCODE=-104, SQLSTATE=42601
-- "category": |-
-    DB2 ErrorCode
-  "categoryColor": |-
-    RED
-  "content": |-
-    型別錯誤 (Ex:字串欄位被當成數值處理)
-  "searchKey": |-
-    SQLCODE=-420, SQLSTATE=22018
-- "category": |-
-    DB2 ErrorCode
-  "categoryColor": |-
-    RED
-  "content": |-
-    欄位長度超過限制
-  "searchKey": |-
-    SQLCODE=-302, SQLSTATE=22001
-- "category": |-
-    DB2 ErrorCode
-  "categoryColor": |-
-    RED
-  "content": |-
-    資料庫連線的資料庫別名有錯
-  "searchKey": |-
-    ERRORCODE=-4499, SQLSTATE=08004
-- "category": |-
-    DB2 ErrorCode
-  "categoryColor": |-
-    RED
-  "content": |-
-    模糊欄位定義
-  "searchKey": |-
-    SQLCODE=-203, SQLSTATE=42702
+- category: DB2 ErrorCode
+  categoryColor: RED
+  content: 這個schema 沒有此表
+  searchKey: SQLCODE=-204, SQLSTATE=42704
+- category: DB2 ErrorCode
+  categoryColor: RED
+  content: 欄位或參數未定義
+  searchKey: SQLCODE=-206, SQLSTATE=42703
+- category: DB2 ErrorCode
+  categoryColor: RED
+  content: PK衝突
+  searchKey: SQLCODE=-803, SQLSTATE=23505
+- category: DB2 ErrorCode
+  categoryColor: RED
+  content: SQL 語法錯誤
+  searchKey: SQLCODE=-104, SQLSTATE=42601
+- category: DB2 ErrorCode
+  categoryColor: RED
+  content: 型別錯誤 (Ex:字串欄位被當成數值處理)
+  searchKey: SQLCODE=-420, SQLSTATE=22018
+- category: DB2 ErrorCode
+  categoryColor: RED
+  content: 欄位長度超過限制
+  searchKey: SQLCODE=-302, SQLSTATE=22001
+- category: DB2 ErrorCode
+  categoryColor: RED
+  content: 資料庫連線的資料庫別名有錯
+  searchKey: ERRORCODE=-4499, SQLSTATE=08004
+- category: DB2 ErrorCode
+  categoryColor: RED
+  content: 模糊欄位定義
+  searchKey: SQLCODE=-203, SQLSTATE=42702
+- category: DB2 ErrorCode
+  categoryColor: ff3333
+  content: 參數索引超出範圍
+  searchKey: ERRORCODE=-4461, SQLSTATE=42815
 ...

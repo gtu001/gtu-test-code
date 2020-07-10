@@ -52,6 +52,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JColorChooser;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
@@ -139,6 +140,7 @@ import gtu.swing.util.AutoComboBox;
 import gtu.swing.util.AutoComboBox.MatchType;
 import gtu.swing.util.HideInSystemTrayHelper;
 import gtu.swing.util.JButtonGroupUtil;
+import gtu.swing.util.JColorUtil;
 import gtu.swing.util.JComboBoxUtil;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JCommonUtil.HandleDocumentEvent;
@@ -292,7 +294,7 @@ public class FastDBQueryUI extends JFrame {
     private JButton refContentConfigSaveBtn;
     private JButton refContentConfigClearBtn;
     private JComboBox refSearchCategoryCombobox;
-    private JComboBox refSearchColorComboBox;
+    private JButton refSearchColorComboBtn;
     private JTextField refConfigPathText;
     private JLabel lbl_config_etc;
     private JPanel panel_23;
@@ -308,7 +310,6 @@ public class FastDBQueryUI extends JFrame {
     private JLabel lblNewLabel_9;
     private JComboBox sqlIdCategoryComboBox;
     private AutoComboBox sqlIdCategoryComboBox_Auto;
-    private JComboBox sqlIdColorComboBox;
     private JLabel lblNewLabel_10;
     private JButton exportYamlConfigBtn;
     private JButton sqlIdFixNameBtn;
@@ -329,6 +330,7 @@ public class FastDBQueryUI extends JFrame {
     private JLabel queryResultTimeLbl;
     private JLabel lblNewLabel_13;
     private JLabel lblNewLabel_12;
+    private JScrollPane sqlTextAreaScroll;
     private JTextComponentSelectPositionHandler mSqlTextAreaJTextAreaSelectPositionHandler;
     private SqlTextAreaPromptHandler mSqlTextAreaPromptHandler;
     private JComboBox tableColumnDefText;
@@ -387,6 +389,7 @@ public class FastDBQueryUI extends JFrame {
     private FastDBQueryUI_TwoTableDlgUI mFastDBQueryUI_TwoTableDlgUI;
     private DBNameIdTextHandler mDBNameIdTextHandler;
     private SqlIdExecuteTypeHandler mSqlIdExecuteTypeHandler;
+    private JButton sqlIdColorButton;
 
     private final Predicate IGNORE_PREDICT = new Predicate() {
         @Override
@@ -709,26 +712,34 @@ public class FastDBQueryUI extends JFrame {
             }
         }));
 
+        // DefaultCaret caret = (DefaultCaret)sqlTextArea.getCaret();
+        // caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
+
         JTextAreaUtil.applyEnterKeyFixPosition(sqlTextArea);
         JTextAreaUtil.applyCloneLine(sqlTextArea);
 
         mSqlTextAreaJTextAreaSelectPositionHandler = JTextComponentSelectPositionHandler.newInst(sqlTextArea);
-
-        panel_2.add(JCommonUtil.createScrollComponent(sqlTextArea));
+        sqlTextAreaScroll = JCommonUtil.createScrollComponent(sqlTextArea);
+        panel_2.add(sqlTextAreaScroll);
 
         JPanel sqlIdPanel = new JPanel();
         lblNewLabel_10 = new JLabel("顏色");
         sqlIdPanel.add(lblNewLabel_10);
 
-        sqlIdColorComboBox = new JComboBox();
-        sqlIdColorComboBox.setModel(RefSearchColor.getModel());
-        sqlIdPanel.add(sqlIdColorComboBox);
-        sqlIdColorComboBox.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                sqlTextAreaChange();
+        sqlIdColorButton = new JButton("色");
+        sqlIdColorButtonChangeColor(Color.BLACK);
+        sqlIdColorButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+                Color newColor = JCommonUtil._JColorChooser_showDialog(sqlIdColorButton.getBackground());
+                if (newColor != null) {
+                    if (sqlBean != null) {
+                        sqlIdColorButtonChangeColor(newColor);
+                        sqlTextAreaChange();
+                    }
+                }
             }
         });
+        sqlIdPanel.add(sqlIdColorButton);
 
         lblNewLabel_9 = new JLabel("類別");
         sqlIdPanel.add(lblNewLabel_9);
@@ -1407,9 +1418,18 @@ public class FastDBQueryUI extends JFrame {
             }
         });
 
-        refSearchColorComboBox = new JComboBox();
-        refSearchColorComboBox.setModel(RefSearchColor.getModel());
-        panel_19.add(refSearchColorComboBox);
+        refSearchColorComboBtn = new JButton("色");
+        refSearchColorComboBtnSetColor(Color.RED, null);
+        refSearchColorComboBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+                Color newColor = JCommonUtil._JColorChooser_showDialog(refSearchColorComboBtn.getBackground());
+                if (newColor != null) {
+                    refSearchColorComboBtnSetColor(newColor, null);
+                }
+            }
+        });
+
+        panel_19.add(refSearchColorComboBtn);
         panel_19.add(refSearchCategoryCombobox);
 
         lblNewLabel_6 = new JLabel("搜尋條件");
@@ -1449,8 +1469,8 @@ public class FastDBQueryUI extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 try {
                     String category = refSearchCategoryCombobox_Auto.getTextComponent().getText();
-                    RefSearchColor categoryColor = (RefSearchColor) refSearchColorComboBox.getSelectedItem();
-                    refSearchListConfigHandler.add(category, refSearchText.getText(), refContentArea.getText(), categoryColor.colorCode);
+                    Color newColor = refSearchColorComboBtn.getBackground();
+                    refSearchListConfigHandler.add(category, refSearchText.getText(), refContentArea.getText(), JColorUtil.toHtmlColor(newColor));
                 } catch (Exception ex) {
                     JCommonUtil.handleException(ex);
                 }
@@ -1504,7 +1524,7 @@ public class FastDBQueryUI extends JFrame {
                         refSearchText.setText(bean.searchKey);
                         refContentArea.setText(bean.content);
                         refSearchCategoryCombobox_Auto.getTextComponent().setText(bean.category);
-                        refSearchColorComboBox.setSelectedItem(RefSearchColor.valueFrom(bean.categoryColor));
+                        refSearchColorComboBtnSetColor(null, bean.categoryColor);
                     }
                 } catch (Exception ex) {
                     JCommonUtil.handleException(ex);
@@ -2360,7 +2380,57 @@ public class FastDBQueryUI extends JFrame {
         sqlIdCommentArea.setText("");
         this.sqlBean = null;
         setSqlListSelection(this.sqlBean);
-        changeTabUITitile("未命名");
+        SqlIdConfigBean emptyBean = new SqlIdConfigBean();
+        emptyBean.color = "";
+        emptyBean.category = "";
+        emptyBean.sqlId = "未命名";
+        emptyBean.sql = "";
+        emptyBean.sqlComment = "";
+        changeTabUITitile(emptyBean);
+    }
+
+    private void sqlIdColorButtonChangeColor(Color newColor) {
+        sqlIdColorButton.setBackground(newColor);
+        // these next two lines do the magic..
+        sqlIdColorButton.setContentAreaFilled(false);
+        sqlIdColorButton.setOpaque(true);
+    }
+
+    private String getSqlBeanColor() {
+        Color newColor = sqlIdColorButton.getBackground();
+        String colorString = Integer.toHexString(newColor.getRed()) + //
+                Integer.toHexString(newColor.getGreen()) + //
+                Integer.toHexString(newColor.getBlue());
+        System.out.println("[getSqlBeanColor]" + colorString);
+        return colorString;
+    }
+
+    private Color getSqlBeanColor2(String color) {
+        try {
+            if (StringUtils.isBlank(color)) {
+                return Color.BLACK;
+            }
+            Color color1 = JColorUtil.rgb(color);
+            System.out.println("[getSqlBeanColor2]" + color1);
+            return color1;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return Color.BLACK;
+        }
+    }
+
+    private void refSearchColorComboBtnSetColor(Color color, String colorString) {
+        if (color != null) {
+            refSearchColorComboBtn.setBackground(color);
+        } else if (StringUtils.isNotBlank(colorString)) {
+            try {
+                refSearchColorComboBtn.setBackground(JColorUtil.rgb(colorString));
+            } catch (Exception ex) {
+                refSearchColorComboBtn.setBackground(Color.RED);
+            }
+        }
+        refSearchColorComboBtn.setContentAreaFilled(false);
+        refSearchColorComboBtn.setOpaque(true);
     }
 
     /**
@@ -2385,7 +2455,6 @@ public class FastDBQueryUI extends JFrame {
                 mUndoSaveHanlder.push(sqlBean.sql);
             }
 
-            RefSearchColor color = (RefSearchColor) sqlIdColorComboBox.getSelectedItem();
             String category = sqlIdCategoryComboBox_Auto.getTextComponent().getText();
             String sqlComment = sqlIdCommentArea.getText();
 
@@ -2396,14 +2465,14 @@ public class FastDBQueryUI extends JFrame {
 
             // 儲存sqlList Prop
             SqlIdConfigBean bean = new SqlIdConfigBean();
-            bean.color = color.colorCode;
+            bean.color = getSqlBeanColor();
             bean.category = category;
             bean.sqlId = sqlId;
             bean.sql = sql;
             bean.sqlComment = sqlComment;
 
             // 改變TabUI標題
-            changeTabUITitile(bean.sqlId);
+            changeTabUITitile(bean);
 
             if (saveSqlIdConfig) {
                 bean = this.saveSqlListProp(bean);
@@ -3248,9 +3317,11 @@ public class FastDBQueryUI extends JFrame {
         // ---------------------------------------
         // sqlTextArea.setText(sqlBean.sql);
         JTextAreaUtil.setText_withoutTriggerChange(sqlTextArea, sqlBean.sql);
+        sqlTextAreaScroll.invalidate();
         // ---------------------------------------
         sqlIdCategoryComboBox.setSelectedItem(sqlBean.category);
-        sqlIdColorComboBox.setSelectedItem(RefSearchColor.valueFrom(sqlBean.color));
+        sqlIdColorButtonChangeColor(getSqlBeanColor2(sqlBean.color));
+
         sqlIdCommentArea.setText(sqlBean.sqlComment);
 
         // 載入參數設定
@@ -3264,15 +3335,15 @@ public class FastDBQueryUI extends JFrame {
         saveSqlButtonClick(false);
 
         // 設定 tab標題
-        changeTabUITitile(sqlBean.sqlId);
+        changeTabUITitile(sqlBean);
 
         // 取得sql執行類型
         mSqlIdExecuteTypeHandler.processExecuteType(sqlBean.sqlId);
     }
 
-    private void changeTabUITitile(String title) {
+    private void changeTabUITitile(SqlIdConfigBean mSqlIdConfigBean) {
         if (TAB_UI1 != null) {
-            TAB_UI1.setTabTitle(null, title);
+            TAB_UI1.setTabTitle(null, mSqlIdConfigBean.toString());//
         }
     }
 
@@ -4964,19 +5035,29 @@ public class FastDBQueryUI extends JFrame {
         }
 
         public String toString() {
-            String fixStyle = "style=\"background-color: #000000;\"";
             if (StringUtils.isNotBlank(category)) {
-                return String.format("<html><body %4$s><font color=\"%1$s\"><b></b>%2$s</font>&nbsp;&nbsp;<font color=\"%1$s\">%3$s</font></body></html>", //
+                return String.format("<html><body %4$s>"//
+                        + "<font style=\"background-color: YELLOW;\">"//
+                        + "<b></b>%2$s</font>"//
+                        + "&nbsp;&nbsp;"//
+                        + "<font color=\"%1$s\">%3$s</font>"//
+                        + "</body></html>", //
                         StringUtils.trimToEmpty(color), //
                         "『" + StringUtils.trimToEmpty(category) + "』  ", //
                         StringUtils.trimToEmpty(sqlId), //
-                        StringUtils.trimToEmpty(color).equalsIgnoreCase("YELLOW") ? fixStyle : "" //
+                        "" //
                 );
             } else {
-                return String.format("<html><body %3$s><font color=\"%1$s\">%2$s</font></body></html>", //
+                return String.format("<html><body %4$s>"//
+                        + "<font style=\"background-color: YELLOW;\">"//
+                        + "<b></b>%2$s</font>"//
+                        + "&nbsp;&nbsp;"//
+                        + "<font color=\"%1$s\">%3$s</font>"//
+                        + "</body></html>", //
                         StringUtils.trimToEmpty(color), //
+                        StringUtils.trimToEmpty(category), //
                         StringUtils.trimToEmpty(sqlId), //
-                        StringUtils.trimToEmpty(color).equalsIgnoreCase("YELLOW") ? fixStyle : ""//
+                        "" //
                 );
             }
         }
@@ -5152,38 +5233,6 @@ public class FastDBQueryUI extends JFrame {
 
         public String toStringInfo() {
             return "RefSearchListConfigBean [category=" + category + ", searchKey=" + searchKey + ", content=" + content + ", categoryColor=" + categoryColor + "]";
-        }
-    }
-
-    private enum RefSearchColor {
-        黑("BLACK"), //
-        藍("BLUE"), //
-        黃("YELLOW"), //
-        綠("GREEN"), //
-        紅("RED"),//
-        ;
-
-        final String colorCode;
-
-        RefSearchColor(String colorCode) {
-            this.colorCode = colorCode;
-        }
-
-        private static DefaultComboBoxModel getModel() {
-            DefaultComboBoxModel d = new DefaultComboBoxModel();
-            for (RefSearchColor e : RefSearchColor.values()) {
-                d.addElement(e);
-            }
-            return d;
-        }
-
-        private static RefSearchColor valueFrom(String categoryColor) {
-            for (RefSearchColor e : RefSearchColor.values()) {
-                if (StringUtils.equals(e.colorCode, categoryColor)) {
-                    return e;
-                }
-            }
-            return RefSearchColor.黑;
         }
     }
 
@@ -5579,7 +5628,7 @@ public class FastDBQueryUI extends JFrame {
             }
 
             String sqlId = sqlIdText.getText();
-            RefSearchColor color = (RefSearchColor) sqlIdColorComboBox.getSelectedItem();
+            String color = getSqlBeanColor();
             String category = sqlIdCategoryComboBox_Auto.getTextComponent().getText();
             String sql = sqlTextArea.getText();
             String sqlComment = sqlIdCommentArea.getText();
@@ -5593,7 +5642,7 @@ public class FastDBQueryUI extends JFrame {
             bean.sql = sql;
             bean.sqlId = sqlId;
             bean.category = category;
-            bean.color = color.colorCode;
+            bean.color = color;
             bean.sqlComment = sqlComment;
 
             File newFile = sqlParameterConfigLoadHandler.getFile(bean.getUniqueKey());
@@ -5639,7 +5688,7 @@ public class FastDBQueryUI extends JFrame {
             JCommonUtil._jOptionPane_showMessageDialog_info("已修正為 : " + bean.getUniqueKey());
 
             // 改變TabUI標題
-            changeTabUITitile(sqlId);
+            changeTabUITitile(bean);
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
         }
@@ -5850,7 +5899,7 @@ public class FastDBQueryUI extends JFrame {
 
     private SqlIdConfigBean getCurrentEditSqlIdConfigBean() {
         String sqlId = sqlIdText.getText();
-        RefSearchColor color = (RefSearchColor) sqlIdColorComboBox.getSelectedItem();
+        String color = getSqlBeanColor();
         String category = sqlIdCategoryComboBox_Auto.getTextComponent().getText();
         String sql = sqlTextArea.getText();
         String sqlComment = sqlIdCommentArea.getText();
@@ -5859,7 +5908,7 @@ public class FastDBQueryUI extends JFrame {
         bean.sql = sql;
         bean.sqlId = sqlId;
         bean.category = category;
-        bean.color = color.colorCode;
+        bean.color = color;
         bean.sqlComment = sqlComment;
         return bean;
     }

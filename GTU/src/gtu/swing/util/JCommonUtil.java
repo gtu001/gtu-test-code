@@ -1,6 +1,7 @@
 package gtu.swing.util;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Cursor;
@@ -52,6 +53,7 @@ import java.util.regex.Pattern;
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
+import javax.swing.JColorChooser;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -679,6 +681,14 @@ public class JCommonUtil {
         Object rtnVal = JOptionPaneUtil.newInstance().showInputDialog_drowdown_top(message, title, drowdown, defaultValue);
         t.done();
         return rtnVal;
+    }
+
+    public static Color _JColorChooser_showDialog(Color defaultColor) {
+        if (defaultColor == null) {
+            defaultColor = Color.RED;
+        }
+        Color newColor = JColorChooser.showDialog(null, "Choose a color", defaultColor);
+        return newColor;
     }
 
     /**

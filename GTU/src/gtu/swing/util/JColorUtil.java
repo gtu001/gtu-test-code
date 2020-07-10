@@ -16,6 +16,12 @@ public class JColorUtil {
         }
         return new Color(vals[0], vals[1], vals[2]);
     }
+    
+    public static String toHtmlColor(Color newColor) {
+        return Integer.toHexString(newColor.getRed()) + //
+        Integer.toHexString(newColor.getGreen()) + //
+        Integer.toHexString(newColor.getBlue());
+    }
 
     public static Color rgb(int r, int g, int b) {
         float[] arry = Color.RGBtoHSB(r, g, b, null);
