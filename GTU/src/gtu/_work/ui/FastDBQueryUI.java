@@ -2398,9 +2398,7 @@ public class FastDBQueryUI extends JFrame {
 
     private String getSqlBeanColor() {
         Color newColor = sqlIdColorButton.getBackground();
-        String colorString = Integer.toHexString(newColor.getRed()) + //
-                Integer.toHexString(newColor.getGreen()) + //
-                Integer.toHexString(newColor.getBlue());
+        String colorString = JColorUtil.toHtmlColor(newColor);
         System.out.println("[getSqlBeanColor]" + colorString);
         return colorString;
     }
@@ -3310,7 +3308,6 @@ public class FastDBQueryUI extends JFrame {
         // return;
         // }
         sqlBean = (SqlIdConfigBean) JListUtil.getLeadSelectionObject(sqlList);
-
         System.out.println("sqlId : " + sqlBean.getUniqueKey());
 
         sqlIdText.setText(sqlBean.sqlId);
