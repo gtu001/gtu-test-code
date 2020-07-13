@@ -91,7 +91,7 @@ public class VoMapCompareUI extends JFrame {
         // }
         // }
         // });
-        SwingTabTemplateUI tabUI = SwingTabTemplateUI.newInstance(null, "google-maps.ico", VoMapCompareUI.class, true, new SwingTabTemplateUI.SwingTabTemplateUI_Callback() {
+        SwingTabTemplateUI tabUI = SwingTabTemplateUI.newInstance(null, "tk_aiengine.ico", VoMapCompareUI.class, true, new SwingTabTemplateUI.SwingTabTemplateUI_Callback() {
             @Override
             public void beforeInit(SwingTabTemplateUI self) {
             }
@@ -208,7 +208,7 @@ public class VoMapCompareUI extends JFrame {
             applyAllEvents();
 
             JCommonUtil.setJFrameCenter(this);
-            JCommonUtil.setJFrameIcon(this, "resource/images/ico/google-maps.ico");
+            JCommonUtil.setJFrameIcon(this, "resource/images/ico/tk_aiengine.ico");
             hideInSystemTrayHelper = HideInSystemTrayHelper.newInstance();
             hideInSystemTrayHelper.apply(this);
             jFrameRGBColorPanel = new JFrameRGBColorPanel(this);

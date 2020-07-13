@@ -233,12 +233,16 @@ public class SwingTabTemplateUI {
     }
 
     private void setIcon(String iconPath) {
-        if (StringUtils.isNotBlank(iconPath)) {
-            if (iconPath.contains("/")) {
-                JCommonUtil.setJFrameIcon(jframe, iconPath);
-            } else {
-                JCommonUtil.setJFrameIcon(jframe, "resource/images/ico/" + iconPath);
+        try {
+            if (StringUtils.isNotBlank(iconPath)) {
+                if (iconPath.contains("/")) {
+                    JCommonUtil.setJFrameIcon(jframe, iconPath);
+                } else {
+                    JCommonUtil.setJFrameIcon(jframe, "resource/images/ico/" + iconPath);
+                }
             }
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
     }
 
