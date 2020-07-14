@@ -63,7 +63,7 @@ public class StringSubstringCheckerUI extends JFrame {
      * Launch the application.
      */
     public static void main(String[] args) {
-        if (!JFrameUtil.lockInstance(StringSubstringCheckerUI.class)) {
+        if (!JFrameUtil.lockInstance_delable(StringSubstringCheckerUI.class)) {
             return;
         }
         EventQueue.invokeLater(new Runnable() {

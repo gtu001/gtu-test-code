@@ -17,7 +17,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-//中科軟
+/**
+ * 可以將 Schema 或 Set 同個表的合併成一個 Set
+ * 亦可註冊PK 若同時新增同樣PK兩次 只有第一筆會保留
+ * 
+ * @author 701216
+ */
 public class MMapGroup {
     private static final Logger logger = LoggerFactory.getLogger(MMapGroup.class);
 
@@ -140,6 +145,13 @@ public class MMapGroup {
             tempMap.put(setObj, value);
         } else {
             tempMap.put(key, value);
+        }
+    }
+
+    public void add(MMap map) {
+        for (Object key : map.keySet()) {
+            Object operation = map.get(key);
+            put(key, operation);
         }
     }
 
@@ -275,7 +287,7 @@ public class MMapGroup {
             while (mth.find()) {
                 String para = mth.group();
                 para = para.substring(1, para.length() - 1);
-                String afterPara = "##æ銝å##";
+                String afterPara = "##找不到參數##";
                 if (paramMap.containsKey(para)) {
                     afterPara = paramMap.get(para);
                 }
@@ -292,7 +304,7 @@ public class MMapGroup {
             if (mth.find()) {
                 return mth.group(1);
             }
-            return "##å憭望##";
+            return "##取直失敗##";
         }
     }
 }

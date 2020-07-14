@@ -62,7 +62,7 @@ public class ChineseSwapUI extends JFrame {
      * Launch the application.
      */
     public static void main(String[] args) {
-        if (!JFrameUtil.lockInstance(ChineseSwapUI.class)) {
+        if (!JFrameUtil.lockInstance_delable(ChineseSwapUI.class)) {
             return;
         }
         EventQueue.invokeLater(new Runnable() {

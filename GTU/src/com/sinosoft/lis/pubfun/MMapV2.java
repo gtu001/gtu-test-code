@@ -15,7 +15,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-//中科軟
+/**
+ * 可以顯示加入schema 或 set 的時機點
+ * 
+ * @author 701216
+ */
 public class MMapV2 extends MMap {
     private static final Logger logger = LoggerFactory.getLogger(MMapV2.class);
 
@@ -117,7 +121,7 @@ public class MMapV2 extends MMap {
             while (mth.find()) {
                 String para = mth.group();
                 para = para.substring(1, para.length() - 1);
-                String afterPara = "##æ銝å##";
+                String afterPara = "##找不到參數##";
                 if (paramMap.containsKey(para)) {
                     afterPara = paramMap.get(para);
                 }
@@ -134,7 +138,7 @@ public class MMapV2 extends MMap {
             if (mth.find()) {
                 return mth.group(1);
             }
-            return "##å憭望##";
+            return "##取直失敗##";
         }
     }
 
@@ -143,5 +147,20 @@ public class MMapV2 extends MMap {
         if (key == null || value == null)
             return;
         mapInfoMap.put(key, new Object[] { value, getPrefix() });
+    }
+
+    public MMap toMMap() {
+        MMap map = new MMap();
+        for (Object key : super.keySet()) {
+            map.put(key, super.get(key));
+        }
+        return map;
+    }
+
+    public void add(MMap map) {
+        for (Object key : map.keySet()) {
+            Object operation = map.get(key);
+            put(key, operation);
+        }
     }
 }

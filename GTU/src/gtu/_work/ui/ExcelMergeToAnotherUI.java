@@ -124,7 +124,7 @@ public class ExcelMergeToAnotherUI extends JFrame {
      * Launch the application.
      */
     public static void main(String[] args) {
-        if (!JFrameUtil.lockInstance(ExcelMergeToAnotherUI.class)) {
+        if (!JFrameUtil.lockInstance_delable(ExcelMergeToAnotherUI.class)) {
             return;
         }
         EventQueue.invokeLater(new Runnable() {

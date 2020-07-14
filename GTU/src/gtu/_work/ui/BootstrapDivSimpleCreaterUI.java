@@ -66,7 +66,7 @@ public class BootstrapDivSimpleCreaterUI extends JFrame {
      * Launch the application.
      */
     public static void main(String[] args) {
-        if (!JFrameUtil.lockInstance(BootstrapDivSimpleCreaterUI.class)) {
+        if (!JFrameUtil.lockInstance_delable(BootstrapDivSimpleCreaterUI.class)) {
             return;
         }
         EventQueue.invokeLater(new Runnable() {

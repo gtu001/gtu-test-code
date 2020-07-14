@@ -69,7 +69,7 @@ public class HtmlConverterUI extends JFrame {
      * Launch the application.
      */
     public static void main(String[] args) {
-        if (!JFrameUtil.lockInstance(HtmlConverterUI.class)) {
+        if (!JFrameUtil.lockInstance_delable(HtmlConverterUI.class)) {
             return;
         }
         EventQueue.invokeLater(new Runnable() {

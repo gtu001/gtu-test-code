@@ -87,7 +87,7 @@ public class JarFinderUI extends javax.swing.JFrame {
      * Auto-generated main method to display this JFrame
      */
     public static void main(String[] args) {
-        if (!JFrameUtil.lockInstance(JarFinderUI.class)) {
+        if (!JFrameUtil.lockInstance_delable(JarFinderUI.class)) {
             return;
         }
         // SwingUtilities.invokeLater(new Runnable() {

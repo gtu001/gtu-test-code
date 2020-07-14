@@ -59,7 +59,7 @@ public class HtmlFormLoadFromXlsUI extends JFrame {
      * Launch the application.
      */
     public static void main(String[] args) {
-        if (!JFrameUtil.lockInstance(HtmlFormLoadFromXlsUI.class)) {
+        if (!JFrameUtil.lockInstance_delable(HtmlFormLoadFromXlsUI.class)) {
             return;
         }
         EventQueue.invokeLater(new Runnable() {

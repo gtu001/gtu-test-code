@@ -103,6 +103,7 @@ public class JFrameUtil {
         Runtime.getRuntime().addShutdownHook(new Thread() {
             public void run() {
                 try {
+                    System.out.println("delete hook file : " + lockFile);
                     lockFile.delete();
                 } catch (Exception e) {
                     System.out.println("Unable to remove lock file: " + lockFile);

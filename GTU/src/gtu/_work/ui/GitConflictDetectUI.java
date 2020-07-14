@@ -141,7 +141,7 @@ public class GitConflictDetectUI extends JFrame {
      * Launch the application.
      */
     public static void main(String[] args) {
-        if (!JFrameUtil.lockInstance(GitConflictDetectUI.class)) {
+        if (!JFrameUtil.lockInstance_delable(GitConflictDetectUI.class)) {
             return;
         }
         // EventQueue.invokeLater(new Runnable() {

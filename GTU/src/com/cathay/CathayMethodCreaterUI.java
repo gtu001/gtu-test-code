@@ -50,7 +50,7 @@ public class CathayMethodCreaterUI extends JFrame {
      * Launch the application.
      */
     public static void main(String[] args) {
-        if (!JFrameUtil.lockInstance(CathayMethodCreaterUI.class)) {
+        if (!JFrameUtil.lockInstance_delable(CathayMethodCreaterUI.class)) {
             return;
         }
         EventQueue.invokeLater(new Runnable() {

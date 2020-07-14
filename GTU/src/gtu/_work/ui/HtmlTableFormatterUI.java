@@ -64,7 +64,7 @@ public class HtmlTableFormatterUI extends JFrame {
      * Launch the application.
      */
     public static void main(String[] args) {
-        if (!JFrameUtil.lockInstance(HtmlTableFormatterUI.class)) {
+        if (!JFrameUtil.lockInstance_delable(HtmlTableFormatterUI.class)) {
             return;
         }
         EventQueue.invokeLater(new Runnable() {

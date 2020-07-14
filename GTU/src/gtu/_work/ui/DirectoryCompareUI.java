@@ -118,7 +118,7 @@ public class DirectoryCompareUI extends javax.swing.JFrame {
      * Auto-generated main method to display this JFrame
      */
     public static void main(String[] args) {
-        if (!JFrameUtil.lockInstance(DirectoryCompareUI.class)) {
+        if (!JFrameUtil.lockInstance_delable(DirectoryCompareUI.class)) {
             return;
         }
         // SwingUtilities.invokeLater(new Runnable() {

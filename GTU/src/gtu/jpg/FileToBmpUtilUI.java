@@ -64,7 +64,7 @@ public class FileToBmpUtilUI extends JFrame {
      * Launch the application.
      */
     public static void main(String[] args) {
-        if (!JFrameUtil.lockInstance(FileToBmpUtilUI.class)) {
+        if (!JFrameUtil.lockInstance_delable(FileToBmpUtilUI.class)) {
             return;
         }
         EventQueue.invokeLater(new Runnable() {

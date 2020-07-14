@@ -220,7 +220,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
      * Launch the application.
      */
     public static void main(String[] args) {
-        if (!JFrameUtil.lockInstance(BrowserHistoryHandlerUI.class)) {
+        if (!JFrameUtil.lockInstance_delable(BrowserHistoryHandlerUI.class)) {
             return;
         }
         EventQueue.invokeLater(new Runnable() {

@@ -428,7 +428,7 @@ public class StoryReaderUI extends JFrame {
     private JCheckBox wheelChangePageChk;
 
     public static void main(String[] args) {
-        if (!JFrameUtil.lockInstance(StoryReaderUI.class)) {
+        if (!JFrameUtil.lockInstance_delable(StoryReaderUI.class)) {
             return;
         }
 

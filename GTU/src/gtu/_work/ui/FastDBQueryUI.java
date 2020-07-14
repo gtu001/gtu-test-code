@@ -30,6 +30,7 @@ import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -48,11 +49,9 @@ import javax.sql.DataSource;
 import javax.swing.AbstractButton;
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultCellEditor;
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JColorChooser;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
@@ -166,6 +165,8 @@ import gtu.swing.util.SwingTabTemplateUI.ChangeTabHandlerGtu001;
 import gtu.yaml.util.YamlMapUtil;
 import gtu.yaml.util.YamlUtilBean;
 import net.sf.json.JSONArray;
+import net.sf.json.JSONException;
+import net.sf.json.JSONObject;
 import net.sf.json.util.JSONUtils;
 import taobe.tec.jcc.JChineseConvertor;
 
@@ -253,6 +254,7 @@ public class FastDBQueryUI extends JFrame {
     private JRadioButton radio_import_excel;
     private JRadioButton radio_export_excel;
     private JRadioButton radio_export_json;
+    private JRadioButton radio_import_clipboard;
 
     private ButtonGroup btnExcelBtn;
     private JLabel label;
@@ -1342,6 +1344,9 @@ public class FastDBQueryUI extends JFrame {
         radio_import_excel = new JRadioButton("匯入excel");
         panel_15.add(radio_import_excel);
 
+        radio_import_clipboard = new JRadioButton("匯入clipboard");
+        panel_15.add(radio_import_clipboard);
+
         radio_export_excel = new JRadioButton("匯出excel");
         panel_15.add(radio_export_excel);
 
@@ -1354,7 +1359,7 @@ public class FastDBQueryUI extends JFrame {
 
         radio_export_json = new JRadioButton("匯出json");
         panel_15.add(radio_export_json);
-        btnExcelBtn = JButtonGroupUtil.createRadioButtonGroup(radio_import_excel, radio_export_excel, radio_export_json);
+        btnExcelBtn = JButtonGroupUtil.createRadioButtonGroup(radio_import_excel, radio_export_excel, radio_export_json, radio_import_clipboard);
 
         radio_export_excel_ignoreNull = new JCheckBox("匯出null改為空白");
         panel_15.add(radio_export_excel_ignoreNull);
@@ -3626,6 +3631,10 @@ public class FastDBQueryUI extends JFrame {
                                         rowLst.add(rowIdx);
                                         rowLabelLst.add(((JToggleButton) v).getText());
                                         rows.add(JTableUtil.getRowData(rowIdx, new int[] { 0 }, queryResultTable));
+                                    } else {
+                                        rowLst.add(rowIdx);
+                                        rowLabelLst.add(String.valueOf(rowIdx));
+                                        rows.add(JTableUtil.getRowData(rowIdx, new int[] {}, queryResultTable));
                                     }
                                 }
                             } else {
@@ -3636,6 +3645,10 @@ public class FastDBQueryUI extends JFrame {
                                         rowLst.add(rowIdx);
                                         rowLabelLst.add(((JToggleButton) v).getText());
                                         rows.add(JTableUtil.getRowData(rowIdx, new int[] { 0 }, queryResultTable));
+                                    } else if (!(v instanceof JToggleButton)) {
+                                        rowLst.add(rowIdx);
+                                        rowLabelLst.add(String.valueOf(rowIdx));
+                                        rows.add(JTableUtil.getRowData(rowIdx, new int[] {}, queryResultTable));
                                     }
                                 }
                             }
@@ -4019,12 +4032,17 @@ public class FastDBQueryUI extends JFrame {
                     @Override
                     public void run() {
                         DefaultTableModel model = null;
+
+                        List<String> titles2 = new ArrayList<String>();
+                        List<Object[]> rowLst = new ArrayList<Object[]>();
+
                         for (int ii = 0; ii <= 0; ii++) {
                             Row row = sheet.getRow(ii);
                             List<Object> titles = new ArrayList<Object>();
                             for (int jj = 0; jj < row.getLastCellNum(); jj++) {
                                 String value = ExcelUtil_Xls97.getInstance().readCell(row.getCell(jj));
                                 titles.add(value);
+                                titles2.add(value);
                             }
                             model = JTableUtil.createModel(true, titles.toArray());
                             queryResultTable.setModel(model);
@@ -4042,15 +4060,24 @@ public class FastDBQueryUI extends JFrame {
                                 rows.add(value);
                             }
                             model.addRow(rows.toArray());
+                            rowLst.add(rows.toArray());
                             prog.addOne();
 
                             if (prog.isExitFlag()) {
                                 return;
                             }
                         }
+
+                        Class<?>[] clzs = new Class[titles2.size()];
+                        Arrays.fill(clzs, String.class);
+                        List<Class<?>> clzLst = Arrays.asList(clzs);
+                        queryList = Triple.of(titles2, clzLst, rowLst);
+
                         prog.dismiss();
                     }
                 }).start();
+            } else if (radio_import_clipboard == selBtn) {
+                new ImportFromClipboard().parseMain();
             } else if (radio_export_excel == selBtn) {
                 final AtomicReference<Triple<List<String>, List<Class<?>>, List<Object[]>>> tmpQueryList = new AtomicReference<Triple<List<String>, List<Class<?>>, List<Object[]>>>();
                 if (filterRowsQueryList != null && !isResetQuery) {
@@ -7411,6 +7438,106 @@ public class FastDBQueryUI extends JFrame {
                 return sql;
             }
             return "";
+        }
+    }
+
+    // ======================================================================================================================
+    // 記事本匯入
+    private class ImportFromClipboard {
+        private List<String> titles;
+        private List<Object[]> rowLst = new ArrayList<Object[]>();
+
+        private Map<String, String> parseMain2(String text) {
+            String[] multLine = text.split("\n");
+
+            for (String line : multLine) {
+                if (StringUtils.isNotBlank(line)) {
+                    Map<String, String> map = null;
+                    try {
+                        map = _parseJSON(line);
+                    } catch (JSONException e) {
+                        map = _parseToString(line);
+                    }
+
+                    if (titles == null && map != null) {
+                        List<String> titLst = new ArrayList<String>();
+                        for (String tit : map.keySet()) {
+                            titLst.add(tit);
+                        }
+                        titles = titLst;
+                    }
+
+                    if (titles != null) {
+                        Object[] row = new Object[titles.size()];
+                        for (int ii = 0; ii < titles.size(); ii++) {
+                            String tit = titles.get(ii);
+                            String value = "";
+                            if (map.containsKey(tit)) {
+                                value = map.get(tit);
+                            }
+                            row[ii] = value;
+                        }
+                        rowLst.add(row);
+                    }
+                }
+            }
+            return null;
+        }
+
+        private Map<String, String> _parseToString(String text) {
+            Map<String, String> treeMap = new LinkedHashMap<String, String>();
+            {
+                Pattern ptn = Pattern.compile("(\\w+)\\=([\u4e00-\u9fa5\\w\\.○\\-\\_\\:\\s]*)");
+                Matcher mth = ptn.matcher(text);
+                while (mth.find()) {
+                    String key = mth.group(1);
+                    String val = mth.group(2);
+                    treeMap.put(key, val);
+                }
+            }
+            {
+                Pattern ptn = Pattern.compile("(\\w+)\\=((?:.|\n|\\*)*?)\\,\\s(?=\\w+\\=)");
+                Matcher mth = ptn.matcher(text);
+                while (mth.find()) {
+                    String key = mth.group(1);
+                    String val = mth.group(2);
+                    treeMap.put(key, val);
+                }
+            }
+            return treeMap;
+        }
+
+        private Map<String, String> _parseJSON(String text) {
+            Map<String, String> rtnMap = new HashMap<String, String>();
+            JSONObject json = JSONObject.fromObject(text);
+            for (Iterator it = json.keys(); it.hasNext();) {
+                String key = (String) it.next();
+                String value = json.getString(key);
+                rtnMap.put(key, value);
+            }
+            return rtnMap;
+        }
+
+        public void parseMain() {
+            try {
+                String text = ClipboardUtil.getInstance().getContents();
+                parseMain2(text);
+                DefaultTableModel model = JTableUtil.createModel(true, titles.toArray());
+                queryResultTable.setModel(model);
+                JTableUtil.newInstance(queryResultTable).setRowHeightByFontSize();
+                for (int ii = 0; ii < rowLst.size(); ii++) {
+                    model.addRow(rowLst.get(ii));
+                }
+                JTableUtil.newInstance(queryResultTable).setColumnWidths_ByDataContent(queryResultTable, null, getInsets());
+
+                Class<?>[] clzs = new Class[titles.size()];
+                Arrays.fill(clzs, String.class);
+                List<Class<?>> clzLst = Arrays.asList(clzs);
+
+                queryList = Triple.of(titles, clzLst, rowLst);
+            } catch (Exception ex) {
+                JCommonUtil.handleException(ex);
+            }
         }
     }
 }

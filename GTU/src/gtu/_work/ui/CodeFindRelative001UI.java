@@ -86,7 +86,7 @@ public class CodeFindRelative001UI extends JFrame {
      * Launch the application.
      */
     public static void main(String[] args) {
-        if (!JFrameUtil.lockInstance(CodeFindRelative001UI.class)) {
+        if (!JFrameUtil.lockInstance_delable(CodeFindRelative001UI.class)) {
             return;
         }
         EventQueue.invokeLater(new Runnable() {

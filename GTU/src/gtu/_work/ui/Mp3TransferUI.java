@@ -107,7 +107,7 @@ public class Mp3TransferUI extends JFrame {
      * Launch the application.
      */
     public static void main(String[] args) {
-        if (!JFrameUtil.lockInstance(Mp3TransferUI.class)) {
+        if (!JFrameUtil.lockInstance_delable(Mp3TransferUI.class)) {
             return;
         }
         EventQueue.invokeLater(new Runnable() {

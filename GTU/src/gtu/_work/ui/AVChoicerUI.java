@@ -147,7 +147,7 @@ public class AVChoicerUI extends JFrame {
      * Launch the application.
      */
     public static void main(String[] args) {
-        if (!JFrameUtil.lockInstance(AVChoicerUI.class)) {
+        if (!JFrameUtil.lockInstance_delable(AVChoicerUI.class)) {
             return;
         }
         EventQueue.invokeLater(new Runnable() {

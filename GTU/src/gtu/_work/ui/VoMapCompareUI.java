@@ -10,10 +10,10 @@ import java.awt.event.FocusEvent;
 import java.util.EventObject;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -78,7 +78,7 @@ public class VoMapCompareUI extends JFrame {
      * Launch the application.
      */
     public static void main(String[] args) {
-        if (!JFrameUtil.lockInstance(VoMapCompareUI.class)) {
+        if (!JFrameUtil.lockInstance_delable(VoMapCompareUI.class)) {
             return;
         }
         // EventQueue.invokeLater(new Runnable() {
@@ -246,7 +246,7 @@ public class VoMapCompareUI extends JFrame {
         swingUtil.addAction("executeBtn.click", new Action() {
 
             private Map<String, String> parseToString(String text) {
-                Map<String, String> treeMap = new TreeMap<String, String>();
+                Map<String, String> treeMap = new LinkedHashMap<String, String>();
                 {
                     Pattern ptn = Pattern.compile("(\\w+)\\=([\u4e00-\u9fa5\\w\\.○\\-\\_\\:\\s]*)");
                     Matcher mth = ptn.matcher(text);
@@ -295,7 +295,7 @@ public class VoMapCompareUI extends JFrame {
                 Map<String, String> vo1 = parseMain(text1);
                 Map<String, String> vo2 = parseMain(text2);
 
-                Set<String> set1 = new TreeSet<String>();
+                Set<String> set1 = new LinkedHashSet<String>();
                 set1.addAll(vo1.keySet());
                 set1.addAll(vo2.keySet());
 

@@ -51,7 +51,7 @@ public class LineMyselfUI extends JFrame {
      * Launch the application.
      */
     public static void main(String[] args) {
-        if (!JFrameUtil.lockInstance(LineMyselfUI.class)) {
+        if (!JFrameUtil.lockInstance_delable(LineMyselfUI.class)) {
             return;
         }
         EventQueue.invokeLater(new Runnable() {

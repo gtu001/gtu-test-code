@@ -44,7 +44,7 @@ public class LinuxLinkUI extends JFrame {
      * Launch the application.
      */
     public static void main(String[] args) {
-        if (!JFrameUtil.lockInstance(LinuxLinkUI.class)) {
+        if (!JFrameUtil.lockInstance_delable(LinuxLinkUI.class)) {
             return;
         }
         EventQueue.invokeLater(new Runnable() {

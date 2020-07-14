@@ -58,7 +58,7 @@ public class PathRenameFullCharUI extends JFrame {
      * Launch the application.
      */
     public static void main(String[] args) {
-        if (!JFrameUtil.lockInstance(PathRenameFullCharUI.class)) {
+        if (!JFrameUtil.lockInstance_delable(PathRenameFullCharUI.class)) {
             return;
         }
         EventQueue.invokeLater(new Runnable() {

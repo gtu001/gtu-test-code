@@ -61,7 +61,7 @@ public class MobiReaderUI extends JFrame {
      * Launch the application.
      */
     public static void main(String[] args) {
-        if (!JFrameUtil.lockInstance(MobiReaderUI.class)) {
+        if (!JFrameUtil.lockInstance_delable(MobiReaderUI.class)) {
             return;
         }
         EventQueue.invokeLater(new Runnable() {

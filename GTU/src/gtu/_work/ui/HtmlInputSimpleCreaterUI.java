@@ -66,7 +66,7 @@ public class HtmlInputSimpleCreaterUI extends JFrame {
      * Launch the application.
      */
     public static void main(String[] args) {
-        if (!JFrameUtil.lockInstance(HtmlInputSimpleCreaterUI.class)) {
+        if (!JFrameUtil.lockInstance_delable(HtmlInputSimpleCreaterUI.class)) {
             return;
         }
         EventQueue.invokeLater(new Runnable() {

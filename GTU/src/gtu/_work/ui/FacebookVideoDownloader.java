@@ -233,7 +233,7 @@ public class FacebookVideoDownloader extends JFrame {
      * Launch the application.
      */
     public static void main(String[] args) {
-        if (!JFrameUtil.lockInstance(FacebookVideoDownloader.class)) {
+        if (!JFrameUtil.lockInstance_delable(FacebookVideoDownloader.class)) {
             return;
         }
         EventQueue.invokeLater(new Runnable() {

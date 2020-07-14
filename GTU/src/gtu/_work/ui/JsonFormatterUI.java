@@ -64,7 +64,7 @@ public class JsonFormatterUI extends JFrame {
      * Launch the application.
      */
     public static void main(String[] args) {
-        if (!JFrameUtil.lockInstance(JsonFormatterUI.class)) {
+        if (!JFrameUtil.lockInstance_delable(JsonFormatterUI.class)) {
             return;
         }
         EventQueue.invokeLater(new Runnable() {

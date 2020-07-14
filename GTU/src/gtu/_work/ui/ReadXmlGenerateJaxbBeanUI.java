@@ -59,7 +59,7 @@ public class ReadXmlGenerateJaxbBeanUI extends JFrame {
      * Launch the application.
      */
     public static void main(String[] args) {
-        if (!JFrameUtil.lockInstance(ReadXmlGenerateJaxbBeanUI.class)) {
+        if (!JFrameUtil.lockInstance_delable(ReadXmlGenerateJaxbBeanUI.class)) {
             return;
         }
         EventQueue.invokeLater(new Runnable() {

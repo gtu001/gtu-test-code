@@ -36,7 +36,7 @@ public class SwingTemplateUI extends JFrame {
      * Launch the application.
      */
     public static void main(String[] args) {
-        if (!JFrameUtil.lockInstance(SwingTemplateUI.class)) {
+        if (!JFrameUtil.lockInstance_delable(SwingTemplateUI.class)) {
             return;
         }
         EventQueue.invokeLater(new Runnable() {

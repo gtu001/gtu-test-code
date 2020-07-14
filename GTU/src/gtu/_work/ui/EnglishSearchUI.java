@@ -200,7 +200,7 @@ public class EnglishSearchUI extends JFrame {
      * Launch the application.
      */
     public static void main(String[] args) {
-        if (!JFrameUtil.lockInstance(EnglishSearchUI.class)) {
+        if (!JFrameUtil.lockInstance_delable(EnglishSearchUI.class)) {
             return;
         }
 

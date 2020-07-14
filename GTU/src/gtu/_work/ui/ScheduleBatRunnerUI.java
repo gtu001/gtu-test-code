@@ -81,7 +81,7 @@ public class ScheduleBatRunnerUI extends JFrame {
      * Launch the application.
      */
     public static void main(String[] args) {
-        if (!JFrameUtil.lockInstance(ScheduleBatRunnerUI.class)) {
+        if (!JFrameUtil.lockInstance_delable(ScheduleBatRunnerUI.class)) {
             return;
         }
         EventQueue.invokeLater(new Runnable() {

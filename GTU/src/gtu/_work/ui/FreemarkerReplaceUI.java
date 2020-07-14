@@ -86,7 +86,7 @@ public class FreemarkerReplaceUI extends JFrame {
      * Launch the application.
      */
     public static void main(String[] args) {
-        if (!JFrameUtil.lockInstance(FreemarkerReplaceUI.class)) {
+        if (!JFrameUtil.lockInstance_delable(FreemarkerReplaceUI.class)) {
             return;
         }
         EventQueue.invokeLater(new Runnable() {
