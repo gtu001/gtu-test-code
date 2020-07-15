@@ -169,6 +169,7 @@ public class FastDBQueryUI_RowCompareDlg_Ver2 extends JDialog {
                 }
                 {
                     importRowTable = new JTable();
+                    JTableUtil.defaultSetting(importRowTable);
                     panel.add(JCommonUtil.createScrollComponent(importRowTable), BorderLayout.CENTER);
                 }
             }
@@ -282,7 +283,7 @@ public class FastDBQueryUI_RowCompareDlg_Ver2 extends JDialog {
     }
 
     private void initTab1(List<String> titleLst, List<Object> row1, List<Object> row2, Pair<String[], Pattern[]> condition, DefaultTableModel model) {
-        Validate.isTrue((titleLst.size() <= row1.size()) && (titleLst.size() <= row2.size()), "資料欄位數目應該相同!");
+        Validate.isTrue((titleLst.size() == row1.size()) && (titleLst.size() == row2.size()), "資料欄位數目應該相同!");
         for (int ii = 0; ii < titleLst.size(); ii++) {
             String col = titleLst.get(ii);
             Object value1 = row1.get(ii);

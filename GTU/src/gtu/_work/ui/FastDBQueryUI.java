@@ -3625,6 +3625,7 @@ public class FastDBQueryUI extends JFrame {
                             List<List<Object>> rows = new ArrayList<List<Object>>();
                             List<Integer> rowLst = new ArrayList<Integer>();
 
+                            boolean isNotIgnoreFirstColumn = false;
                             final int[] selectRowIdxArry = JTableUtil.newInstance(queryResultTable).getSelectedRows(false);
                             if (selectRowIdxArry != null && selectRowIdxArry.length == 2) {
                                 for (int ii : selectRowIdxArry) {
@@ -3638,6 +3639,7 @@ public class FastDBQueryUI extends JFrame {
                                         rowLst.add(rowIdx);
                                         rowLabelLst.add(String.valueOf(rowIdx));
                                         rows.add(JTableUtil.getRowData(rowIdx, new int[] {}, queryResultTable));
+                                        isNotIgnoreFirstColumn = true;
                                     }
                                 }
                             } else {
@@ -3652,6 +3654,7 @@ public class FastDBQueryUI extends JFrame {
                                         rowLst.add(rowIdx);
                                         rowLabelLst.add(String.valueOf(rowIdx));
                                         rows.add(JTableUtil.getRowData(rowIdx, new int[] {}, queryResultTable));
+                                        isNotIgnoreFirstColumn = true;
                                     }
                                 }
                             }
@@ -3668,6 +3671,14 @@ public class FastDBQueryUI extends JFrame {
                                             rowLabelLst.add("NA");
                                             rows.add(JTableUtil.getRowData(rowIdx, new int[] { 0 }, queryResultTable));
                                             rows.add(Arrays.asList(new Object[rows.get(0).size()]));
+                                        } else if (!(v instanceof JToggleButton)) {
+                                            rowLst.add(rowIdx);
+                                            rowLst.add(-1);
+                                            rowLabelLst.add(String.valueOf(rowIdx));
+                                            rowLabelLst.add("NA");
+                                            rows.add(JTableUtil.getRowData(rowIdx, new int[] {}, queryResultTable));
+                                            rows.add(Arrays.asList(new Object[rows.get(0).size()]));
+                                            isNotIgnoreFirstColumn = true;
                                         }
                                     }
                                 }
@@ -3678,6 +3689,9 @@ public class FastDBQueryUI extends JFrame {
                                 return;
                             }
                             List<String> titles = JTableUtil.newInstance(queryResultTable).getColumnTitleStringArray(new int[] { 0 });
+                            if (isNotIgnoreFirstColumn) {
+                                titles = JTableUtil.newInstance(queryResultTable).getColumnTitleStringArray(new int[] {});
+                            }
                             if (mFastDBQueryUI_RowCompareDlg_Ver2 != null) {
                                 mFastDBQueryUI_RowCompareDlg_Ver2.dispose();
                             }
