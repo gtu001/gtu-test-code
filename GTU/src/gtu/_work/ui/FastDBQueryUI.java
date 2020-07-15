@@ -392,6 +392,7 @@ public class FastDBQueryUI extends JFrame {
     private DBNameIdTextHandler mDBNameIdTextHandler;
     private SqlIdExecuteTypeHandler mSqlIdExecuteTypeHandler;
     private JButton sqlIdColorButton;
+    private JCheckBox radio_import_excel_isAppend;
 
     private final Predicate IGNORE_PREDICT = new Predicate() {
         @Override
@@ -1346,6 +1347,9 @@ public class FastDBQueryUI extends JFrame {
 
         radio_import_clipboard = new JRadioButton("匯入clipboard");
         panel_15.add(radio_import_clipboard);
+
+        radio_import_excel_isAppend = new JCheckBox("匯入附加");
+        panel_15.add(radio_import_excel_isAppend);
 
         radio_export_excel = new JRadioButton("匯出excel");
         panel_15.add(radio_export_excel);
@@ -4031,7 +4035,7 @@ public class FastDBQueryUI extends JFrame {
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        DefaultTableModel model = null;
+                        DefaultTableModel model = (DefaultTableModel) queryResultTable.getModel();
 
                         List<String> titles2 = new ArrayList<String>();
                         List<Object[]> rowLst = new ArrayList<Object[]>();
@@ -4044,34 +4048,70 @@ public class FastDBQueryUI extends JFrame {
                                 titles.add(value);
                                 titles2.add(value);
                             }
-                            model = JTableUtil.createModel(true, titles.toArray());
+                        }
+
+                        if (!radio_import_excel_isAppend.isSelected()) {
+                            model = JTableUtil.createModel(true, titles2.toArray());
                             queryResultTable.setModel(model);
                             JTableUtil.newInstance(queryResultTable).setRowHeightByFontSize();
+
+                            for (int ii = 1; ii <= sheet.getLastRowNum(); ii++) {
+                                Row row = sheet.getRow(ii);
+                                if (row == null) {
+                                    continue;
+                                }
+                                List<Object> rows = new ArrayList<Object>();
+                                for (int jj = 0; jj < row.getLastCellNum(); jj++) {
+                                    String value = ExcelUtil_Xls97.getInstance().readCell(row.getCell(jj));
+                                    rows.add(value);
+                                }
+                                model.addRow(rows.toArray());
+                                rowLst.add(rows.toArray());
+                                prog.addOne();
+
+                                if (prog.isExitFlag()) {
+                                    return;
+                                }
+                            }
+
+                            Class<?>[] clzs = new Class[titles2.size()];
+                            Arrays.fill(clzs, String.class);
+                            List<Class<?>> clzLst = Arrays.asList(clzs);
+                            queryList = Triple.of(titles2, clzLst, rowLst);
+
+                        } else {
+                            List<Object> titles = JTableUtil.newInstance(queryResultTable).getColumnTitleArray();
+                            Map<Integer, Integer> titlesMap = new TreeMap<Integer, Integer>();
+                            A: for (int jj = 0; jj < titles2.size(); jj++) {
+                                for (int ii = 0; ii < titles.size(); ii++) {
+                                    if (StringUtils.equalsIgnoreCase(String.valueOf(titles.get(ii)), titles2.get(jj))) {
+                                        titlesMap.put(ii, jj);
+                                        continue A;
+                                    }
+                                }
+                            }
+
+                            for (int ii = 1; ii <= sheet.getLastRowNum(); ii++) {
+                                Row row = sheet.getRow(ii);
+                                if (row == null) {
+                                    continue;
+                                }
+                                List<Object> rows = new ArrayList<Object>();
+                                for (int jj : titlesMap.values()) {
+                                    String value = ExcelUtil_Xls97.getInstance().readCell(row.getCell(jj));
+                                    rows.add(value);
+                                }
+                                model.addRow(rows.toArray());
+                                rowLst.add(rows.toArray());
+                                prog.addOne();
+
+                                if (prog.isExitFlag()) {
+                                    return;
+                                }
+                            }
+
+                            queryList.getRight().addAll(rowLst);
                         }
-
-                        for (int ii = 1; ii <= sheet.getLastRowNum(); ii++) {
-                            Row row = sheet.getRow(ii);
-                            if (row == null) {
-                                continue;
-                            }
-                            List<Object> rows = new ArrayList<Object>();
-                            for (int jj = 0; jj < row.getLastCellNum(); jj++) {
-                                String value = ExcelUtil_Xls97.getInstance().readCell(row.getCell(jj));
-                                rows.add(value);
-                            }
-                            model.addRow(rows.toArray());
-                            rowLst.add(rows.toArray());
-                            prog.addOne();
-
-                            if (prog.isExitFlag()) {
-                                return;
-                            }
-                        }
-
-                        Class<?>[] clzs = new Class[titles2.size()];
-                        Arrays.fill(clzs, String.class);
-                        List<Class<?>> clzLst = Arrays.asList(clzs);
-                        queryList = Triple.of(titles2, clzLst, rowLst);
 
                         prog.dismiss();
                     }
@@ -7496,7 +7536,7 @@ public class FastDBQueryUI extends JFrame {
                 }
             }
             {
-                Pattern ptn = Pattern.compile("(\\w+)\\=((?:.|\n|\\*)*?)\\,\\s(?=\\w+\\=)");
+                Pattern ptn = Pattern.compile("(\\w+)\\=((?:^\n|\n|\\*)*?)\\,\\s(?=\\w+\\=)");
                 Matcher mth = ptn.matcher(text);
                 while (mth.find()) {
                     String key = mth.group(1);
@@ -7522,19 +7562,50 @@ public class FastDBQueryUI extends JFrame {
             try {
                 String text = ClipboardUtil.getInstance().getContents();
                 parseMain2(text);
-                DefaultTableModel model = JTableUtil.createModel(true, titles.toArray());
-                queryResultTable.setModel(model);
-                JTableUtil.newInstance(queryResultTable).setRowHeightByFontSize();
-                for (int ii = 0; ii < rowLst.size(); ii++) {
-                    model.addRow(rowLst.get(ii));
+
+                DefaultTableModel model = (DefaultTableModel) queryResultTable.getModel();
+
+                if (!radio_import_excel_isAppend.isSelected()) {
+                    model = JTableUtil.createModel(true, titles.toArray());
+                    queryResultTable.setModel(model);
+
+                    JTableUtil.newInstance(queryResultTable).setRowHeightByFontSize();
+                    for (int ii = 0; ii < rowLst.size(); ii++) {
+                        model.addRow(rowLst.get(ii));
+                    }
+                    JTableUtil.newInstance(queryResultTable).setColumnWidths_ByDataContent(queryResultTable, null, getInsets());
+
+                    Class<?>[] clzs = new Class[titles.size()];
+                    Arrays.fill(clzs, String.class);
+                    List<Class<?>> clzLst = Arrays.asList(clzs);
+
+                    queryList = Triple.of(titles, clzLst, rowLst);
+                } else {
+                    List<Object> titlesN = JTableUtil.newInstance(queryResultTable).getColumnTitleArray();
+
+                    Map<Integer, Integer> titlesMap = new TreeMap<Integer, Integer>();
+                    A: for (int jj = 0; jj < titles.size(); jj++) {
+                        for (int ii = 0; ii < titlesN.size(); ii++) {
+                            if (StringUtils.equalsIgnoreCase(String.valueOf(titlesN.get(ii)), titles.get(jj))) {
+                                titlesMap.put(ii, jj);
+                                continue A;
+                            }
+                        }
+                    }
+
+                    List<Object[]> appendRowsLst = new ArrayList<Object[]>();
+                    for (int ii = 0; ii < rowLst.size(); ii++) {
+                        List<Object> rows = new ArrayList<Object>();
+                        for (int jj : titlesMap.values()) {
+                            rows.add(rowLst.get(ii)[jj]);
+                        }
+                        Object[] realRow = rows.toArray();
+                        model.addRow(realRow);
+                        appendRowsLst.add(realRow);
+                    }
+
+                    queryList.getRight().addAll(appendRowsLst);
                 }
-                JTableUtil.newInstance(queryResultTable).setColumnWidths_ByDataContent(queryResultTable, null, getInsets());
-
-                Class<?>[] clzs = new Class[titles.size()];
-                Arrays.fill(clzs, String.class);
-                List<Class<?>> clzLst = Arrays.asList(clzs);
-
-                queryList = Triple.of(titles, clzLst, rowLst);
             } catch (Exception ex) {
                 JCommonUtil.handleException(ex);
             }

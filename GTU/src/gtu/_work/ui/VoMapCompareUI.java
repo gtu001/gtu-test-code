@@ -257,7 +257,7 @@ public class VoMapCompareUI extends JFrame {
                     }
                 }
                 {
-                    Pattern ptn = Pattern.compile("(\\w+)\\=((?:.|\n|\\*)*?)\\,\\s(?=\\w+\\=)");
+                    Pattern ptn = Pattern.compile("(\\w+)\\=((?:^\n|\n|\\*)*?)\\,\\s(?=\\w+\\=)");
                     Matcher mth = ptn.matcher(text);
                     while (mth.find()) {
                         String key = mth.group(1);
