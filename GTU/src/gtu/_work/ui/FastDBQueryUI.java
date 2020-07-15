@@ -134,6 +134,7 @@ import gtu.properties.PropertiesUtil;
 import gtu.properties.PropertiesUtilBean;
 import gtu.spring.SimilarityUtil;
 import gtu.string.StringNumberUtil;
+import gtu.string.StringUtilForDb;
 import gtu.string.StringUtil_;
 import gtu.swing.util.AutoComboBox;
 import gtu.swing.util.AutoComboBox.MatchType;
@@ -2906,7 +2907,7 @@ public class FastDBQueryUI extends JFrame {
             Object[] rows = queryList.getRight().get(ii);
             Object[] rows2 = new Object[rows.length + 1];
             System.arraycopy(rows, 0, rows2, 1, rows.length);
-            rows2[0] = createSelectionBtn(ii + 1);// TODO
+            rows2[0] = createSelectionBtn(String.valueOf(ii + 1));// TODO
             createModel.addRow(rows2);
         }
 
@@ -2928,8 +2929,8 @@ public class FastDBQueryUI extends JFrame {
         }
     }
 
-    private JToggleButton createSelectionBtn(int serialNo) {
-        final JToggleButton selectionBtn = new JToggleButton(String.valueOf((serialNo)));
+    private JToggleButton createSelectionBtn(String serialNo) {
+        final JToggleButton selectionBtn = new JToggleButton(serialNo);
         selectionBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -4091,12 +4092,20 @@ public class FastDBQueryUI extends JFrame {
                                 }
                             }
 
+                            boolean isButtonStart = false;
+                            if (!titles.isEmpty() && StringUtils.equals(QUERY_RESULT_COLUMN_NO, String.valueOf(titles.get(0)))) {
+                                isButtonStart = true;
+                            }
+
                             for (int ii = 1; ii <= sheet.getLastRowNum(); ii++) {
                                 Row row = sheet.getRow(ii);
                                 if (row == null) {
                                     continue;
                                 }
                                 List<Object> rows = new ArrayList<Object>();
+                                if (isButtonStart) {
+                                    rows.add(createSelectionBtn("*" + ii));
+                                }
                                 for (int jj : titlesMap.values()) {
                                     String value = ExcelUtil_Xls97.getInstance().readCell(row.getCell(jj));
                                     rows.add(value);
@@ -7590,12 +7599,28 @@ public class FastDBQueryUI extends JFrame {
                                 titlesMap.put(ii, jj);
                                 continue A;
                             }
+                            if (StringUtils.equalsIgnoreCase(String.valueOf(titlesN.get(ii)), StringUtilForDb.javaToDbField(titles.get(jj)))) {
+                                titlesMap.put(ii, jj);
+                                continue A;
+                            }
+                            if (StringUtils.equalsIgnoreCase(String.valueOf(titlesN.get(ii)), StringUtilForDb.dbFieldToJava(titles.get(jj)))) {
+                                titlesMap.put(ii, jj);
+                                continue A;
+                            }
                         }
+                    }
+
+                    boolean isButtonStart = false;
+                    if (!titlesN.isEmpty() && StringUtils.equals(QUERY_RESULT_COLUMN_NO, String.valueOf(titlesN.get(0)))) {
+                        isButtonStart = true;
                     }
 
                     List<Object[]> appendRowsLst = new ArrayList<Object[]>();
                     for (int ii = 0; ii < rowLst.size(); ii++) {
                         List<Object> rows = new ArrayList<Object>();
+                        if (isButtonStart) {
+                            rows.add(createSelectionBtn("*" + ii));
+                        }
                         for (int jj : titlesMap.values()) {
                             rows.add(rowLst.get(ii)[jj]);
                         }
