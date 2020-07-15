@@ -10,16 +10,19 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.DocumentEvent;
 import javax.swing.table.DefaultTableModel;
 
-import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
@@ -27,15 +30,16 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.hssf.util.HSSFColor;
-import org.apache.poi.hssf.util.HSSFColor.PINK;
 import org.apache.poi.ss.usermodel.Row;
 
 import gtu._work.ui.FastDBQueryUI_CrudDlgUI.DataType;
+import gtu._work.ui.FastDBQueryUI_XlsColumnDefLoader.RegExpAndTextFilter;
 import gtu.file.FileUtil;
 import gtu.poi.hssf.ExcelUtil_Xls97;
 import gtu.poi.hssf.ExcelWriter;
 import gtu.poi.hssf.ExcelWriter.CellStyleHandler;
 import gtu.swing.util.JCommonUtil;
+import gtu.swing.util.JCommonUtil.HandleDocumentEvent;
 import gtu.swing.util.JTableUtil;
 
 public class FastDBQueryUI_RowCompareDlg_Ver2 extends JDialog {
@@ -50,6 +54,7 @@ public class FastDBQueryUI_RowCompareDlg_Ver2 extends JDialog {
     String row2Label;
     List<Object> row1;
     List<Object> row2;
+    private JTextField columnFilterText;
 
     /**
      * Launch the application.
@@ -79,7 +84,7 @@ public class FastDBQueryUI_RowCompareDlg_Ver2 extends JDialog {
             dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
             dialog.setVisible(true);
             DefaultTableModel model = dialog.initImportRowTable(row1Label, row2Label);
-            dialog.initTab1(titleLst, row1, row2, model);
+            dialog.initTab1(titleLst, row1, row2, null, model);
 
             dialog.addWindowListener(new WindowAdapter() {
                 public void windowClosed(WindowEvent e) {
@@ -122,10 +127,30 @@ public class FastDBQueryUI_RowCompareDlg_Ver2 extends JDialog {
 
                     JPanel panel_11 = new JPanel();
                     panel_1.add(panel_11, BorderLayout.CENTER);
-                    panel_11.setLayout(new BorderLayout(0, 0));
+                    panel_11.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+                    {
+                        JLabel lblNewLabel = new JLabel("過濾");
+                        panel_11.add(lblNewLabel);
+                    }
+                    {
+                        columnFilterText = new JTextField();
+                        panel_11.add(columnFilterText);
+                        columnFilterText.setColumns(50);
+
+                        columnFilterText.getDocument().addDocumentListener(JCommonUtil.getDocumentListener(new HandleDocumentEvent() {
+                            @Override
+                            public void process(DocumentEvent event) {
+                                String text = StringUtils.trimToEmpty(columnFilterText.getText());
+                                DefaultTableModel model = initImportRowTable(row1Label, row2Label);
+
+                                Pair<String[], Pattern[]> condition = FastDBQueryUI_XlsColumnDefLoader.RegExpAndTextFilter.toSearchCondition(text);
+                                initTab1(titleLst, row1, row2, condition, model);
+                            }
+                        }));
+                    }
                     {
                         JPanel panel_12 = new JPanel();
-                        panel_11.add(panel_12, BorderLayout.EAST);
+                        panel_11.add(panel_12);
                     }
                 }
                 {
@@ -201,7 +226,9 @@ public class FastDBQueryUI_RowCompareDlg_Ver2 extends JDialog {
                 JTableUtil util = JTableUtil.newInstance(importRowTable);
                 Object v1 = util.getRealValueAt(row, 1);
                 Object v2 = util.getRealValueAt(row, 2);
-                if (ObjectUtils.notEqual(v1, v2)) {
+                String v11 = v1 == null ? "" : String.valueOf(v1);
+                String v22 = v2 == null ? "" : String.valueOf(v2);
+                if (!StringUtils.equals(v11, v22)) {
                     return Pair.of(Color.RED, null);
                 }
                 return null;
@@ -213,7 +240,9 @@ public class FastDBQueryUI_RowCompareDlg_Ver2 extends JDialog {
                 JTableUtil util = JTableUtil.newInstance(importRowTable);
                 Object v1 = util.getRealValueAt(row, 1);
                 Object v2 = util.getRealValueAt(row, 2);
-                if (ObjectUtils.notEqual(v1, v2) && StringUtils.isNotBlank(String.valueOf(v1))) {
+                String v11 = v1 == null ? "" : String.valueOf(v1);
+                String v22 = v2 == null ? "" : String.valueOf(v2);
+                if (!StringUtils.equals(v11, v22)) {
                     return Pair.of(Color.GREEN, null);
                 }
                 return null;
@@ -225,7 +254,9 @@ public class FastDBQueryUI_RowCompareDlg_Ver2 extends JDialog {
                 JTableUtil util = JTableUtil.newInstance(importRowTable);
                 Object v1 = util.getRealValueAt(row, 1);
                 Object v2 = util.getRealValueAt(row, 2);
-                if (ObjectUtils.notEqual(v1, v2) && StringUtils.isNotBlank(String.valueOf(v2))) {
+                String v11 = v1 == null ? "" : String.valueOf(v1);
+                String v22 = v2 == null ? "" : String.valueOf(v2);
+                if (!StringUtils.equals(v11, v22)) {
                     return Pair.of(Color.GREEN, null);
                 }
                 return null;
@@ -250,13 +281,33 @@ public class FastDBQueryUI_RowCompareDlg_Ver2 extends JDialog {
         }
     }
 
-    private void initTab1(List<String> titleLst, List<Object> row1, List<Object> row2, DefaultTableModel model) {
+    private void initTab1(List<String> titleLst, List<Object> row1, List<Object> row2, Pair<String[], Pattern[]> condition, DefaultTableModel model) {
         Validate.isTrue((titleLst.size() <= row1.size()) && (titleLst.size() <= row2.size()), "資料欄位數目應該相同!");
         for (int ii = 0; ii < titleLst.size(); ii++) {
             String col = titleLst.get(ii);
             Object value1 = row1.get(ii);
             Object value2 = row2.get(ii);
-            model.addRow(new Object[] { col, value1, value2 });
+
+            boolean findOk = false;
+            if (!RegExpAndTextFilter.isEmptyCondition(condition)) {
+                if (RegExpAndTextFilter.isTextContain(col, condition.getLeft()) || //
+                        RegExpAndTextFilter.isTextContain(String.valueOf(value1), condition.getLeft()) || //
+                        RegExpAndTextFilter.isTextContain(String.valueOf(value2), condition.getLeft())) {
+                    findOk = true;
+                }
+                if (!findOk && (FastDBQueryUI_XlsColumnDefLoader.RegExpAndTextFilter.isRegexMatch(col, condition.getRight()) || //
+                        FastDBQueryUI_XlsColumnDefLoader.RegExpAndTextFilter.isRegexMatch(String.valueOf(value1), condition.getRight()) || //
+                        FastDBQueryUI_XlsColumnDefLoader.RegExpAndTextFilter.isRegexMatch(String.valueOf(value2), condition.getRight()) //
+                )) {
+                    findOk = true;
+                }
+            } else {
+                findOk = true;
+            }
+
+            if (findOk) {
+                model.addRow(new Object[] { col, value1, value2 });
+            }
         }
         JTableUtil.newInstance(importRowTable).setRowHeightByFontSize();
         System.out.println("-------------init size : " + model.getRowCount());

@@ -449,6 +449,73 @@ public class FastDBQueryUI_XlsColumnDefLoader {
         }
     }
 
+    // ==========================================================================================
+    public static class RegExpAndTextFilter {
+        private static final Pattern CONDITION_PTN = Pattern.compile("\\/(.*?)\\/");
+
+        public static Pair<String[], Pattern[]> toSearchCondition(String text) {
+            Matcher mth = CONDITION_PTN.matcher(text);
+            List<Pattern> ptnLst = new ArrayList<Pattern>();
+            List<String> paramLst = new ArrayList<String>();
+            StringBuffer sb = new StringBuffer();
+            while (mth.find()) {
+                try {
+                    ptnLst.add(Pattern.compile(mth.group(1), Pattern.CASE_INSENSITIVE));
+                    mth.appendReplacement(sb, "");
+                } catch (Exception ex) {
+                }
+            }
+            mth.appendTail(sb);
+            String[] parameters = sb.toString().split("\\^", -1);
+            for (int ii = 0; ii < parameters.length; ii++) {
+                if (StringUtils.isNotBlank(parameters[ii])) {
+                    paramLst.add(parameters[ii]);
+                }
+            }
+            return Pair.of(paramLst.toArray(new String[0]), ptnLst.toArray(new Pattern[0]));
+        }
+
+        public static boolean isEmptyCondition(Pair<String[], Pattern[]> condition) {
+            if (condition == null) {
+                return true;
+            }
+            if ((condition.getLeft() == null || condition.getLeft().length == 0) && //
+                    (condition.getRight() == null || condition.getRight().length == 0)) {
+                return true;
+            }
+            return false;
+        }
+
+        public static boolean isRegexMatch(String target, Pattern[] search) {
+            if (search == null || search.length == 0) {
+                return false;
+            }
+            if (search != null && search.length > 0) {
+                for (Pattern ptn : search) {
+                    if (ptn.matcher(target).find()) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        public static boolean isTextContain(String text, String[] condition) {
+            if (condition == null || condition.length == 0) {
+                return false;
+            }
+            for (String txt : condition) {
+                if (StringUtils.isNotBlank(txt)) {
+                    if (text.toLowerCase().contains(txt.toLowerCase())) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+    }
+    // ==========================================================================================
+
     private class QueryHandler {
         String[] tableQryText;
         Pattern[] tableQryPtn;
@@ -461,19 +528,8 @@ public class FastDBQueryUI_XlsColumnDefLoader {
         DefaultTableModel model;
         int findRowCount = 0;
         boolean hasChinese;
-        Pattern p1 = Pattern.compile("\\/(.*?)\\/");
-        private int DEFAULT_EXCEL_TITLES_COUNT = 50;
 
-        private boolean isRegexMatch(String target, Pattern[] search) {
-            if (search != null && search.length > 0) {
-                for (Pattern ptn : search) {
-                    if (ptn.matcher(target).find()) {
-                        return true;
-                    }
-                }
-            }
-            return false;
-        }
+        private int DEFAULT_EXCEL_TITLES_COUNT = 50;
 
         private boolean isConditionOk(String[] param, Pattern[] ptns) {
             if (param != null && param.length > 0) {
@@ -498,7 +554,7 @@ public class FastDBQueryUI_XlsColumnDefLoader {
                             continue A;
                         }
                     }
-                    if (isRegexMatch(tab.table, tableQryPtn)) {
+                    if (RegExpAndTextFilter.isRegexMatch(tab.table, tableQryPtn)) {
                         tabLst2.add(tab);
                         continue A;
                     }
@@ -524,7 +580,7 @@ public class FastDBQueryUI_XlsColumnDefLoader {
                                 }
                             }
                         }
-                        if (isRegexMatch(column, columnQryPtn)) {
+                        if (RegExpAndTextFilter.isRegexMatch(column, columnQryPtn)) {
                             tab.qryMatchMarkLst.add(ii);
                             continue A;
                         }
@@ -550,7 +606,7 @@ public class FastDBQueryUI_XlsColumnDefLoader {
                                         }
                                     }
                                 }
-                                if (isRegexMatch(other, otherPtn)) {
+                                if (RegExpAndTextFilter.isRegexMatch(other, otherPtn)) {
                                     tab.qryMatchMarkLst.add(ii);
                                     continue A;
                                 }
@@ -622,42 +678,20 @@ public class FastDBQueryUI_XlsColumnDefLoader {
             JTableUtil.setColumnWidths_ByDataContent(jtable, preferences, jframe.getInsets());//
         }
 
-        private Pair<String[], Pattern[]> toSearchCondition(String text) {
-            Matcher mth = p1.matcher(text);
-            List<Pattern> ptnLst = new ArrayList<Pattern>();
-            List<String> paramLst = new ArrayList<String>();
-            StringBuffer sb = new StringBuffer();
-            while (mth.find()) {
-                try {
-                    ptnLst.add(Pattern.compile(mth.group(1), Pattern.CASE_INSENSITIVE));
-                    mth.appendReplacement(sb, "");
-                } catch (Exception ex) {
-                }
-            }
-            mth.appendTail(sb);
-            String[] parameters = sb.toString().split("\\^", -1);
-            for (int ii = 0; ii < parameters.length; ii++) {
-                if (StringUtils.isNotBlank(parameters[ii])) {
-                    paramLst.add(parameters[ii]);
-                }
-            }
-            return Pair.of(paramLst.toArray(new String[0]), ptnLst.toArray(new Pattern[0]));
-        }
-
         public QueryHandler(String tableQry, String columnQry, String otherQry, final boolean hasChinese, JTable jtable) {
             this.hasChinese = hasChinese;
             if (StringUtils.isNotBlank(tableQry)) {
-                Pair<String[], Pattern[]> val = toSearchCondition(tableQry);
+                Pair<String[], Pattern[]> val = RegExpAndTextFilter.toSearchCondition(tableQry);
                 tableQryText = val.getLeft();
                 tableQryPtn = val.getRight();
             }
             if (StringUtils.isNotBlank(columnQry)) {
-                Pair<String[], Pattern[]> val = toSearchCondition(columnQry);
+                Pair<String[], Pattern[]> val = RegExpAndTextFilter.toSearchCondition(columnQry);
                 columnQryText = val.getLeft();
                 columnQryPtn = val.getRight();
             }
             if (StringUtils.isNotBlank(otherQry)) {
-                Pair<String[], Pattern[]> val = toSearchCondition(otherQry);
+                Pair<String[], Pattern[]> val = RegExpAndTextFilter.toSearchCondition(otherQry);
                 otherText = val.getLeft();
                 otherPtn = val.getRight();
             }

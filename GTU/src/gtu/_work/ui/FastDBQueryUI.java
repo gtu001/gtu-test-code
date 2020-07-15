@@ -1609,14 +1609,12 @@ public class FastDBQueryUI extends JFrame {
                 if (StringUtils.isNotBlank(compareXlsColumnSettingTitleText.getText())) {
                     if (mTableColumnDefTextHandler == null) {
                         mTableColumnDefTextHandler = new TableColumnDefTextHandler();
-                    }
-                    if (mTableColumnDefTextHandler != null) {
                         mTableColumnDefTextHandler.init(true);
                     }
                     if (mXlsColumnDefDlg == null) {
                         mXlsColumnDefDlg = new XlsColumnDefDlg();
                     }
-                    if (mXlsColumnDefDlg != null && mXlsColumnDefDlg.getConfig() == null) {
+                    if (mXlsColumnDefDlg != null && mXlsColumnDefDlg.getConfig() == null || mXlsColumnDefDlg.getConfig().isEmpty()) {
                         mXlsColumnDefDlg.show();
                     }
                 }
@@ -6827,7 +6825,7 @@ public class FastDBQueryUI extends JFrame {
                 checkXlsLoader(reset);
             }
             if (tableColumnDefText.getSelectedItem() != null && StringUtils.isNotBlank((String) tableColumnDefText.getSelectedItem())) {
-                if (mXlsColumnDefDlg.getConfig() == null) {
+                if (mXlsColumnDefDlg.getConfig() == null || mXlsColumnDefDlg.getConfig().isEmpty()) {
                     Validate.isTrue(false, "請先按設定");
                 }
                 xlsLoader.setMappingConfig(mXlsColumnDefDlg.getConfig());
@@ -6844,7 +6842,7 @@ public class FastDBQueryUI extends JFrame {
             if (xlsLoader == null) {
                 checkXlsLoader(false);
             }
-            if (mXlsColumnDefDlg.getConfig() == null) {
+            if (mXlsColumnDefDlg.getConfig() == null || mXlsColumnDefDlg.getConfig().isEmpty()) {
                 if (showErrMsg) {
                     Validate.isTrue(false, "請先按設定");
                 }
