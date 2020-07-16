@@ -6686,14 +6686,32 @@ public class FastDBQueryUI extends JFrame {
     // 格式為 /*中文解釋 */
     private void setCustomColumnTitleTooltip() {
         queryResultTable.setTitleTooltipTransformer(new Transformer() {
+
+            private int getSerialIndex(Pair<Integer, Object> p) {
+                int columnIdx = p.getLeft();
+                String column = (String) p.getRight();
+                int serialIndex = 0;
+                List<String> titles = JTableUtil.newInstance(queryResultTable).getColumnTitleStringArray();
+                List<String> subLst = titles.subList(0, columnIdx + 1);
+                for (String col : subLst) {
+                    if (StringUtils.equalsIgnoreCase(col, column)) {
+                        serialIndex++;
+                    }
+                }
+                return serialIndex;
+            }
+
             @Override
             public Object transform(Object input) {
                 Pair<Integer, Object> p = (Pair<Integer, Object>) input;
+                int columnIdx = p.getLeft();
                 String column = (String) p.getRight();
+                int serialIndex = this.getSerialIndex(p);
                 String sql = getCurrentSQL();
                 Pattern ptn = Pattern.compile(column + "[\\]\\'\"]?[\\s\\t\n\r]*\\/\\*(.*?)\\*\\/", Pattern.DOTALL | Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
                 Matcher mth = ptn.matcher(sql);
                 String tmpTip = null;
+                int idx = 0;
                 while (mth.find()) {
                     int startPos = mth.start();
                     tmpTip = mth.group(1);
@@ -6701,7 +6719,10 @@ public class FastDBQueryUI extends JFrame {
                     if (prefix.matches("[a-zA-Z]")) {
                         continue;
                     }
-                    return tmpTip;
+                    idx++;
+                    if (serialIndex == idx) {
+                        return tmpTip;
+                    }
                 }
                 return null;
             }
@@ -6715,12 +6736,21 @@ public class FastDBQueryUI extends JFrame {
             Pattern ptn3 = Pattern.compile("\\s+(.*)", Pattern.DOTALL | Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
             String sql = getCurrentSQL();
             final Map<String, Map<String, String>> columnCodeValueMap = new HashMap<String, Map<String, String>>();
-            final List<Object> titles = JTableUtil.newInstance(queryResultTable).getColumnTitleArray();
-            for (Object tit : titles) {
-                String column = (String) tit;
+            final Map<Integer, Map<String, String>> columnCodeValueMap2 = new HashMap<Integer, Map<String, String>>();
+            final List<String> titles = JTableUtil.newInstance(queryResultTable).getColumnTitleStringArray();
+            for (int ii = 0; ii < titles.size(); ii++) {
+                String column = titles.get(ii);
+                int serialIndex = 0;
+                for (int jj = 0; jj <= ii; jj++) {
+                    String column2 = titles.get(jj);
+                    if (StringUtils.equalsIgnoreCase(column, column2)) {
+                        serialIndex++;
+                    }
+                }
                 Pattern ptn = Pattern.compile(Pattern.quote(column) + "[\\]\\'\"]?[\\s\\t\n\r]*\\/\\*(.*?)\\*\\/", Pattern.DOTALL | Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
                 Matcher mth = ptn.matcher(sql);
                 String tmpTip = null;
+                int idx = 0;
                 while (mth.find()) {
                     int startPos = mth.start();
                     tmpTip = mth.group(1);
@@ -6728,7 +6758,10 @@ public class FastDBQueryUI extends JFrame {
                     if (prefix.matches("[a-zA-Z]")) {
                         continue;
                     }
-                    break;
+                    idx++;
+                    if (idx == serialIndex) {
+                        break;
+                    }
                 }
                 if (StringUtils.isNotBlank(tmpTip)) {
                     Matcher mth21 = ptn3.matcher(tmpTip);
@@ -6749,6 +6782,7 @@ public class FastDBQueryUI extends JFrame {
                                 }
                             }
                             columnCodeValueMap.put(column, codeValMap);
+                            columnCodeValueMap2.put(ii, codeValMap);
                         }
                     }
                 }
@@ -6758,15 +6792,28 @@ public class FastDBQueryUI extends JFrame {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         Pair<Integer, Integer> pair = (Pair<Integer, Integer>) e.getSource();
-                        Object title = JTableUtil.newInstance(queryResultTable).getColumnTitle(pair.getRight());
-                        if (title == null) {
-                            queryResultTable.setToolTipText(null);
-                            return;
-                        }
-                        String column = (String) title;
-                        if (columnCodeValueMap.containsKey(column)) {
+                        /*
+                         * Object title =
+                         * JTableUtil.newInstance(queryResultTable).
+                         * getColumnTitle(pair.getRight()); if (title == null) {
+                         * queryResultTable.setToolTipText(null); return; }
+                         * String column = (String) title; if
+                         * (columnCodeValueMap.containsKey(column)) { Object val
+                         * =
+                         * JTableUtil.newInstance(queryResultTable).getValueAt(
+                         * true, pair.getLeft(), pair.getRight()); Map<String,
+                         * String> codeValueMap = MapUtil.getIgnorecase(column,
+                         * columnCodeValueMap); if (val != null) { String value
+                         * = StringUtils.trimToEmpty(String.valueOf(val));
+                         * String mappingLabel = MapUtil.getIgnorecase(value,
+                         * codeValueMap);
+                         * queryResultTable.setToolTipText(mappingLabel);
+                         * return; } } queryResultTable.setToolTipText(null);
+                         */
+                        queryResultTable.setToolTipText(null);
+                        if (columnCodeValueMap2.containsKey(pair.getRight())) {
+                            Map<String, String> codeValueMap = columnCodeValueMap2.get(pair.getRight());
                             Object val = JTableUtil.newInstance(queryResultTable).getValueAt(true, pair.getLeft(), pair.getRight());
-                            Map<String, String> codeValueMap = MapUtil.getIgnorecase(column, columnCodeValueMap);
                             if (val != null) {
                                 String value = StringUtils.trimToEmpty(String.valueOf(val));
                                 String mappingLabel = MapUtil.getIgnorecase(value, codeValueMap);
@@ -6774,7 +6821,6 @@ public class FastDBQueryUI extends JFrame {
                                 return;
                             }
                         }
-                        queryResultTable.setToolTipText(null);
                     }
                 });
             }
@@ -6886,6 +6932,9 @@ public class FastDBQueryUI extends JFrame {
         public String getSelectColumns() {
             StringBuffer sb = new StringBuffer();
             try {
+                if (StringUtils.isBlank((String) tableColumnDefText.getSelectedItem())) {
+                    JCommonUtil._jOptionPane_showMessageDialog_error("請輸入表格名稱");
+                }
                 if (init(false)) {
                     String table = String.valueOf(tableColumnDefText.getSelectedItem());
                     String tableAlias = getTableAlias(table, true);
@@ -6898,6 +6947,8 @@ public class FastDBQueryUI extends JFrame {
                         if (ListUtil.constainIgnorecase(column, colLst)) {
                             String chinese = xlsLoader.getDBColumnChinese(column, false, table);
                             sb.append(tableAlias + column + " /*" + chinese + "*/,\r\n");
+                        } else {
+                            sb.append(tableAlias + column + " /*" + "" + "*/,\r\n");
                         }
                     }
                 }
@@ -7015,6 +7066,7 @@ public class FastDBQueryUI extends JFrame {
                             File reulstFile = result.getLeft();
                             String errMsg = result.getRight();
                             if (StringUtils.isNotBlank(errMsg)) {
+                                dlg.dispose();
                                 JCommonUtil._jOptionPane_showMessageDialog_error(errMsg);
                             }
                             if (reulstFile != null && reulstFile.exists()) {

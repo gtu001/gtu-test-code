@@ -1698,6 +1698,10 @@ public class JTableUtil {
         }
         return titles;
     }
+    
+    public List<String> getColumnTitleStringArray() {
+        return getColumnTitleStringArray(null);
+    }
 
     public List<String> getColumnTitleStringArray(int[] ignoreColIdxes) {
         List<String> titles = new ArrayList<String>();
