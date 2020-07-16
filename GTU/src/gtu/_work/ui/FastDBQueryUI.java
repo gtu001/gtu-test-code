@@ -394,6 +394,7 @@ public class FastDBQueryUI extends JFrame {
     private SqlIdExecuteTypeHandler mSqlIdExecuteTypeHandler;
     private JButton sqlIdColorButton;
     private JCheckBox radio_import_excel_isAppend;
+    private AtomicReference<String> currentSQL = new AtomicReference<String>();
 
     private final Predicate IGNORE_PREDICT = new Predicate() {
         @Override
@@ -948,11 +949,22 @@ public class FastDBQueryUI extends JFrame {
             innerPanel11.add(lblNewLabel_12, "2, 2");
             innerPanel11.add(sqlParamCommentArea, "4, 2, fill, fill");
 
+            innerPanel2.add(innerPanel11, BorderLayout.NORTH);
+        }
+
+        {// 多包一層
+            JPanel innerPanel11 = new JPanel();
+
+            innerPanel11.setLayout(new FormLayout(
+                    new ColumnSpec[] { FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow"),
+                            FormFactory.RELATED_GAP_COLSPEC, },
+                    new RowSpec[] { FormFactory.RELATED_GAP_ROWSPEC, RowSpec.decode("default:grow"), FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, }));
+
             innerPanel2.add(innerPanel11, BorderLayout.SOUTH);
 
             lblNewLabel_13 = new JLabel("選填項目用中括號\"[]\"表示, 參數用 :paramKey 表示, 注入式SQL用 _#sqlKey#_ 表示");
             lblNewLabel_13.setForeground(Color.RED);
-            innerPanel11.add(lblNewLabel_13, "4, 3");
+            innerPanel11.add(lblNewLabel_13, "4, 2");
         }
 
         panel_1.add(innerPanel2, BorderLayout.CENTER);
@@ -1353,6 +1365,7 @@ public class FastDBQueryUI extends JFrame {
         panel_15.add(radio_import_excel_isAppend);
 
         radio_export_excel = new JRadioButton("匯出excel");
+        radio_export_excel.setSelected(true);
         panel_15.add(radio_export_excel);
 
         excelExportBtn = new JButton("動作");
@@ -2617,12 +2630,12 @@ public class FastDBQueryUI extends JFrame {
                 }
             }
 
-            String sql = getCurrentSQL();
+            currentSQL.set(getCurrentSQL());
 
-            JCommonUtil.isBlankErrorMsg(sql, "請輸入sql");
+            JCommonUtil.isBlankErrorMsg(currentSQL.get(), "請輸入sql");
 
             // 取得執行sql物件
-            SqlParam param = parseSqlToParam(sql);
+            SqlParam param = parseSqlToParam(currentSQL.get());
 
             // 檢查參數是否異動
             for (String columnName : param.paramSet) {
@@ -3866,7 +3879,7 @@ public class FastDBQueryUI extends JFrame {
 
     private String getRandom_TableNSchema() {
         Pattern ptn = Pattern.compile("from\\s+(\\w+[\\.\\w]+|\\w+)", Pattern.CASE_INSENSITIVE | Pattern.DOTALL | Pattern.MULTILINE);
-        String sql = StringUtils.trimToEmpty(getCurrentSQL());
+        String sql = StringUtils.trimToEmpty(currentSQL.get());
         Matcher mth = ptn.matcher(sql);
         if (mth.find()) {
             return mth.group(1);
@@ -4187,7 +4200,7 @@ public class FastDBQueryUI extends JFrame {
                             JTableUtil paramUtl = JTableUtil.newInstance(parametersTable);
                             Row sqlRow = exlUtl.getRowChk(sheet2, 0);
                             Cell sqlCell = exlUtl.getCellChk(sqlRow, 0);
-                            sqlCell.setCellValue(StringUtils.trimToEmpty(getCurrentSQL()));
+                            sqlCell.setCellValue(StringUtils.trimToEmpty(currentSQL.get()));
                             sqlRow.setHeightInPoints((10 * sheet2.getDefaultRowHeightInPoints()));
 
                             if (paramUtl.getModel().getRowCount() > 0) {
@@ -4344,7 +4357,7 @@ public class FastDBQueryUI extends JFrame {
                         prog.dismiss();
 
                         String filename = FastDBQueryUI.class.getSimpleName() + //
-                        "_Export_" + //
+                        "_" + getRandom_TableNSchema() + "_" + //
                         "_" + StringUtils.trimToEmpty(sqlIdText.getText()) + "_" + //
                         DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMdd_HHmmss");
                         filename = JCommonUtil._jOptionPane_showInputDialog("儲存檔案", filename);
@@ -6717,7 +6730,7 @@ public class FastDBQueryUI extends JFrame {
                 int columnIdx = p.getLeft();
                 String column = (String) p.getRight();
                 int serialIndex = this.getSerialIndex(p);
-                String sql = getCurrentSQL();
+                String sql = currentSQL.get();
                 Pattern ptn = Pattern.compile(column + "[\\]\\'\"]?[\\s\\t\n\r]*\\/\\*(.*?)\\*\\/", Pattern.DOTALL | Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
                 Matcher mth = ptn.matcher(sql);
                 String tmpTip = null;
@@ -6744,7 +6757,7 @@ public class FastDBQueryUI extends JFrame {
     private void setCustomColumnCodeValueTooptip() {
         try {
             Pattern ptn3 = Pattern.compile("\\s+(.*)", Pattern.DOTALL | Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
-            String sql = getCurrentSQL();
+            String sql = currentSQL.get();
             final Map<String, Map<String, String>> columnCodeValueMap = new HashMap<String, Map<String, String>>();
             final Map<Integer, Map<String, String>> columnCodeValueMap2 = new HashMap<Integer, Map<String, String>>();
             final List<String> titles = JTableUtil.newInstance(queryResultTable).getColumnTitleStringArray();
@@ -6931,7 +6944,7 @@ public class FastDBQueryUI extends JFrame {
         }
 
         private String getTableAlias(String table, boolean appendDot) {
-            String sql = getCurrentSQL();
+            String sql = currentSQL.get();
             Pattern ptn = Pattern.compile(table + "\\s+(\\w+)", Pattern.DOTALL | Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
             Matcher mth = ptn.matcher(sql);
             if (mth.find()) {

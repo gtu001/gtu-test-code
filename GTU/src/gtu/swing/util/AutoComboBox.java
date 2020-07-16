@@ -5,6 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -15,11 +16,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
+import javax.swing.event.EventListenerList;
 import javax.swing.event.ListDataListener;
 import javax.swing.plaf.basic.BasicComboPopup;
 import javax.swing.text.AttributeSet;
@@ -28,6 +31,7 @@ import javax.swing.text.JTextComponent;
 import javax.swing.text.PlainDocument;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.reflect.FieldUtils;
 
 /**
  * 最終成功版 (目前效果最穩)
@@ -260,6 +264,7 @@ public class AutoComboBox extends PlainDocument {
 
     private class RemoveLinisterController {
         ListDataListener[] tempListeners;
+        Object[] tempListenerArry;
 
         private void removeListener(JComboBox combox) {
             DefaultComboBoxModel model = (DefaultComboBoxModel) combox.getModel();
@@ -267,12 +272,33 @@ public class AutoComboBox extends PlainDocument {
             for (int ii = 0; ii < tempListeners.length; ii++) {
                 model.removeListDataListener(tempListeners[ii]);
             }
+
+            // -----------------
+            try {
+                Field listenerField = FieldUtils.getDeclaredField(JComponent.class, "listenerList", true);
+                EventListenerList listener2 = (EventListenerList) listenerField.get(combox);
+                Field listenerField2 = FieldUtils.getDeclaredField(EventListenerList.class, "listenerList", true);
+                tempListenerArry = (Object[]) listenerField2.get(listener2);
+                listenerField2.set(listener2, new Object[0]);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
         private void addBackListener(JComboBox combox) {
             DefaultComboBoxModel model = (DefaultComboBoxModel) combox.getModel();
             for (int ii = 0; ii < tempListeners.length; ii++) {
                 model.addListDataListener(tempListeners[ii]);
+            }
+
+            // -----------------
+            try {
+                Field listenerField = FieldUtils.getDeclaredField(JComponent.class, "listenerList", true);
+                EventListenerList listener2 = (EventListenerList) listenerField.get(combox);
+                Field listenerField2 = FieldUtils.getDeclaredField(EventListenerList.class, "listenerList", true);
+                listenerField2.set(listener2, tempListenerArry);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
     }
