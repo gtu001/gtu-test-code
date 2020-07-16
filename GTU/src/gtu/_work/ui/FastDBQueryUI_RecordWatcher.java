@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
+import javax.swing.JCheckBox;
+
 import org.apache.commons.collections.Transformer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -53,8 +55,10 @@ public class FastDBQueryUI_RecordWatcher extends Thread {
     SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmssSSS");
     NewNameHandler mNewNameHandler;
 
+    JCheckBox recordWatcherToggleAutoChk;
+
     public FastDBQueryUI_RecordWatcher(Triple<List<String>, List<Class<?>>, List<Object[]>> orignQueryResult, String sql, Object[] params, int maxRowsLimit, Callable<Connection> fetchConnCallable,
-            long skipTime, String fileMiddleName, SysTrayUtil sysTray, Transformer finalDo) {
+            long skipTime, String fileMiddleName, SysTrayUtil sysTray, Transformer finalDo, JCheckBox recordWatcherToggleAutoChk) {
         this.orignQueryResult = orignQueryResult;
         this.sql = sql;
         this.params = params;
@@ -64,6 +68,7 @@ public class FastDBQueryUI_RecordWatcher extends Thread {
         this.sysTray = sysTray;
         this.fileMiddleName = fileMiddleName;
         this.finalDo = finalDo;
+        this.recordWatcherToggleAutoChk = recordWatcherToggleAutoChk;
     }
 
     private void finalDoSomething(String message, Throwable ex) {
@@ -301,10 +306,19 @@ public class FastDBQueryUI_RecordWatcher extends Thread {
         }
     }
 
-    public void run() {
+    public synchronized void run() {
         try {
             System.out.println("--------RecordWatcher start");
             while (!doStop) {
+                if (!this.recordWatcherToggleAutoChk.isSelected()) {
+                    try {
+                        System.out.println("........監聽待命");
+                        Thread.sleep(1000 * 5);
+                    } catch (Exception ex) {
+                    }
+                    continue;
+                }
+
                 if (this.orignQueryResult == null) {
                     System.out.println("--------RecordWatcher start -- [init query]");
                     try {

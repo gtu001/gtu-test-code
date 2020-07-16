@@ -395,6 +395,7 @@ public class FastDBQueryUI extends JFrame {
     private JButton sqlIdColorButton;
     private JCheckBox radio_import_excel_isAppend;
     private AtomicReference<String> currentSQL = new AtomicReference<String>();
+    private JCheckBox recordWatcherToggleAutoChk;
 
     private final Predicate IGNORE_PREDICT = new Predicate() {
         @Override
@@ -1390,6 +1391,9 @@ public class FastDBQueryUI extends JFrame {
             }
         });
         panel_15.add(recordWatcherToggleBtn);
+
+        recordWatcherToggleAutoChk = new JCheckBox("Auto");
+        panel_15.add(recordWatcherToggleAutoChk);
 
         panel_16 = new JPanel();
         panel_12.add(panel_16, BorderLayout.EAST);
@@ -6603,7 +6607,7 @@ public class FastDBQueryUI extends JFrame {
                 }
                 return null;
             }
-        }));
+        }, this.recordWatcherToggleAutoChk));
     }
 
     private boolean checkIsNeedResetQueryResultTable(boolean isCheckColumnFilterText) {
