@@ -18,8 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * 可以將 Schema 或 Set 同個表的合併成一個 Set
- * 亦可註冊PK 若同時新增同樣PK兩次 只有第一筆會保留
+ * 可以將 Schema 或 Set 同個表的合併成一個 Set 亦可註冊PK 若同時新增同樣PK兩次 只有第一筆會保留
  * 
  * @author 701216
  */
@@ -130,13 +129,29 @@ public class MMapGroup {
         }
     }
 
+    private boolean isNeedToCombineSet(Object key) {
+        for (Object k : tempMap.keySet()) {
+            if (k.getClass().getName().equals(key.getClass().getName())) {
+                return true;
+            }
+            if (k.getClass().getName().replaceAll("Set$", "Schema").equals(key.getClass().getName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private void _put(Object key, Object value) {
         if (key.getClass().getSimpleName().endsWith("Schema")) {
-            com.sinosoft.persistence.Set setObj = getExistsSet2(key);
-            setObj.add(key);
-            this.distinctSet(setObj);
-            this.distinctSetByPks(setObj);
-            tempMap.put(setObj, value);
+            if (!isNeedToCombineSet(key)) {
+                tempMap.put(key, value);
+            } else {
+                com.sinosoft.persistence.Set setObj = getExistsSet2(key);
+                setObj.add(key);
+                this.distinctSet(setObj);
+                this.distinctSetByPks(setObj);
+                tempMap.put(setObj, value);
+            }
         } else if (key.getClass().getSimpleName().endsWith("Set")) {
             com.sinosoft.persistence.Set setObj = getExistsSet(key);
             setObj.addAll((com.sinosoft.persistence.Set) key);
