@@ -128,7 +128,7 @@ public class FastDBQueryUI_RecordWatcherDirectXls {
             applyStyleByIndex(0, sd, pkIndexLst, pkCs, nonPkCs);
             applyStyleByIndex(0, su, pkIndexLst, pkCs, nonPkCs);
 
-            if (columnsAndChinese != null && !columnsAndChinese.isEmpty()) {
+            if (isColumnsAndChineseReady()) {
                 addRow_NChinese(1, sn, titleLst2, columnsAndChinese);
                 addRow_NChinese(1, sd, titleLst2, columnsAndChinese);
                 addRow_NChinese(1, su, titleLst2, columnsAndChinese);
@@ -340,6 +340,18 @@ public class FastDBQueryUI_RecordWatcherDirectXls {
 
     public void setPkIndexLst(List<Integer> pkIndexLst) {
         this.pkIndexLst = pkIndexLst;
+    }
+
+    private boolean isColumnsAndChineseReady() {
+        if (columnsAndChinese == null || columnsAndChinese.isEmpty()) {
+            return false;
+        }
+        for (String key : columnsAndChinese.keySet()) {
+            if (StringUtils.isNotBlank(columnsAndChinese.get(key))) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static void main(String[] args) {

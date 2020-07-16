@@ -1606,17 +1606,13 @@ public class FastDBQueryUI extends JFrame {
         compareXlsColumnSettingTitleText.addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
-                if (StringUtils.isNotBlank(compareXlsColumnSettingTitleText.getText())) {
-                    if (mTableColumnDefTextHandler == null) {
-                        mTableColumnDefTextHandler = new TableColumnDefTextHandler();
-                        mTableColumnDefTextHandler.init(true);
+                try {
+                    if (mTableColumnDefTextHandler != null) {
+                        mTableColumnDefTextHandler.init(false);
                     }
-                    if (mXlsColumnDefDlg == null) {
-                        mXlsColumnDefDlg = new XlsColumnDefDlg();
-                    }
-                    if (mXlsColumnDefDlg != null && mXlsColumnDefDlg.getConfig() == null || mXlsColumnDefDlg.getConfig().isEmpty()) {
-                        mXlsColumnDefDlg.show();
-                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    mXlsColumnDefDlg.show();
                 }
             }
         });
@@ -6852,7 +6848,7 @@ public class FastDBQueryUI extends JFrame {
         String xlsLoaderResourceKey = TableColumnDefTextHandler.class.getName() + "_xlsLoaderResourceKey";
         String xlsColumnDefDlgKey = TableColumnDefTextHandler.class.getName() + "_xlsColumnDefDlgKey";
 
-        private void checkXlsLoader(boolean reset) {
+        private boolean checkXlsLoader(boolean reset, boolean showErrMsg) {
             if (mXlsColumnDefDlg == null) {
                 if (TAB_UI1 != null) {
                     mXlsColumnDefDlg = (XlsColumnDefDlg) TAB_UI1.getResourcesPool().get(xlsColumnDefDlgKey);
@@ -6860,20 +6856,31 @@ public class FastDBQueryUI extends JFrame {
                 if (mXlsColumnDefDlg == null) {
                     mXlsColumnDefDlg = new XlsColumnDefDlg();
                 }
-                TAB_UI1.getResourcesPool().put(xlsColumnDefDlgKey, mXlsColumnDefDlg);
             }
-
             if (TAB_UI1 != null) {
                 xlsLoader = (FastDBQueryUI_XlsColumnDefLoader) TAB_UI1.getResourcesPool().get(xlsLoaderResourceKey);
             }
+            boolean isNeedExecute = false;
             if (xlsLoader == null || reset) {
                 xlsLoader = new FastDBQueryUI_XlsColumnDefLoader(null, mXlsColumnDefDlg.getConfig());
                 xlsLoader.setLoadingInfoListener(loadingInfoListener);
-                xlsLoader.execute();
-                if (TAB_UI1 != null) {
-                    TAB_UI1.getResourcesPool().put(xlsLoaderResourceKey, xlsLoader);
-                }
+                isNeedExecute = true;
             }
+            if (mXlsColumnDefDlg.getConfig() == null || mXlsColumnDefDlg.getConfig().isEmpty()) {
+                if (showErrMsg) {
+                    Validate.isTrue(false, "請先按設定");
+                }
+            } else {
+                xlsLoader.setMappingConfig(mXlsColumnDefDlg.getConfig());
+            }
+            if (isNeedExecute) {
+                xlsLoader.execute();
+            }
+            if (TAB_UI1 != null) {
+                TAB_UI1.getResourcesPool().put(xlsLoaderResourceKey, xlsLoader);
+                TAB_UI1.getResourcesPool().put(xlsColumnDefDlgKey, mXlsColumnDefDlg);
+            }
+            return true;
         }
 
         private boolean init(boolean reset) {
@@ -6882,13 +6889,9 @@ public class FastDBQueryUI extends JFrame {
                 dir.mkdirs();
             }
             if (xlsLoader == null || reset) {
-                checkXlsLoader(reset);
+                checkXlsLoader(reset, true);
             }
             if (tableColumnDefText.getSelectedItem() != null && StringUtils.isNotBlank((String) tableColumnDefText.getSelectedItem())) {
-                if (mXlsColumnDefDlg.getConfig() == null || mXlsColumnDefDlg.getConfig().isEmpty()) {
-                    Validate.isTrue(false, "請先按設定");
-                }
-                xlsLoader.setMappingConfig(mXlsColumnDefDlg.getConfig());
                 return true;
             }
             return false;
@@ -6900,14 +6903,8 @@ public class FastDBQueryUI extends JFrame {
                 dir.mkdirs();
             }
             if (xlsLoader == null) {
-                checkXlsLoader(false);
+                checkXlsLoader(false, false);
             }
-            if (mXlsColumnDefDlg.getConfig() == null || mXlsColumnDefDlg.getConfig().isEmpty()) {
-                if (showErrMsg) {
-                    Validate.isTrue(false, "請先按設定");
-                }
-            }
-            xlsLoader.setMappingConfig(mXlsColumnDefDlg.getConfig());
         }
 
         public void action(boolean reset) {
