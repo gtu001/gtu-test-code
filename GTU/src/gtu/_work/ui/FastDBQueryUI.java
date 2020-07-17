@@ -1393,6 +1393,14 @@ public class FastDBQueryUI extends JFrame {
         panel_15.add(recordWatcherToggleBtn);
 
         recordWatcherToggleAutoChk = new JCheckBox("Auto");
+        recordWatcherToggleAutoChk.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (mRecordWatcher.get() != null && recordWatcherToggleAutoChk.isSelected()) {
+                    mRecordWatcher.get().doNotify();
+                }
+            }
+        });
         panel_15.add(recordWatcherToggleAutoChk);
 
         panel_16 = new JPanel();

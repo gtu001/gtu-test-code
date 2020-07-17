@@ -55,6 +55,7 @@ public class FastDBQueryUI_RecordWatcher extends Thread {
     SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmssSSS");
     NewNameHandler mNewNameHandler;
 
+    Object syncObject = new Object();
     JCheckBox recordWatcherToggleAutoChk;
 
     public FastDBQueryUI_RecordWatcher(Triple<List<String>, List<Class<?>>, List<Object[]>> orignQueryResult, String sql, Object[] params, int maxRowsLimit, Callable<Connection> fetchConnCallable,
@@ -306,70 +307,68 @@ public class FastDBQueryUI_RecordWatcher extends Thread {
         }
     }
 
-    public synchronized void run() {
-        try {
-            System.out.println("--------RecordWatcher start");
-            while (!doStop) {
-                if (!this.recordWatcherToggleAutoChk.isSelected()) {
-                    try {
-                        System.out.println("........監聽待命");
-                        Thread.sleep(1000 * 5);
-                    } catch (Exception ex) {
-                    }
-                    continue;
-                }
+    public void run() {
+        synchronized (syncObject) {
+            try {
+                System.out.println("--------RecordWatcher start");
+                while (!doStop) {
 
-                if (this.orignQueryResult == null) {
-                    System.out.println("--------RecordWatcher start -- [init query]");
-                    try {
-                        this.orignQueryResult = JdbcDBUtil.queryForList_customColumns(sql, params, getConnection(), true, maxRowsLimit);
-                    } catch (Exception e) {
-                        // throw new RuntimeException("查詢錯誤!", e);
-                        Thread.sleep(100);
-                        continue;
+                    while (!this.recordWatcherToggleAutoChk.isSelected()) {
+                        syncObject.wait();
                     }
-                } else {
-                    System.out.println("--------RecordWatcher start -- [requery]");
-                    long startTime = System.currentTimeMillis();
-                    Triple<List<String>, List<Class<?>>, List<Object[]>> compareResult = null;
-                    try {
-                        compareResult = JdbcDBUtil.queryForList_customColumns(sql, params, getConnection(), true, maxRowsLimit);
-                    } catch (Exception e) {
-                        // throw new RuntimeException("查詢錯誤!", e);
-                        Thread.sleep(100);
-                        continue;
-                    }
-                    long endTime = System.currentTimeMillis();
 
-                    if (orignQueryResult != null && compareResult != null) {
-                        List<String> titleLst = orignQueryResult.getLeft();
-                        if (titleLst.size() != compareResult.getLeft().size()) {
-                            throw new RuntimeException("欄位數不同(old/new) : " + titleLst.size() + "/" + compareResult.getLeft().size());
-                        } else {
-                            // 真實比對 XXX
-                            // ==============================================================
-                            long sleepTime = compareOldAndNew(orignQueryResult.getRight(), compareResult.getRight(), titleLst, startTime, endTime);
-                            // 真實比對 XXX
-                            // ==============================================================
-                            orignQueryResult = compareResult;
-                            if (sleepTime > 0) {
-                                try {
-                                    Thread.sleep(sleepTime);
-                                } catch (InterruptedException e) {
+                    if (this.orignQueryResult == null) {
+                        System.out.println("--------RecordWatcher start -- [init query]");
+                        try {
+                            this.orignQueryResult = JdbcDBUtil.queryForList_customColumns(sql, params, getConnection(), true, maxRowsLimit);
+                        } catch (Exception e) {
+                            // throw new RuntimeException("查詢錯誤!", e);
+                            Thread.sleep(100);
+                            continue;
+                        }
+                    } else {
+                        System.out.println("--------RecordWatcher start -- [requery]");
+                        long startTime = System.currentTimeMillis();
+                        Triple<List<String>, List<Class<?>>, List<Object[]>> compareResult = null;
+                        try {
+                            compareResult = JdbcDBUtil.queryForList_customColumns(sql, params, getConnection(), true, maxRowsLimit);
+                        } catch (Exception e) {
+                            // throw new RuntimeException("查詢錯誤!", e);
+                            Thread.sleep(100);
+                            continue;
+                        }
+                        long endTime = System.currentTimeMillis();
+
+                        if (orignQueryResult != null && compareResult != null) {
+                            List<String> titleLst = orignQueryResult.getLeft();
+                            if (titleLst.size() != compareResult.getLeft().size()) {
+                                throw new RuntimeException("欄位數不同(old/new) : " + titleLst.size() + "/" + compareResult.getLeft().size());
+                            } else {
+                                // 真實比對 XXX
+                                // ==============================================================
+                                long sleepTime = compareOldAndNew(orignQueryResult.getRight(), compareResult.getRight(), titleLst, startTime, endTime);
+                                // 真實比對 XXX
+                                // ==============================================================
+                                orignQueryResult = compareResult;
+                                if (sleepTime > 0) {
+                                    try {
+                                        Thread.sleep(sleepTime);
+                                    } catch (InterruptedException e) {
+                                    }
                                 }
                             }
                         }
                     }
                 }
+                System.out.println("--------RecordWatcher start -- [end]");
+                String stopMessage = "監聽結束!!";
+                if (!isShowStopMessage) {
+                    stopMessage = null;
+                }
+                this.finalDoSomething(stopMessage, null);
+            } catch (Throwable ex) {
+                this.finalDoSomething(ex.getMessage(), ex);
             }
-            System.out.println("--------RecordWatcher start -- [end]");
-            String stopMessage = "監聽結束!!";
-            if (!isShowStopMessage) {
-                stopMessage = null;
-            }
-            this.finalDoSomething(stopMessage, null);
-        } catch (Throwable ex) {
-            this.finalDoSomething(ex.getMessage(), ex);
         }
     }
 
@@ -398,5 +397,11 @@ public class FastDBQueryUI_RecordWatcher extends Thread {
 
     public void setPkIndexLst(List<Integer> pkIndexLst) {
         this.pkIndexLst = pkIndexLst;
+    }
+
+    public void doNotify() {
+        synchronized (syncObject) {
+            syncObject.notify();
+        }
     }
 }
