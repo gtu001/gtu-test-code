@@ -40,6 +40,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
@@ -163,6 +164,7 @@ import gtu.swing.util.KeyEventUtil;
 import gtu.swing.util.SimpleTextDlg;
 import gtu.swing.util.SwingTabTemplateUI;
 import gtu.swing.util.SwingTabTemplateUI.ChangeTabHandlerGtu001;
+import gtu.swing.util.SwingTabTemplateUI.CloneTabInterfaceGtu001;
 import gtu.yaml.util.YamlMapUtil;
 import gtu.yaml.util.YamlUtilBean;
 import net.sf.json.JSONArray;
@@ -316,7 +318,7 @@ public class FastDBQueryUI extends JFrame {
     private JLabel lblNewLabel_10;
     private JButton exportYamlConfigBtn;
     private JButton sqlIdFixNameBtn;
-    private SqlIdConfigBean sqlBean;// 當前選則
+    protected SqlIdConfigBean sqlBean;// 當前選則
     private JTextField maxRowsText;
     private JButton executeSqlButton;
     private JLabel label_1;
@@ -456,6 +458,30 @@ public class FastDBQueryUI extends JFrame {
                 }
             }
         });
+        tabUI.setCloneTabInterface(new CloneTabInterfaceGtu001() {
+            @Override
+            public boolean cloneTab(JFrame cloneFromFrame, JFrame cloneToFrame) {
+                FastDBQueryUI cloneFromFrame1 = (FastDBQueryUI) cloneFromFrame;
+                FastDBQueryUI cloneToFrame1 = (FastDBQueryUI) cloneToFrame;
+                SqlIdConfigBean sqlBean1 = new SqlIdConfigBean();
+                sqlBean1.category = cloneFromFrame1.sqlIdCategoryComboBox_Auto.getTextComponent().getText();
+                sqlBean1.sql = cloneFromFrame1.sqlTextArea.getText();
+                sqlBean1.sqlComment = cloneFromFrame1.sqlIdCommentArea.getText();
+                sqlBean1.sqlId = cloneFromFrame1.sqlIdText.getText();
+                if (StringUtils.isBlank(sqlBean1.sqlId)) {
+                    sqlBean1.sqlId = "未命名";
+                }
+                cloneToFrame1.sqlIdText.setText(sqlBean1.sqlId);
+                if (StringUtils.isNotBlank(sqlBean1.sql)) {
+                    cloneToFrame1.sqlTextArea.setText(sqlBean1.sql);
+                }
+                if (cloneFromFrame1.sqlBean != null) {
+                    sqlBean1.color = cloneFromFrame1.sqlBean.color;
+                }
+                cloneToFrame1.sqlListMouseClicked(null, sqlBean1);
+                return true;
+            }
+        });
         tabUI.setWindowCloseEvent(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -525,7 +551,7 @@ public class FastDBQueryUI extends JFrame {
         sqlList.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                sqlListMouseClicked(e);
+                sqlListMouseClicked(e, null);
             }
         });
         sqlList.addKeyListener(new KeyAdapter() {
@@ -840,7 +866,7 @@ public class FastDBQueryUI extends JFrame {
                         .addJMenuItem("還原", new ActionListener() {
                             @Override
                             public void actionPerformed(ActionEvent e) {
-                                sqlListMouseClicked(null);
+                                sqlListMouseClicked(null, null);
                             }
                         })//
                         .applyEvent(e)//
@@ -918,7 +944,7 @@ public class FastDBQueryUI extends JFrame {
 
         sqlSaveButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                saveSqlButtonClick(true);
+                saveSqlButtonClick(true, true);
             }
         });
 
@@ -2463,14 +2489,16 @@ public class FastDBQueryUI extends JFrame {
     /**
      * 儲存sql
      */
-    private void saveSqlButtonClick(boolean saveSqlIdConfig) {
+    private void saveSqlButtonClick(boolean saveSqlIdConfig, boolean isShowErrMsg) {
         try {
             String sqlId = sqlIdText.getText();
             String sql = sqlTextArea.getText();
-            JCommonUtil.isBlankErrorMsg(sqlId, "請輸入sql Id");
-            JCommonUtil.isBlankErrorMsg(sql, "請輸入sql");
+            if (isShowErrMsg) {
+                JCommonUtil.isBlankErrorMsg(sqlId, "請輸入sql Id");
+                JCommonUtil.isBlankErrorMsg(sql, "請輸入sql");
+            }
 
-            if (isSqlIdChange()) {
+            if (isSqlIdChange() && isShowErrMsg) {
                 boolean isContinue = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("您輸入SqlID以存在:" + sqlIdText.getText() + ", 是否要繼續?", "已存在SqlID");
                 if (!isContinue) {
                     JCommonUtil._jOptionPane_showMessageDialog_error("儲存取消!!!");
@@ -2499,7 +2527,9 @@ public class FastDBQueryUI extends JFrame {
             bean.sqlComment = sqlComment;
 
             // 改變TabUI標題
-            changeTabUITitile(bean);
+            if (isShowErrMsg) {
+                changeTabUITitile(bean);
+            }
 
             if (saveSqlIdConfig) {
                 bean = this.saveSqlListProp(bean);
@@ -3332,11 +3362,14 @@ public class FastDBQueryUI extends JFrame {
     /**
      * 讀取sqlId相對的sql
      */
-    private void sqlListMouseClicked(MouseEvent e) {
+    private void sqlListMouseClicked(MouseEvent e, SqlIdConfigBean sqlBean2) {
         // if(!JMouseEventUtil.buttonLeftClick(2, e)){
         // return;
         // }
         sqlBean = (SqlIdConfigBean) JListUtil.getLeadSelectionObject(sqlList);
+        if (sqlBean2 != null) {
+            sqlBean = sqlBean2;
+        }
         System.out.println("sqlId : " + sqlBean.getUniqueKey());
 
         sqlIdText.setText(sqlBean.sqlId);
@@ -3355,13 +3388,15 @@ public class FastDBQueryUI extends JFrame {
         loadParameterTableConfig();
 
         // 判斷是否要自動切換dataSource
-        loadSqlIdMappingDataSourceConfig();
+        loadSqlIdMappingDataSourceConfig(sqlBean);
 
         // trigger 儲存按鈕
-        saveSqlButtonClick(false);
+        saveSqlButtonClick(false, sqlBean2 == null);
 
         // 設定 tab標題
-        changeTabUITitile(sqlBean);
+        if (sqlBean2 == null) {
+            changeTabUITitile(sqlBean);
+        }
 
         // 取得sql執行類型
         mSqlIdExecuteTypeHandler.processExecuteType(sqlBean.sqlId);
@@ -3373,10 +3408,13 @@ public class FastDBQueryUI extends JFrame {
         }
     }
 
-    private void loadSqlIdMappingDataSourceConfig() {
+    private void loadSqlIdMappingDataSourceConfig(SqlIdConfigBean bean2) {
         try {
             sqlIdListDSMappingHandler.init();
             SqlIdConfigBean bean = (SqlIdConfigBean) JListUtil.getLeadSelectionObject(sqlList);
+            if (bean2 != null) {
+                bean = bean2;
+            }
             if (sqlIdListDSMappingHandler.containsKey(bean.getUniqueKey())) {
                 String saveKey = sqlIdListDSMappingHandler.getProperty(bean.getUniqueKey());
                 if (!StringUtils.equals(mDBNameIdTextHandler.dbNameIdText_getText(), saveKey)) {

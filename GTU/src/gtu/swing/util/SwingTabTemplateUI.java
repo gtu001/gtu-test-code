@@ -40,6 +40,7 @@ public class SwingTabTemplateUI {
     private List<JFrame> jframeKeeperLst = new ArrayList<JFrame>();
     private ChangeTabHandlerGtu001 changeTabHandlerGtu001;
     private FocusTabHandlerGtu001 focusTabHandlerGtu001;
+    private CloneTabInterfaceGtu001 cloneTabInterfaceGtu001;
     private Map<String, Object> resourcesPool = new HashMap<String, Object>();
     private SysTrayUtil sysTray = SysTrayUtil.newInstance();
 
@@ -111,16 +112,26 @@ public class SwingTabTemplateUI {
                             });//
                         }
                         if (idx == clickTabIdx) {
-                            popupUtil.addJMenuItem("移除分頁", new ActionListener() {
-                                @Override
-                                public void actionPerformed(ActionEvent e) {
-                                    boolean confirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("確認移除 : " + tabbedPane.getTitleAt(idx), "移除分頁");
-                                    if (confirm) {
-                                        tabbedPane.remove(idx);
-                                        jframeKeeperLst.remove(idx);
+                            if (cloneTabInterfaceGtu001 != null) {
+                                popupUtil.addJMenuItem("複製分頁", new ActionListener() {
+                                    @Override
+                                    public void actionPerformed(ActionEvent e) {
+                                        cloneTab(clickTabIdx, true);
                                     }
-                                }
-                            });//
+                                });//
+                            }
+                            if (getTabCount() > 1) {
+                                popupUtil.addJMenuItem("移除分頁", new ActionListener() {
+                                    @Override
+                                    public void actionPerformed(ActionEvent e) {
+                                        boolean confirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("確認移除 : " + tabbedPane.getTitleAt(idx), "移除分頁");
+                                        if (confirm) {
+                                            tabbedPane.remove(idx);
+                                            jframeKeeperLst.remove(idx);
+                                        }
+                                    }
+                                });//
+                            }
                         }
                         /*
                          * popupUtil.addJMenuItem("修改分頁名子", new ActionListener()
@@ -289,6 +300,32 @@ public class SwingTabTemplateUI {
         jframe.setBounds(x, y, jframe.getBounds().width, jframe.getBounds().height);
     }
 
+    public interface CloneTabInterfaceGtu001 {
+        boolean cloneTab(JFrame cloneFromFrame, JFrame cloneToFrame);
+    }
+
+    public void cloneTab(int cloneFromTabIndex, boolean moveToNew) {
+        try {
+            JFrame cloneFromFrame = jframeKeeperLst.get(cloneFromTabIndex);
+            String tabName = this.getTabTitle(cloneFromTabIndex);
+            JFrame childFrame = (JFrame) this.uiJframeClass.newInstance();
+            boolean isValid = this.cloneTabInterfaceGtu001.cloneTab(cloneFromFrame, childFrame);
+            if (!isValid) {
+                return;
+            }
+            JPanel panel = new JPanel();
+            tabbedPane.addTab(tabName, null, panel, null);
+            panel.setLayout(new BorderLayout(0, 0));
+            panel.add(childFrame.getContentPane(), BorderLayout.CENTER);
+            jframeKeeperLst.add(childFrame);
+            if (moveToNew) {
+                tabbedPane.setSelectedIndex(tabbedPane.getTabCount() - 1);
+            }
+        } catch (Exception ex) {
+            JCommonUtil.handleException(ex);
+        }
+    }
+
     public void addTab(String tabName, boolean moveToNew) {
         try {
             JFrame childFrame = (JFrame) this.uiJframeClass.newInstance();
@@ -329,6 +366,13 @@ public class SwingTabTemplateUI {
         return jframeKeeperLst;
     }
 
+    public String getTabTitle(Integer idx) {
+        if (idx == null) {
+            idx = tabbedPane.getSelectedIndex();
+        }
+        return tabbedPane.getTitleAt(idx);
+    }
+
     public void setTabTitle(Integer idx, String title) {
         if (idx == null) {
             idx = tabbedPane.getSelectedIndex();
@@ -338,5 +382,9 @@ public class SwingTabTemplateUI {
 
     public int getClickTabIndex(MouseEvent e) {
         return tabbedPane.indexAtLocation(e.getX(), e.getY());
+    }
+
+    public void setCloneTabInterface(CloneTabInterfaceGtu001 cloneTabInterfaceGtu001) {
+        this.cloneTabInterfaceGtu001 = cloneTabInterfaceGtu001;
     }
 }
