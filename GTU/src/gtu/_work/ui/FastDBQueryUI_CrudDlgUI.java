@@ -1355,7 +1355,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
             }
             btnGroup = JButtonGroupUtil.createRadioButtonGroup(rdbtnInsert, rdbtnUpdate, rdbtnDelete, rdbtnOthers, rdbtnSelect);
             {
-                applyAllQueryResultCheckBox = new JCheckBox("套全部");
+                applyAllQueryResultCheckBox = new JCheckBox("多筆匯出");
                 panel.add(applyAllQueryResultCheckBox);
             }
         }

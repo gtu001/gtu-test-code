@@ -40,7 +40,6 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
@@ -162,6 +161,7 @@ import gtu.swing.util.JTooltipUtil;
 import gtu.swing.util.KeyEventExecuteHandler;
 import gtu.swing.util.KeyEventUtil;
 import gtu.swing.util.SimpleTextDlg;
+import gtu.swing.util.SwingAuthorityChecker;
 import gtu.swing.util.SwingTabTemplateUI;
 import gtu.swing.util.SwingTabTemplateUI.ChangeTabHandlerGtu001;
 import gtu.swing.util.SwingTabTemplateUI.CloneTabInterfaceGtu001;
@@ -398,7 +398,7 @@ public class FastDBQueryUI extends JFrame {
     private JCheckBox radio_import_excel_isAppend;
     private AtomicReference<String> currentSQL = new AtomicReference<String>();
     private JCheckBox recordWatcherToggleAutoChk;
-
+   
     private final Predicate IGNORE_PREDICT = new Predicate() {
         @Override
         public boolean evaluate(Object input) {
@@ -866,7 +866,7 @@ public class FastDBQueryUI extends JFrame {
                         .addJMenuItem("還原", new ActionListener() {
                             @Override
                             public void actionPerformed(ActionEvent e) {
-                                sqlListMouseClicked(null, null);
+                               sqlListMouseClicked(null, null);
                             }
                         })//
                         .applyEvent(e)//
@@ -4069,6 +4069,7 @@ public class FastDBQueryUI extends JFrame {
             final ExcelUtil_Xls97 exlUtl = ExcelUtil_Xls97.getInstance();
             AbstractButton selBtn = JButtonGroupUtil.getSelectedButton(btnExcelBtn);
             if (radio_import_excel == selBtn) {
+
                 File xlsfile = JCommonUtil._jFileChooser_selectFileOnly();
                 if (!xlsfile.exists() || !xlsfile.getName().endsWith(".xls")) {
                     JCommonUtil._jOptionPane_showMessageDialog_info("檔案錯誤(.xls)!");
@@ -6574,55 +6575,59 @@ public class FastDBQueryUI extends JFrame {
     }
 
     private void startRecordWatcher() {
-        boolean allOk = false;
-        // 啟動
-        if (ArrayUtils.contains(new String[] { "監聽", "監聽off" }, recordWatcherToggleBtn.getText())) {
-            if (this.queryList != null) {
-                if (mRecordWatcher.get() != null && //
-                        (mRecordWatcher.get().getState() == Thread.State.NEW)) {
-                    allOk = true;
-                    if (mFastDBQueryUI_RowDiffWatcherDlg != null) {
-                        mFastDBQueryUI_RowDiffWatcherDlg.setVisible(false);
-                    }
-                    mFastDBQueryUI_RowDiffWatcherDlg = FastDBQueryUI_RowPKSettingDlg.newInstance(this.queryList.getLeft(), new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            FastDBQueryUI_RowPKSettingDlg dlg = (FastDBQueryUI_RowPKSettingDlg) e.getSource();
-                            List<Integer> pkIndexLst = new ArrayList<Integer>();
-                            for (int ii = 0; ii < queryList.getLeft().size(); ii++) {
-                                String column = queryList.getLeft().get(ii);
-                                for (String mColumn : dlg.getPkLst()) {
-                                    if (StringUtils.equals(column, mColumn)) {
-                                        pkIndexLst.add(ii);
+        try {
+            boolean allOk = false;
+            // 啟動
+            if (ArrayUtils.contains(new String[] { "監聽", "監聽off" }, recordWatcherToggleBtn.getText())) {
+                if (this.queryList != null) {
+                    if (mRecordWatcher.get() != null && //
+                            (mRecordWatcher.get().getState() == Thread.State.NEW)) {
+                        allOk = true;
+                        if (mFastDBQueryUI_RowDiffWatcherDlg != null) {
+                            mFastDBQueryUI_RowDiffWatcherDlg.setVisible(false);
+                        }
+                        mFastDBQueryUI_RowDiffWatcherDlg = FastDBQueryUI_RowPKSettingDlg.newInstance(this.queryList.getLeft(), new ActionListener() {
+                            @Override
+                            public void actionPerformed(ActionEvent e) {
+                                FastDBQueryUI_RowPKSettingDlg dlg = (FastDBQueryUI_RowPKSettingDlg) e.getSource();
+                                List<Integer> pkIndexLst = new ArrayList<Integer>();
+                                for (int ii = 0; ii < queryList.getLeft().size(); ii++) {
+                                    String column = queryList.getLeft().get(ii);
+                                    for (String mColumn : dlg.getPkLst()) {
+                                        if (StringUtils.equals(column, mColumn)) {
+                                            pkIndexLst.add(ii);
+                                        }
                                     }
                                 }
+                                if (pkIndexLst.isEmpty()) {
+                                    JCommonUtil._jOptionPane_showMessageDialog_error("請選擇主鍵!");
+                                } else {
+                                    mRecordWatcher.get().setPkIndexLst(pkIndexLst);
+                                    mRecordWatcher.get().start();
+                                    recordWatcherToggleBtn.setText("監聽ing");
+                                }
                             }
-                            if (pkIndexLst.isEmpty()) {
-                                JCommonUtil._jOptionPane_showMessageDialog_error("請選擇主鍵!");
-                            } else {
-                                mRecordWatcher.get().setPkIndexLst(pkIndexLst);
-                                mRecordWatcher.get().start();
-                                recordWatcherToggleBtn.setText("監聽ing");
+                        }, new ActionListener() {
+                            @Override
+                            public void actionPerformed(ActionEvent e) {
+                                mJDlgHolderBringToFrontHandler.remove((JDialog) e.getSource());
                             }
-                        }
-                    }, new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            mJDlgHolderBringToFrontHandler.remove((JDialog) e.getSource());
-                        }
-                    });
-                    mJDlgHolderBringToFrontHandler.add(mFastDBQueryUI_RowDiffWatcherDlg);
+                        });
+                        mJDlgHolderBringToFrontHandler.add(mFastDBQueryUI_RowDiffWatcherDlg);
+                    }
                 }
+                if (!allOk) {
+                    JCommonUtil._jOptionPane_showMessageDialog_error("請重新查詢");
+                }
+            } else if (ArrayUtils.contains(new String[] { "監聽ing" }, recordWatcherToggleBtn.getText())) {
+                if (mRecordWatcher.get() != null) {
+                    mRecordWatcher.get().doStop(true);
+                }
+            } else {
+                System.out.println("怪怪的....");
             }
-            if (!allOk) {
-                JCommonUtil._jOptionPane_showMessageDialog_error("請重新查詢");
-            }
-        } else if (ArrayUtils.contains(new String[] { "監聽ing" }, recordWatcherToggleBtn.getText())) {
-            if (mRecordWatcher.get() != null) {
-                mRecordWatcher.get().doStop(true);
-            }
-        } else {
-            System.out.println("怪怪的....");
+        } catch (Exception ex) {
+            JCommonUtil.handleException(ex);
         }
     }
 
