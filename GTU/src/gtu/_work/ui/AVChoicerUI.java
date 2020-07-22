@@ -110,7 +110,7 @@ public class AVChoicerUI extends JFrame {
     private static final String AV_LIST_KEY = "avDirList";
     private static final String AV_EXE_KEY = "avExeText";
 
-    private PropertiesUtilBean config = new PropertiesUtilBean(AVChoicerUI.class);// 
+    private PropertiesUtilBean config = new PropertiesUtilBean(AVChoicerUI.class);//
     {
         config = JSwingCommonConfigUtil.checkTestingPropertiesUtilBean(config, getClass(), AVChoicerUI.class.getSimpleName());
     }
@@ -118,7 +118,7 @@ public class AVChoicerUI extends JFrame {
     private Set<File> clickAvSet = new HashSet<File>();
     private AtomicReference<File> currentAvFile = new AtomicReference<File>();
     private CurrentFileHandler currentFileHandler = new CurrentFileHandler();
-    private List<File> cacheFileList = new ArrayList<File>();
+    // private List<File> cacheFileList = new ArrayList<File>();
     private JLabel deleteAVFileLabel;
     private JLabel movCountLabel;
     private JButton replayBtn;
@@ -495,8 +495,8 @@ public class AVChoicerUI extends JFrame {
                 if (JMouseEventUtil.buttonLeftClick(2, paramMouseEvent)) {
                     File dir = new File((String) JListUtil.getLeadSelectionObject(moveToList));
                     DesktopUtil.openDir(dir);
-                    
-                    //設定目的 dir
+
+                    // 設定目的 dir
                     readyMoveToDirText.setText(dir.getAbsolutePath());
                 }
             }
@@ -508,6 +508,14 @@ public class AVChoicerUI extends JFrame {
 
         JPanel panel_19 = new JPanel();
         panel_18.add(panel_19, BorderLayout.NORTH);
+
+        JButton dirCheckListResetBtn = new JButton("重設");
+        dirCheckListResetBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                dirCheckListResetBtnAction();
+            }
+        });
+        panel_19.add(dirCheckListResetBtn);
 
         JLabel lblNewLabel_3 = new JLabel("檢視目錄");
         panel_19.add(lblNewLabel_3);
@@ -708,8 +716,9 @@ public class AVChoicerUI extends JFrame {
                             triggerIndicateFolderTextFoucsLost();
                         }
                     } else {
-                        cacheFileList = new ArrayList<File>();
-                        cacheFileList.addAll(dirCheckTextActionPerformed(lst));
+                        // cacheFileList = new ArrayList<File>();
+                        // cacheFileList.addAll(dirCheckTextActionPerformed(lst));
+                        dirCheckTextActionPerformed(lst);
                     }
                 }
             }
@@ -740,7 +749,8 @@ public class AVChoicerUI extends JFrame {
         File avFolder = new File(indicateFolderText.getText());
         if (avFolder != null && avFolder.exists() && avFolder.isDirectory()) {
             currentAvFile.set(avFolder);
-            this.cacheFileList = this.getSubFolderAvLst(avFolder);
+            // this.cacheFileList = this.getSubFolderAvLst(avFolder);
+            dirCheckTextActionPerformed(this.getSubFolderAvLst(avFolder));
             resetSameFolderChk(true);
         } else {
             indicateFolderText.setText("");
@@ -1011,15 +1021,28 @@ public class AVChoicerUI extends JFrame {
         }
     }
 
+    private List<File> getCacheFileLst() {
+        List<File> lst = new ArrayList<File>();
+        DefaultListModel model = (DefaultListModel) dirCheckList.getModel();
+        for (int ii = 0; ii < model.getSize(); ii++) {
+            FileZ f = (FileZ) model.get(ii);
+            if (movPtn.matcher(f.file.getName()).find()) {
+                lst.add(f.file);
+            }
+        }
+        return lst;
+    }
+
     private File getRandomAvFile() {
+        List<File> cacheFileList = getCacheFileLst();
         if (cacheFileList == null || cacheFileList.isEmpty()) {
             cacheFileList = new ArrayList<File>();
-
+            final List<File> cacheFileList2 = cacheFileList;
             DefaultListModel model = (DefaultListModel) avDirList.getModel();
             IntStream.range(0, model.size())//
                     .mapToObj(i -> (File) model.getElementAt(i))//
                     .forEach(file -> {
-                        FileUtil.searchFileMatchs(file, ".*\\." + PatternCollection.VIDEO_PATTERN, cacheFileList);
+                        FileUtil.searchFileMatchs(file, ".*\\." + PatternCollection.VIDEO_PATTERN, cacheFileList2);
                     });
         }
 
@@ -1123,7 +1146,7 @@ public class AVChoicerUI extends JFrame {
             int totalSize = -1;
             int alreadyLookSize = -1;
             try {
-                totalSize = cacheFileList.size();
+                totalSize = getCacheFileLst().size();
             } catch (Exception ex) {
             }
             try {
@@ -1178,6 +1201,7 @@ public class AVChoicerUI extends JFrame {
         }
 
         private void removeFromCacheLst(File removeFile) {
+            List<File> cacheFileList = getCacheFileLst();
             if (cacheFileList != null) {
                 for (int ii = 0; ii < cacheFileList.size(); ii++) {
                     if (cacheFileList.get(ii) == removeFile) {
@@ -1277,7 +1301,7 @@ public class AVChoicerUI extends JFrame {
     }
 
     private void resetCacheFileList() {
-        cacheFileList = null;
+        dirCheckList.setModel(new DefaultListModel());
     }
 
     private File getMediaPlayerExe() throws Exception {
@@ -1315,7 +1339,6 @@ public class AVChoicerUI extends JFrame {
                 days = Double.parseDouble(historyBetweenConfigText.getText());
             } catch (Exception ex) {
                 historyBetweenConfigText.setText("3");
-                JCommonUtil.handleException(ex);
             }
 
             if (!historyConfig.getConfigProp().containsKey(avFile.getName())) {
@@ -1627,10 +1650,10 @@ public class AVChoicerUI extends JFrame {
         }
     }
 
-    private static class FileZ {
-        private static Pattern movPtn = Pattern.compile(PatternCollection.VIDEO_PATTERN, Pattern.CASE_INSENSITIVE);
-        private static Pattern jpgPtn = Pattern.compile(PatternCollection.PICTURE_PATTERN, Pattern.CASE_INSENSITIVE);
+    private static Pattern movPtn = Pattern.compile(PatternCollection.VIDEO_PATTERN, Pattern.CASE_INSENSITIVE);
+    private static Pattern jpgPtn = Pattern.compile(PatternCollection.PICTURE_PATTERN, Pattern.CASE_INSENSITIVE);
 
+    private static class FileZ {
         File file;
         String name;
         boolean isMovie = true;
@@ -1680,5 +1703,9 @@ public class AVChoicerUI extends JFrame {
             }
             return String.format("<html><span style='color : %s ; background-color : %s;'>" + viewOk + "%s</span></html>", fontColor, bgColor, name);
         }
+    }
+
+    private void dirCheckListResetBtnAction() {
+        resetCacheFileList();
     }
 }

@@ -84,13 +84,16 @@ public class DbSqlCreater {
     public TableInfo execute(String tableName, String whereCondition, Set<String> pkSet) {
         try {
             TableInfo info = new TableInfo();
-            info.execute("select * from " + tableName + " where rownum = 1 ", dbs.getConnection());
+            info.execute(" select * from " + tableName + " where 1!=1 ", dbs.getConnection());
 
             if (StringUtils.isBlank(info.tableName)) {
                 info.tableName = tableName;// XXX
             }
-            if (info.pkColumns.isEmpty()) {
+            if (pkSet != null && !pkSet.isEmpty()) {
                 info.pkColumns = pkSet;// XXX
+            }
+            if (info.pkColumns == null) {
+                info.pkColumns = new HashSet<String>();
             }
 
             // XStream xstream = new XStream(new DomDriver());
@@ -272,7 +275,7 @@ public class DbSqlCreater {
                 while (pk.next()) {
                     Map<String, String> pkMap = getResultSetToMap(pk);
                     System.out.println(pkMap);
-                    System.out.println(pkMap);
+                    pkColumns.add(pkMap.get("COLUMN_NAME"));
                 }
                 System.out.println("============================================================pk end");
             } catch (Exception ex) {
@@ -315,10 +318,12 @@ public class DbSqlCreater {
             }
         }
 
-        private void validateData() {
+        private void validateData(boolean ignorePkColumns) {
             Validate.notEmpty(tableName, "tableName為空");
             Validate.notEmpty(columns, "columns欄位為空");
-            Validate.notEmpty(pkColumns, "pkColumns欄位為空");
+            if (!ignorePkColumns) {
+                Validate.notEmpty(pkColumns, "pkColumns欄位為空");
+            }
         }
 
         public String getTableAndSchema() {
@@ -351,11 +356,15 @@ public class DbSqlCreater {
             return false;
         }
 
+        public String createInsertSql(Map<String, String> valmap, Set<String> ignoreColumns) {
+            return createInsertSql(valmap, ignoreColumns, false);
+        }
+
         /**
          * 傳入要建立的新增資料
          */
-        public String createInsertSql(Map<String, String> valmap, Set<String> ignoreColumns) {
-            validateData();
+        public String createInsertSql(Map<String, String> valmap, Set<String> ignoreColumns, boolean ignorePk) {
+            validateData(ignorePk);
             StringBuilder sb = new StringBuilder();
             String value = null;
             sb.append(String.format("INSERT INTO %s  (", getTableAndSchema()));
@@ -382,11 +391,15 @@ public class DbSqlCreater {
             return sb.toString();
         }
 
+        public String createUpdateSql(Map<String, String> valmap, Map<String, String> pkValMap, boolean ignoreNull, Set<String> ignoreColumns) {
+            return createUpdateSql(valmap, pkValMap, ignoreNull, ignoreColumns, false);
+        }
+
         /**
          * 傳入要建立的更新資料
          */
-        public String createUpdateSql(Map<String, String> valmap, Map<String, String> pkValMap, boolean ignoreNull, Set<String> ignoreColumns) {
-            validateData();
+        public String createUpdateSql(Map<String, String> valmap, Map<String, String> pkValMap, boolean ignoreNull, Set<String> ignoreColumns, boolean ignorePk) {
+            validateData(false);
             StringBuilder sb = new StringBuilder();
             sb.append("UPDATE " + getTableAndSchema() + " SET ");
             for (String key : columns) {
@@ -420,11 +433,15 @@ public class DbSqlCreater {
             return sb.toString();
         }
 
+        public String createSelectSql(Map<String, String> valmap) {
+            return createSelectSql(valmap, false);
+        }
+
         /**
          * 傳入要建立的查詢資料
          */
-        public String createSelectSql(Map<String, String> valmap) {
-            validateData();
+        public String createSelectSql(Map<String, String> valmap, boolean ignorePk) {
+            validateData(ignorePk);
             StringBuilder sb = new StringBuilder();
             sb.append("SELECT * FROM " + getTableAndSchema() + " WHERE ");
             for (String key : pkColumns) {
@@ -438,11 +455,15 @@ public class DbSqlCreater {
             return sb.toString();
         }
 
+        public String createDeleteSql(Map<String, String> valmap) {
+            return createDeleteSql(valmap, false);
+        }
+
         /**
          * 傳入要建立的刪除資料
          */
-        public String createDeleteSql(Map<String, String> valmap) {
-            validateData();
+        public String createDeleteSql(Map<String, String> valmap, boolean ignorePk) {
+            validateData(ignorePk);
             StringBuilder sb = new StringBuilder();
             sb.append("DELETE FROM " + getTableAndSchema() + " WHERE ");
             for (String key : pkColumns) {
