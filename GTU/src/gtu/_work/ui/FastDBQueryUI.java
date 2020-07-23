@@ -161,7 +161,6 @@ import gtu.swing.util.JTooltipUtil;
 import gtu.swing.util.KeyEventExecuteHandler;
 import gtu.swing.util.KeyEventUtil;
 import gtu.swing.util.SimpleTextDlg;
-import gtu.swing.util.SwingAuthorityChecker;
 import gtu.swing.util.SwingTabTemplateUI;
 import gtu.swing.util.SwingTabTemplateUI.ChangeTabHandlerGtu001;
 import gtu.swing.util.SwingTabTemplateUI.CloneTabInterfaceGtu001;
@@ -3762,6 +3761,40 @@ public class FastDBQueryUI extends JFrame {
                                         public void actionPerformed(ActionEvent e) {
                                         }
                                     }, FastDBQueryUI.this);
+                        } catch (Exception ex) {
+                            JCommonUtil.handleException(ex);
+                        }
+                    }
+                });//
+
+                ppap.addJMenuItem("逆向產生SelectSQL", new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        try {
+                            DefaultTableModel model = JTableUtil.newInstance(queryResultTable).getModel();
+                            int rowPos = JTableUtil.getRealRowPos(queryResultTable.getSelectedRow(), queryResultTable);
+                            List<Object> columnLst = JTableUtil.newInstance(queryResultTable).getColumnTitleArray();
+                            StringBuffer sb = new StringBuffer();
+                            sb.append("select * from " + getRandom_TableNSchema() + " where 1=1 ");
+                            for (int jj = 0; jj < columnLst.size(); jj++) {
+                                String columnN = String.valueOf(columnLst.get(jj));
+                                if (QUERY_RESULT_COLUMN_NO.equals(columnN)) {
+                                    continue;
+                                }
+                                for (int ii = 0; ii < model.getColumnCount(); ii++) {
+                                    String column = model.getColumnName(ii);
+                                    if (StringUtils.equals(column, columnN)) {
+                                        Object value = model.getValueAt(rowPos, ii);
+                                        sb.append(" and " + column + " = ");
+                                        if (value != null) {
+                                            sb.append("'").append(value).append("' ");
+                                        } else {
+                                            sb.append("null ");
+                                        }
+                                    }
+                                }
+                            }
+                            JCommonUtil._jOptionPane_showInputDialog("產生SQL", sb.toString());
                         } catch (Exception ex) {
                             JCommonUtil.handleException(ex);
                         }
