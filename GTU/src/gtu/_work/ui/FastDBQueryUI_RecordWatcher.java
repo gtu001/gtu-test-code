@@ -441,4 +441,8 @@ public class FastDBQueryUI_RecordWatcher extends Thread {
             syncObject.notify();
         }
     }
+
+    public void setColumnsAndChinese(Map<String, String> columnsAndChinese) {
+        this.columnsAndChinese = columnsAndChinese;
+    }
 }

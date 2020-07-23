@@ -1258,6 +1258,7 @@ public class FastDBQueryUI extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 mTableColumnDefTextHandler.action(false);
+                updateRecordWatcherChineseMap();
             }
         });
 
@@ -6699,6 +6700,19 @@ public class FastDBQueryUI extends JFrame {
                 return null;
             }
         }, columnsAndChinese, this.recordWatcherToggleAutoChk));
+    }
+
+    private void updateRecordWatcherChineseMap() {
+        if (mRecordWatcher.get() != null) {
+            Map<String, String> columnsAndChinese = new HashMap<String, String>();
+            if (StringUtils.isNotBlank(tableColumnDefText_Auto.getTextComponent().getText())) {
+                String tableName = tableColumnDefText_Auto.getTextComponent().getText();
+                columnsAndChinese = mTableColumnDefTextHandler.getColumnsAndChinese(tableName, true);
+                if (!columnsAndChinese.isEmpty()) {
+                    mRecordWatcher.get().setColumnsAndChinese(columnsAndChinese);
+                }
+            }
+        }
     }
 
     private boolean checkIsNeedResetQueryResultTable(boolean isCheckColumnFilterText) {
