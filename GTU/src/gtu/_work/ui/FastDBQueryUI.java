@@ -397,6 +397,7 @@ public class FastDBQueryUI extends JFrame {
     private JCheckBox radio_import_excel_isAppend;
     private AtomicReference<String> currentSQL = new AtomicReference<String>();
     private JCheckBox recordWatcherToggleAutoChk;
+    private FastDBQueryUI_ReserveSqlDlg mFastDBQueryUI_ReserveSqlDlg;
 
     private final Predicate IGNORE_PREDICT = new Predicate() {
         @Override
@@ -3769,14 +3770,23 @@ public class FastDBQueryUI extends JFrame {
                 });//
 
                 ppap.addJMenuItem("逆向產生SelectSQL", new ActionListener() {
+
+                    private Class<?> getValueClz(String column) {
+                        for (int ii = 0; ii < queryList.getLeft().size(); ii++) {
+                            if (StringUtils.equalsIgnoreCase(column, queryList.getLeft().get(ii))) {
+                                return queryList.getMiddle().get(ii);
+                            }
+                        }
+                        return String.class;
+                    }
+
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         try {
                             DefaultTableModel model = JTableUtil.newInstance(queryResultTable).getModel();
                             int rowPos = JTableUtil.getRealRowPos(queryResultTable.getSelectedRow(), queryResultTable);
                             List<Object> columnLst = JTableUtil.newInstance(queryResultTable).getColumnTitleArray();
-                            StringBuffer sb = new StringBuffer();
-                            sb.append("select * from " + getRandom_TableNSchema() + " where 1=1 ");
+                            List<Triple<String, Class<?>, Object>> sqlLst = new ArrayList<Triple<String, Class<?>, Object>>();
                             for (int jj = 0; jj < columnLst.size(); jj++) {
                                 String columnN = String.valueOf(columnLst.get(jj));
                                 if (QUERY_RESULT_COLUMN_NO.equals(columnN)) {
@@ -3786,16 +3796,15 @@ public class FastDBQueryUI extends JFrame {
                                     String column = model.getColumnName(ii);
                                     if (StringUtils.equals(column, columnN)) {
                                         Object value = model.getValueAt(rowPos, ii);
-                                        sb.append(" and " + column + " = ");
-                                        if (value != null) {
-                                            sb.append("'").append(value).append("' ");
-                                        } else {
-                                            sb.append("null ");
-                                        }
+                                        sqlLst.add(Triple.of(column, getValueClz(column), value));
                                     }
                                 }
                             }
-                            JCommonUtil._jOptionPane_showInputDialog("產生SQL", sb.toString());
+                            if (mFastDBQueryUI_ReserveSqlDlg != null) {
+                                mFastDBQueryUI_ReserveSqlDlg.dispose();
+                            }
+                            mFastDBQueryUI_ReserveSqlDlg = FastDBQueryUI_ReserveSqlDlg.newInstance(getRandom_TableNSchema(), sqlLst);
+                            mFastDBQueryUI_ReserveSqlDlg.show();
                         } catch (Exception ex) {
                             JCommonUtil.handleException(ex);
                         }
