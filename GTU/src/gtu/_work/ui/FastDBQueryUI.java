@@ -3771,7 +3771,7 @@ public class FastDBQueryUI extends JFrame {
 
                 ppap.addJMenuItem("逆向產生SelectSQL", new ActionListener() {
 
-                    private Class<?> getValueClz(String column) {
+                    private Class getValueClz(String column) {
                         for (int ii = 0; ii < queryList.getLeft().size(); ii++) {
                             if (StringUtils.equalsIgnoreCase(column, queryList.getLeft().get(ii))) {
                                 return queryList.getMiddle().get(ii);
@@ -3786,7 +3786,7 @@ public class FastDBQueryUI extends JFrame {
                             DefaultTableModel model = JTableUtil.newInstance(queryResultTable).getModel();
                             int rowPos = JTableUtil.getRealRowPos(queryResultTable.getSelectedRow(), queryResultTable);
                             List<Object> columnLst = JTableUtil.newInstance(queryResultTable).getColumnTitleArray();
-                            List<Triple<String, Class<?>, Object>> sqlLst = new ArrayList<Triple<String, Class<?>, Object>>();
+                            List<Triple<String, Class, Object>> sqlLst = new ArrayList<Triple<String, Class, Object>>();
                             for (int jj = 0; jj < columnLst.size(); jj++) {
                                 String columnN = String.valueOf(columnLst.get(jj));
                                 if (QUERY_RESULT_COLUMN_NO.equals(columnN)) {

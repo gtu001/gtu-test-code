@@ -31,12 +31,12 @@ public class FastDBQueryUI_ReserveSqlDlg extends JDialog {
     private JComboBox dbTypeComboBox;
 
     private String tableName;
-    private List<Triple<String, Class<?>, Object>> sqlLst;
+    private List<Triple<String, Class, Object>> sqlLst;
 
     /**
      * Launch the application.
      */
-    public static FastDBQueryUI_ReserveSqlDlg newInstance(String tableName, List<Triple<String, Class<?>, Object>> sqlLst) {
+    public static FastDBQueryUI_ReserveSqlDlg newInstance(String tableName, List<Triple<String, Class, Object>> sqlLst) {
         try {
             FastDBQueryUI_ReserveSqlDlg dialog = new FastDBQueryUI_ReserveSqlDlg(tableName, sqlLst);
             dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -54,14 +54,14 @@ public class FastDBQueryUI_ReserveSqlDlg extends JDialog {
         }
         StringBuffer sb = new StringBuffer();
         sb.append("select *  \r\n").append(" from ").append(tableName).append("\r\n").append(" where 1=1 \r\n");
-        for (Triple<String, Class<?>, Object> arry : sqlLst) {
-            sb.append(" and ").append(arry.getLeft()).append(" = ");
+        for (Triple<String, Class, Object> arry : sqlLst) {
+            sb.append("     and ").append(arry.getLeft()).append(" = ");
             sb.append(getStringValue(arry)).append("\r\n");
         }
         sqlTextArea.setText(sb.toString());
     }
 
-    private String getStringValue(Triple<String, Class<?>, Object> arry) {
+    private String getStringValue(Triple<String, Class, Object> arry) {
         if (arry.getRight() == null) {
             return "null";
         }
@@ -81,7 +81,7 @@ public class FastDBQueryUI_ReserveSqlDlg extends JDialog {
     /**
      * Create the dialog.
      */
-    public FastDBQueryUI_ReserveSqlDlg(String tableName, List<Triple<String, Class<?>, Object>> sqlLst) {
+    public FastDBQueryUI_ReserveSqlDlg(String tableName, List<Triple<String, Class, Object>> sqlLst) {
         {
             this.tableName = tableName;
             this.sqlLst = sqlLst;
