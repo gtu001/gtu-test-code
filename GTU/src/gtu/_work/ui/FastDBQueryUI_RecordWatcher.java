@@ -28,6 +28,7 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.Row;
 
+import gtu.collection.MapUtil;
 import gtu.db.JdbcDBUtil;
 import gtu.file.FileUtil;
 import gtu.javafx.traynotification.NotificationType;
@@ -57,9 +58,12 @@ public class FastDBQueryUI_RecordWatcher extends Thread {
 
     Object syncObject = new Object();
     JCheckBox recordWatcherToggleAutoChk;
+    Map<String, String> columnsAndChinese;
+
+    HSSFWorkbook wb;
 
     public FastDBQueryUI_RecordWatcher(Triple<List<String>, List<Class<?>>, List<Object[]>> orignQueryResult, String sql, Object[] params, int maxRowsLimit, Callable<Connection> fetchConnCallable,
-            long skipTime, String fileMiddleName, SysTrayUtil sysTray, Transformer finalDo, JCheckBox recordWatcherToggleAutoChk) {
+            long skipTime, String fileMiddleName, SysTrayUtil sysTray, Transformer finalDo, Map<String, String> columnsAndChinese, JCheckBox recordWatcherToggleAutoChk) {
         this.orignQueryResult = orignQueryResult;
         this.sql = sql;
         this.params = params;
@@ -70,6 +74,7 @@ public class FastDBQueryUI_RecordWatcher extends Thread {
         this.fileMiddleName = fileMiddleName;
         this.finalDo = finalDo;
         this.recordWatcherToggleAutoChk = recordWatcherToggleAutoChk;
+        this.columnsAndChinese = columnsAndChinese;
     }
 
     private void finalDoSomething(String message, Throwable ex) {
@@ -158,19 +163,21 @@ public class FastDBQueryUI_RecordWatcher extends Thread {
     private File writeExcel(List<String> titleLst, List<Object[]> delArry, List<Object[]> newArry, List<Pair<Object[], Object[]>> updArry) {
         File xlsFile = new File(FileUtil.DESKTOP_DIR, mNewNameHandler.getName(false));
 
-        HSSFWorkbook wb = new HSSFWorkbook();
         HSSFSheet sn = null;
         HSSFSheet sd = null;
         HSSFSheet su = null;
 
         boolean isExist = false;
-        if (xlsFile.exists()) {
+
+        // if (xlsFile.exists()) {
+        if (wb != null) {
             isExist = true;
-            wb = ExcelUtil_Xls97.getInstance().readExcel(xlsFile);
+            // wb = ExcelUtil_Xls97.getInstance().readExcel(xlsFile);
             sn = wb.getSheet("new");
             sd = wb.getSheet("del");
             su = wb.getSheet("update");
         } else {
+            wb = new HSSFWorkbook();
             sn = wb.createSheet("new");
             sd = wb.createSheet("del");
             su = wb.createSheet("update");
@@ -195,6 +202,15 @@ public class FastDBQueryUI_RecordWatcher extends Thread {
             applyStyleByIndex(0, sn, pkIndexLst, pkCs, nonPkCs);
             applyStyleByIndex(0, sd, pkIndexLst, pkCs, nonPkCs);
             applyStyleByIndex(0, su, pkIndexLst, pkCs, nonPkCs);
+
+            if (isColumnsAndChineseReady()) {
+                addRow_NChinese(1, sn, titleLst2, columnsAndChinese);
+                addRow_NChinese(1, sd, titleLst2, columnsAndChinese);
+                addRow_NChinese(1, su, titleLst2, columnsAndChinese);
+                applyStyleByIndex(1, sn, pkIndexLst, pkCs, nonPkCs);
+                applyStyleByIndex(1, sd, pkIndexLst, pkCs, nonPkCs);
+                applyStyleByIndex(1, su, pkIndexLst, pkCs, nonPkCs);
+            }
         } else {
             addRowSplit(sn.getLastRowNum() + 1, sn, titleLst2, splitCs);
             addRowSplit(sd.getLastRowNum() + 1, sd, titleLst2, splitCs);
@@ -250,6 +266,15 @@ public class FastDBQueryUI_RecordWatcher extends Thread {
         for (int ii = 0; ii < data.length; ii++) {
             String d = String.valueOf(data[ii]);
             r1.createCell(ii).setCellValue(d);
+        }
+    }
+
+    private void addRow_NChinese(int rowIdx, HSSFSheet sn, Object[] data, Map<String, String> columnsAndChinese) {
+        HSSFRow r1 = sn.createRow(rowIdx);
+        for (int ii = 0; ii < data.length; ii++) {
+            String d = String.valueOf(data[ii]);
+            String chinese = MapUtil.getIgnorecase(d, columnsAndChinese);
+            r1.createCell(ii).setCellValue(chinese);
         }
     }
 
@@ -370,6 +395,18 @@ public class FastDBQueryUI_RecordWatcher extends Thread {
                 this.finalDoSomething(ex.getMessage(), ex);
             }
         }
+    }
+
+    private boolean isColumnsAndChineseReady() {
+        if (columnsAndChinese == null || columnsAndChinese.isEmpty()) {
+            return false;
+        }
+        for (String key : columnsAndChinese.keySet()) {
+            if (StringUtils.isNotBlank(columnsAndChinese.get(key))) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private class NewNameHandler {

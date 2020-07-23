@@ -398,7 +398,7 @@ public class FastDBQueryUI extends JFrame {
     private JCheckBox radio_import_excel_isAppend;
     private AtomicReference<String> currentSQL = new AtomicReference<String>();
     private JCheckBox recordWatcherToggleAutoChk;
-   
+
     private final Predicate IGNORE_PREDICT = new Predicate() {
         @Override
         public boolean evaluate(Object input) {
@@ -866,7 +866,7 @@ public class FastDBQueryUI extends JFrame {
                         .addJMenuItem("還原", new ActionListener() {
                             @Override
                             public void actionPerformed(ActionEvent e) {
-                               sqlListMouseClicked(null, null);
+                                sqlListMouseClicked(null, null);
                             }
                         })//
                         .applyEvent(e)//
@@ -6639,6 +6639,13 @@ public class FastDBQueryUI extends JFrame {
         if (StringUtils.isBlank(fileMiddleName)) {
             fileMiddleName = getRandom_TableNSchema();
         }
+
+        Map<String, String> columnsAndChinese = new HashMap<String, String>();
+        if (StringUtils.isNotBlank(tableColumnDefText_Auto.getTextComponent().getText())) {
+            String tableName = tableColumnDefText_Auto.getTextComponent().getText();
+            columnsAndChinese = mTableColumnDefTextHandler.getColumnsAndChinese(tableName, true);
+        }
+
         mRecordWatcher.set(new FastDBQueryUI_RecordWatcher(orignQueryResult, sql, params, maxRowsLimit, new Callable<Connection>() {
             @Override
             public Connection call() throws Exception {
@@ -6658,7 +6665,7 @@ public class FastDBQueryUI extends JFrame {
                 }
                 return null;
             }
-        }, this.recordWatcherToggleAutoChk));
+        }, columnsAndChinese, this.recordWatcherToggleAutoChk));
     }
 
     private boolean checkIsNeedResetQueryResultTable(boolean isCheckColumnFilterText) {
