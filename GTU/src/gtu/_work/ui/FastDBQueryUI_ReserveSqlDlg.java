@@ -20,8 +20,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Triple;
 
 import gtu.db.jdbc.util.DBDateUtil;
+import gtu.string.StringUtilForDb;
+import gtu.string.StringUtil_;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JTextAreaUtil;
+import javax.swing.JCheckBox;
 
 public class FastDBQueryUI_ReserveSqlDlg extends JDialog {
 
@@ -32,6 +35,7 @@ public class FastDBQueryUI_ReserveSqlDlg extends JDialog {
 
     private String tableName;
     private List<Triple<String, Class, Object>> sqlLst;
+    private JCheckBox javaToDBChk;
 
     /**
      * Launch the application.
@@ -48,6 +52,13 @@ public class FastDBQueryUI_ReserveSqlDlg extends JDialog {
         }
     }
 
+    private String getColumn(String column) {
+        if (javaToDBChk.isSelected()) {
+            return StringUtilForDb.javaToDbField(column);
+        }
+        return column;
+    }
+
     private void processSql() {
         if (StringUtils.isBlank(tableName)) {
             tableName = "XXXXXXXXXXX";
@@ -55,7 +66,7 @@ public class FastDBQueryUI_ReserveSqlDlg extends JDialog {
         StringBuffer sb = new StringBuffer();
         sb.append("select *  \r\n").append(" from ").append(tableName).append("\r\n").append(" where 1=1 \r\n");
         for (Triple<String, Class, Object> arry : sqlLst) {
-            sb.append("     and ").append(arry.getLeft()).append(" = ");
+            sb.append("     and ").append(getColumn(arry.getLeft())).append(" = ");
             sb.append(getStringValue(arry)).append("\r\n");
         }
         sqlTextArea.setText(sb.toString());
@@ -113,6 +124,16 @@ public class FastDBQueryUI_ReserveSqlDlg extends JDialog {
                     model.addElement(e);
                 }
                 dbTypeComboBox.setModel(model);
+            }
+            {
+                javaToDBChk = new JCheckBox("java->DB");
+                javaToDBChk.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        processSql();
+                    }
+                });
+                panel.add(javaToDBChk);
             }
         }
         {
