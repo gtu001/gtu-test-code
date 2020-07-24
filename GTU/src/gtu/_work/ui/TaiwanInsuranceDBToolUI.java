@@ -268,12 +268,9 @@ public class TaiwanInsuranceDBToolUI extends JFrame {
                 JCommonUtil.isBlankErrorMsg(table, "請輸入表名稱");
                 JCommonUtil.isBlankErrorMsg(sql, "請輸入SQL");
 
-                String driver = driverText.getText();
-                String url = jdbcUrlText.getText();
-                String username = userNameText.getText();
-                String password = passwordText.getText();
-                DbSqlCreater mDbSqlCreater = new DbSqlCreater(driver, url, username, password);
-                TableInfo tableInfo = mDbSqlCreater.execute(table, "1!=1", null);
+                TableInfo tableInfo = new TableInfo();
+                tableInfo.execute(" select * from " + table + " where 1!=1 ", getDataSource().getConnection());
+                
                 tableInfo.setDbDateDateFormat(DBDateUtil.DBDateFormat.Oracle);
 
                 List<Map<String, Object>> queryLst = JdbcDBUtil.queryForList(sql, getDataSource().getConnection(), true);

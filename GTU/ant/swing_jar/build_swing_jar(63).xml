@@ -85,6 +85,7 @@
 			<packagename mode="small" name="commons-dbcp-1.4.jar">org.apache.commons.dbcp.BasicDataSource</packagename>
 			<packagename mode="small" name="commons-pool-1.5.4.jar">org.apache.commons.pool.KeyedObjectPoolFactory</packagename>
 			<packagename mode="small" name="commons-codec-1.6.jar">org.apache.commons.codec.binary</packagename>
+			<packagename mode="small" name="">org.apache.commons.beanutils</packagename>
 			
 
 		</jarfinder>
