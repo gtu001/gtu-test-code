@@ -5,10 +5,13 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -21,10 +24,9 @@ import org.apache.commons.lang3.tuple.Triple;
 
 import gtu.db.jdbc.util.DBDateUtil;
 import gtu.string.StringUtilForDb;
-import gtu.string.StringUtil_;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JTextAreaUtil;
-import javax.swing.JCheckBox;
+import gtu.swing.util.SimpleCheckListDlg;
 
 public class FastDBQueryUI_ReserveSqlDlg extends JDialog {
 
@@ -32,10 +34,13 @@ public class FastDBQueryUI_ReserveSqlDlg extends JDialog {
     private final JPanel contentPanel = new JPanel();
     private JTextArea sqlTextArea;
     private JComboBox dbTypeComboBox;
+    private JButton columnBtn;
 
     private String tableName;
     private List<Triple<String, Class, Object>> sqlLst;
     private JCheckBox javaToDBChk;
+    private SimpleCheckListDlg mSimpleCheckListDlg;
+    private Map<String, String> choiceMap = new HashMap<String, String>();
 
     /**
      * Launch the application.
@@ -66,10 +71,37 @@ public class FastDBQueryUI_ReserveSqlDlg extends JDialog {
         StringBuffer sb = new StringBuffer();
         sb.append("select *  \r\n").append(" from ").append(tableName).append("\r\n").append(" where 1=1 \r\n");
         for (Triple<String, Class, Object> arry : sqlLst) {
-            sb.append("     and ").append(getColumn(arry.getLeft())).append(" = ");
-            sb.append(getStringValue(arry)).append("\r\n");
+            if (choiceMap == null || choiceMap.isEmpty() || choiceMap.containsKey(arry.getLeft())) {
+                sb.append("     and ").append(getColumn(arry.getLeft())).append(" = ");
+                sb.append(getStringValue(arry)).append("\r\n");
+            }
         }
         sqlTextArea.setText(sb.toString());
+    }
+
+    private void columnBtnAction() {
+        String title = "選擇過濾欄位";
+        Map<String, String> titleMap = new HashMap<String, String>();
+        for (Triple<String, Class, Object> tri : sqlLst) {
+            String strVal = "";
+            if (tri.getRight() != null) {
+                strVal = String.valueOf(tri.getRight());
+            }
+            titleMap.put(tri.getLeft(), strVal);
+        }
+        if (mSimpleCheckListDlg != null) {
+            mSimpleCheckListDlg.dispose();
+        }
+        mSimpleCheckListDlg = SimpleCheckListDlg.newInstance(title, titleMap, new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+                choiceMap = mSimpleCheckListDlg.getCheckedMap();
+                processSql();
+            }
+        }, new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+            }
+        });
+        mSimpleCheckListDlg.show();
     }
 
     private String getStringValue(Triple<String, Class, Object> arry) {
@@ -134,6 +166,16 @@ public class FastDBQueryUI_ReserveSqlDlg extends JDialog {
                     }
                 });
                 panel.add(javaToDBChk);
+            }
+            {
+                columnBtn = new JButton("挑選欄位");
+                columnBtn.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        columnBtnAction();
+                    }
+                });
+                panel.add(columnBtn);
             }
         }
         {
