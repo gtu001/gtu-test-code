@@ -270,6 +270,7 @@ public class TaiwanInsuranceDBToolUI extends JFrame {
 
                 TableInfo tableInfo = new TableInfo();
                 tableInfo.execute(" select * from " + table + " where 1!=1 ", getDataSource().getConnection());
+                tableInfo.setTableName(table);
                 
                 tableInfo.setDbDateDateFormat(DBDateUtil.DBDateFormat.Oracle);
 
