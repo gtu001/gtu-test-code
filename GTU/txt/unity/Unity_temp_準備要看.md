@@ -13,3 +13,5 @@ Unity_準備要看.md
 	https://subscription.packtpub.com/book/game_development/9781789538335/6/ch06lvl1sec37/3d-game-kit
 
 	https://www.fanatical.com/en/bundle/unity-game-development-bundle
+
+	https://www.youtube.com/watch?v=qsU4nM0L_n0
