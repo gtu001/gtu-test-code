@@ -13,6 +13,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -206,9 +207,51 @@ public class AVChoicerUI extends JFrame {
         panel_7.add(deleteAVFileBtn);
 
         replayBtn = new JButton("重播");
-        replayBtn.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent arg0) {
-                currentFileHandler.replay();
+        replayBtn.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (JMouseEventUtil.buttonLeftClick(1, e)) {
+                    currentFileHandler.replay();
+                } else if (JMouseEventUtil.buttonRightClick(1, e)) {
+                    JPopupMenuUtil.newInstance(replayBtn)//
+                            .addJMenuItem("normal", new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    currentFileHandler.replay_for_mplayer("");
+                                }
+                            })//
+                            .addJMenuItem("mirror", new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    currentFileHandler.replay_for_mplayer("mirror");
+                                }
+                            })//
+                            .addJMenuItem("90", new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    currentFileHandler.replay_for_mplayer("90");
+                                }
+                            })//
+                            .addJMenuItem("180", new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    currentFileHandler.replay_for_mplayer("180");
+                                }
+                            })//
+                            .addJMenuItem("270", new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    currentFileHandler.replay_for_mplayer("270");
+                                }
+                            })//
+                            .addJMenuItem("180_mirror", new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    currentFileHandler.replay_for_mplayer("180_mirror");
+                                }
+                            })//
+                            .applyEvent(e).show();
+                }
             }
         });
 
@@ -1226,6 +1269,16 @@ public class AVChoicerUI extends JFrame {
             }
         }
 
+        private void replay_for_mplayer(String rotate) {
+            playAvFile_for_mplayer(historyConfigHandler.getPlayFile(new Callable<File>() {
+                @Override
+                public File call() throws Exception {
+                    return tempFile.get();
+                }
+            }), rotate);
+            dirCheckList.repaint();
+        }
+
         private void replay() {
             playAvFile(historyConfigHandler.getPlayFile(new Callable<File>() {
                 @Override
@@ -1383,6 +1436,58 @@ public class AVChoicerUI extends JFrame {
                 JCommonUtil.handleException(e);
                 throw new RuntimeException("HistoryConfigHandler ERR : " + e.getMessage(), e);
             }
+        }
+    }
+
+    private void playAvFile_for_mplayer(File avFile, String rotate) {
+        try {
+            // File exe = new File(avExeText.getText());
+            String commandFormat = "mplayer %1$s \"%2$s\" ";
+            String encoding = avExeEncodeText.getText();
+
+            String rotateString = "";
+            switch (rotate) {
+            case "mirror":
+                rotateString = " -vf-add mirror ";
+                break;
+            case "90":
+                rotateString = " -vf-add rotate=1 ";
+                break;
+            case "180":
+                rotateString = " -vf-add flip ";
+                break;
+            case "270":
+                rotateString = " -vf-add mirror,rotate=1 ";
+                break;
+            case "180_mirror":
+                rotateString = " -vf-add mirror,flip ";
+                break;
+            default:
+                rotateString = "";
+                break;
+            }
+
+            currentFileHandler.setFile(avFile);
+            System.out.println("檔案存在 : " + avFile.exists() + " -> " + avFile);
+
+            RuntimeBatPromptModeUtil t = RuntimeBatPromptModeUtil.newInstance();
+            String command = String.format(commandFormat, rotateString, avFile.getCanonicalPath());
+            System.out.println("CMD ==> " + command);
+            System.out.println("encoding ==> " + encoding);
+            t.command(command);
+            t.runInBatFile(false);
+
+            ProcessWatcher watcher = ProcessWatcher.newInstance(t.apply("tmpPlayer_", encoding));
+            String str1 = watcher.getInputStreamToString();
+            String err1 = watcher.getErrorStreamToString();
+            System.out.println("Input=============================================Start");
+            System.out.println(str1);
+            System.out.println("Input=============================================End");
+            System.out.println("Error=============================================Start");
+            System.out.println(err1);
+            System.out.println("Error=============================================End");
+        } catch (Throwable ex) {
+            JCommonUtil.handleException(ex);
         }
     }
 
