@@ -1448,22 +1448,22 @@ public class AVChoicerUI extends JFrame {
             String rotateString = "";
             switch (rotate) {
             case "mirror":
-                rotateString = " -vf-add mirror ";
+                rotateString = " -zoom -vf-add mirror ";
                 break;
             case "90":
-                rotateString = " -vf-add rotate=1 ";
+                rotateString = " -zoom -vf-add rotate=1 ";
                 break;
             case "180":
-                rotateString = " -vf-add flip ";
+                rotateString = " -zoom -vf-add flip ";
                 break;
             case "270":
-                rotateString = " -vf-add mirror,rotate=1 ";
+                rotateString = " -zoom -vf-add mirror,rotate=1 ";
                 break;
             case "180_mirror":
-                rotateString = " -vf-add mirror,flip ";
+                rotateString = " -zoom -vf-add mirror,flip ";
                 break;
             default:
-                rotateString = "";
+                rotateString = " -zoom ";
                 break;
             }
 
@@ -1475,7 +1475,7 @@ public class AVChoicerUI extends JFrame {
             System.out.println("CMD ==> " + command);
             System.out.println("encoding ==> " + encoding);
             t.command(command);
-            t.runInBatFile(false);
+            t.runInBatFile(true);
 
             ProcessWatcher watcher = ProcessWatcher.newInstance(t.apply("tmpPlayer_", encoding));
             String str1 = watcher.getInputStreamToString();

@@ -184,12 +184,22 @@ public class RuntimeBatPromptModeUtil {
                     return Runtime.getRuntime().exec(String.format("cmd /C \"%s\" ", tmpBat));
                 }
             } else {
-                cmd.insert(0, "#!/bin/bash\r\n");
-                File tmpSh = File.createTempFile(prefix, ".sh");
-                FileUtil.saveToFile(tmpSh, __fixCommand(cmd.toString()), encode);
-                System.out.println("tmpSh : " + tmpSh);
-                Runtime.getRuntime().exec(String.format("chmod u+x %s", tmpSh));
-                return Runtime.getRuntime().exec(String.format("sh %s ", tmpSh));
+                if (runInBatFile) {
+                    File tmpSh = File.createTempFile(prefix, ".sh");
+                    cmd.insert(0, "#!/bin/bash\r\n");
+                    FileUtil.saveToFile(tmpSh, __fixCommand(cmd.toString()), encode);
+                    String linuxCommand = String.format("gnome-terminal --working-directory=\"/\" -- bash -c \"%s\" &", tmpSh);//-x => -- 
+                    System.out.println("linuxCommand : " + linuxCommand);
+                    Runtime.getRuntime().exec(String.format("chmod u+x %s", tmpSh));
+                    return Runtime.getRuntime().exec(linuxCommand);
+                } else {
+                    File tmpSh = File.createTempFile(prefix, ".sh");
+                    cmd.insert(0, "#!/bin/bash\r\n");
+                    FileUtil.saveToFile(tmpSh, __fixCommand(cmd.toString()), encode);
+                    System.out.println("tmpSh : " + tmpSh);
+                    Runtime.getRuntime().exec(String.format("chmod u+x %s", tmpSh));
+                    return Runtime.getRuntime().exec(String.format("sh %s ", tmpSh));
+                }
             }
         } catch (Throwable ex) {
             throw new RuntimeException("batRun ERR : " + ex.getMessage(), ex);
