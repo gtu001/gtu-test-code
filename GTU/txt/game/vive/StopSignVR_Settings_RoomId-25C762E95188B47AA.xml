@@ -50,7 +50,7 @@
 				-0.111220f, 0.993614f, -0.019011f, 0.451100f, 
 				0.013353f, 0.020622f, 0.999699f, 0.384380f"/>
 		</Box>
-		<Box Name="3" Width="0.735503f" Height="0.251459f" Depth="0.279407f" FullOnDistance_Meters="0.500000f" FullOffDistance_Meters="0.800000f" Active="true" AlertForImpacts="true" SilentWarningWhenClose="true" SidesImage="BoxSkin_WireframeBlue.png" TextureQuality="30">
+		<Box Name="3" Width="0.735503f" Height="0.251459f" Depth="0.279407f" FullOnDistance_Meters="0.500000f" FullOffDistance_Meters="0.800000f" Active="false" AlertForImpacts="true" SilentWarningWhenClose="true" SidesImage="BoxSkin_WireframeBlue.png" TextureQuality="30">
 			<Center HmdMatrix34="
 				0.999652f, -0.020328f, -0.016810f, 0.220795f, 
 				0.019799f, 0.999321f, -0.031045f, 0.718035f, 
