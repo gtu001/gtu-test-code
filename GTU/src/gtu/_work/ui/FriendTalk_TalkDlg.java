@@ -59,7 +59,7 @@ public class FriendTalk_TalkDlg extends JDialog {
     /**
      * Create the dialog.
      */
-    public FriendTalk_TalkDlg(MyFriendGtu001 mMyFriendGtu001) {
+    public FriendTalk_TalkDlg(final MyFriendGtu001 mMyFriendGtu001) {
         {
             this.mMyFriendGtu001 = mMyFriendGtu001;
         }
@@ -107,7 +107,7 @@ public class FriendTalk_TalkDlg extends JDialog {
                         return;
                     }
 
-                    String talkMsg = talkArea.getText();
+                    final String talkMsg = talkArea.getText();
 
                     if (mMyFriendGtu001 != null) {
                         new Thread(new Runnable() {
@@ -163,15 +163,18 @@ public class FriendTalk_TalkDlg extends JDialog {
             if (this.mMyFriendGtu001 != null) {
                 friendNameLbl.setText(this.mMyFriendGtu001.getName());
                 friendIpLbl.setText(this.mMyFriendGtu001.getIp());
+                
+                //初次update
+                updateMessageDlg();
 
-                messageSize = this.mMyFriendGtu001.getMessageLst().size();
+                this.mMyFriendGtu001.readMessageCount = this.mMyFriendGtu001.getMessageLst().size();
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
                         while (true) {
                             try {
-                                if (mMyFriendGtu001.getMessageLst().size() != messageSize) {
-                                    messageSize = mMyFriendGtu001.getMessageLst().size();
+                                if (mMyFriendGtu001.getMessageLst().size() != mMyFriendGtu001.readMessageCount) {
+                                    mMyFriendGtu001.readMessageCount = mMyFriendGtu001.getMessageLst().size();
                                     updateMessageDlg();
                                 }
                                 Thread.sleep(500);
@@ -186,7 +189,6 @@ public class FriendTalk_TalkDlg extends JDialog {
         }
     }
 
-    int messageSize = -1;
     BufferedReader in;
     PrintWriter out;
 
@@ -195,11 +197,12 @@ public class FriendTalk_TalkDlg extends JDialog {
             talkPane.setText("");
             for (MyFriendTalkGtu001 msg : this.mMyFriendGtu001.getMessageLst()) {
                 if (!msg.isMe) {
-                    JTextPaneUtil.newInstance(talkPane).append(msg.getFixMessage());
+                    SimpleAttributeSet attributes = new SimpleAttributeSet();
+                    StyleConstants.setAlignment(attributes, StyleConstants.ALIGN_LEFT);
+                    JTextPaneUtil.newInstance(talkPane).append(msg.getFixMessage(), attributes);
                 } else {
                     SimpleAttributeSet attributes = new SimpleAttributeSet();
                     StyleConstants.setAlignment(attributes, StyleConstants.ALIGN_RIGHT);
-                    attributes.addAttribute(StyleConstants.CharacterConstants.Italic, Boolean.TRUE);
                     JTextPaneUtil.newInstance(talkPane).append(msg.getFixMessage(), attributes);
                 }
             }

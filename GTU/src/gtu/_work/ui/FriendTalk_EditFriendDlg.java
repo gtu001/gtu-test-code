@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
@@ -23,6 +24,7 @@ import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
 
+import gtu.net.NetTool;
 import gtu.swing.util.JCommonUtil;
 
 public class FriendTalk_EditFriendDlg extends JDialog {
@@ -32,6 +34,7 @@ public class FriendTalk_EditFriendDlg extends JDialog {
     private JTextField friendNameText;
     private JTextField friendIPText;
     private MyFriendGtu001 mMyFriendGtu001;
+    private ActionListener okActionListener;
 
     /**
      * Launch the application.
@@ -60,9 +63,10 @@ public class FriendTalk_EditFriendDlg extends JDialog {
     /**
      * Create the dialog.
      */
-    public FriendTalk_EditFriendDlg(MyFriendGtu001 mMyFriendGtu001, ActionListener okActionListener) {
+    public FriendTalk_EditFriendDlg(MyFriendGtu001 mMyFriendGtu001, final ActionListener okActionListener) {
         {
             this.mMyFriendGtu001 = mMyFriendGtu001;
+            this.okActionListener = okActionListener;
         }
         setBounds(100, 100, 361, 217);
         getContentPane().setLayout(new BorderLayout());
@@ -132,6 +136,7 @@ public class FriendTalk_EditFriendDlg extends JDialog {
         String ip;
         String name;
 
+        int readMessageCount;
         AtomicReference<List<MyFriendTalkGtu001>> messageLst = new AtomicReference();
 
         public MyFriendGtu001() {
@@ -155,11 +160,16 @@ public class FriendTalk_EditFriendDlg extends JDialog {
         }
 
         public String toString() {
-            return name + "　 " + ip;
+            String unreadMsg = "";
+            if (messageLst.get().size() > readMessageCount) {
+                unreadMsg = "　<font color=red>" + String.valueOf(readMessageCount - messageLst.get().size()) + "</font>";
+            }
+            return "<html>" + name + "　 " + ip + unreadMsg + "</html>";
         }
 
         public String getPrefix() {
-            return "#[" + name + "|" + ip + "|" + DateFormatUtils.format(System.currentTimeMillis(), "yyyy-MM-dd HH:mm:ss.SSSSS") + "]#";
+            String ip2 = FriendTalkUI.MY_IP;
+            return "#[" + name + "|" + ip2 + "|" + DateFormatUtils.format(System.currentTimeMillis(), "yyyy-MM-dd HH:mm:ss.SSSSS") + "]#";
         }
 
         public List<MyFriendTalkGtu001> getMessageLst() {

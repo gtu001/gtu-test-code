@@ -35,13 +35,18 @@ public class MavenDenpencyJarListLoader {
         // //-----------------------------------------------------------------
         File pomFile = new File("‪D:/workstuff/gtu-test-code/GTU/pom.xml");
         File mavenDir = new File("D:/apps/apache-maven-3.3.9/bin/mvn"); //
-        
-        //File pomFile = new File("/media/gtu001/OLD_D/workstuff/workspace/gtu-test-code/GTU/pom.xml");
-        //File mavenDir = new File("/media/gtu001/OLD_D/apps/apache-maven-3.3.9/bin/mvn"); //
-        
-//        [jarfinder] AntJarFinder - mavenExe : /media/gtu001/OLD_D/apps/apache-maven-3.3.9/bin/mvn - true
-//        [jarfinder] AntJarFinder - pomFile : /media/gtu001/OLD_D/workstuff/workspace/gtu-test-code/GTU/pom.xml - true
-        
+
+        // File pomFile = new
+        // File("/media/gtu001/OLD_D/workstuff/workspace/gtu-test-code/GTU/pom.xml");
+        // File mavenDir = new
+        // File("/media/gtu001/OLD_D/apps/apache-maven-3.3.9/bin/mvn"); //
+
+        // [jarfinder] AntJarFinder - mavenExe :
+        // /media/gtu001/OLD_D/apps/apache-maven-3.3.9/bin/mvn - true
+        // [jarfinder] AntJarFinder - pomFile :
+        // /media/gtu001/OLD_D/workstuff/workspace/gtu-test-code/GTU/pom.xml -
+        // true
+
         // System.getenv("M2_HOME")
         // -----------------------------------------------------------------
         List<String> jarLst = MavenDenpencyJarListLoader.newInstance()//
@@ -91,6 +96,8 @@ public class MavenDenpencyJarListLoader {
             if (isWindows) {
                 execdo.runInBatFile(false);
                 execdo.command(rootPath);
+            } else {
+                execdo.runInBatFile(false);
             }
             execdo.command((isWindows ? "" : "sh ") + FileUtil.replaceSpecialChar(mavenExePath.getAbsolutePath()) + " dependency:build-classpath -DincludeScope=runtime");
             System.out.println("----------------------------------------");

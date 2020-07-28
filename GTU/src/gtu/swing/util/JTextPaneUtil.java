@@ -49,7 +49,7 @@ public class JTextPaneUtil {
         return success;
     }
 
-    public AtomicBoolean append(final String text, SimpleAttributeSet attrSet) {
+    public AtomicBoolean append(final String text, final SimpleAttributeSet attrSet) {
         final AtomicBoolean success = new AtomicBoolean(false);
         Runnable runnable = new Runnable() {
             public void run() {
@@ -57,7 +57,9 @@ public class JTextPaneUtil {
                     StyledDocument doc = ((JTextPane) textArea).getStyledDocument();
                     int offset = doc.getLength();
                     doc.insertString(offset, text, attrSet);
-                    doc.setCharacterAttributes(offset, StringUtils.length(text), attrSet, true);
+                    // doc.setCharacterAttributes(offset,
+                    // StringUtils.length(text), attrSet, true);
+                    doc.setParagraphAttributes(offset, StringUtils.length(text), attrSet, false);
                 } catch (Exception e) {
                     success.set(true);
                     e.printStackTrace();

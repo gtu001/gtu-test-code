@@ -13,6 +13,7 @@ import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.EventObject;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -32,6 +33,7 @@ import org.apache.commons.lang3.StringUtils;
 import gtu._work.ui.FriendTalk_EditFriendDlg.MyFriendGtu001;
 import gtu._work.ui.FriendTalk_EditFriendDlg.MyFriendTalkGtu001;
 import gtu._work.ui.JMenuBarUtil.JMenuAppender;
+import gtu.net.NetTool;
 import gtu.swing.util.HideInSystemTrayHelper;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JFrameRGBColorPanel;
@@ -59,6 +61,7 @@ public class FriendTalkUI extends JFrame {
     private JButton addFriendBtn;
     private FriendTalk_TalkDlg mFriendTalk_TalkDlg;
     private FriendTalk_EditFriendDlg mFriendTalk_EditFriendDlg;
+    public static String MY_IP;
 
     /**
      * Launch the application.
@@ -73,6 +76,7 @@ public class FriendTalkUI extends JFrame {
                     FriendTalkUI frame = new FriendTalkUI();
                     gtu.swing.util.JFrameUtil.setVisible(true, frame);
                     frame.execute(6666, System.out);
+                    frame.updateFriendList();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -152,7 +156,14 @@ public class FriendTalkUI extends JFrame {
             panel_2.add(hideInSystemTrayHelper.getToggleButton(false));
             this.applyAppMenu();
             JCommonUtil.defaultToolTipDelay();
-            this.setTitle("You Set My World On Fire");
+            // this.setTitle("You Set My World On Fire");
+
+            try {
+                MY_IP = NetTool.getLocalHostLANAddress().getHostAddress();
+                setTitle("我的IP:" + MY_IP);
+            } catch (UnknownHostException e1) {
+                e1.printStackTrace();
+            }
         }
     }
 
@@ -200,6 +211,22 @@ public class FriendTalkUI extends JFrame {
             @Override
             public void action(EventObject evt) throws Exception {
                 MouseEvent e = (MouseEvent) evt;
+
+                if (JMouseEventUtil.buttonRightClick(1, evt)) {
+                    if (mFriendTalk_EditFriendDlg != null) {
+                        mFriendTalk_EditFriendDlg.dispose();
+                    }
+                    final MyFriendGtu001 friend = (MyFriendGtu001) JListUtil.getLeadSelectionObject(friendsList);
+                    mFriendTalk_EditFriendDlg = FriendTalk_EditFriendDlg.newInstance(friend, new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            MyFriendGtu001 fnd = mFriendTalk_EditFriendDlg.getFriend();
+                            friend.setIp(fnd.getIp());
+                            friend.setName(fnd.getName());
+                        }
+                    });
+                }
+
                 if (JMouseEventUtil.buttonLeftClick(2, evt)) {
                     MyFriendGtu001 friend = (MyFriendGtu001) JListUtil.getLeadSelectionObject(friendsList);
                     if (mFriendTalk_TalkDlg != null) {
@@ -227,7 +254,22 @@ public class FriendTalkUI extends JFrame {
         return swingUtil;
     }
 
-    public void execute(int port, PrintStream serverLogOut) {
+    public void updateFriendList() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (true) {
+                    try {
+                        friendsList.repaint();
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                    }
+                }
+            }
+        }).start();
+    }
+
+    public void execute(final int port, final PrintStream serverLogOut) {
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -299,7 +341,7 @@ public class FriendTalkUI extends JFrame {
             DefaultListModel model = (DefaultListModel) friendsList.getModel();
             for (int ii = 0; ii < model.getSize(); ii++) {
                 MyFriendGtu001 fn = (MyFriendGtu001) model.getElementAt(ii);
-                if (StringUtils.equals(fn.name, name) && StringUtils.equals(fn.ip, ip)) {
+                if (StringUtils.equals(fn.ip, ip)) {
                     talkFn = fn;
                     break;
                 }
