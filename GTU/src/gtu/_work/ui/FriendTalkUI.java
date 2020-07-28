@@ -14,7 +14,9 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.Enumeration;
 import java.util.EventObject;
+import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -34,6 +36,7 @@ import gtu._work.ui.FriendTalk_EditFriendDlg.MyFriendGtu001;
 import gtu._work.ui.FriendTalk_EditFriendDlg.MyFriendTalkGtu001;
 import gtu._work.ui.JMenuBarUtil.JMenuAppender;
 import gtu.net.NetTool;
+import gtu.properties.PropertiesUtilBean;
 import gtu.swing.util.HideInSystemTrayHelper;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JFrameRGBColorPanel;
@@ -59,9 +62,15 @@ public class FriendTalkUI extends JFrame {
     private JPanel panel_6;
     private JList friendsList;
     private JButton addFriendBtn;
+    private JButton fixIPBtn;
+    private JButton encidingBtn;
+    private JButton fixMyNameBtn;
     private FriendTalk_TalkDlg mFriendTalk_TalkDlg;
     private FriendTalk_EditFriendDlg mFriendTalk_EditFriendDlg;
     public static String MY_IP;
+    public static String ENCODING = "BIG5";
+    public static String MY_NAME = "未命名";
+    private PropertiesUtilBean config = new PropertiesUtilBean(FriendTalkUI.class);
 
     /**
      * Launch the application.
@@ -102,13 +111,37 @@ public class FriendTalkUI extends JFrame {
         contentPane.add(tabbedPane, BorderLayout.CENTER);
 
         JPanel panel = new JPanel();
-        tabbedPane.addTab("New tab", null, panel, null);
+        tabbedPane.addTab("聯絡人", null, panel, null);
         panel.setLayout(new BorderLayout(0, 0));
 
         panel_3 = new JPanel();
         panel.add(panel_3, BorderLayout.NORTH);
 
-        addFriendBtn = new JButton("加入");
+        fixMyNameBtn = new JButton("MyName");
+        fixMyNameBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                swingUtil.invokeAction("fixMyNameBtn.click", e);
+            }
+        });
+        panel_3.add(fixMyNameBtn);
+
+        fixIPBtn = new JButton("MyIP");
+        fixIPBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                swingUtil.invokeAction("fixIPBtn.click", e);
+            }
+        });
+        panel_3.add(fixIPBtn);
+
+        encidingBtn = new JButton("編碼");
+        encidingBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                swingUtil.invokeAction("encidingBtn.click", e);
+            }
+        });
+        panel_3.add(encidingBtn);
+
+        addFriendBtn = new JButton("加入聯絡人");
         addFriendBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 swingUtil.invokeAction("addFriendBtn.click", e);
@@ -134,8 +167,8 @@ public class FriendTalkUI extends JFrame {
             }
         });
 
-        JPanel panel_1 = new JPanel();
-        tabbedPane.addTab("New tab", null, panel_1, null);
+        // JPanel panel_1 = new JPanel();
+        // tabbedPane.addTab("New tab", null, panel_1, null);
 
         panel_2 = new JPanel();
         tabbedPane.addTab("其他設定", null, panel_2, null);
@@ -164,6 +197,8 @@ public class FriendTalkUI extends JFrame {
             } catch (UnknownHostException e1) {
                 e1.printStackTrace();
             }
+
+            reflectInfo();
         }
     }
 
@@ -176,6 +211,45 @@ public class FriendTalkUI extends JFrame {
     private void initFriendsLst() {
         DefaultListModel model = JListUtil.createModel();
         friendsList.setModel(model);
+    }
+
+    private void storeInfo() {
+        Properties prop = config.getConfigProp();
+        prop.setProperty("IP", MY_IP);
+        prop.setProperty("NAME", MY_NAME);
+        prop.setProperty("ENCODING", ENCODING);
+        DefaultListModel model = (DefaultListModel) friendsList.getModel();
+        for (int ii = 0; ii < model.getSize(); ii++) {
+            MyFriendTalkGtu001 fnd = (MyFriendTalkGtu001) model.getElementAt(ii);
+            prop.setProperty("friend" + ii, fnd.getName() + "|" + fnd.getIp());
+        }
+        config.store();
+    }
+
+    private void reflectInfo() {
+        Properties prop = config.getConfigProp();
+        if (prop.containsKey("IP")) {
+            MY_IP = prop.getProperty("IP");
+        }
+        if (prop.containsKey("NAME")) {
+            MY_NAME = prop.getProperty("NAME");
+        }
+        if (prop.containsKey("ENCODING")) {
+            ENCODING = prop.getProperty("ENCODING");
+        }
+        DefaultListModel model = JListUtil.createModel();
+        friendsList.setModel(model);
+        for (Enumeration enu = prop.keys(); enu.hasMoreElements();) {
+            String key = (String) enu.nextElement();
+            if (key.startsWith("friend")) {
+                String strVal = prop.getProperty(key);
+                String[] arry = strVal.split("\\|", -1);
+                MyFriendTalkGtu001 fnd = new MyFriendTalkGtu001();
+                fnd.setIp(arry[1]);
+                fnd.setName(arry[0]);
+                model.addElement(fnd);
+            }
+        }
     }
 
     private void applyAllEvents() {
@@ -191,6 +265,40 @@ public class FriendTalkUI extends JFrame {
                 System.out.println("tabbedPane : " + tabbedPane.getSelectedIndex());
             }
         });
+        swingUtil.addActionHex("fixIPBtn.click", new Action() {
+            @Override
+            public void action(EventObject evt) throws Exception {
+                String ip = JCommonUtil._jOptionPane_showInputDialog("請輸入你的IP", MY_IP);
+                if (StringUtils.isNotBlank(ip) && ip.matches("[0-9\\.]+")) {
+                    MY_IP = ip;
+                    setInfo();
+                    storeInfo();
+                }
+            }
+        });
+        swingUtil.addActionHex("encidingBtn.click", new Action() {
+            @Override
+            public void action(EventObject evt) throws Exception {
+                String encoding = JCommonUtil._jOptionPane_showInputDialog("請輸入編碼", ENCODING);
+                if (StringUtils.isNotBlank(encoding)) {
+                    ENCODING = encoding;
+                    setInfo();
+                    storeInfo();
+                }
+            }
+        });
+        swingUtil.addActionHex("fixMyNameBtn.click", new Action() {
+            @Override
+            public void action(EventObject evt) throws Exception {
+                String myName = JCommonUtil._jOptionPane_showInputDialog("請輸入編碼", MY_NAME);
+                if (StringUtils.isNotBlank(myName)) {
+                    MY_NAME = myName;
+                    setInfo();
+                    storeInfo();
+                }
+            }
+        });
+
         swingUtil.addActionHex("addFriendBtn.click", new Action() {
             @Override
             public void action(EventObject evt) throws Exception {
@@ -203,6 +311,7 @@ public class FriendTalkUI extends JFrame {
                         MyFriendGtu001 fnd = mFriendTalk_EditFriendDlg.getFriend();
                         DefaultListModel model = (DefaultListModel) friendsList.getModel();
                         model.addElement(fnd);
+                        storeInfo();
                     }
                 });
             }
@@ -223,6 +332,7 @@ public class FriendTalkUI extends JFrame {
                             MyFriendGtu001 fnd = mFriendTalk_EditFriendDlg.getFriend();
                             friend.setIp(fnd.getIp());
                             friend.setName(fnd.getName());
+                            storeInfo();
                         }
                     });
                 }
@@ -236,6 +346,10 @@ public class FriendTalkUI extends JFrame {
                 }
             }
         });
+    }
+
+    private void setInfo() {
+        setTitle("你的IP:" + MY_IP + "(" + MY_NAME + ")" + ",編碼:" + ENCODING);
     }
 
     private void applyAppMenu() {
@@ -300,7 +414,7 @@ public class FriendTalkUI extends JFrame {
 
         public void run() {
             try {
-                BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream(), ENCODING));
                 PrintWriter out = new PrintWriter(socket.getOutputStream(),
                         true /* autoFlush */);
                 boolean done = false;
@@ -349,6 +463,19 @@ public class FriendTalkUI extends JFrame {
 
             if (talkFn != null) {
                 talkFn.getMessageLst().add(talk);
+            } else {
+                talkFn = new MyFriendGtu001();
+                talkFn.setName("未知");
+                talkFn.setIp(ip);
+                talkFn.getMessageLst().add(talk);
+                ((DefaultListModel) friendsList.getModel()).addElement(talkFn);
+            }
+            System.out.println("size----" + talkFn.getMessageLst().size() + "/" + talkFn.getReadMessageCount());
+
+            // 刷新UI
+            friendsList.repaint();
+            if (mFriendTalk_TalkDlg != null) {
+                mFriendTalk_TalkDlg.updateMessageDlg();
             }
         }
     }

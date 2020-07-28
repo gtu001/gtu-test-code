@@ -5,9 +5,10 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.OutputStreamWriter;
 import java.net.Socket;
 
 import javax.swing.JButton;
@@ -17,12 +18,8 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextPane;
 import javax.swing.border.EmptyBorder;
-import javax.swing.text.DefaultStyledDocument;
 import javax.swing.text.SimpleAttributeSet;
-import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
-import javax.swing.text.StyleContext;
-import javax.swing.text.StyledDocument;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -116,7 +113,7 @@ public class FriendTalk_TalkDlg extends JDialog {
                                 try {
                                     Socket s = new Socket(mMyFriendGtu001.getIp(), 6666);
                                     in = new BufferedReader(new InputStreamReader(s.getInputStream()));
-                                    out = new PrintWriter(s.getOutputStream(), true);
+                                    out = new BufferedWriter(new OutputStreamWriter(s.getOutputStream(), FriendTalkUI.ENCODING));
 
                                     if (s.isConnected()) {
                                         out.write(mMyFriendGtu001.getPrefix() + talkMsg);
@@ -126,6 +123,9 @@ public class FriendTalk_TalkDlg extends JDialog {
                                         mMyFriendGtu001.getMessageLst().add(MyFriendTalkGtu001.ofMyself(talkMsg));
 
                                         updateMessageDlg();
+
+                                        // 設定已讀
+                                        setIsAlreadyReading();
                                     }
                                     s.close();
                                 } catch (IOException e) {
@@ -140,6 +140,7 @@ public class FriendTalk_TalkDlg extends JDialog {
         }
         {
             talkPane = new JTextPane();
+            talkPane.setEditable(false);
             contentPanel.add(JCommonUtil.createScrollComponent(talkPane), BorderLayout.CENTER);
         }
         {
@@ -163,36 +164,25 @@ public class FriendTalk_TalkDlg extends JDialog {
             if (this.mMyFriendGtu001 != null) {
                 friendNameLbl.setText(this.mMyFriendGtu001.getName());
                 friendIpLbl.setText(this.mMyFriendGtu001.getIp());
-                
-                //初次update
+
+                // 初次update
                 updateMessageDlg();
 
-                this.mMyFriendGtu001.readMessageCount = this.mMyFriendGtu001.getMessageLst().size();
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        while (true) {
-                            try {
-                                if (mMyFriendGtu001.getMessageLst().size() != mMyFriendGtu001.readMessageCount) {
-                                    mMyFriendGtu001.readMessageCount = mMyFriendGtu001.getMessageLst().size();
-                                    updateMessageDlg();
-                                }
-                                Thread.sleep(500);
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }
-                }).start();
+                // 設定已讀
+                setIsAlreadyReading();
             }
             JCommonUtil.setJFrameCenter(this);
         }
     }
 
-    BufferedReader in;
-    PrintWriter out;
+    private void setIsAlreadyReading() {
+        mMyFriendGtu001.readMessageCount = mMyFriendGtu001.getMessageLst().size();
+    }
 
-    private void updateMessageDlg() {
+    BufferedReader in;
+    BufferedWriter out;
+
+    public void updateMessageDlg() {
         if (this.mMyFriendGtu001 != null) {
             talkPane.setText("");
             for (MyFriendTalkGtu001 msg : this.mMyFriendGtu001.getMessageLst()) {

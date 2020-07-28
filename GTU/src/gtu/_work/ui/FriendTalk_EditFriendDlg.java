@@ -104,10 +104,15 @@ public class FriendTalk_EditFriendDlg extends JDialog {
                 okButton.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        if (okActionListener != null) {
-                            okActionListener.actionPerformed(e);
+                        try {
+                            JCommonUtil.isBlankErrorMsg(friendIPText.getText(), "IP未填");
+                            if (okActionListener != null) {
+                                okActionListener.actionPerformed(e);
+                            }
+                            dispose();
+                        } catch (Exception ex) {
+                            JCommonUtil.handleException(ex);
                         }
-                        dispose();
                     }
                 });
             }
@@ -162,14 +167,13 @@ public class FriendTalk_EditFriendDlg extends JDialog {
         public String toString() {
             String unreadMsg = "";
             if (messageLst.get().size() > readMessageCount) {
-                unreadMsg = "　<font color=red>" + String.valueOf(readMessageCount - messageLst.get().size()) + "</font>";
+                unreadMsg = "　<font color=red>" + String.valueOf(messageLst.get().size() - readMessageCount) + "</font>";
             }
             return "<html>" + name + "　 " + ip + unreadMsg + "</html>";
         }
 
         public String getPrefix() {
-            String ip2 = FriendTalkUI.MY_IP;
-            return "#[" + name + "|" + ip2 + "|" + DateFormatUtils.format(System.currentTimeMillis(), "yyyy-MM-dd HH:mm:ss.SSSSS") + "]#";
+            return "#[" + FriendTalkUI.MY_NAME + "|" + FriendTalkUI.MY_IP + "|" + DateFormatUtils.format(System.currentTimeMillis(), "yyyy-MM-dd HH:mm:ss.SSSSS") + "]#";
         }
 
         public List<MyFriendTalkGtu001> getMessageLst() {
@@ -178,6 +182,18 @@ public class FriendTalk_EditFriendDlg extends JDialog {
 
         public void setMessageLst(List<MyFriendTalkGtu001> messageLst) {
             this.messageLst.set(messageLst);
+        }
+
+        public int getReadMessageCount() {
+            return readMessageCount;
+        }
+
+        public void setReadMessageCount(int readMessageCount) {
+            this.readMessageCount = readMessageCount;
+        }
+
+        public void setMessageLst(AtomicReference<List<MyFriendTalkGtu001>> messageLst) {
+            this.messageLst = messageLst;
         }
     }
 
