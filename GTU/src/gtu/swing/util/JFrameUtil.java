@@ -96,6 +96,10 @@ public class JFrameUtil {
     public static boolean lockInstance_delable(final File lockFile) {
         if (lockFile.exists()) {
             System.out.println("Unable to create and/or lock file: " + lockFile);
+            boolean forceOpen = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("已有存在的執行,是否要強制開啟?", "強制開啟");
+            if (forceOpen) {
+                return true;
+            }
             return false;
         }
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSSSS");
