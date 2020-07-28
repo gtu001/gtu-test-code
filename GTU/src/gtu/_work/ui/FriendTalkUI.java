@@ -220,7 +220,7 @@ public class FriendTalkUI extends JFrame {
         prop.setProperty("ENCODING", ENCODING);
         DefaultListModel model = (DefaultListModel) friendsList.getModel();
         for (int ii = 0; ii < model.getSize(); ii++) {
-            MyFriendTalkGtu001 fnd = (MyFriendTalkGtu001) model.getElementAt(ii);
+            MyFriendGtu001 fnd = (MyFriendGtu001) model.getElementAt(ii);
             prop.setProperty("friend" + ii, fnd.getName() + "|" + fnd.getIp());
         }
         config.store();
@@ -244,7 +244,7 @@ public class FriendTalkUI extends JFrame {
             if (key.startsWith("friend")) {
                 String strVal = prop.getProperty(key);
                 String[] arry = strVal.split("\\|", -1);
-                MyFriendTalkGtu001 fnd = new MyFriendTalkGtu001();
+                MyFriendGtu001 fnd = new MyFriendGtu001();
                 fnd.setIp(arry[1]);
                 fnd.setName(arry[0]);
                 model.addElement(fnd);
