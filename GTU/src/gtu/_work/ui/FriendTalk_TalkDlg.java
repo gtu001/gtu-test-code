@@ -1,8 +1,8 @@
 package gtu._work.ui;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
@@ -26,7 +26,6 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
-import javax.swing.text.StyleContext;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -292,7 +291,7 @@ public class FriendTalk_TalkDlg extends JDialog {
         mMyFriendGtu001.readMessageCount = mMyFriendGtu001.getMessageLst().size();
     }
 
-    public void updateMessageDlg() {
+    public synchronized void updateMessageDlg() {
         if (this.mMyFriendGtu001 != null) {
             talkPane.setText("");
             for (MyFriendTalkGtu001 msg : this.mMyFriendGtu001.getMessageLst()) {
@@ -300,25 +299,23 @@ public class FriendTalk_TalkDlg extends JDialog {
                 if (!msg.isMe) {
                     SimpleAttributeSet attributes = new SimpleAttributeSet();
                     StyleConstants.setAlignment(attributes, StyleConstants.ALIGN_LEFT);
+                    attributes.addAttribute(StyleConstants.Background, JColorUtil.rgb("DDDDDD"));
 
-                    StyleContext sc = StyleContext.getDefaultStyleContext();
-                    AttributeSet aset = sc.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Background, JColorUtil.rgb("EEEEEE"));
-                    aset = sc.addAttribute(aset, StyleConstants.FontFamily, "Lucida Console");
-                    aset = sc.addAttribute(aset, StyleConstants.Alignment, StyleConstants.ALIGN_JUSTIFIED);
+                    SimpleAttributeSet attributes1 = new SimpleAttributeSet();
+                    StyleConstants.setAlignment(attributes1, StyleConstants.ALIGN_LEFT);
 
-                    JTextPaneUtil.newInstance(talkPane).append(message2[0], attributes, aset);
-                    JTextPaneUtil.newInstance(talkPane).append(message2[1], attributes);
+                    JTextPaneUtil.newInstance(talkPane).append(message2[0], new AttributeSet[] { attributes }, new int[] { 1 });
+                    JTextPaneUtil.newInstance(talkPane).append(message2[1], new AttributeSet[] { attributes1 }, new int[] { 1 });
                 } else {
                     SimpleAttributeSet attributes = new SimpleAttributeSet();
                     StyleConstants.setAlignment(attributes, StyleConstants.ALIGN_RIGHT);
+                    attributes.addAttribute(StyleConstants.Background, JColorUtil.rgb("EEEEEE"));
 
-                    StyleContext sc = StyleContext.getDefaultStyleContext();
-                    AttributeSet aset = sc.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Background, JColorUtil.rgb("DDDDDD"));
-                    aset = sc.addAttribute(aset, StyleConstants.FontFamily, "Lucida Console");
-                    aset = sc.addAttribute(aset, StyleConstants.Alignment, StyleConstants.ALIGN_JUSTIFIED);
+                    SimpleAttributeSet attributes1 = new SimpleAttributeSet();
+                    StyleConstants.setAlignment(attributes1, StyleConstants.ALIGN_RIGHT);
 
-                    JTextPaneUtil.newInstance(talkPane).append(message2[0], attributes, aset);
-                    JTextPaneUtil.newInstance(talkPane).append(message2[1], attributes);
+                    JTextPaneUtil.newInstance(talkPane).append(message2[0], new AttributeSet[] { attributes }, new int[] { 1 });
+                    JTextPaneUtil.newInstance(talkPane).append(message2[1], new AttributeSet[] { attributes1 }, new int[] { 1 });
                 }
             }
         }

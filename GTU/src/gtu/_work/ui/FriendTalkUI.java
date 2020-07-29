@@ -448,7 +448,7 @@ public class FriendTalkUI extends JFrame {
                         new SocketServer_Thread(incoming).start();
                         i++;
 
-                        Thread.sleep(500);
+                        // Thread.sleep(500);
                     }
                 } catch (Exception e) {
                     serverLogOut.println("Exception in line 19 : " + e);
@@ -470,7 +470,7 @@ public class FriendTalkUI extends JFrame {
                         new SocketServer_File_Thread(incoming).start();
                         i++;
 
-                        Thread.sleep(500);
+                        // Thread.sleep(500);
                     }
                 } catch (Exception e) {
                     serverLogOut.println("Exception in line 19 : " + e);
@@ -664,18 +664,11 @@ public class FriendTalkUI extends JFrame {
                 out = new PrintWriter(socket.getOutputStream(),
                         true /* autoFlush */);
 
-                int lineCount = 0;
+                boolean isFirstLine = true;
                 StringBuffer sb = new StringBuffer();
-                for (String line = null; in.ready();) {
-                    line = in.readLine();
-                    lineCount++;
-                    if (line == null) {
-                        continue;
-                    }
-                    sb.append(StringUtils.trimToEmpty(line));
-                    if (lineCount > 4000) {
-                        break;
-                    }
+                for (String line = null; (line = in.readLine()) != null;) {
+                    sb.append((!isFirstLine ? "\n" : "") + StringUtils.trimToEmpty(line));
+                    isFirstLine = false;
                 }
 
                 String strVal = sb.toString();
