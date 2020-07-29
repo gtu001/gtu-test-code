@@ -299,23 +299,21 @@ public class FriendTalk_TalkDlg extends JDialog {
                 if (!msg.isMe) {
                     SimpleAttributeSet attributes = new SimpleAttributeSet();
                     StyleConstants.setAlignment(attributes, StyleConstants.ALIGN_LEFT);
-                    attributes.addAttribute(StyleConstants.Background, JColorUtil.rgb("DDDDDD"));
 
                     SimpleAttributeSet attributes1 = new SimpleAttributeSet();
-                    StyleConstants.setAlignment(attributes1, StyleConstants.ALIGN_LEFT);
+                    attributes1.addAttribute(StyleConstants.Background, JColorUtil.rgb("DDDDDD"));
 
-                    JTextPaneUtil.newInstance(talkPane).append(message2[0], new AttributeSet[] { attributes }, new int[] { 1 });
-                    JTextPaneUtil.newInstance(talkPane).append(message2[1], new AttributeSet[] { attributes1 }, new int[] { 1 });
+                    JTextPaneUtil.newInstance(talkPane).append(message2[0], new AttributeSet[] { attributes, attributes1 }, new int[] { 0, 1 });
+                    JTextPaneUtil.newInstance(talkPane).append(message2[1], new AttributeSet[] { attributes }, new int[] { 0 });
                 } else {
                     SimpleAttributeSet attributes = new SimpleAttributeSet();
                     StyleConstants.setAlignment(attributes, StyleConstants.ALIGN_RIGHT);
-                    attributes.addAttribute(StyleConstants.Background, JColorUtil.rgb("EEEEEE"));
 
                     SimpleAttributeSet attributes1 = new SimpleAttributeSet();
-                    StyleConstants.setAlignment(attributes1, StyleConstants.ALIGN_RIGHT);
+                    attributes1.addAttribute(StyleConstants.Background, JColorUtil.rgb("EEEEEE"));
 
-                    JTextPaneUtil.newInstance(talkPane).append(message2[0], new AttributeSet[] { attributes }, new int[] { 1 });
-                    JTextPaneUtil.newInstance(talkPane).append(message2[1], new AttributeSet[] { attributes1 }, new int[] { 1 });
+                    JTextPaneUtil.newInstance(talkPane).append(message2[0], new AttributeSet[] { attributes, attributes1 }, new int[] { 0, 1 });
+                    JTextPaneUtil.newInstance(talkPane).append(message2[1], new AttributeSet[] { attributes }, new int[] { 0 });
                 }
             }
         }
