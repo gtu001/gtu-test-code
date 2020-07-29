@@ -3,20 +3,31 @@ package gtu._work.ui;
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
+import java.awt.TrayIcon.MessageType;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.io.PrintWriter;
+import java.math.BigDecimal;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Enumeration;
 import java.util.EventObject;
 import java.util.Properties;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -30,12 +41,17 @@ import javax.swing.JTabbedPane;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeListener;
 
+import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.StringUtils;
 
+import gtu._work.ui.FriendTalk_EditFriendDlg.MyFileAcceptGtu001;
 import gtu._work.ui.FriendTalk_EditFriendDlg.MyFriendGtu001;
 import gtu._work.ui.FriendTalk_EditFriendDlg.MyFriendTalkGtu001;
 import gtu._work.ui.JMenuBarUtil.JMenuAppender;
+import gtu.file.FileUtil;
+import gtu.log.Logger2File;
 import gtu.net.NetTool;
+import gtu.properties.PropertiesUtil;
 import gtu.properties.PropertiesUtilBean;
 import gtu.swing.util.HideInSystemTrayHelper;
 import gtu.swing.util.JCommonUtil;
@@ -71,6 +87,9 @@ public class FriendTalkUI extends JFrame {
     public static String ENCODING = "BIG5";
     public static String MY_NAME = "未命名";
     private PropertiesUtilBean config = new PropertiesUtilBean(FriendTalkUI.class);
+    private static Logger2File logger = new Logger2File(PropertiesUtil.getJarCurrentPath(FriendTalkUI.class).getAbsolutePath(), "logger.txt");
+    public static AtomicReference<MyFileAcceptGtu001> sendFile = new AtomicReference<MyFileAcceptGtu001>();
+    public static AtomicReference<MyFileAcceptGtu001> acceptFile = new AtomicReference<MyFileAcceptGtu001>();
 
     /**
      * Launch the application.
@@ -85,6 +104,7 @@ public class FriendTalkUI extends JFrame {
                     FriendTalkUI frame = new FriendTalkUI();
                     gtu.swing.util.JFrameUtil.setVisible(true, frame);
                     frame.execute(6666, System.out);
+                    frame.execute_File(6667, System.out);
                     frame.updateFriendList();
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -199,6 +219,7 @@ public class FriendTalkUI extends JFrame {
             }
 
             reflectInfo();
+            setInfo();
         }
     }
 
@@ -252,6 +273,37 @@ public class FriendTalkUI extends JFrame {
         }
     }
 
+    private ActionListener delUserActionListener = new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            MyFriendGtu001 fnd = mFriendTalk_EditFriendDlg.getFriend();
+            boolean delConfirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("是否要刪除:" + fnd.getName() + " " + fnd.getIp(), "刪除USER");
+            if (!delConfirm) {
+                return;
+            }
+            DefaultListModel model = (DefaultListModel) friendsList.getModel();
+            for (int ii = 0; ii < model.getSize(); ii++) {
+                MyFriendGtu001 fn1 = (MyFriendGtu001) model.getElementAt(ii);
+                if (StringUtils.equals(fn1.getIp(), fnd.getIp()) && StringUtils.equals(fn1.getName(), fnd.getName())) {
+                    model.removeElementAt(ii);
+                    ii--;
+                }
+            }
+            Properties prop = config.getConfigProp();
+            for (Enumeration enu = prop.keys(); enu.hasMoreElements();) {
+                String key = (String) enu.nextElement();
+                if (key.startsWith("friend")) {
+                    String strVal = prop.getProperty(key);
+                    String[] arry = strVal.split("\\|", -1);
+                    if (StringUtils.equals(arry[0], fnd.getName()) && StringUtils.equals(arry[1], fnd.getIp())) {
+                        prop.remove(key);
+                    }
+                }
+            }
+            config.store();
+        }
+    };
+
     private void applyAllEvents() {
         swingUtil.addActionHex(ActionDefine.TEST_DEFAULT_EVENT.name(), new Action() {
             @Override
@@ -290,7 +342,7 @@ public class FriendTalkUI extends JFrame {
         swingUtil.addActionHex("fixMyNameBtn.click", new Action() {
             @Override
             public void action(EventObject evt) throws Exception {
-                String myName = JCommonUtil._jOptionPane_showInputDialog("請輸入編碼", MY_NAME);
+                String myName = JCommonUtil._jOptionPane_showInputDialog("請輸入姓名", MY_NAME);
                 if (StringUtils.isNotBlank(myName)) {
                     MY_NAME = myName;
                     setInfo();
@@ -313,7 +365,7 @@ public class FriendTalkUI extends JFrame {
                         model.addElement(fnd);
                         storeInfo();
                     }
-                });
+                }, delUserActionListener);
             }
         });
         swingUtil.addActionHex("friendsList.click", new Action() {
@@ -334,7 +386,7 @@ public class FriendTalkUI extends JFrame {
                             friend.setName(fnd.getName());
                             storeInfo();
                         }
-                    });
+                    }, delUserActionListener);
                 }
 
                 if (JMouseEventUtil.buttonLeftClick(2, evt)) {
@@ -405,17 +457,210 @@ public class FriendTalkUI extends JFrame {
         }).start();
     }
 
-    private class SocketServer_Thread extends Thread {
+    public void execute_File(final int port, final PrintStream serverLogOut) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                int i = 1;
+                try {
+                    ServerSocket s = new ServerSocket(port);
+                    for (;;) {
+                        Socket incoming = s.accept();
+                        System.out.println("<------------------ accept file");
+                        new SocketServer_File_Thread(incoming).start();
+                        i++;
+
+                        Thread.sleep(500);
+                    }
+                } catch (Exception e) {
+                    serverLogOut.println("Exception in line 19 : " + e);
+                }
+            }
+        }).start();
+    }
+
+    private class SocketServer_File_Thread extends Thread {
         private Socket socket;
 
-        public SocketServer_Thread(Socket socket) {
+        public SocketServer_File_Thread(Socket socket) {
             this.socket = socket;
         }
 
         public void run() {
             try {
-                BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream(), ENCODING));
-                PrintWriter out = new PrintWriter(socket.getOutputStream(),
+                boolean startReceiveFile = false;
+                if (acceptFile.get() != null) {
+                    // 二十分鐘內接受
+                    if ((System.currentTimeMillis() - acceptFile.get().getApproveTime()) < 20 * 60 * 1000) {
+                        startReceiveFile = true;
+                    }
+                }
+
+                if (startReceiveFile) {
+                    BufferedInputStream buffIn = new BufferedInputStream(socket.getInputStream());
+                    BufferedOutputStream buffOut = new BufferedOutputStream(new FileOutputStream(new File(FileUtil.DESKTOP_PATH, acceptFile.get().getFileName())));
+                    byte[] arr = new byte[1024 * 1024];
+                    int available = -1;
+                    while ((available = buffIn.read(arr)) > 0) {
+                        buffOut.write(arr, 0, available);
+                    }
+                    buffOut.flush();
+                    buffOut.close();
+                }
+            } catch (Exception e) {
+                JCommonUtil.handleException(e);
+            }
+        }
+    }
+
+    long updateTitleTime = 0;
+
+    private void setTransferUpdateTitle(long transferSize, long fileLength) {
+        BigDecimal t1 = new BigDecimal(transferSize);
+        BigDecimal f1 = new BigDecimal(fileLength);
+        BigDecimal val = t1.divide(f1, 2, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100));
+        String updateTitleMessage = "傳檔進度 : " + val + "%";
+        System.out.println(updateTitleMessage);
+        if ((System.currentTimeMillis() - updateTitleTime) > 1000) {
+            setTitle(updateTitleMessage);
+            updateTitleTime = System.currentTimeMillis();
+        }
+    }
+
+    private void sendRealFile() {
+        if (FriendTalkUI.sendFile.get() == null) {
+            System.out.println("發送檔案紀錄為空!");
+            return;
+        } else {
+            System.out.println("發送檔案紀錄 : " + ReflectionToStringBuilder.toString(FriendTalkUI.sendFile.get()));
+        }
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    MyFileAcceptGtu001 sendFile = FriendTalkUI.sendFile.get();
+                    long fileLength = sendFile.getFileLength();
+                    Socket s = new Socket(sendFile.getAcceptIp(), 6667);
+                    if (s.isConnected()) {
+                        BufferedInputStream buffIn = null;
+                        BufferedOutputStream buffOut = null;
+                        try {
+                            buffIn = new BufferedInputStream(new FileInputStream(sendFile.getFile()));
+                            buffOut = new BufferedOutputStream(s.getOutputStream());
+                            byte[] arr = new byte[1024 * 1024];
+                            int available = -1;
+
+                            long transferSize = 0;
+
+                            while ((available = buffIn.read(arr)) > 0) {
+                                buffOut.write(arr, 0, available);
+                                transferSize += available;
+
+                                setTransferUpdateTitle(transferSize, fileLength);
+                            }
+                            buffOut.flush();
+                        } catch (Exception ex) {
+                            JCommonUtil.handleException(ex);
+                        } finally {
+                            buffOut.close();
+                        }
+                    }
+                    s.close();
+                } catch (Exception ex) {
+                    // JTextPaneUtil.newInstance(talkPane).append("ERROR : " +
+                    // ex);
+                    ex.printStackTrace();
+                }
+            }
+        }).start();
+    }
+
+    public void sendFileReceiverSendBack(final boolean isAccept, final MyFileAcceptGtu001 sendMsg) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                BufferedReader in = null;
+                BufferedWriter out = null;
+                try {
+                    Socket s1 = new Socket(sendMsg.getSendIp(), 6666);
+                    in = new BufferedReader(new InputStreamReader(s1.getInputStream()));
+                    out = new BufferedWriter(new OutputStreamWriter(s1.getOutputStream(), FriendTalkUI.ENCODING));
+
+                    if (s1.isConnected()) {
+                        MyFriendGtu001 sender = new MyFriendGtu001();
+                        sender.setIp(sendMsg.getSendIp());
+                        sender.setName("SENDER");
+
+                        sendMsg.setIsAccept(isAccept);
+                        sendMsg.setApproveTime(System.currentTimeMillis());
+                        String fileMsg = sendMsg.getSendMessage();
+                        out.write(sender.getPrefix() + fileMsg);
+                        out.flush();
+
+                        logger.debug("我:" + fileMsg);
+                    }
+                    s1.close();
+                } catch (IOException e) {
+                    // JTextPaneUtil.newInstance(talkPane).append("ERROR : "
+                    // + e);
+                    e.printStackTrace();
+                } finally {
+                    try {
+                        in.close();
+                    } catch (IOException e) {
+                    }
+                    try {
+                        out.close();
+                    } catch (IOException e) {
+                    }
+                }
+            }
+        }).start();
+    }
+
+    private class SocketServer_Thread extends Thread {
+        private Socket socket;
+
+        public SocketServer_Thread(final Socket socket) {
+            this.socket = socket;
+        }
+
+        private boolean isProcessFile(final String strVal) {
+            MyFileAcceptGtu001 sendMsg = MyFileAcceptGtu001.ofSendMessage(strVal);
+            if (sendMsg != null) {
+                if (sendMsg.getIsAccept() == null) {
+                    sendMsg.setApproveTime(System.currentTimeMillis());
+                    boolean isAcceptFile = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption(//
+                            "發送端 :" + sendMsg.getSendIp() + //
+                                    ", 傳送檔案 : " + sendMsg.getFileName() + //
+                                    ", 大小 : " + FileUtil.getSizeDescription(sendMsg.getFileLength()) + //
+                                    " 是否接受?",
+                            "傳送檔案");
+                    acceptFile.set(sendMsg);
+                    sendFileReceiverSendBack(isAcceptFile, acceptFile.get());
+                    return true;
+                } else if (sendMsg.getIsAccept() == true) {
+                    if (StringUtils.equals(sendMsg.getFileName(), FriendTalkUI.sendFile.get().getFileName())) {
+                        System.out.println("SEND-RECEIVE 檔名相同 : " + sendMsg.getFileName());
+                        sendRealFile();
+                    } else {
+                        System.out.println("SEND-RECEIVE 檔名不相同 : " + sendMsg.getFileName() + " / " + FriendTalkUI.sendFile.get().getFileName());
+                    }
+                    return true;
+                } else if (sendMsg.getIsAccept() == false) {
+                    System.out.println("SEND-RECEIVE 檔案傳送駁回");
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public void run() {
+            BufferedReader in = null;
+            PrintWriter out = null;
+            try {
+                in = new BufferedReader(new InputStreamReader(socket.getInputStream(), ENCODING));
+                out = new PrintWriter(socket.getOutputStream(),
                         true /* autoFlush */);
                 boolean done = false;
                 while (!done) {
@@ -424,12 +669,28 @@ public class FriendTalkUI extends JFrame {
                         done = true;
                     } else {
                         System.out.println(">>>>" + strVal);
-                        processFriendMessage(strVal);
                         out.println(strVal);
+
+                        boolean isIgnoreAfter = isProcessFile(strVal);
+                        if (isIgnoreAfter) {
+                            continue;
+                        }
+
+                        // 處理對話訊息
+                        processFriendMessage(strVal);
                     }
                 }
             } catch (Exception e) {
                 JCommonUtil.handleException(e);
+            } finally {
+                try {
+                    in.close();
+                } catch (Exception e) {
+                }
+                try {
+                    out.close();
+                } catch (Exception e) {
+                }
             }
         }
     }
@@ -461,16 +722,25 @@ public class FriendTalkUI extends JFrame {
                 }
             }
 
+            String youAssignName = "";
             if (talkFn != null) {
                 talkFn.getMessageLst().add(talk);
+                youAssignName = talkFn.getName();
             } else {
                 talkFn = new MyFriendGtu001();
                 talkFn.setName("未知");
                 talkFn.setIp(ip);
                 talkFn.getMessageLst().add(talk);
                 ((DefaultListModel) friendsList.getModel()).addElement(talkFn);
+                youAssignName = "未知";
             }
             System.out.println("size----" + talkFn.getMessageLst().size() + "/" + talkFn.getReadMessageCount());
+
+            // 送出右下角訊息
+            hideInSystemTrayHelper.displayMessage(youAssignName + "傳送了訊息!", youAssignName + ":" + message, MessageType.INFO);
+
+            // log
+            logger.debug(youAssignName + ":" + message);
 
             // 刷新UI
             friendsList.repaint();

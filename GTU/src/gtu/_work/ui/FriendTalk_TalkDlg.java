@@ -4,12 +4,19 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -22,9 +29,12 @@ import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 
+import gtu._work.ui.FriendTalk_EditFriendDlg.MyFileAcceptGtu001;
 import gtu._work.ui.FriendTalk_EditFriendDlg.MyFriendGtu001;
 import gtu._work.ui.FriendTalk_EditFriendDlg.MyFriendTalkGtu001;
+import gtu.log.Logger2File;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JTextPaneUtil;
 
@@ -38,6 +48,7 @@ public class FriendTalk_TalkDlg extends JDialog {
     private JTextArea talkArea;
     private MyFriendGtu001 mMyFriendGtu001;
     private JButton sendBtn;
+    private static Logger2File logger = Logger2File.getLogger();
 
     /**
      * Launch the application.
@@ -93,47 +104,27 @@ public class FriendTalk_TalkDlg extends JDialog {
             talkArea = new JTextArea();
             sendBtn = new JButton("送出");
 
-            panel.add(JCommonUtil.createScrollComponent(talkArea), BorderLayout.CENTER);
-            panel.add(sendBtn, BorderLayout.EAST);
-
             sendBtn.addActionListener(new ActionListener() {
 
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    if (StringUtils.isBlank(talkArea.getText())) {
-                        return;
-                    }
+                    sendMessage();
+                }
+            });
 
-                    final String talkMsg = talkArea.getText();
+            panel.add(JCommonUtil.createScrollComponent(talkArea), BorderLayout.CENTER);
+            panel.add(sendBtn, BorderLayout.EAST);
 
-                    if (mMyFriendGtu001 != null) {
-                        new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                try {
-                                    Socket s = new Socket(mMyFriendGtu001.getIp(), 6666);
-                                    in = new BufferedReader(new InputStreamReader(s.getInputStream()));
-                                    out = new BufferedWriter(new OutputStreamWriter(s.getOutputStream(), FriendTalkUI.ENCODING));
+            talkArea.addKeyListener(new KeyAdapter() {
 
-                                    if (s.isConnected()) {
-                                        out.write(mMyFriendGtu001.getPrefix() + talkMsg);
-                                        out.flush();
-                                        talkArea.setText("");
+                long latestClickEnter = -1;
 
-                                        mMyFriendGtu001.getMessageLst().add(MyFriendTalkGtu001.ofMyself(talkMsg));
-
-                                        updateMessageDlg();
-
-                                        // 設定已讀
-                                        setIsAlreadyReading();
-                                    }
-                                    s.close();
-                                } catch (IOException e) {
-                                    JTextPaneUtil.newInstance(talkPane).append("Exception in line 52 : " + e);
-                                    e.printStackTrace();
-                                }
-                            }
-                        }).start();
+                @Override
+                public void keyPressed(KeyEvent e) {
+                    if (e.getKeyCode() == KeyEvent.VK_ENTER && (System.currentTimeMillis() - latestClickEnter) < 1500) {
+                        sendMessage();
+                    } else if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                        latestClickEnter = System.currentTimeMillis();
                     }
                 }
             });
@@ -141,6 +132,15 @@ public class FriendTalk_TalkDlg extends JDialog {
         {
             talkPane = new JTextPane();
             talkPane.setEditable(false);
+            JCommonUtil.applyDropFiles(talkPane, new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    List<File> fileLst = (List<File>) e.getSource();
+                    if (!fileLst.isEmpty()) {
+                        sendFile(fileLst.get(0));
+                    }
+                }
+            });
             contentPanel.add(JCommonUtil.createScrollComponent(talkPane), BorderLayout.CENTER);
         }
         {
@@ -175,12 +175,122 @@ public class FriendTalk_TalkDlg extends JDialog {
         }
     }
 
+    private void sendFile(final File file) {
+        if (file == null || !file.exists()) {
+            JCommonUtil._jOptionPane_showMessageDialog_error("檔案有問題!");
+            return;
+        }
+
+        if ((file.length() / (1024 * 1024)) > 20) {
+            JCommonUtil._jOptionPane_showMessageDialog_error("檔案必須小於20mb");
+            return;
+        }
+
+        if (mMyFriendGtu001 != null) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    BufferedReader in = null;
+                    BufferedWriter out = null;
+                    try {
+                        Socket s1 = new Socket(mMyFriendGtu001.getIp(), 6666);
+                        in = new BufferedReader(new InputStreamReader(s1.getInputStream()));
+                        out = new BufferedWriter(new OutputStreamWriter(s1.getOutputStream(), FriendTalkUI.ENCODING));
+
+                        if (s1.isConnected()) {
+                            MyFileAcceptGtu001 sendFile = new MyFileAcceptGtu001();
+                            sendFile.setFileName(file.getName());
+                            sendFile.setFileLength(file.length());
+                            sendFile.setFile(file);
+                            sendFile.setSendIp(FriendTalkUI.MY_IP);
+                            sendFile.setAcceptIp(mMyFriendGtu001.getIp());
+                            FriendTalkUI.sendFile.set(sendFile);
+
+                            String fileMsg = sendFile.getSendMessage();
+                            out.write(mMyFriendGtu001.getPrefix() + fileMsg);
+                            out.flush();
+                            talkArea.setText("");
+
+                            mMyFriendGtu001.getMessageLst().add(MyFriendTalkGtu001.ofMyself(fileMsg));
+
+                            logger.debug("我:" + fileMsg);
+
+                            updateMessageDlg();
+
+                            // 設定已讀
+                            setIsAlreadyReading();
+                        }
+                        s1.close();
+                    } catch (IOException e) {
+                        JTextPaneUtil.newInstance(talkPane).append("ERROR : " + e);
+                        e.printStackTrace();
+                    } finally {
+                        try {
+                            in.close();
+                        } catch (IOException e) {
+                        }
+                        try {
+                            out.close();
+                        } catch (IOException e) {
+                        }
+                    }
+                }
+            }).start();
+        }
+    }
+
+    private void sendMessage() {
+        if (StringUtils.isBlank(talkArea.getText())) {
+            return;
+        }
+        final String talkMsg = talkArea.getText();
+        if (mMyFriendGtu001 != null) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    BufferedReader in = null;
+                    BufferedWriter out = null;
+                    try {
+                        Socket s = new Socket(mMyFriendGtu001.getIp(), 6666);
+                        in = new BufferedReader(new InputStreamReader(s.getInputStream()));
+                        out = new BufferedWriter(new OutputStreamWriter(s.getOutputStream(), FriendTalkUI.ENCODING));
+
+                        if (s.isConnected()) {
+                            out.write(mMyFriendGtu001.getPrefix() + talkMsg);
+                            out.flush();
+                            talkArea.setText("");
+
+                            mMyFriendGtu001.getMessageLst().add(MyFriendTalkGtu001.ofMyself(talkMsg));
+
+                            logger.debug("我:" + talkMsg);
+
+                            updateMessageDlg();
+
+                            // 設定已讀
+                            setIsAlreadyReading();
+                        }
+                        s.close();
+                    } catch (IOException e) {
+                        JTextPaneUtil.newInstance(talkPane).append("連線失敗 : " + e.getMessage());
+                        e.printStackTrace();
+                    } finally {
+                        try {
+                            in.close();
+                        } catch (IOException e) {
+                        }
+                        try {
+                            out.close();
+                        } catch (IOException e) {
+                        }
+                    }
+                }
+            }).start();
+        }
+    }
+
     private void setIsAlreadyReading() {
         mMyFriendGtu001.readMessageCount = mMyFriendGtu001.getMessageLst().size();
     }
-
-    BufferedReader in;
-    BufferedWriter out;
 
     public void updateMessageDlg() {
         if (this.mMyFriendGtu001 != null) {

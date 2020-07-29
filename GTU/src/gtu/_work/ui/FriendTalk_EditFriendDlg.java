@@ -4,10 +4,12 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.net.UnknownHostException;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -24,7 +26,6 @@ import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
 
-import gtu.net.NetTool;
 import gtu.swing.util.JCommonUtil;
 
 public class FriendTalk_EditFriendDlg extends JDialog {
@@ -35,13 +36,14 @@ public class FriendTalk_EditFriendDlg extends JDialog {
     private JTextField friendIPText;
     private MyFriendGtu001 mMyFriendGtu001;
     private ActionListener okActionListener;
+    private ActionListener deleteActionListener;
 
     /**
      * Launch the application.
      */
-    public static FriendTalk_EditFriendDlg newInstance(MyFriendGtu001 mMyFriendGtu001, ActionListener okActionListener) {
+    public static FriendTalk_EditFriendDlg newInstance(MyFriendGtu001 mMyFriendGtu001, ActionListener okActionListener, final ActionListener deleteActionListener) {
         try {
-            FriendTalk_EditFriendDlg dialog = new FriendTalk_EditFriendDlg(mMyFriendGtu001, okActionListener);
+            FriendTalk_EditFriendDlg dialog = new FriendTalk_EditFriendDlg(mMyFriendGtu001, okActionListener, deleteActionListener);
             dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
             dialog.setVisible(true);
             return dialog;
@@ -63,10 +65,11 @@ public class FriendTalk_EditFriendDlg extends JDialog {
     /**
      * Create the dialog.
      */
-    public FriendTalk_EditFriendDlg(MyFriendGtu001 mMyFriendGtu001, final ActionListener okActionListener) {
+    public FriendTalk_EditFriendDlg(MyFriendGtu001 mMyFriendGtu001, final ActionListener okActionListener, final ActionListener deleteActionListener) {
         {
             this.mMyFriendGtu001 = mMyFriendGtu001;
             this.okActionListener = okActionListener;
+            this.deleteActionListener = deleteActionListener;
         }
         setBounds(100, 100, 361, 217);
         getContentPane().setLayout(new BorderLayout());
@@ -97,7 +100,19 @@ public class FriendTalk_EditFriendDlg extends JDialog {
             buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
             getContentPane().add(buttonPane, BorderLayout.SOUTH);
             {
-                JButton okButton = new JButton("OK");
+                JButton deleteBtn = new JButton("刪除聯絡人");
+                deleteBtn.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        if (deleteActionListener != null) {
+                            deleteActionListener.actionPerformed(e);
+                        }
+                    }
+                });
+                deleteBtn.setActionCommand("OK");
+                buttonPane.add(deleteBtn);
+            }
+            {
+                JButton okButton = new JButton("確定");
                 okButton.setActionCommand("OK");
                 buttonPane.add(okButton);
                 getRootPane().setDefaultButton(okButton);
@@ -117,7 +132,7 @@ public class FriendTalk_EditFriendDlg extends JDialog {
                 });
             }
             {
-                JButton cancelButton = new JButton("Cancel");
+                JButton cancelButton = new JButton("取消");
                 cancelButton.setActionCommand("Cancel");
                 buttonPane.add(cancelButton);
                 cancelButton.addActionListener(new ActionListener() {
@@ -256,6 +271,105 @@ public class FriendTalk_EditFriendDlg extends JDialog {
 
         public void setMe(boolean isMe) {
             this.isMe = isMe;
+        }
+    }
+
+    /**
+     * @author wistronits
+     *
+     */
+    public static class MyFileAcceptGtu001 {
+        String fileName;
+        Boolean isAccept;
+        long approveTime;
+        long fileLength;
+        File file;
+        String acceptIp;
+        String sendIp;
+
+        public String getSendMessage() {
+            String acceptStr = "NA";
+            if (isAccept != null) {
+                acceptStr = isAccept ? "Y" : "N";
+            }
+            return "#[file:" + fileLength + "|" + sendIp + "|" + acceptStr + "|" + fileName + "]#";
+        }
+
+        public static MyFileAcceptGtu001 ofSendMessage(String sendMessage) {
+            MyFileAcceptGtu001 f = new MyFileAcceptGtu001();
+            Pattern ptn = Pattern.compile("\\#\\[file\\:(\\d+)\\|([\\d\\.]+)\\|(Y|N|NA)\\|(.*?)\\]\\#");
+            Matcher mth = ptn.matcher(sendMessage);
+            if (mth.find()) {
+                f.fileLength = Long.parseLong(mth.group(1));
+                f.sendIp = mth.group(2);
+                f.fileName = mth.group(4);
+                String acceptStr = mth.group(3);
+                if (StringUtils.equals(acceptStr, "NA")) {
+                    f.isAccept = null;
+                } else if (StringUtils.equals(acceptStr, "Y")) {
+                    f.isAccept = true;
+                } else if (StringUtils.equals(acceptStr, "N")) {
+                    f.isAccept = false;
+                }
+                return f;
+            }
+            return null;
+        }
+
+        public String getFileName() {
+            return fileName;
+        }
+
+        public void setFileName(String fileName) {
+            this.fileName = fileName;
+        }
+
+        public Boolean getIsAccept() {
+            return isAccept;
+        }
+
+        public void setIsAccept(Boolean isAccept) {
+            this.isAccept = isAccept;
+        }
+
+        public long getApproveTime() {
+            return approveTime;
+        }
+
+        public void setApproveTime(long approveTime) {
+            this.approveTime = approveTime;
+        }
+
+        public long getFileLength() {
+            return fileLength;
+        }
+
+        public void setFileLength(long fileLength) {
+            this.fileLength = fileLength;
+        }
+
+        public File getFile() {
+            return file;
+        }
+
+        public void setFile(File file) {
+            this.file = file;
+        }
+
+        public String getAcceptIp() {
+            return acceptIp;
+        }
+
+        public void setAcceptIp(String acceptIp) {
+            this.acceptIp = acceptIp;
+        }
+
+        public String getSendIp() {
+            return sendIp;
+        }
+
+        public void setSendIp(String sendIp) {
+            this.sendIp = sendIp;
         }
     }
 }
