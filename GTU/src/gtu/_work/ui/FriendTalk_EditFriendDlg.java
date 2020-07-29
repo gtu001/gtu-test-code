@@ -229,8 +229,10 @@ public class FriendTalk_EditFriendDlg extends JDialog {
             return talk;
         }
 
-        public String getFixMessage() {
-            return name + "(" + ip + ")[" + time + "] \n" + message + "\n";
+        public String[] getFixMessage() {
+            String prefix = name + "(" + ip + ")[" + time + "] \n";
+            String message2 = message + "\n\n";
+            return new String[] { prefix, message2 };
         }
 
         public String getIp() {

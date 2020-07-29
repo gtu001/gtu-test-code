@@ -87,7 +87,7 @@ public class FriendTalkUI extends JFrame {
     public static String ENCODING = "BIG5";
     public static String MY_NAME = "未命名";
     private PropertiesUtilBean config = new PropertiesUtilBean(FriendTalkUI.class);
-    private static Logger2File logger = new Logger2File(PropertiesUtil.getJarCurrentPath(FriendTalkUI.class).getAbsolutePath(), "logger.txt");
+    public static Logger2File logger = new Logger2File(PropertiesUtil.getJarCurrentPath(FriendTalkUI.class).getAbsolutePath(), FriendTalkUI.class.getSimpleName());
     public static AtomicReference<MyFileAcceptGtu001> sendFile = new AtomicReference<MyFileAcceptGtu001>();
     public static AtomicReference<MyFileAcceptGtu001> acceptFile = new AtomicReference<MyFileAcceptGtu001>();
 
@@ -563,6 +563,7 @@ public class FriendTalkUI extends JFrame {
                             JCommonUtil.handleException(ex);
                         } finally {
                             buffOut.close();
+                            JCommonUtil._jOptionPane_showMessageDialog_info("檔案下載完成:" + sendFile.getFileName());
                         }
                     }
                     s.close();
@@ -662,24 +663,33 @@ public class FriendTalkUI extends JFrame {
                 in = new BufferedReader(new InputStreamReader(socket.getInputStream(), ENCODING));
                 out = new PrintWriter(socket.getOutputStream(),
                         true /* autoFlush */);
-                boolean done = false;
-                while (!done) {
-                    String strVal = in.readLine();
-                    if (strVal == null) {
-                        done = true;
-                    } else {
-                        System.out.println(">>>>" + strVal);
-                        out.println(strVal);
 
-                        boolean isIgnoreAfter = isProcessFile(strVal);
-                        if (isIgnoreAfter) {
-                            continue;
-                        }
-
-                        // 處理對話訊息
-                        processFriendMessage(strVal);
+                int lineCount = 0;
+                StringBuffer sb = new StringBuffer();
+                for (String line = null; in.ready();) {
+                    line = in.readLine();
+                    lineCount++;
+                    if (line == null) {
+                        continue;
+                    }
+                    sb.append(StringUtils.trimToEmpty(line));
+                    if (lineCount > 4000) {
+                        break;
                     }
                 }
+
+                String strVal = sb.toString();
+
+                System.out.println(">>>>" + strVal);
+                out.println(strVal);
+
+                boolean isIgnoreAfter = isProcessFile(strVal);
+                if (isIgnoreAfter) {
+                    return;
+                }
+
+                // 處理對話訊息
+                processFriendMessage(strVal);
             } catch (Exception e) {
                 JCommonUtil.handleException(e);
             } finally {
@@ -737,7 +747,10 @@ public class FriendTalkUI extends JFrame {
             System.out.println("size----" + talkFn.getMessageLst().size() + "/" + talkFn.getReadMessageCount());
 
             // 送出右下角訊息
-            hideInSystemTrayHelper.displayMessage(youAssignName + "傳送了訊息!", youAssignName + ":" + message, MessageType.INFO);
+            if (mFriendTalk_TalkDlg != null && !mFriendTalk_TalkDlg.isFocus()) {
+                hideInSystemTrayHelper.displayMessage(youAssignName + "傳送了訊息!", youAssignName + ":" + message, MessageType.INFO);
+                mFriendTalk_TalkDlg.setIsAlreadyReading();
+            }
 
             // log
             logger.debug(youAssignName + ":" + message);

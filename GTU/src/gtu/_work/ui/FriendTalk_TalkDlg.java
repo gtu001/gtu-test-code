@@ -1,17 +1,15 @@
 package gtu._work.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -25,16 +23,18 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextPane;
 import javax.swing.border.EmptyBorder;
+import javax.swing.text.AttributeSet;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
+import javax.swing.text.StyleContext;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 
 import gtu._work.ui.FriendTalk_EditFriendDlg.MyFileAcceptGtu001;
 import gtu._work.ui.FriendTalk_EditFriendDlg.MyFriendGtu001;
 import gtu._work.ui.FriendTalk_EditFriendDlg.MyFriendTalkGtu001;
 import gtu.log.Logger2File;
+import gtu.swing.util.JColorUtil;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JTextPaneUtil;
 
@@ -48,7 +48,7 @@ public class FriendTalk_TalkDlg extends JDialog {
     private JTextArea talkArea;
     private MyFriendGtu001 mMyFriendGtu001;
     private JButton sendBtn;
-    private static Logger2File logger = Logger2File.getLogger();
+    private Logger2File logger = FriendTalkUI.logger;
 
     /**
      * Launch the application.
@@ -121,7 +121,7 @@ public class FriendTalk_TalkDlg extends JDialog {
 
                 @Override
                 public void keyPressed(KeyEvent e) {
-                    if (e.getKeyCode() == KeyEvent.VK_ENTER && (System.currentTimeMillis() - latestClickEnter) < 1500) {
+                    if (e.getKeyCode() == KeyEvent.VK_ENTER && (System.currentTimeMillis() - latestClickEnter) < 800) {
                         sendMessage();
                     } else if (e.getKeyCode() == KeyEvent.VK_ENTER) {
                         latestClickEnter = System.currentTimeMillis();
@@ -276,11 +276,11 @@ public class FriendTalk_TalkDlg extends JDialog {
                     } finally {
                         try {
                             in.close();
-                        } catch (IOException e) {
+                        } catch (Exception e) {
                         }
                         try {
                             out.close();
-                        } catch (IOException e) {
+                        } catch (Exception e) {
                         }
                     }
                 }
@@ -288,7 +288,7 @@ public class FriendTalk_TalkDlg extends JDialog {
         }
     }
 
-    private void setIsAlreadyReading() {
+    public void setIsAlreadyReading() {
         mMyFriendGtu001.readMessageCount = mMyFriendGtu001.getMessageLst().size();
     }
 
@@ -296,16 +296,40 @@ public class FriendTalk_TalkDlg extends JDialog {
         if (this.mMyFriendGtu001 != null) {
             talkPane.setText("");
             for (MyFriendTalkGtu001 msg : this.mMyFriendGtu001.getMessageLst()) {
+                String[] message2 = msg.getFixMessage();
                 if (!msg.isMe) {
                     SimpleAttributeSet attributes = new SimpleAttributeSet();
                     StyleConstants.setAlignment(attributes, StyleConstants.ALIGN_LEFT);
-                    JTextPaneUtil.newInstance(talkPane).append(msg.getFixMessage(), attributes);
+
+                    StyleContext sc = StyleContext.getDefaultStyleContext();
+                    AttributeSet aset = sc.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Background, JColorUtil.rgb("EEEEEE"));
+                    aset = sc.addAttribute(aset, StyleConstants.FontFamily, "Lucida Console");
+                    aset = sc.addAttribute(aset, StyleConstants.Alignment, StyleConstants.ALIGN_JUSTIFIED);
+
+                    JTextPaneUtil.newInstance(talkPane).append(message2[0], attributes, aset);
+                    JTextPaneUtil.newInstance(talkPane).append(message2[1], attributes);
                 } else {
                     SimpleAttributeSet attributes = new SimpleAttributeSet();
                     StyleConstants.setAlignment(attributes, StyleConstants.ALIGN_RIGHT);
-                    JTextPaneUtil.newInstance(talkPane).append(msg.getFixMessage(), attributes);
+
+                    StyleContext sc = StyleContext.getDefaultStyleContext();
+                    AttributeSet aset = sc.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Background, JColorUtil.rgb("DDDDDD"));
+                    aset = sc.addAttribute(aset, StyleConstants.FontFamily, "Lucida Console");
+                    aset = sc.addAttribute(aset, StyleConstants.Alignment, StyleConstants.ALIGN_JUSTIFIED);
+
+                    JTextPaneUtil.newInstance(talkPane).append(message2[0], attributes, aset);
+                    JTextPaneUtil.newInstance(talkPane).append(message2[1], attributes);
                 }
             }
         }
+    }
+
+    public boolean isFocus() {
+        if (this.isVisible() && //
+                (talkPane.isFocusOwner() || //
+                        talkArea.isFocusOwner())) {
+            return true;
+        }
+        return false;
     }
 }

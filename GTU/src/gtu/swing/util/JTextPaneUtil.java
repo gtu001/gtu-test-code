@@ -5,10 +5,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
+import javax.swing.text.AttributeSet;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.MutableAttributeSet;
-import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyledDocument;
 
 import org.apache.commons.lang.StringUtils;
@@ -49,17 +49,21 @@ public class JTextPaneUtil {
         return success;
     }
 
-    public AtomicBoolean append(final String text, final SimpleAttributeSet attrSet) {
+    public AtomicBoolean append(final String text, final AttributeSet... attrSet) {
         final AtomicBoolean success = new AtomicBoolean(false);
         Runnable runnable = new Runnable() {
             public void run() {
                 try {
                     StyledDocument doc = ((JTextPane) textArea).getStyledDocument();
-                    int offset = doc.getLength();
-                    doc.insertString(offset, text, attrSet);
+                    int offset = textArea.getDocument().getLength();
+                    doc.insertString(offset, text, null);
                     // doc.setCharacterAttributes(offset,
                     // StringUtils.length(text), attrSet, true);
-                    doc.setParagraphAttributes(offset, StringUtils.length(text), attrSet, false);
+                    // doc.setParagraphAttributes(offset,
+                    // StringUtils.length(text), attrSet, false);
+                    for (AttributeSet attr : attrSet) {
+                        doc.setCharacterAttributes(offset, StringUtils.length(text), attr, false);
+                    }
                 } catch (Exception e) {
                     success.set(true);
                     e.printStackTrace();
