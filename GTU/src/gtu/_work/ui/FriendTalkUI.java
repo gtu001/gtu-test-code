@@ -665,6 +665,30 @@ public class FriendTalkUI extends JFrame {
             return false;
         }
 
+        private boolean isCommand(final String strVal) {
+            Pattern ptn = Pattern.compile("\\#\\[command\\:(.*?)\\]\\#");
+            Matcher mth = ptn.matcher(strVal);
+            if (mth.find()) {
+                String commandStrVal = mth.group(1);
+                if ("RING".equalsIgnoreCase(commandStrVal)) {
+                    commandRingProcess(strVal);
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private void commandRingProcess(String strVal) {
+            MyFriendGtu001 talkFn = getFriendByStrVal(strVal);
+            if (talkFn != null) {
+                if (mFriendTalk_TalkDlg != null) {
+                    mFriendTalk_TalkDlg.dispose();
+                }
+                mFriendTalk_TalkDlg = FriendTalk_TalkDlg.newInstance(talkFn);
+                JCommonUtil.setFrameAtop(mFriendTalk_EditFriendDlg, true);
+            }
+        }
+
         public void run() {
             BufferedReader in = null;
             PrintWriter out = null;
@@ -689,6 +713,11 @@ public class FriendTalkUI extends JFrame {
                 if (isIgnoreAfter) {
                     return;
                 }
+                
+                isIgnoreAfter = isCommand(strVal);
+                if (isIgnoreAfter) {
+                    return;
+                }
 
                 // 處理對話訊息
                 processFriendMessage(strVal);
@@ -708,7 +737,7 @@ public class FriendTalkUI extends JFrame {
     }
 
     private void processFriendMessage(String strVal) {
-        Pattern ptn = Pattern.compile("\\#\\[(.*)\\]\\#");
+        Pattern ptn = Pattern.compile("\\#\\[friend\\:(.*)\\]\\#");
         Matcher mth = ptn.matcher(strVal);
         if (mth.find()) {
             String groupStr = mth.group(1);
@@ -763,5 +792,29 @@ public class FriendTalkUI extends JFrame {
                 mFriendTalk_TalkDlg.updateMessageDlg();
             }
         }
+    }
+
+    private MyFriendGtu001 getFriendByStrVal(String strVal) {
+        MyFriendGtu001 talkFn = null;
+        Pattern ptn = Pattern.compile("\\#\\[friend\\:(.*)\\]\\#");
+        Matcher mth = ptn.matcher(strVal);
+        if (mth.find()) {
+            String groupStr = mth.group(1);
+            String[] arry = groupStr.split("\\|", -1);
+            String name = arry[0];
+            String ip = arry[1];
+            String time = arry[2];
+            String message = strVal.substring(mth.end(0));
+
+            DefaultListModel model = (DefaultListModel) friendsList.getModel();
+            for (int ii = 0; ii < model.getSize(); ii++) {
+                MyFriendGtu001 fn = (MyFriendGtu001) model.getElementAt(ii);
+                if (StringUtils.equals(fn.ip, ip)) {
+                    talkFn = fn;
+                    break;
+                }
+            }
+        }
+        return talkFn;
     }
 }

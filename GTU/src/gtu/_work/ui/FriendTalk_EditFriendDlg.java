@@ -188,7 +188,7 @@ public class FriendTalk_EditFriendDlg extends JDialog {
         }
 
         public String getPrefix() {
-            return "#[" + FriendTalkUI.MY_NAME + "|" + FriendTalkUI.MY_IP + "|" + DateFormatUtils.format(System.currentTimeMillis(), "yyyy-MM-dd HH:mm:ss.SSSSS") + "]#";
+            return "#[friend:" + FriendTalkUI.MY_NAME + "|" + FriendTalkUI.MY_IP + "|" + DateFormatUtils.format(System.currentTimeMillis(), "yyyy-MM-dd HH:mm:ss.SSSSS") + "]#";
         }
 
         public List<MyFriendTalkGtu001> getMessageLst() {

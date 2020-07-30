@@ -48,6 +48,7 @@ public class FriendTalk_TalkDlg extends JDialog {
     private MyFriendGtu001 mMyFriendGtu001;
     private JButton sendBtn;
     private Logger2File logger = FriendTalkUI.logger;
+    private JButton callFriendBtn;
 
     /**
      * Launch the application.
@@ -78,6 +79,15 @@ public class FriendTalk_TalkDlg extends JDialog {
         {
             JPanel panel = new JPanel();
             contentPanel.add(panel, BorderLayout.NORTH);
+            {
+                callFriendBtn = new JButton("招喚");
+                callFriendBtn.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        callFriendBtnProcess(mMyFriendGtu001);
+                    }
+                });
+                panel.add(callFriendBtn);
+            }
             {
                 friendNameLbl = new JLabel("                   ");
                 panel.add(friendNameLbl);
@@ -336,5 +346,53 @@ public class FriendTalk_TalkDlg extends JDialog {
             return true;
         }
         return false;
+    }
+
+    private void callFriendBtnProcess(MyFriendGtu001 mMyFriendGtu001) {
+        this.sendCommand("#[command:RING]#", mMyFriendGtu001);
+    }
+
+    private void sendCommand(String command, MyFriendGtu001 mMyFriendGtu001) {
+        if (mMyFriendGtu001 != null) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    BufferedReader in = null;
+                    BufferedWriter out = null;
+                    try {
+                        Socket s = new Socket(mMyFriendGtu001.getIp(), 6666);
+                        in = new BufferedReader(new InputStreamReader(s.getInputStream()));
+                        out = new BufferedWriter(new OutputStreamWriter(s.getOutputStream(), FriendTalkUI.ENCODING));
+
+                        if (s.isConnected()) {
+                            out.write(mMyFriendGtu001.getPrefix() + command);
+                            out.flush();
+
+                            mMyFriendGtu001.getMessageLst().add(MyFriendTalkGtu001.ofMyself(command));
+
+                            logger.debug("我:" + command);
+
+                            updateMessageDlg();
+
+                            // 設定已讀
+                            setIsAlreadyReading();
+                        }
+                        s.close();
+                    } catch (IOException e) {
+                        JTextPaneUtil.newInstance(talkPane).append("連線失敗 : " + e.getMessage());
+                        e.printStackTrace();
+                    } finally {
+                        try {
+                            in.close();
+                        } catch (Exception e) {
+                        }
+                        try {
+                            out.close();
+                        } catch (Exception e) {
+                        }
+                    }
+                }
+            }).start();
+        }
     }
 }
