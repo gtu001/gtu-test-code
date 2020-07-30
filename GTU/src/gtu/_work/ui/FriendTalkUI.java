@@ -497,15 +497,31 @@ public class FriendTalkUI extends JFrame {
                 }
 
                 if (startReceiveFile) {
-                    BufferedInputStream buffIn = new BufferedInputStream(socket.getInputStream());
-                    BufferedOutputStream buffOut = new BufferedOutputStream(new FileOutputStream(new File(FileUtil.DESKTOP_PATH, acceptFile.get().getFileName())));
-                    byte[] arr = new byte[1024 * 1024];
-                    int available = -1;
-                    while ((available = buffIn.read(arr)) > 0) {
-                        buffOut.write(arr, 0, available);
+                    BufferedInputStream buffIn = null;
+                    BufferedOutputStream buffOut = null;
+                    try {
+                        long fileLength = acceptFile.get().getFileLength();
+                        long transferSize = 0;
+
+                        buffIn = new BufferedInputStream(socket.getInputStream());
+                        buffOut = new BufferedOutputStream(new FileOutputStream(new File(FileUtil.DESKTOP_PATH, acceptFile.get().getFileName())));
+                        byte[] arr = new byte[1024 * 1024];
+                        int available = -1;
+                        while ((available = buffIn.read(arr)) > 0) {
+                            buffOut.write(arr, 0, available);
+
+                            transferSize += available;
+                            setTransferUpdateTitle(transferSize, fileLength);
+                        }
+                        buffOut.flush();
+                        buffOut.close();
+                    } catch (Exception ex) {
+                        JCommonUtil.handleException(ex);
+                    } finally {
+                        buffIn.close();
+                        buffOut.close();
+                        JCommonUtil._jOptionPane_showMessageDialog_info("檔案下載完成:" + acceptFile.get().getFileName());
                     }
-                    buffOut.flush();
-                    buffOut.close();
                 }
             } catch (Exception e) {
                 JCommonUtil.handleException(e);
@@ -539,7 +555,6 @@ public class FriendTalkUI extends JFrame {
             public void run() {
                 try {
                     MyFileAcceptGtu001 sendFile = FriendTalkUI.sendFile.get();
-                    long fileLength = sendFile.getFileLength();
                     Socket s = new Socket(sendFile.getAcceptIp(), 6667);
                     if (s.isConnected()) {
                         BufferedInputStream buffIn = null;
@@ -549,21 +564,15 @@ public class FriendTalkUI extends JFrame {
                             buffOut = new BufferedOutputStream(s.getOutputStream());
                             byte[] arr = new byte[1024 * 1024];
                             int available = -1;
-
-                            long transferSize = 0;
-
                             while ((available = buffIn.read(arr)) > 0) {
                                 buffOut.write(arr, 0, available);
-                                transferSize += available;
-
-                                setTransferUpdateTitle(transferSize, fileLength);
                             }
                             buffOut.flush();
                         } catch (Exception ex) {
                             JCommonUtil.handleException(ex);
                         } finally {
                             buffOut.close();
-                            JCommonUtil._jOptionPane_showMessageDialog_info("檔案下載完成:" + sendFile.getFileName());
+                            JCommonUtil._jOptionPane_showMessageDialog_info("檔案已傳送:" + sendFile.getFileName());
                         }
                     }
                     s.close();
