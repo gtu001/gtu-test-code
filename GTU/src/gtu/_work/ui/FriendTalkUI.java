@@ -678,7 +678,7 @@ public class FriendTalkUI extends JFrame {
             return false;
         }
 
-        private void commandRingProcess(String strVal) {
+        private void commandRingProcess(final String strVal) {
             MyFriendGtu001 talkFn = getFriendByStrVal(strVal);
             if (talkFn != null) {
                 if (mFriendTalk_TalkDlg != null) {
@@ -736,7 +736,7 @@ public class FriendTalkUI extends JFrame {
         }
     }
 
-    private void processFriendMessage(String strVal) {
+    private void processFriendMessage(final String strVal) {
         Pattern ptn = Pattern.compile("\\#\\[friend\\:(.*)\\]\\#");
         Matcher mth = ptn.matcher(strVal);
         if (mth.find()) {
@@ -794,7 +794,7 @@ public class FriendTalkUI extends JFrame {
         }
     }
 
-    private MyFriendGtu001 getFriendByStrVal(String strVal) {
+    private MyFriendGtu001 getFriendByStrVal(final String strVal) {
         MyFriendGtu001 talkFn = null;
         Pattern ptn = Pattern.compile("\\#\\[friend\\:(.*)\\]\\#");
         Matcher mth = ptn.matcher(strVal);

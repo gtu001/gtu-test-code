@@ -348,11 +348,11 @@ public class FriendTalk_TalkDlg extends JDialog {
         return false;
     }
 
-    private void callFriendBtnProcess(MyFriendGtu001 mMyFriendGtu001) {
+    private void callFriendBtnProcess(final MyFriendGtu001 mMyFriendGtu001) {
         this.sendCommand("#[command:RING]#", mMyFriendGtu001);
     }
 
-    private void sendCommand(String command, MyFriendGtu001 mMyFriendGtu001) {
+    private void sendCommand(final String command, final MyFriendGtu001 mMyFriendGtu001) {
         if (mMyFriendGtu001 != null) {
             new Thread(new Runnable() {
                 @Override
