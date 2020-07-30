@@ -201,7 +201,6 @@ public class FriendTalkUI extends JFrame {
             applyAllEvents();
 
             JCommonUtil.setJFrameCenter(this);
-            JCommonUtil.setJFrameIcon(this, "resource/images/ico/tk_aiengine.ico");
             hideInSystemTrayHelper = HideInSystemTrayHelper.newInstance();
             hideInSystemTrayHelper.apply(this);
             jFrameRGBColorPanel = new JFrameRGBColorPanel(this);
@@ -218,8 +217,28 @@ public class FriendTalkUI extends JFrame {
                 e1.printStackTrace();
             }
 
+            updateICON();
             reflectInfo();
             setInfo();
+        }
+    }
+
+    private void updateICON() {
+        boolean hasUnread = false;
+        if (friendsList != null) {
+            DefaultListModel model = (DefaultListModel) friendsList.getModel();
+            for (int ii = 0; ii < model.getSize(); ii++) {
+                MyFriendGtu001 fnd = (MyFriendGtu001) model.getElementAt(ii);
+                if (fnd.getMessageLst().size() != fnd.getReadMessageCount()) {
+                    hasUnread = true;
+                    break;
+                }
+            }
+        }
+        if (hasUnread) {
+            JCommonUtil.setJFrameIcon(this, "resource/images/ico/line_warning.ico");
+        } else {
+            JCommonUtil.setJFrameIcon(this, "resource/images/ico/line.ico");
         }
     }
 
@@ -395,6 +414,8 @@ public class FriendTalkUI extends JFrame {
                         mFriendTalk_TalkDlg.dispose();
                     }
                     mFriendTalk_TalkDlg = FriendTalk_TalkDlg.newInstance(friend);
+                    // 更新icon
+                    updateICON();
                 }
             }
         });
@@ -686,6 +707,8 @@ public class FriendTalkUI extends JFrame {
                 }
                 mFriendTalk_TalkDlg = FriendTalk_TalkDlg.newInstance(talkFn);
                 JCommonUtil.setFrameAtop(mFriendTalk_TalkDlg, true);
+                // 更新icon
+                updateICON();
             }
         }
 
@@ -713,7 +736,7 @@ public class FriendTalkUI extends JFrame {
                 if (isIgnoreAfter) {
                     return;
                 }
-                
+
                 isIgnoreAfter = isCommand(strVal);
                 if (isIgnoreAfter) {
                     return;
@@ -780,7 +803,7 @@ public class FriendTalkUI extends JFrame {
             // 送出右下角訊息
             if (mFriendTalk_TalkDlg != null && !mFriendTalk_TalkDlg.isFocus()) {
                 hideInSystemTrayHelper.displayMessage(youAssignName + "傳送了訊息!", youAssignName + ":" + message, MessageType.INFO);
-                mFriendTalk_TalkDlg.setIsAlreadyReading();
+                // mFriendTalk_TalkDlg.setIsAlreadyReading();
             }
 
             // log
@@ -791,6 +814,9 @@ public class FriendTalkUI extends JFrame {
             if (mFriendTalk_TalkDlg != null) {
                 mFriendTalk_TalkDlg.updateMessageDlg();
             }
+
+            // 更新icon
+            updateICON();
         }
     }
 
