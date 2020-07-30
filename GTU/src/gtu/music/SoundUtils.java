@@ -31,14 +31,14 @@ public class SoundUtils {
     }
 
     public static void main(String[] args) throws Exception {
-        SoundUtils.tone(1000, 100);
-        Thread.sleep(1000);
-        SoundUtils.tone(100, 1000);
-        Thread.sleep(1000);
-        SoundUtils.tone(5000, 100);
-        Thread.sleep(1000);
-        SoundUtils.tone(400, 500);
-        Thread.sleep(1000);
-        SoundUtils.tone(400, 500, 0.2);
+//        SoundUtils.tone(1000, 100);
+//        Thread.sleep(1000);
+//        SoundUtils.tone(100, 1000);
+//        Thread.sleep(1000);
+        SoundUtils.tone(5000, 200);
+//        Thread.sleep(1000);
+//        SoundUtils.tone(400, 500);
+//        Thread.sleep(1000);
+//        SoundUtils.tone(400, 500, 0.2);
     }
 }

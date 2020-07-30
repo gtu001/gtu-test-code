@@ -58,6 +58,7 @@ public class FriendTalk_TalkDlg extends JDialog {
             FriendTalk_TalkDlg dialog = new FriendTalk_TalkDlg(mMyFriendGtu001);
             dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
             dialog.setVisible(true);
+            JCommonUtil.focusComponent(dialog.talkArea, false, null);
             return dialog;
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);

@@ -31,6 +31,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.sound.sampled.LineUnavailableException;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -50,6 +51,7 @@ import gtu._work.ui.FriendTalk_EditFriendDlg.MyFriendTalkGtu001;
 import gtu._work.ui.JMenuBarUtil.JMenuAppender;
 import gtu.file.FileUtil;
 import gtu.log.Logger2File;
+import gtu.music.SoundUtils;
 import gtu.net.NetTool;
 import gtu.properties.PropertiesUtil;
 import gtu.properties.PropertiesUtilBean;
@@ -219,26 +221,31 @@ public class FriendTalkUI extends JFrame {
 
             updateICON();
             reflectInfo();
-            setInfo();
         }
     }
 
     private void updateICON() {
-        boolean hasUnread = false;
+        int unreadCount = 0;
         if (friendsList != null) {
             DefaultListModel model = (DefaultListModel) friendsList.getModel();
             for (int ii = 0; ii < model.getSize(); ii++) {
                 MyFriendGtu001 fnd = (MyFriendGtu001) model.getElementAt(ii);
                 if (fnd.getMessageLst().size() != fnd.getReadMessageCount()) {
-                    hasUnread = true;
-                    break;
+                    unreadCount += Math.abs(fnd.getMessageLst().size() - fnd.getReadMessageCount());
                 }
             }
         }
-        if (hasUnread) {
+        if (unreadCount > 0) {
             JCommonUtil.setJFrameIcon(this, "resource/images/ico/line_warning.ico");
+            setTitle(unreadCount + "封未讀訊息!");
+            try {
+                SoundUtils.tone(5000, 200);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         } else {
             JCommonUtil.setJFrameIcon(this, "resource/images/ico/line.ico");
+            setInfo();
         }
     }
 
@@ -342,7 +349,7 @@ public class FriendTalkUI extends JFrame {
                 String ip = JCommonUtil._jOptionPane_showInputDialog("請輸入你的IP", MY_IP);
                 if (StringUtils.isNotBlank(ip) && ip.matches("[0-9\\.]+")) {
                     MY_IP = ip;
-                    setInfo();
+                    updateICON();
                     storeInfo();
                 }
             }
@@ -353,7 +360,7 @@ public class FriendTalkUI extends JFrame {
                 String encoding = JCommonUtil._jOptionPane_showInputDialog("請輸入編碼", ENCODING);
                 if (StringUtils.isNotBlank(encoding)) {
                     ENCODING = encoding;
-                    setInfo();
+                    updateICON();
                     storeInfo();
                 }
             }
@@ -364,7 +371,7 @@ public class FriendTalkUI extends JFrame {
                 String myName = JCommonUtil._jOptionPane_showInputDialog("請輸入姓名", MY_NAME);
                 if (StringUtils.isNotBlank(myName)) {
                     MY_NAME = myName;
-                    setInfo();
+                    updateICON();
                     storeInfo();
                 }
             }
