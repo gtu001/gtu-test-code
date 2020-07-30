@@ -685,7 +685,7 @@ public class FriendTalkUI extends JFrame {
                     mFriendTalk_TalkDlg.dispose();
                 }
                 mFriendTalk_TalkDlg = FriendTalk_TalkDlg.newInstance(talkFn);
-                JCommonUtil.setFrameAtop(mFriendTalk_EditFriendDlg, true);
+                JCommonUtil.setFrameAtop(mFriendTalk_TalkDlg, true);
             }
         }
 
