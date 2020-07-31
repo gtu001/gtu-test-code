@@ -519,8 +519,11 @@ public class FriendTalkUI extends JFrame {
                 boolean startReceiveFile = false;
                 if (acceptFile.get() != null) {
                     // 二十分鐘內接受
-                    if ((System.currentTimeMillis() - acceptFile.get().getApproveTime()) < 20 * 60 * 1000) {
+                    if (((System.currentTimeMillis() - acceptFile.get().getApproveTime()) < 60 * 60 * 1000) && //
+                            true == acceptFile.get().getIsAccept()) {
                         startReceiveFile = true;
+                    } else {
+                        JCommonUtil._jOptionPane_showMessageDialog_error("下載取消...");
                     }
                 }
 
@@ -675,6 +678,7 @@ public class FriendTalkUI extends JFrame {
                                     ", 大小 : " + FileUtil.getSizeDescription(sendMsg.getFileLength()) + //
                                     " 是否接受?",
                             "傳送檔案");
+                    sendMsg.setIsAccept(isAcceptFile);
                     acceptFile.set(sendMsg);
                     sendFileReceiverSendBack(isAcceptFile, acceptFile.get());
                     return true;
