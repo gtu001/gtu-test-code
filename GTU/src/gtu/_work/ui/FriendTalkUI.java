@@ -548,6 +548,7 @@ public class FriendTalkUI extends JFrame {
                     } finally {
                         buffIn.close();
                         buffOut.close();
+                        setTitle("下載完成!");
                         JCommonUtil._jOptionPane_showMessageDialog_info("檔案下載完成:" + acceptFile.get().getFileName());
                     }
                 }
