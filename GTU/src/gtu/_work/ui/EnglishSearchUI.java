@@ -170,13 +170,16 @@ public class EnglishSearchUI extends JFrame {
 
     private PropertiesUtilBean propertyBean = new PropertiesUtilBean(this.getClass());
     {
-        if (!PropertiesUtil.isClassInJar(EnglishSearchUI.class)) {
-            if (OsInfoUtil.isWindows()) {
-                propertyBean = new PropertiesUtilBean(new File("D:/my_tool/EnglishSearchUI/EnglishSearchUI_win10_config.properties"));
-            } else {
-                propertyBean = new PropertiesUtilBean(new File("/media/gtu001/OLD_D/my_tool/EnglishSearchUI/EnglishSearchUI_linux_config.properties"));
-            }
-        }
+        // if (!PropertiesUtil.isClassInJar(EnglishSearchUI.class)) {
+        // if (OsInfoUtil.isWindows()) {
+        // propertyBean = new PropertiesUtilBean(new
+        // File("D:/my_tool/EnglishSearchUI/EnglishSearchUI_win10_config.properties"));
+        // } else {
+        // propertyBean = new PropertiesUtilBean(new
+        // File("/media/gtu001/OLD_D/my_tool/EnglishSearchUI/EnglishSearchUI_linux_config.properties"));
+        // }
+        // }
+        propertyBean = JSwingCommonConfigUtil.checkTestingPropertiesUtilBean_diffConfig(propertyBean, EnglishSearchUI.class, "EnglishSearchUI/");
         System.out.println("configFile : " + propertyBean.getPropFile());
     }
 
