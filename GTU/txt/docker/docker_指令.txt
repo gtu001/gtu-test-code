@@ -40,11 +40,12 @@
 	$ docker run  --rm -d -it --net=host -v [建立目錄]  -h [host_name]  --name=[container name]  [image id]
 
 	--rm : 離開自動砍掉
-	-d : 背景執行
+	-d (--detach) : 背景執行
 	-it : 進入console
 	-v : 在container建目錄
 	-h : 建立host_name
 	--name : 指定container name
+	-p(--publish) : port對應(本機port : container port)
 
 --------------------------------------------------------------------------
 
@@ -159,13 +160,13 @@
 跑 images
 
 	docker run -it -d --rm -h 
-		i 可互動 
-		t 假的tty
-		d 背景執行 
-		rm  離開時自動移除container
-		p 本機port : container port , Ex: -p 80:80
-		h 給主機名 Ex: -h www.myhost.net
-		v 給實體空間位置  Ex: -v /var/www/html 
+		-i 可互動 
+		-t 假的tty
+		-d 背景執行 
+		--rm  離開時自動移除container
+		-p 本機port : container port , Ex: -p 80:80
+		-h 給主機名 Ex: -h www.myhost.net
+		-v 給實體空間位置  Ex: -v /var/www/html 
 	
 	
 --------------------------------------------------------------------------
