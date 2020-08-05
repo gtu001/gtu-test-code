@@ -825,9 +825,9 @@ public class MavenRepositoryUI extends javax.swing.JFrame {
                 for (PomFile _pomFile : pomFileList) {
                     sb.append("<dependency>\n");
                     sb.append("    <groupId>" + StringUtils.trimToEmpty(_pomFile.pom.groupId) + "</groupId>\n");
-                    sb.append("    <artifactId>" + StringUtils.trimToEmpty(_pomFile.pom.artifactId) + "</artifactId><dependency>\n");
+                    sb.append("    <artifactId>" + StringUtils.trimToEmpty(_pomFile.pom.artifactId) + "</artifactId>\n");
                     sb.append("    <version>" + StringUtils.trimToEmpty(_pomFile.pom.version) + "</version>\n");
-                    sb.append("<dependency>\n");
+                    sb.append("</dependency>\n");
                 }
                 final String title = "COPY SELECTED Pom Config : " + pomFileList.size();
                 copyAllPomConfigMenu.setText(title);
