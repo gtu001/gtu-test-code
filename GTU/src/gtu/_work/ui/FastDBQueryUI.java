@@ -6828,11 +6828,10 @@ public class FastDBQueryUI extends JFrame {
     private void setCustomColumnTitleTooltip() {
         queryResultTable.setTitleTooltipTransformer(new Transformer() {
 
-            private int getSerialIndex(Pair<Integer, Object> p) {
+            private int getSerialIndex(Pair<Integer, Object> p, List<String> titles) {
                 int columnIdx = p.getLeft();
                 String column = (String) p.getRight();
                 int serialIndex = 0;
-                List<String> titles = JTableUtil.newInstance(queryResultTable).getColumnTitleStringArray();
                 List<String> subLst = titles.subList(0, columnIdx + 1);
                 for (String col : subLst) {
                     if (StringUtils.equalsIgnoreCase(col, column)) {
@@ -6842,16 +6841,29 @@ public class FastDBQueryUI extends JFrame {
                 return serialIndex;
             }
 
+            private String getBaseIndexInfo(Pair<Integer, Object> p, List<String> titles) {
+                int columnIdx = p.getLeft();
+                if (QUERY_RESULT_COLUMN_NO.equals(titles.get(0))) {
+                    if (columnIdx == 0) {
+                        return null;
+                    }
+                    return String.valueOf(columnIdx);
+                }
+                return String.valueOf(columnIdx + 1);
+            }
+
             @Override
             public Object transform(Object input) {
                 Pair<Integer, Object> p = (Pair<Integer, Object>) input;
                 int columnIdx = p.getLeft();
+                List<String> titles = JTableUtil.newInstance(queryResultTable).getColumnTitleStringArray();
                 String column = (String) p.getRight();
-                int serialIndex = this.getSerialIndex(p);
+                int serialIndex = this.getSerialIndex(p, titles);
                 String sql = currentSQL.get();
                 Pattern ptn = Pattern.compile(column + "[\\]\\'\"]?[\\s\\t\n\r]*\\/\\*(.*?)\\*\\/", Pattern.DOTALL | Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
                 Matcher mth = ptn.matcher(sql);
                 String tmpTip = null;
+                String baseIndexInfo = getBaseIndexInfo(p, titles);
                 int idx = 0;
                 while (mth.find()) {
                     int startPos = mth.start();
@@ -6862,10 +6874,10 @@ public class FastDBQueryUI extends JFrame {
                     }
                     idx++;
                     if (serialIndex == idx) {
-                        return tmpTip;
+                        return baseIndexInfo + "." + tmpTip;
                     }
                 }
-                return null;
+                return baseIndexInfo;
             }
         });
     }
