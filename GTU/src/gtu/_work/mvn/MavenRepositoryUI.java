@@ -16,6 +16,7 @@ import gtu.swing.util.JListUtil;
 import gtu.swing.util.JMouseEventUtil;
 import gtu.swing.util.JOptionPaneUtil;
 import gtu.swing.util.JPopupMenuUtil;
+import gtu.swing.util.JProgressBarHelper;
 import gtu.swing.util.JTableUtil;
 
 import java.awt.BorderLayout;
@@ -29,7 +30,6 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
@@ -62,6 +62,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.plaf.ProgressBarUI;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
@@ -72,7 +73,6 @@ import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
-
 
 /**
  * This code was edited or generated using CloudGarden's Jigloo SWT/Swing GUI
@@ -126,7 +126,8 @@ public class MavenRepositoryUI extends javax.swing.JFrame {
             public void run() {
                 MavenRepositoryUI inst = new MavenRepositoryUI();
                 inst.setLocationRelativeTo(null);
-                 gtu.swing.util.JFrameUtil.setVisible(true,inst);
+                gtu.swing.util.JFrameUtil.setVisible(true, inst);
+                inst.setVisible(true);
             }
         });
     }
@@ -190,6 +191,7 @@ public class MavenRepositoryUI extends javax.swing.JFrame {
                             ListModel scanList2Model = new DefaultListModel();
                             scanList2.setModel(scanList2Model);
                             scanList2.addMouseListener(new MouseAdapter() {
+
                                 public void mouseClicked(MouseEvent evt) {
                                     defaultJListClick(scanList2, evt);
                                 }
@@ -201,6 +203,7 @@ public class MavenRepositoryUI extends javax.swing.JFrame {
                 }
                 {
                     jPanel2 = new JPanel();
+
                     BorderLayout jPanel2Layout = new BorderLayout();
                     jPanel2.setLayout(jPanel2Layout);
                     jTabbedPane1.addTab("jar find", null, jPanel2, null);
@@ -328,9 +331,8 @@ public class MavenRepositoryUI extends javax.swing.JFrame {
                                     reloadRepositoryDir();
                                     return;
                                 }
-                                File newRepository = new File(file, "repository");
-                                File settings = new File(file, "settings.xml");
-                                if (settings.exists() && settings.isFile() && newRepository.exists() && newRepository.isDirectory()) {
+                                File newRepository = file;
+                                if (newRepository.exists() && newRepository.isDirectory()) {
                                     repositoryDir = newRepository;
                                     reloadRepositoryDir();
                                 } else {
@@ -348,8 +350,8 @@ public class MavenRepositoryUI extends javax.swing.JFrame {
                         saveCurrentDataBtn.setText("save current data");
                         saveCurrentDataBtn.addActionListener(new ActionListener() {
                             public void actionPerformed(ActionEvent evt) {
-                                File cfgFile = new File(PropertiesUtil.getJarCurrentPath(MavenRepositoryUI.class), MavenRepositoryUI.class.getSimpleName() + "_"
-                                        + DateFormatUtil.format(System.currentTimeMillis(), "yyyyMMdd_HHmmss") + ".cfg");
+                                File cfgFile = new File(PropertiesUtil.getJarCurrentPath(MavenRepositoryUI.class),
+                                        MavenRepositoryUI.class.getSimpleName() + "_" + DateFormatUtil.format(System.currentTimeMillis(), "yyyyMMdd_HHmmss") + ".cfg");
                                 try {
                                     ObjectOutputStream writer = new ObjectOutputStream(new FileOutputStream(cfgFile));
                                     writer.writeObject(pomFileList);
@@ -391,33 +393,21 @@ public class MavenRepositoryUI extends javax.swing.JFrame {
                         });
 
                     }
-                    jPanel3Layout.setHorizontalGroup(jPanel3Layout.createSequentialGroup()
-                        .addContainerGap(24, 24)
-                        .addGroup(jPanel3Layout.createParallelGroup()
-                            .addGroup(jPanel3Layout.createSequentialGroup()
-                                .addComponent(loadConfigDataBtn, GroupLayout.PREFERRED_SIZE, 223, GroupLayout.PREFERRED_SIZE))
-                            .addGroup(jPanel3Layout.createSequentialGroup()
-                                .addComponent(saveCurrentDataBtn, GroupLayout.PREFERRED_SIZE, 223, GroupLayout.PREFERRED_SIZE))
-                            .addGroup(jPanel3Layout.createSequentialGroup()
-                                .addComponent(copyToDir, GroupLayout.PREFERRED_SIZE, 223, GroupLayout.PREFERRED_SIZE))
-                            .addGroup(jPanel3Layout.createSequentialGroup()
-                                .addComponent(resetM2Dir, GroupLayout.PREFERRED_SIZE, 223, GroupLayout.PREFERRED_SIZE))
-                            .addGroup(jPanel3Layout.createSequentialGroup()
-                                .addComponent(getJButton1(), GroupLayout.PREFERRED_SIZE, 223, GroupLayout.PREFERRED_SIZE)))
-                        .addContainerGap(281, Short.MAX_VALUE));
-                    jPanel3Layout.setVerticalGroup(jPanel3Layout.createSequentialGroup()
-                        .addContainerGap(25, 25)
-                        .addComponent(copyToDir, GroupLayout.PREFERRED_SIZE, 30, GroupLayout.PREFERRED_SIZE)
-                        .addGap(22)
-                        .addComponent(resetM2Dir, GroupLayout.PREFERRED_SIZE, 30, GroupLayout.PREFERRED_SIZE)
-                        .addGap(24)
-                        .addComponent(saveCurrentDataBtn, GroupLayout.PREFERRED_SIZE, 31, GroupLayout.PREFERRED_SIZE)
-                        .addGap(25)
-                        .addComponent(loadConfigDataBtn, GroupLayout.PREFERRED_SIZE, 31, GroupLayout.PREFERRED_SIZE)
-                        .addGap(28)
-                        .addComponent(getJButton1(), GroupLayout.PREFERRED_SIZE, 31, GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap(34, Short.MAX_VALUE));
+                    jPanel3Layout.setHorizontalGroup(jPanel3Layout.createSequentialGroup().addContainerGap(24, 24)
+                            .addGroup(jPanel3Layout.createParallelGroup()
+                                    .addGroup(jPanel3Layout.createSequentialGroup().addComponent(loadConfigDataBtn, GroupLayout.PREFERRED_SIZE, 223, GroupLayout.PREFERRED_SIZE))
+                                    .addGroup(jPanel3Layout.createSequentialGroup().addComponent(saveCurrentDataBtn, GroupLayout.PREFERRED_SIZE, 223, GroupLayout.PREFERRED_SIZE))
+                                    .addGroup(jPanel3Layout.createSequentialGroup().addComponent(copyToDir, GroupLayout.PREFERRED_SIZE, 223, GroupLayout.PREFERRED_SIZE))
+                                    .addGroup(jPanel3Layout.createSequentialGroup().addComponent(resetM2Dir, GroupLayout.PREFERRED_SIZE, 223, GroupLayout.PREFERRED_SIZE))
+                                    .addGroup(jPanel3Layout.createSequentialGroup().addComponent(getJButton1(), GroupLayout.PREFERRED_SIZE, 223, GroupLayout.PREFERRED_SIZE)))
+                            .addContainerGap(281, Short.MAX_VALUE));
+                    jPanel3Layout.setVerticalGroup(jPanel3Layout.createSequentialGroup().addContainerGap(25, 25).addComponent(copyToDir, GroupLayout.PREFERRED_SIZE, 30, GroupLayout.PREFERRED_SIZE)
+                            .addGap(22).addComponent(resetM2Dir, GroupLayout.PREFERRED_SIZE, 30, GroupLayout.PREFERRED_SIZE).addGap(24)
+                            .addComponent(saveCurrentDataBtn, GroupLayout.PREFERRED_SIZE, 31, GroupLayout.PREFERRED_SIZE).addGap(25)
+                            .addComponent(loadConfigDataBtn, GroupLayout.PREFERRED_SIZE, 31, GroupLayout.PREFERRED_SIZE).addGap(28)
+                            .addComponent(getJButton1(), GroupLayout.PREFERRED_SIZE, 31, GroupLayout.PREFERRED_SIZE).addContainerGap(34, Short.MAX_VALUE));
                 }
+
                 {
                     jPanel6 = new JPanel();
                     BorderLayout jPanel6Layout = new BorderLayout();
@@ -440,7 +430,8 @@ public class MavenRepositoryUI extends javax.swing.JFrame {
                                 } else {
                                     FileUtil.searchFileMatchs(file, "pom.xml", pomList);
                                 }
-                                Set<PomFile> poms = loadPomList(pomList);
+
+                                Set<PomFile> poms = loadPomList(pomList, null);
                                 resetUIStatus();
 
                                 Map<DependencyKey, PomFile> map = new HashMap<DependencyKey, PomFile>();
@@ -539,7 +530,7 @@ public class MavenRepositoryUI extends javax.swing.JFrame {
                                             try {
                                                 FileUtil.copyFile(f, new File(pomOutputJarDir_, f.getName()));
                                                 ok++;
-                                            } catch (IOException e) {
+                                            } catch (Exception e) {
                                                 e.printStackTrace();
                                                 noOk++;
                                                 fsb.append(f + "\n");
@@ -567,13 +558,13 @@ public class MavenRepositoryUI extends javax.swing.JFrame {
         }
     }
 
-    static Set<PomFile> pomFileList;//全部的pom不一定有jar
-    static Set<PomFile> pomFileJarList;//有對應jar黨的pom
+    static Set<PomFile> pomFileList;// 全部的pom不一定有jar
+    static Set<PomFile> pomFileJarList;// 有對應jar黨的pom
     static Map<DependencyKey, PomFile> pomFileMap;
 
     static JarFinder jarfinder;
-    static File copyTo = FileUtil.DESKTOP_DIR;//single jar copy to
-    static File pomOutputJarDir_;//multi jar copy to
+    static File copyTo = FileUtil.DESKTOP_DIR;// single jar copy to
+    static File pomOutputJarDir_;// multi jar copy to
 
     static File repositoryDir;
 
@@ -592,55 +583,51 @@ public class MavenRepositoryUI extends javax.swing.JFrame {
         dependencyConfig = sb.toString();
     }
 
-    DocumentListener getDocumentListener(final JList list, final Set<PomFile> pomfilelist) {
-        return JCommonUtil.getDocumentListener(new HandleDocumentEvent() {
-            public void process(DocumentEvent event) {
-                if (pomfilelist == null || pomfilelist.isEmpty()) {
-                    return;
-                }
-                String text = JCommonUtil.getDocumentText(event);
-                DefaultListModel model = new DefaultListModel();
-                for (PomFile pomfile : pomfilelist) {
-                    if (pomfile.xmlFile.getName().contains(text)) {
-                        model.addElement(pomfile);
-                        continue;
-                    }
-                    if (StringUtils.defaultString(pomfile.pom.modelVersion).contains(text)) {
-                        model.addElement(pomfile);
-                        continue;
-                    }
-                    if (StringUtils.defaultString(pomfile.pom.groupId).contains(text)) {
-                        model.addElement(pomfile);
-                        continue;
-                    }
-                    if (StringUtils.defaultString(pomfile.pom.artifactId).contains(text)) {
-                        model.addElement(pomfile);
-                        continue;
-                    }
-                    if (StringUtils.defaultString(pomfile.pom.packaging).contains(text)) {
-                        model.addElement(pomfile);
-                        continue;
-                    }
-                    if (StringUtils.defaultString(pomfile.pom.name).contains(text)) {
-                        model.addElement(pomfile);
-                        continue;
-                    }
-                    if (StringUtils.defaultString(pomfile.pom.version).contains(text)) {
-                        model.addElement(pomfile);
-                        continue;
-                    }
-                    if (StringUtils.defaultString(pomfile.pom.url).contains(text)) {
-                        model.addElement(pomfile);
-                        continue;
-                    }
-                    if (StringUtils.defaultString(pomfile.pom.description).contains(text)) {
-                        model.addElement(pomfile);
-                        continue;
-                    }
-                }
-                list.setModel(model);
+    void scanTextFindProcess(final JTextField textField, final JList list, final Set<PomFile> pomfilelist) {
+        if (pomfilelist == null || pomfilelist.isEmpty()) {
+            return;
+        }
+        String text = textField.getText();
+        DefaultListModel model = new DefaultListModel();
+        for (PomFile pomfile : pomfilelist) {
+            if (pomfile.xmlFile.getName().contains(text)) {
+                model.addElement(pomfile);
+                continue;
             }
-        });
+            if (StringUtils.defaultString(pomfile.pom.modelVersion).contains(text)) {
+                model.addElement(pomfile);
+                continue;
+            }
+            if (StringUtils.defaultString(pomfile.pom.groupId).contains(text)) {
+                model.addElement(pomfile);
+                continue;
+            }
+            if (StringUtils.defaultString(pomfile.pom.artifactId).contains(text)) {
+                model.addElement(pomfile);
+                continue;
+            }
+            if (StringUtils.defaultString(pomfile.pom.packaging).contains(text)) {
+                model.addElement(pomfile);
+                continue;
+            }
+            if (StringUtils.defaultString(pomfile.pom.name).contains(text)) {
+                model.addElement(pomfile);
+                continue;
+            }
+            if (StringUtils.defaultString(pomfile.pom.version).contains(text)) {
+                model.addElement(pomfile);
+                continue;
+            }
+            if (StringUtils.defaultString(pomfile.pom.url).contains(text)) {
+                model.addElement(pomfile);
+                continue;
+            }
+            if (StringUtils.defaultString(pomfile.pom.description).contains(text)) {
+                model.addElement(pomfile);
+                continue;
+            }
+        }
+        list.setModel(model);
     }
 
     void openPomFetchDependency(Pom pom, Map<LoadPomListDependency.DependencyKey, PomFile> model, Set<LoadPomListDependency.DependencyKey> errorSet) {
@@ -681,17 +668,20 @@ public class MavenRepositoryUI extends javax.swing.JFrame {
     }
 
     void defaultJListClick(final JList jList, MouseEvent evt) {
+        if (JMouseEventUtil.buttonLeftClick(1, evt)) {
+            return;
+        }
         if (jList.getLeadSelectionIndex() == -1) {
             return;
         }
 
-        //多選
+        // 多選
         if (jList.getSelectedValues().length > 1) {
             defaultPopupMenu(ListUtil.getList(jList.getSelectedValues(), PomFile.class), jList, evt);
             return;
         }
 
-        //單選
+        // 單選
         final PomFile pomFile = (PomFile) JListUtil.getLeadSelectionObject(jList);
         this.defaultPopupMenu(Arrays.asList(pomFile), jList, evt);
         if (JListUtil.newInstance(jList).isCorrectMouseClick(evt)) {
@@ -744,7 +734,7 @@ public class MavenRepositoryUI extends javax.swing.JFrame {
                                     try {
                                         FileUtil.copyFile(jar, copyToFile);
                                         successCount++;
-                                    } catch (IOException e) {
+                                    } catch (Exception e) {
                                         e.printStackTrace();
                                         errorCount++;
                                         err.append(jar + "\n");
@@ -752,9 +742,9 @@ public class MavenRepositoryUI extends javax.swing.JFrame {
                                 }
                                 JOptionPaneUtil.newInstance().iconInformationMessage().showMessageDialog(//
                                         "copy completed!! \n" + //
-                                                "during : " + (System.currentTimeMillis() - startTime) + "\n" + "success : " + successCount + "\n" + //
-                                                "fail : " + errorCount + "\n" + //
-                                                "fail list : \n" + err, "COMPLETED");
+                                "during : " + (System.currentTimeMillis() - startTime) + "\n" + "success : " + successCount + "\n" + //
+                                "fail : " + errorCount + "\n" + //
+                                "fail list : \n" + err, "COMPLETED");
                             }
                         }, "copy all jar to target " + hashCode()).start();
                     }
@@ -791,6 +781,7 @@ public class MavenRepositoryUI extends javax.swing.JFrame {
                 final String title = "COPY SELECTED JAR(newest) : " + jarList.size();
                 copyAllNewMenu.setText(title);
                 copyAllNewMenu.addActionListener(new ActionListener() {
+
                     public void actionPerformed(ActionEvent paramActionEvent) {
                         System.out.println("# copyMenu action ...");
                         JOptionPaneUtil.ComfirmDialogResult result = JOptionPaneUtil.newInstance().confirmButtonYesNoCancel().showConfirmDialog(//
@@ -811,7 +802,7 @@ public class MavenRepositoryUI extends javax.swing.JFrame {
                                     try {
                                         FileUtil.copyFile(jar, copyToFile);
                                         successCount++;
-                                    } catch (IOException e) {
+                                    } catch (Exception e) {
                                         e.printStackTrace();
                                         errorCount++;
                                         err.append(jar + "\n");
@@ -819,16 +810,44 @@ public class MavenRepositoryUI extends javax.swing.JFrame {
                                 }
                                 JOptionPaneUtil.newInstance().iconInformationMessage().showMessageDialog(//
                                         "copy completed!! \n" + //
-                                                "during : " + (System.currentTimeMillis() - startTime) + "\n" + "success : " + successCount + "\n" + //
-                                                "fail : " + errorCount + "\n" + //
-                                                "fail list : \n" + err, "COMPLETED");
+                                "during : " + (System.currentTimeMillis() - startTime) + "\n" + "success : " + successCount + "\n" + //
+                                "fail : " + errorCount + "\n" + //
+                                "fail list : \n" + err, "COMPLETED");
                             }
                         }, "copy all jar to target " + hashCode()).start();
                     }
                 });
             }
 
-            JPopupMenuUtil.newInstance(component).applyEvent(evt).addJMenuItem(copyAllMenu, copyAllNewMenu).show();
+            final JMenuItem copyAllPomConfigMenu = new JMenuItem();
+            {
+                final StringBuilder sb = new StringBuilder();
+                for (PomFile _pomFile : pomFileList) {
+                    sb.append("<dependency>\n");
+                    sb.append("    <groupId>" + StringUtils.trimToEmpty(_pomFile.pom.groupId) + "</groupId>\n");
+                    sb.append("    <artifactId>" + StringUtils.trimToEmpty(_pomFile.pom.artifactId) + "</artifactId><dependency>\n");
+                    sb.append("    <version>" + StringUtils.trimToEmpty(_pomFile.pom.version) + "</version>\n");
+                    sb.append("<dependency>\n");
+                }
+                final String title = "COPY SELECTED Pom Config : " + pomFileList.size();
+                copyAllPomConfigMenu.setText(title);
+                copyAllPomConfigMenu.addActionListener(new ActionListener() {
+
+                    public void actionPerformed(ActionEvent paramActionEvent) {
+                        boolean yesFileConfirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("按確定產生檔案於桌面,取消則於記事本", "產生設定內容");
+                        if (yesFileConfirm) {
+                            FileUtil.saveToFile(//
+                                    new File(FileUtil.DESKTOP_DIR, MavenRepositoryUI.class.getSimpleName() + "_" + //
+                            DateFormatUtil.format(System.currentTimeMillis(), "yyyyMMddHHmmss") + ".txt"), //
+                                    sb.toString(), "UTF8");
+                        } else {
+                            ClipboardUtil.getInstance().setContents(sb.toString());
+                        }
+                    }
+                });
+            }
+
+            JPopupMenuUtil.newInstance(component).applyEvent(evt).addJMenuItem(copyAllMenu, copyAllNewMenu, copyAllPomConfigMenu).show();
         }
 
         if (pomFile != null) {
@@ -850,13 +869,13 @@ public class MavenRepositoryUI extends javax.swing.JFrame {
                         File copyToFile = new File(copyTo, pomFile.jarFile.getName());
                         JOptionPaneUtil.ComfirmDialogResult result = JOptionPaneUtil.newInstance().confirmButtonYesNoCancel().showConfirmDialog(//
                                 "are you sure copy file : \n" + //
-                                        pomFile.jarFile.getParent() + "\nto\n" + //
-                                        copyToFile.getParent() + "\n" + //
-                                        "\t???", getJarName(pomFile));
+                        pomFile.jarFile.getParent() + "\nto\n" + //
+                        copyToFile.getParent() + "\n" + //
+                        "\t???", getJarName(pomFile));
                         if (result == JOptionPaneUtil.ComfirmDialogResult.YES_OK_OPTION) {
                             try {
                                 FileUtil.copyFile(pomFile.jarFile, copyToFile);
-                            } catch (IOException e) {
+                            } catch (Exception e) {
                                 e.printStackTrace();
                                 JOptionPaneUtil.newInstance().iconErrorMessage().showMessageDialog(e.toString(), "ERROR");
                             }
@@ -877,9 +896,9 @@ public class MavenRepositoryUI extends javax.swing.JFrame {
                                     String command = String.format("cmd /c mvn -U -f \"%s\"", pomFile.xmlFile);
                                     System.out.println(command);
                                     final ProcessWatcher watcher = ProcessWatcher.newInstance(Runtime.getRuntime().exec("cmd /c @echo TODO!!"));
-                                    //TODO
-                                    //FIXME
-                                    //XXX
+                                    // TODO
+                                    // FIXME
+                                    // XXX
                                     JOptionPaneUtil.newInstance().iconInformationMessage().showMessageDialog("TODO", "MAVEN UPDATE");
                                 } catch (Exception ex) {
                                     JCommonUtil.handleException(ex);
@@ -901,7 +920,7 @@ public class MavenRepositoryUI extends javax.swing.JFrame {
                         try {
                             Runtime.getRuntime().exec(String.format("cmd /c call \"%s\" \"%s\"", //
                                     "C:/apps/jd-gui-0.3.1.windows/jd-gui.exe", pomFile.jarFile));
-                        } catch (IOException ex) {
+                        } catch (Exception ex) {
                             JCommonUtil.handleException(ex);
                         }
                     }
@@ -914,7 +933,7 @@ public class MavenRepositoryUI extends javax.swing.JFrame {
                     public void actionPerformed(ActionEvent paramActionEvent) {
                         try {
                             Desktop.getDesktop().open(pomFile.xmlFile.getParentFile());
-                        } catch (IOException ex) {
+                        } catch (Exception ex) {
                             JCommonUtil.handleException(ex);
                         }
                     }
@@ -923,7 +942,7 @@ public class MavenRepositoryUI extends javax.swing.JFrame {
             final JMenuItem showDepedencyMessage = new JMenuItem();
             {
                 showDepedencyMessage.setText("show dependency");
-                showDepedencyMessage.addActionListener(new ActionListener(){
+                showDepedencyMessage.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent paramActionEvent) {
                         clipboardPomJarConfig(pomFile, true);
                     }
@@ -933,8 +952,8 @@ public class MavenRepositoryUI extends javax.swing.JFrame {
             JPopupMenuUtil.newInstance(component).applyEvent(evt).addJMenuItem(copyMenu, updateSnapshotMenu, jdJarMenu, openJarDirMenu, showDepedencyMessage).show();
         }
     }
-    
-    private void clipboardPomJarConfig(PomFile pomFile, boolean isOpen){
+
+    private void clipboardPomJarConfig(PomFile pomFile, boolean isOpen) {
         try {
             StringBuilder sb = new StringBuilder();
             sb.append("             <dependency>                                   \n");
@@ -943,7 +962,7 @@ public class MavenRepositoryUI extends javax.swing.JFrame {
             sb.append("                     <artifactId>{2}</artifactId>           \n");
             sb.append("                     <version>{3}</version>                 \n");
             sb.append("             </dependency>                                  \n");
-            
+
             String jarName = pomFile.jarFile == null ? "" : pomFile.jarFile.getName();
             Pom pom = pomFile.pom;
             String groupId = pom.groupId;
@@ -973,9 +992,9 @@ public class MavenRepositoryUI extends javax.swing.JFrame {
             groupId = StringUtils.defaultString(groupId);
             artifactId = StringUtils.defaultString(artifactId);
             version = StringUtils.defaultString(version);
-            
+
             String pomMessage = MessageFormat.format(sb.toString(), jarName, groupId, artifactId, version);
-            if(isOpen){
+            if (isOpen) {
                 JCommonUtil._jOptionPane_showMessageDialog_info(pomMessage);
             }
             ClipboardUtil.getInstance().setContents(pomMessage);
@@ -1006,33 +1025,43 @@ public class MavenRepositoryUI extends javax.swing.JFrame {
             return;
         }
 
+        final JProgressBarHelper jprogDlg = JProgressBarHelper.newInstance(this, "讀取m2");
+        jprogDlg.indeterminate(true);
+        jprogDlg.build();
+        jprogDlg.show();
         Thread initThread = new Thread(Thread.currentThread().getThreadGroup(), new Runnable() {
             public void run() {
-                long startTime = System.currentTimeMillis();
-                setTitle("loading... " + repositoryDir);
+                try {
+                    long startTime = System.currentTimeMillis();
+                    setTitle("loading... " + repositoryDir);
 
-                List<File> pomList = new ArrayList<File>();
-                FileUtil.searchFileMatchs(repositoryDir, ".*\\.pom", pomList);
+                    List<File> pomList = new ArrayList<File>();
+                    FileUtil.searchFileMatchs(repositoryDir, ".*\\.pom", pomList);
 
-                pomFileList = new HashSet<PomFile>();
-                pomFileJarList = new HashSet<PomFile>();
-                pomFileMap = new HashMap<DependencyKey, PomFile>();
+                    pomFileList = new HashSet<PomFile>();
+                    pomFileJarList = new HashSet<PomFile>();
+                    pomFileMap = new HashMap<DependencyKey, PomFile>();
 
-                loadPomList(pomList);
+                    loadPomList(pomList, jprogDlg);
 
-                long endTime = System.currentTimeMillis() - startTime;
-                String message = "load completed! \ntime:" + endTime + ", poms:" + pomFileList.size() + ", jars:" + pomFileJarList.size();
-                setTitle(message);
-                JOptionPaneUtil.newInstance().iconInformationMessage().showMessageDialog(message, "SCAN COMPLETED");
+                    long endTime = System.currentTimeMillis() - startTime;
+                    String message = "load completed! \ntime:" + endTime + ", poms:" + pomFileList.size() + ", jars:" + pomFileJarList.size();
+                    setTitle(message);
+                    JOptionPaneUtil.newInstance().iconInformationMessage().showMessageDialog(message, "SCAN COMPLETED");
 
-                resetUIStatus();
+                    resetUIStatus();
+                } catch (Exception ex) {
+                    JCommonUtil.handleException(ex);
+                } finally {
+                    jprogDlg.dismiss();
+                }
             }
         }, "reloadRepositoryDir");
         initThread.setDaemon(true);
         initThread.start();
     }
 
-    Set<PomFile> loadPomList(List<File> pomList) {
+    Set<PomFile> loadPomList(List<File> pomList, JProgressBarHelper jprogDlg) {
         Set<PomFile> pomFileListInner = new HashSet<PomFile>();
         Set<PomFile> pomFileJarListInner = new HashSet<PomFile>();
         Map<DependencyKey, PomFile> pomFileMapInner = new HashMap<DependencyKey, PomFile>();
@@ -1040,15 +1069,21 @@ public class MavenRepositoryUI extends javax.swing.JFrame {
         for (File f : pomList) {
             try {
                 Document doc = new SAXReader().read(f);
-                this.addPom(doc, f, pomFileListInner, pomFileJarListInner, pomFileMapInner);
+                PomFile pom = this.addPom(doc, f, pomFileListInner, pomFileJarListInner, pomFileMapInner);
+                if (jprogDlg != null) {
+                    jprogDlg.setStateText(pom.xmlFile.getName());
+                }
             } catch (Exception e) {
-                try{
-                    //替換掉特殊字元 &xxxx; 會造成錯誤
+                try {
+                    // 替換掉特殊字元 &xxxx; 會造成錯誤
                     String xmlStr = FileUtils.readFileToString(f, "utf8");
                     xmlStr = xmlStr.replaceAll("\\&[\\w\\(\\)\\#]*\\;", "");
                     Document doc = new SAXReader().read(new StringReader(xmlStr));
-                    this.addPom(doc, f, pomFileListInner, pomFileJarListInner, pomFileMapInner);
-                }catch(Exception ex){
+                    PomFile pom = this.addPom(doc, f, pomFileListInner, pomFileJarListInner, pomFileMapInner);
+                    if (jprogDlg != null) {
+                        jprogDlg.setStateText(pom.xmlFile.getName());
+                    }
+                } catch (Exception ex) {
                     JCommonUtil.handleException(ex);
                 }
             }
@@ -1058,8 +1093,8 @@ public class MavenRepositoryUI extends javax.swing.JFrame {
         pomFileMap.putAll(pomFileMapInner);
         return pomFileListInner;
     }
-    
-    private void addPom(Document doc, File f, Set<PomFile> pomFileListInner, Set<PomFile> pomFileJarListInner, Map<DependencyKey, PomFile> pomFileMapInner) throws DocumentException{
+
+    private PomFile addPom(Document doc, File f, Set<PomFile> pomFileListInner, Set<PomFile> pomFileJarListInner, Map<DependencyKey, PomFile> pomFileMapInner) throws DocumentException {
         Element root = (Element) doc.selectSingleNode("*");
         PomFile pomFile = new PomFile();
         pomFile.pom = new Pom(root);
@@ -1082,6 +1117,7 @@ public class MavenRepositoryUI extends javax.swing.JFrame {
         } else {
             pomFileMapInner.put(key, pomFile);
         }
+        return pomFile;
     }
 
     void resetUIStatus() {
@@ -1109,11 +1145,11 @@ public class MavenRepositoryUI extends javax.swing.JFrame {
                 }
             };
             for (PomFile pom : pomFileList) {
-                model.addRow(new Object[] {//
-                pom,//
-                        DateFormatUtils.format(pom.xmlFile.lastModified(), "yyyy/MM/dd HH:mm:ss"),//
+                model.addRow(new Object[] { //
+                        pom, //
+                        DateFormatUtils.format(pom.xmlFile.lastModified(), "yyyy/MM/dd HH:mm:ss"), //
                         (pom.jarFile == null ? "" : DateFormatUtils.format(pom.jarFile.lastModified(), "yyyy/MM/dd HH:mm:ss") + "(" + (pom.jarFile.length() / 1024) + ")"), //
-                        (pom.pom.parent == null ? "" : "Y"),//
+                        (pom.pom.parent == null ? "" : "Y"), //
                         pom.pom.modelVersion, //
                         pom.pom.groupId, //
                         pom.pom.artifactId, //
@@ -1127,12 +1163,22 @@ public class MavenRepositoryUI extends javax.swing.JFrame {
             scanTable.setModel(model);
         }
 
-        scanText.getDocument().addDocumentListener(getDocumentListener(scanList, pomFileList));
-        scanText2.getDocument().addDocumentListener(getDocumentListener(scanList2, pomFileJarList));
+        scanText.getDocument().addDocumentListener(JCommonUtil.getDocumentListener(new HandleDocumentEvent() {
+            @Override
+            public void process(DocumentEvent event) {
+                scanTextFindProcess(scanText, scanList, pomFileList);
+            }
+        }));
+        scanText2.getDocument().addDocumentListener(JCommonUtil.getDocumentListener(new HandleDocumentEvent() {
+            @Override
+            public void process(DocumentEvent event) {
+                scanTextFindProcess(scanText2, scanList2, pomFileJarList);
+            }
+        }));
     }
 
     private void tableMouseClicked(JTable table, int pomFileColPos, MouseEvent evt) {
-        //多選
+        // 多選
         if (table.getSelectedRowCount() > 1) {
             int realRowPos = -1;
             PomFile pomFile = null;
@@ -1146,7 +1192,7 @@ public class MavenRepositoryUI extends javax.swing.JFrame {
             return;
         }
 
-        //單選
+        // 單選
         Object selectValue = JTableUtil.newInstance(table).getSelectedValue();
         int rowIndex = JTableUtil.newInstance(table).getSelectedRow();
         PomFile pomFile = (PomFile) table.getModel().getValueAt(rowIndex, pomFileColPos);
@@ -1158,9 +1204,9 @@ public class MavenRepositoryUI extends javax.swing.JFrame {
             this.showPomInfo(pomFile);
         }
     }
-    
+
     private JButton getJButton1() {
-        if(deleteOldJarBtn == null) {
+        if (deleteOldJarBtn == null) {
             deleteOldJarBtn = new JButton();
             deleteOldJarBtn.setText("delete old jarfile");
             deleteOldJarBtn.addActionListener(new ActionListener() {
@@ -1176,18 +1222,18 @@ public class MavenRepositoryUI extends javax.swing.JFrame {
                             }
                         });
                         Pattern pattern = Pattern.compile("^.*\\-[\\d]{8}\\.[\\d]{6}\\-\\d+\\.jar$");
-                        for(PomFile f : list){
-                            if(pattern.matcher(f.jarFile.getName()).matches()){
+                        for (PomFile f : list) {
+                            if (pattern.matcher(f.jarFile.getName()).matches()) {
                                 System.out.println(f.jarFile);
-                                if(f.jarFile.delete()){
-                                    count ++;
+                                if (f.jarFile.delete()) {
+                                    count++;
                                 }
-                                if(f.xmlFile.delete()){
-                                    count1 ++;
+                                if (f.xmlFile.delete()) {
+                                    count1++;
                                 }
                             }
                         }
-                        JCommonUtil._jOptionPane_showMessageDialog_info("刪除舊的非snapshot的jar檔\njar檔案數:" + count+"\npom檔:" + count1);
+                        JCommonUtil._jOptionPane_showMessageDialog_info("刪除舊的非snapshot的jar檔\njar檔案數:" + count + "\npom檔:" + count1);
                     } catch (Exception ex) {
                         JCommonUtil.handleException(ex);
                         ex.printStackTrace();

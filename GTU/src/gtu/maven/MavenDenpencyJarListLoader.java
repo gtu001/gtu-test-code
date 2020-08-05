@@ -1,15 +1,15 @@
 package gtu.maven;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.util.IOUtils;
 
 import gtu.file.FileUtil;
 import gtu.runtime.ProcessWatcher;
@@ -33,7 +33,7 @@ public class MavenDenpencyJarListLoader {
         // File("/media/gtu001/OLD_D/apps/apache-maven-3.3.9/bin/mvn"); //
         // System.getenv("M2_HOME")
         // //-----------------------------------------------------------------
-        File pomFile = new File("‪D:/workstuff/gtu-test-code/GTU/pom.xml");
+        File pomFile = new File("D:/workstuff/gtu-test-code/GTU/pom.xml");
         File mavenDir = new File("D:/apps/apache-maven-3.3.9/bin/mvn"); //
 
         // File pomFile = new
@@ -82,37 +82,57 @@ public class MavenDenpencyJarListLoader {
     public List<String> build() {
         LineNumberReader reader = null;
         try {
-            if (mavenExePath == null) {
-                File tmpExeFile = new File(System.getenv("M2_HOME") + "/bin/mvn");
-                if (tmpExeFile.exists()) {
-                    mavenExePath = tmpExeFile;
-                }
-            }
-
-            String rootPath = pomFile.getAbsolutePath().substring(0, pomFile.getAbsolutePath().indexOf(":") + 1);
-
-            RuntimeBatPromptModeUtil execdo = RuntimeBatPromptModeUtil.newInstance();
-            execdo.command(String.format("cd %s", FileUtil.replaceSpecialChar(pomFile.getParent())));
-            if (isWindows) {
-                execdo.runInBatFile(false);
-                execdo.command(rootPath);
-            } else {
-                execdo.runInBatFile(false);
-            }
-            execdo.command((isWindows ? "" : "sh ") + FileUtil.replaceSpecialChar(mavenExePath.getAbsolutePath()) + " dependency:build-classpath -DincludeScope=runtime");
-            System.out.println("----------------------------------------");
-            System.out.println(execdo.getCommand());
-            System.out.println("----------------------------------------");
-
-            Process exec = execdo.apply();
-            ProcessWatcher _inst = ProcessWatcher.newInstance(exec);
-            _inst.getStreamSync();
-
             boolean buildSuccess = false;
-
             StringBuilder sb = new StringBuilder();
-            reader = new LineNumberReader(new StringReader(_inst.getInputStreamToString()));
+
+            File pomUsageFile = new File(pomFile.getParentFile(), "pom_usage.txt");
+            if (!pomUsageFile.exists()) {
+                if (mavenExePath == null) {
+                    File tmpExeFile = new File(System.getenv("M2_HOME") + "/bin/mvn");
+                    if (tmpExeFile.exists()) {
+                        mavenExePath = tmpExeFile;
+                    }
+                }
+
+                String rootPath = pomFile.getAbsolutePath().substring(0, pomFile.getAbsolutePath().indexOf(":") + 1);
+
+                RuntimeBatPromptModeUtil execdo = RuntimeBatPromptModeUtil.newInstance();
+                execdo.command(String.format("cd %s", FileUtil.replaceSpecialChar(pomFile.getParent())));
+                if (isWindows) {
+                    execdo.runInBatFile(false);
+                    execdo.command(rootPath);
+                } else {
+                    execdo.runInBatFile(false);
+                }
+                execdo.command((isWindows ? "" : "sh ") + FileUtil.replaceSpecialChar(mavenExePath.getAbsolutePath()) + " dependency:build-classpath -DincludeScope=runtime");
+                System.out.println("----------------------------------------");
+                System.out.println(execdo.getCommand());
+                System.out.println("----------------------------------------");
+
+                Process exec = execdo.apply();
+                ProcessWatcher _inst = ProcessWatcher.newInstance(exec);
+                _inst.getStreamSync();
+
+                reader = new LineNumberReader(new StringReader(_inst.getInputStreamToString()));
+                for (String line = null; (line = reader.readLine()) != null;) {
+                    sb.append(line + "\r\n");
+                    if (StringUtils.trimToEmpty(line).startsWith("[INFO] BUILD SUCCESS")) {
+                        buildSuccess = true;
+                    }
+                }
+
+                if (!buildSuccess) {
+                    System.err.println("input : " + _inst.getInputStreamToString());
+                    System.err.println("error : " + _inst.getErrorStreamToString());
+                    throw new Exception("非正常結束!, not build success");
+                }
+
+                FileUtil.saveToFile(pomUsageFile, sb.toString(), "UTF8");
+            }
+
+            sb.setLength(0);
             int startPos = -1;
+            reader = new LineNumberReader(new InputStreamReader(new FileInputStream(pomUsageFile), "UTF8"));
             for (String line = null; (line = reader.readLine()) != null;) {
                 line = StringUtils.trimToEmpty(line);
                 // System.out.println("....." + line);
@@ -133,8 +153,6 @@ public class MavenDenpencyJarListLoader {
             }
 
             if (!buildSuccess) {
-                System.err.println("input : " + _inst.getInputStreamToString());
-                System.err.println("error : " + _inst.getErrorStreamToString());
                 throw new Exception("非正常結束!, not build success");
             }
 

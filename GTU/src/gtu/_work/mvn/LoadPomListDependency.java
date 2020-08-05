@@ -31,14 +31,14 @@ public class LoadPomListDependency {
         System.out.println(pom);
     }
 
-    static String getNodeText(Node node) {
+    static String getNodeText(final Node node) {
         if (node != null) {
             return node.getText().trim();
         }
         return null;
     }
 
-    static void showSelectNodes(String prefix, Node node) {
+    static void showSelectNodes(final String prefix, final Node node) {
         for (Object n2 : node.selectNodes("*")) {
             Node n22 = (Node) n2;
             System.out.println(prefix + n22.getName() + " " + n22.getPath());
@@ -59,7 +59,7 @@ public class LoadPomListDependency {
         final String description;
         final List<Dependency> dependencies;
 
-        Pom(Node node) {
+        Pom(final Node node) {
             modelVersion = getNodeText(node.selectSingleNode("*[name()='modelVersion']"));
             Node parentNode = node.selectSingleNode("*[name()='parent']");
             if (parentNode != null) {
@@ -179,7 +179,7 @@ public class LoadPomListDependency {
         final String version;
         final String scope;
 
-        Dependency(Node node) {
+        Dependency(final Node node) {
             groupId = getNodeText(node.selectSingleNode("*[name()='groupId']"));
             artifactId = getNodeText(node.selectSingleNode("*[name()='artifactId']"));
             version = getNodeText(node.selectSingleNode("*[name()='version']"));
@@ -197,7 +197,7 @@ public class LoadPomListDependency {
         final String groupId;
         final String artifactId;
 
-        public DependencyKey(String groupId, String artifactId) {
+        public DependencyKey(final String groupId, final String artifactId) {
             super();
             this.groupId = groupId;
             this.artifactId = artifactId;
