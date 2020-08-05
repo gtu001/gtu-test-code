@@ -7,3 +7,6 @@ $ git branch -r --all | grep T028
 $ git checkout origin/feature/#NCSPOS-T028
 $ git checkout -b feature/#NCSPOS-T028 origin/feature/#NCSPOS-T028
 
+$ git checkout -b <local branch>  --track <remote>
+	Ex : git checkout -b feature/#NCSPOS-T028 --track origin/feature/#NCSPOS-T028
+
