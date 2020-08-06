@@ -7901,7 +7901,7 @@ public class FastDBQueryUI extends JFrame {
         }
 
         private boolean fixTwoTry(final int colIndex, final String columnName, final String sql) {
-            int pos = sql.indexOf(columnName);
+            int pos = sql.indexOf(Pattern.quote(columnName));
             if (pos != -1) {
                 pos += columnName.length();
                 String beforeStr = sql.substring(0, pos);
