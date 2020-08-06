@@ -1201,6 +1201,7 @@ public class FastDBQueryUI extends JFrame {
                                         findOk = true;
                                     }
                                 }
+                                index ++;
                             }
                             mth.appendTail(sb);
                             if (findOk) {
