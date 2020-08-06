@@ -1156,7 +1156,7 @@ public class FastDBQueryUI extends JFrame {
         queryResultTable.getTableHeader().addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                int col = queryResultTable.columnAtPoint(e.getPoint());
+                final int col = queryResultTable.columnAtPoint(e.getPoint());
                 final String name = queryResultTable.getColumnName(col);
                 System.out.println("Column index selected " + col + " " + name);
 
@@ -1166,6 +1166,48 @@ public class FastDBQueryUI extends JFrame {
                         @Override
                         public void actionPerformed(ActionEvent e) {
                             ClipboardUtil.getInstance().setContents(name);
+                        }
+                    }).addJMenuItem("加入標籤 : " + name, new ActionListener() {
+
+                        private int getIndex(String columnName, int colIndex) {
+                            List<String> lst = JTableUtil.newInstance(queryResultTable).getColumnTitleStringArray();
+                            int index = 0;
+                            for (int ii = 0; ii <= colIndex; ii++) {
+                                if (StringUtils.equals(columnName, lst.get(ii))) {
+                                    index++;
+                                }
+                            }
+                            return index;
+                        }
+
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            final int colIndex = col;
+                            final String columnName = name;
+                            String sql = sqlTextArea.getText().toString();
+                            sql = StringUtils.defaultString(sql);
+                            Pattern ptn = Pattern.compile(Pattern.quote(columnName), Pattern.DOTALL | Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
+                            Matcher mth = ptn.matcher(sql);
+                            int realIndex = getIndex(columnName, colIndex);
+                            int index = 1;
+                            StringBuffer sb = new StringBuffer();
+                            boolean findOk = false;
+                            while (mth.find()) {
+                                if (realIndex == index) {
+                                    String label = JCommonUtil._jOptionPane_showInputDialog("請輸入標題");
+                                    if (StringUtils.isNotBlank(label)) {
+                                        label = " /*" + StringUtils.trimToEmpty(label) + "*/";
+                                        mth.appendReplacement(sb, mth.group() + label);
+                                        findOk = true;
+                                    }
+                                }
+                            }
+                            mth.appendTail(sb);
+                            if (findOk) {
+                                sqlTextArea.setText(sb.toString());
+                            } else {
+                                JCommonUtil._jOptionPane_showMessageDialog_info("找不到欄位!");
+                            }
                         }
                     }).addJMenuItem("複製全部(逗號)", new ActionListener() {
                         @Override
@@ -1180,6 +1222,13 @@ public class FastDBQueryUI extends JFrame {
                             JTableUtil tabUtil = JTableUtil.newInstance(queryResultTable);
                             List<Object> lst = tabUtil.getColumnTitleArray();
                             ClipboardUtil.getInstance().setContents(StringUtils.join(lst, "\r\n"));
+                        }
+                    }).addJMenuItem("複製全部(多行逗號)", new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            JTableUtil tabUtil = JTableUtil.newInstance(queryResultTable);
+                            List<Object> lst = tabUtil.getColumnTitleArray();
+                            ClipboardUtil.getInstance().setContents(StringUtils.join(lst, ",\r\n"));
                         }
                     }).addJMenuItem("Sql Column IN (...)", new ActionListener() {
                         @Override
