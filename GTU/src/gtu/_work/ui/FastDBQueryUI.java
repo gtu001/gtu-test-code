@@ -1168,46 +1168,18 @@ public class FastDBQueryUI extends JFrame {
                             ClipboardUtil.getInstance().setContents(name);
                         }
                     }).addJMenuItem("加入標籤 : " + name, new ActionListener() {
-
-                        private int getIndex(String columnName, int colIndex) {
-                            List<String> lst = JTableUtil.newInstance(queryResultTable).getColumnTitleStringArray();
-                            int index = 0;
-                            for (int ii = 0; ii <= colIndex; ii++) {
-                                if (StringUtils.equals(columnName, lst.get(ii))) {
-                                    index++;
-                                }
-                            }
-                            return index;
-                        }
-
                         @Override
                         public void actionPerformed(ActionEvent e) {
                             final int colIndex = col;
                             final String columnName = name;
-                            String sql = sqlTextArea.getText().toString();
-                            sql = StringUtils.defaultString(sql);
-                            Pattern ptn = Pattern.compile(Pattern.quote(columnName), Pattern.DOTALL | Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
-                            Matcher mth = ptn.matcher(sql);
-                            int realIndex = getIndex(columnName, colIndex);
-                            int index = 1;
-                            StringBuffer sb = new StringBuffer();
-                            boolean findOk = false;
-                            while (mth.find()) {
-                                if (realIndex == index) {
-                                    String label = JCommonUtil._jOptionPane_showInputDialog("請輸入標題");
-                                    if (StringUtils.isNotBlank(label)) {
-                                        label = " /*" + StringUtils.trimToEmpty(label) + "*/";
-                                        mth.appendReplacement(sb, mth.group() + label);
-                                        findOk = true;
-                                    }
-                                }
-                                index ++;
+                            String sql = StringUtils.defaultString(sqlTextArea.getText().toString());
+                            TitleSetLabel mTitleSetLabel = new TitleSetLabel();
+                            boolean fixOk = mTitleSetLabel.fixOneTry(colIndex, columnName, sql);
+                            if (!fixOk) {
+                                mTitleSetLabel.fixTwoTry(colIndex, columnName, sql);
                             }
-                            mth.appendTail(sb);
-                            if (findOk) {
-                                sqlTextArea.setText(sb.toString());
-                            } else {
-                                JCommonUtil._jOptionPane_showMessageDialog_info("找不到欄位!");
+                            if (!fixOk) {
+                                JCommonUtil._jOptionPane_showMessageDialog_error("找不到欄位!");
                             }
                         }
                     }).addJMenuItem("複製全部(逗號)", new ActionListener() {
@@ -7888,6 +7860,60 @@ public class FastDBQueryUI extends JFrame {
             } catch (Exception ex) {
                 JCommonUtil.handleException(ex);
             }
+        }
+    }
+
+    private class TitleSetLabel {
+        private int getIndex(String columnName, int colIndex) {
+            List<String> lst = JTableUtil.newInstance(queryResultTable).getColumnTitleStringArray();
+            int index = 0;
+            for (int ii = 0; ii <= colIndex; ii++) {
+                if (StringUtils.equals(columnName, lst.get(ii))) {
+                    index++;
+                }
+            }
+            return index;
+        }
+
+        private boolean fixOneTry(final int colIndex, final String columnName, final String sql) {
+            Pattern ptn = Pattern.compile(Pattern.quote(columnName), Pattern.DOTALL | Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
+            Matcher mth = ptn.matcher(sql);
+            int realIndex = getIndex(columnName, colIndex);
+            int index = 1;
+            StringBuffer sb = new StringBuffer();
+            boolean findOk = false;
+            while (mth.find()) {
+                if (realIndex == index) {
+                    String label = JCommonUtil._jOptionPane_showInputDialog("請輸入標題");
+                    if (StringUtils.isNotBlank(label)) {
+                        label = " /*" + StringUtils.trimToEmpty(label) + "*/";
+                        mth.appendReplacement(sb, mth.group() + label);
+                    }
+                    findOk = true;
+                }
+                index++;
+            }
+            mth.appendTail(sb);
+            if (findOk) {
+                sqlTextArea.setText(sb.toString());
+            }
+            return findOk;
+        }
+
+        private boolean fixTwoTry(final int colIndex, final String columnName, final String sql) {
+            int pos = sql.indexOf(columnName);
+            if (pos != -1) {
+                pos += columnName.length();
+                String beforeStr = sql.substring(0, pos);
+                String afterStr = sql.substring(pos);
+                String label = JCommonUtil._jOptionPane_showInputDialog("請輸入標題");
+                if (StringUtils.isNotBlank(label)) {
+                    label = " /*" + StringUtils.trimToEmpty(label) + "*/";
+                    sqlTextArea.setText(beforeStr + label + afterStr);
+                }
+                return true;
+            }
+            return false;
         }
     }
 }
