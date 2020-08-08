@@ -29,12 +29,19 @@
 	<typedef name="antDebug" classname="gtu.ant.AntDebug" classpathref="my_test_classpath" />
 	<typedef name="jarToExe" classname="gtu.ant.AntJarToExe" classpathref="my_test_classpath" />
 	<typedef name="notify" classname="gtu.ant.AntNotify" classpathref="my_test_classpath" />
+	<typedef name="obfuscator" classname="gtu.ant.AntObfuscator" classpathref="my_test_classpath" />
 
 	<!-- 參考的jar -->
 	<path id="class_path">
 		<fileset dir="${jar_repsitory}">
 			<filename name="**/*.jar" />
 		</fileset>
+	</path>
+	<path id="javafx_class_path">
+		<fileset dir="/media/gtu001/OLD_D/my_tool/jfxrt">
+			<filename name="**/*.jar" />
+		</fileset>
+		<pathelement path="${build.dir}" />
 	</path>
 
 	<!--
@@ -98,14 +105,18 @@
 	<target name="main">
 		<antcall target="clean">
 			<!--清除-->
-			<param name="enable" value="true" />
+			<param name="enable" value="true" /><!--false -->
 		</antcall>
 
 		<antcall target="buildClassSet">
-			<param name="enable" value="true" />
+			<param name="enable" value="true" /><!--false -->
 		</antcall>
 
 		<antcall target="copyReference">
+			<param name="enable" value="true" /><!--false -->
+		</antcall>
+
+		<antcall target="compiler">
 			<param name="enable" value="true" />
 		</antcall>
 
@@ -122,6 +133,10 @@
 		<antcall target="runJar">
 			<param name="enable" value="false" />
 		</antcall>
+	
+		<antcall target="obfuscator">
+			<param name="enable" value="false" />
+		</antcall>
 
 		<antcall target="moveJarToDesktop">
 			<param name="enable" value="true" />
@@ -133,7 +148,7 @@
 
 		<antcall target="clean">
 			<!--清除-->
-			<param name="enable" value="true" />
+			<param name="enable" value="true" /><!--false -->
 		</antcall>
 
 		<antcall target="jarToExe">
@@ -144,7 +159,7 @@
 			<param name="enable" value="true" />
 		</antcall>
 	</target>
-	
+
 	<target name="notify">
 		<echo># notify ...</echo>
 		<!--
@@ -155,13 +170,14 @@
 		<notify type="info" title="build完成" message="create ${main_class}.jar complete!!" />
 	</target>
 
-	<target name="compiler">
+	<target name="compiler" if="${enable}">
 		<echo># compiler ...</echo>
-		<javac compiler="javac1.6" source="1.6" target="1.6" includeantruntime="true" srcdir="${src_dir}" destdir="${build_dir}" deprecation="no" nowarn="true" encoding="UTF-8" debug="on">
-			<include name="**/${main_class}.java" />
+		<javac fork="yes" executable="${jdk_javac}" compiler="javac1.6" source="1.6" target="1.6" includeantruntime="true" srcdir="${src_dir}" destdir="${build_dir}" deprecation="no" nowarn="true" encoding="UTF-8" debug="on"><!-- -->
+			<include name="**/${main_class}.java" /><!--executable="${jdk_javac}" fork="yes" -->
 			<classpath>
 				<path location="${build_dir}" />
 			</classpath>
+			<classpath refid="javafx_class_path" />
 		</javac>
 	</target>
 
@@ -177,12 +193,12 @@
 	<target name="createJar" if="${enable}">
 		<echo># create ${main_class}.jar</echo>
 		<!--
-				<jar destfile="${main_class}.jar" basedir="${build_dir}">
-					<manifest>
-						<attribute name="Main-Class" value="${main_class_full}" />
-					</manifest>
-				</jar>
-				-->
+			<jar destfile="${main_class}.jar" basedir="${build_dir}">
+				<manifest>
+					<attribute name="Main-Class" value="${main_class_full}" />
+				</manifest>
+			</jar>
+			-->
 		<jar destfile="${main_class}.jar">
 			<zipfileset dir="${build_dir}">
 				<exclude name="META-INF/**" />
@@ -192,7 +208,7 @@
 			<manifest>
 				<attribute name="Main-Class" value="${main_class_full}" />
 				<attribute name="Class-Path" value="." />
-				<!--<attribute name="Rsrc-Class-Path" value="./ ojdbc14.jar" />-->
+				<attribute name="Rsrc-Class-Path" value="./ ojdbc14.jar" />
 			</manifest>
 		</jar>
 	</target>
@@ -243,5 +259,10 @@
 				<include name="**/*.jar" />
 			</fileset>
 		</unjar>
+	</target>
+
+	<target name="obfuscator" if="${enable}">
+		<echo># obfuscator = ${enable}</echo>
+		<obfuscator jarDir="${obfuscator_dir}" inJar="${basedir}/${main_class}.jar" />
 	</target>
 </project>
