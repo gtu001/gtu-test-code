@@ -146,7 +146,7 @@ public class DirectoryCompareUI extends javax.swing.JFrame {
         super();
         initGUI();
     }
-    
+
     private MouseAdapter pasteEvent = new MouseAdapter() {
         @Override
         public void mouseClicked(final MouseEvent e1) {
@@ -222,6 +222,20 @@ public class DirectoryCompareUI extends javax.swing.JFrame {
                             executeBtn.addActionListener(new ActionListener() {
                                 public void actionPerformed(ActionEvent evt) {
                                     compareStart();
+                                }
+                            });
+                        }
+                        {
+                            JButton swapBtn = new JButton();
+                            jPanel2.add(swapBtn);
+                            jPanel2.add(getResetBtn());
+                            swapBtn.setText("<>");
+                            swapBtn.addActionListener(new ActionListener() {
+                                public void actionPerformed(ActionEvent evt) {
+                                    String left = leftDirText.getText();
+                                    String right = rightDirText.getText();
+                                    leftDirText.setText(right);
+                                    rightDirText.setText(left);
                                 }
                             });
                         }

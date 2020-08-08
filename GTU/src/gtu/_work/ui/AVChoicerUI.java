@@ -13,7 +13,6 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -1209,37 +1208,42 @@ public class AVChoicerUI extends JFrame {
         }
 
         private void deleteFile() {
-            File file = tempFile.get();
+            final File file = tempFile.get();
             if (!file.exists()) {
                 JCommonUtil._jOptionPane_showMessageDialog_error("檔案不存在!");
                 return;
             }
             boolean result = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("是否刪除此檔 : " + file, "刪除檔案!");
             if (result) {
-                try {
-                    boolean delResult = false;
-                    if (isWindows) {
-                        delResult = RecycleBinUtil_forWin.moveTo(file);
-                    } else {
-                        delResult = RecycleBinTrashcanUtil.moveToTrashCan(file);
-                        if (!delResult) {
-                            try {
-                                FileUtils.forceDelete(file);
-                                delResult = file.exists();
-                            } catch (Exception ex) {
-                                ex.printStackTrace();
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            boolean delResult = false;
+                            if (isWindows) {
+                                delResult = RecycleBinUtil_forWin.moveTo(file);
+                            } else {
+                                delResult = RecycleBinTrashcanUtil.moveToTrashCan(file);
+                                if (!delResult) {
+                                    try {
+                                        FileUtils.forceDelete(file);
+                                        delResult = file.exists();
+                                    } catch (Exception ex) {
+                                        ex.printStackTrace();
+                                    }
+                                }
                             }
+                            trayUtil.displayMessage(delResult ? "刪除成功!" : "刪除失敗", file.toString(), MessageType.INFO);
+                            deleteAVFileLabel.setText(file.exists() ? "Done!" : "NotDone!");
+                            setCountLabel();
+                            // resetCacheFileList();
+                            removeFromCacheLst(file);
+                            dirCheckTextActionPerformed(null);
+                        } catch (Exception e) {
+                            JCommonUtil.handleException(e);
                         }
                     }
-                    trayUtil.displayMessage(delResult ? "刪除成功!" : "刪除失敗", file.toString(), MessageType.INFO);
-                    deleteAVFileLabel.setText(file.exists() ? "Done!" : "NotDone!");
-                    setCountLabel();
-                    // resetCacheFileList();
-                    removeFromCacheLst(file);
-                    dirCheckTextActionPerformed(null);
-                } catch (Exception e) {
-                    JCommonUtil.handleException(e);
-                }
+                }).start();
             }
         }
 
