@@ -5,7 +5,7 @@
 輸入
  $ git gc --prune=now
 或
- $ git remote prune origin
+ $ git remote prune origin  <--- 會砍掉所有異動內容, 記得backup
 
 
 在顯示log 顯示沒有任何 log 

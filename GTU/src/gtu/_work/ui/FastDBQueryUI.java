@@ -5049,6 +5049,16 @@ public class FastDBQueryUI extends JFrame {
         public void updateQueryTime() {
             SqlIdConfigBean bean = getCurrentEditSqlIdConfigBean();
             if (bean != null) {
+                String queryTimes = "0";
+                if (lst.contains(bean)) {
+                    queryTimes = lst.get(lst.indexOf(bean)).queryTimes;
+                }
+                try {
+                    queryTimes = "" + (Integer.parseInt(queryTimes) + 1);
+                } catch (Exception ex) {
+                    queryTimes = "1";
+                }
+                bean.queryTimes = queryTimes;
                 bean.latestQueryTime = DateFormatUtils.format(System.currentTimeMillis(), "yyyy-MM-dd HH:mm:ss.SSS");
                 save(bean);
             }
@@ -5071,6 +5081,7 @@ public class FastDBQueryUI extends JFrame {
                 b2.sql = b.sql;
                 b2.sqlId = b.sqlId;
                 b2.sqlComment = b.sqlComment;
+                b2.queryTimes = b.queryTimes;
                 b2.latestQueryTime = b.latestQueryTime;
                 b2.latestUpdateTime = b.latestUpdateTime;
             } else {
@@ -5148,7 +5159,7 @@ public class FastDBQueryUI extends JFrame {
     }
 
     public static class SqlIdConfigBean {
-        private static String[] KEYS_DEF = new String[] { "color", "category", "sqlId", "sqlComment", "latestUpdateTime", "latestQueryTime" };
+        private static String[] KEYS_DEF = new String[] { "color", "category", "sqlId", "sqlComment", "latestUpdateTime", "latestQueryTime", "queryTimes" };
         private static String[] VALUES_DEF = new String[] { "sql" };
 
         public static int SHOW_TIME_STATUS = -1;
@@ -5160,6 +5171,7 @@ public class FastDBQueryUI extends JFrame {
         String sqlComment;
         String latestUpdateTime;
         String latestQueryTime;
+        String queryTimes;
 
         public String getCategory() {
             return category;
@@ -5224,11 +5236,13 @@ public class FastDBQueryUI extends JFrame {
         }
 
         public String toString() {
-            String latestUpdateTimeStr = "";
+            String prefixStatusString = "";
             if (SHOW_TIME_STATUS == 1) {
-                latestUpdateTimeStr = StringUtils.trimToEmpty(latestUpdateTime) + "  ";
+                prefixStatusString = StringUtils.trimToEmpty(latestUpdateTime) + "  ";
             } else if (SHOW_TIME_STATUS == 2) {
-                latestUpdateTimeStr = StringUtils.trimToEmpty(latestQueryTime) + "  ";
+                prefixStatusString = StringUtils.trimToEmpty(latestQueryTime) + "  ";
+            } else if (SHOW_TIME_STATUS == 3) {
+                prefixStatusString = StringUtils.trimToEmpty(queryTimes) + "  ";
             }
             if (StringUtils.isNotBlank(category)) {
                 return String.format("<html><body %5$s>"//
@@ -5241,7 +5255,7 @@ public class FastDBQueryUI extends JFrame {
                         StringUtils.trimToEmpty(color), //
                         "『" + StringUtils.trimToEmpty(category) + "』  ", //
                         StringUtils.trimToEmpty(sqlId), //
-                        latestUpdateTimeStr, //
+                        prefixStatusString, //
                         "" //
                 );
             } else {
@@ -5255,7 +5269,7 @@ public class FastDBQueryUI extends JFrame {
                         StringUtils.trimToEmpty(color), //
                         StringUtils.trimToEmpty(category), //
                         StringUtils.trimToEmpty(sqlId), //
-                        latestUpdateTimeStr, //
+                        prefixStatusString, //
                         "" //
                 );
             }
@@ -5350,6 +5364,14 @@ public class FastDBQueryUI extends JFrame {
 
         public void setLatestQueryTime(String latestQueryTime) {
             this.latestQueryTime = latestQueryTime;
+        }
+
+        public String getQueryTimes() {
+            return queryTimes;
+        }
+
+        public void setQueryTimes(String queryTimes) {
+            this.queryTimes = queryTimes;
         }
     }
 
@@ -7979,7 +8001,9 @@ public class FastDBQueryUI extends JFrame {
         SAVETIME_DESC("修改日期 desc"), //
         SAVETIME_ASC("修改日期 asc"), //
         QUERYTIME_DESC("查詢日期 desc"), //
-        QUERYTIME_ASC("查詢日期 asc"),//
+        QUERYTIME_ASC("查詢日期 asc"), //
+        QUERYTIME_COUNT_DESC("查詢次數 asc"), //
+        QUERYTIME_COUNT_ASC("查詢次數 asc"),//
         ;
 
         String label;
@@ -8069,6 +8093,26 @@ public class FastDBQueryUI extends JFrame {
                     @Override
                     public int compare(SqlIdConfigBean o1, SqlIdConfigBean o2) {
                         int compare1 = StringUtils.trimToEmpty(o1.latestQueryTime).toLowerCase().compareTo(StringUtils.trimToEmpty(o2.latestQueryTime).toLowerCase());
+                        return compare1;
+                    }
+                });
+                break;
+            case QUERYTIME_COUNT_DESC:
+                SqlIdConfigBean.SHOW_TIME_STATUS = 3;
+                Collections.sort(sqlIdList, new Comparator<SqlIdConfigBean>() {
+                    @Override
+                    public int compare(SqlIdConfigBean o1, SqlIdConfigBean o2) {
+                        int compare1 = -1 * StringUtils.trimToEmpty(o1.queryTimes).toLowerCase().compareTo(StringUtils.trimToEmpty(o2.queryTimes).toLowerCase());
+                        return compare1;
+                    }
+                });
+                break;
+            case QUERYTIME_COUNT_ASC:
+                SqlIdConfigBean.SHOW_TIME_STATUS = 3;
+                Collections.sort(sqlIdList, new Comparator<SqlIdConfigBean>() {
+                    @Override
+                    public int compare(SqlIdConfigBean o1, SqlIdConfigBean o2) {
+                        int compare1 = StringUtils.trimToEmpty(o1.queryTimes).toLowerCase().compareTo(StringUtils.trimToEmpty(o2.queryTimes).toLowerCase());
                         return compare1;
                     }
                 });
