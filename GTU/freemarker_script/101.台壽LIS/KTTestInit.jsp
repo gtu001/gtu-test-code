@@ -434,4 +434,18 @@
     		getSelectedRowNoArry : getSelectedRowNoArry
     	}
     }
+
+    function processAjax() {
+	    var postData=new PostData();
+	    postData.setModuleName("ind_pa");
+	    postData.setTheRestUrl("/bq/PEdorTypeST/");
+	    postData.setAction("INIT");
+	    postData.put("EdorAcceptNo",document.getElementById("EdorAcceptNo").value);
+	    postData.put("ContNo",document.getElementById("ContNo").value);
+	    postData.submit(postData, function(flagStr,content,result) {
+		    document.all('EdorValiDate').value = result.DefaultEdorValiDate;
+		    document.all('PayToDate').value = result.PayToDate;
+		});
+	}
+
 </script>

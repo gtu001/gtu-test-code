@@ -2,8 +2,16 @@
     $('.datepicker input[type="text"]').datepicker("option", {
         dateFormat: "yy/mm/dd",
         changeMonth: true,
-        changeYear: true
+        changeYear: true,
+        showOn: "both",
+	buttonImageOnly: true,
+	onSelect: function(dateText) {
+		console.log("Selected date: " + dateText + "; input's current value: " + this.value);
+	}
     });
     $('.datepicker img').click(function(){
         $(this).siblings().datepicker('show');
     });
+
+    var dateStr = $("some date input").datepicker("getDate");
+    $('some date input').datepicker('setDate', dateStr);

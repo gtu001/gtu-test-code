@@ -1,0 +1,23 @@
+<!-- <%@ page pageEncoding="UTF-8"%> -->
+
+<html>
+<head>
+<meta charset="UTF-8" />
+<!--<script src="jquery.js" type="text/javascript"></script>-->
+<script src="laydate.js" type="text/javascript"></script>
+<!--<LINK href="laydate.css" rel=stylesheet type="text/css">-->
+<script language="javascript">
+
+</script>
+<style type="text/css">
+	$(document).ready(function(){
+		laydate({elem: '[name=EdorValiDate]'});
+	});
+</style>
+
+</head>
+<body>
+	<input class="coolDatePicker" readonly name=EdorValiDate onClick="laydate({elem: '#EdorValiDate'});" id="EdorValiDate">
+	<span class="icon"><a onClick="laydate({elem: '#EdorValiDate'});"><img src="skins/default/icon.png" /></a></span>
+</body>
+</html>
