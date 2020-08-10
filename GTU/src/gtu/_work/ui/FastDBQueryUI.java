@@ -49,6 +49,7 @@ import javax.sql.DataSource;
 import javax.swing.AbstractButton;
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultCellEditor;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -113,6 +114,7 @@ import gtu.binary.Base64JdkUtil;
 import gtu.clipboard.ClipboardUtil;
 import gtu.collection.ListUtil;
 import gtu.collection.MapUtil;
+import gtu.date.DateFormatUtil;
 import gtu.db.ExternalJDBCDriverJarLoader;
 import gtu.db.JdbcDBUtil;
 import gtu.db.jdbc.util.DBDateUtil.DBDateFormat;
@@ -398,6 +400,8 @@ public class FastDBQueryUI extends JFrame {
     private AtomicReference<String> currentSQL = new AtomicReference<String>();
     private JCheckBox recordWatcherToggleAutoChk;
     private FastDBQueryUI_ReserveSqlDlg mFastDBQueryUI_ReserveSqlDlg;
+    private JComboBox sqlListSortCombobox;
+    private JLabel lblNewLabel_22;
 
     private final Predicate IGNORE_PREDICT = new Predicate() {
         @Override
@@ -607,6 +611,22 @@ public class FastDBQueryUI extends JFrame {
         sqlQueryText = new JTextField();
         sqlQueryText.setToolTipText("SQL ID標籤過濾");
         sqlQueryText.setColumns(15);
+
+        lblNewLabel_22 = new JLabel("排序");
+        newPanel1.add(lblNewLabel_22);
+
+        sqlListSortCombobox = new JComboBox();
+        sqlListSortCombobox.setModel(SqlListSortCombobox_SortEnum.getModel());
+        newPanel1.add(sqlListSortCombobox);
+        sqlListSortCombobox.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    initLoadSqlListConfig();
+                } catch (Exception ex) {
+                    JCommonUtil.handleException(ex);
+                }
+            }
+        });
 
         lblNewLabel_21 = new JLabel("類別過濾");
         newPanel1.add(lblNewLabel_21);
@@ -2331,17 +2351,8 @@ public class FastDBQueryUI extends JFrame {
             }
         }
 
-        Collections.sort(sqlIdList, new Comparator<SqlIdConfigBean>() {
-            @Override
-            public int compare(SqlIdConfigBean o1, SqlIdConfigBean o2) {
-                int compare1 = StringUtils.trimToEmpty(o1.category).toLowerCase().compareTo(StringUtils.trimToEmpty(o2.category).toLowerCase());
-                int compare2 = StringUtils.trimToEmpty(o1.sqlId).toLowerCase().compareTo(StringUtils.trimToEmpty(o2.sqlId).toLowerCase());
-                if (compare1 != 0) {
-                    return compare1;
-                }
-                return compare2;
-            }
-        });
+        // 資料排序
+        sortSqlListProcess(sqlIdList);
 
         DefaultListModel model = JListUtil.createModel();
         for (SqlIdConfigBean s : sqlIdList) {
@@ -2615,6 +2626,7 @@ public class FastDBQueryUI extends JFrame {
      * 儲存prop
      */
     private SqlIdConfigBean saveSqlListProp(SqlIdConfigBean bean) throws IOException {
+        bean.latestUpdateTime = DateFormatUtils.format(System.currentTimeMillis(), "yyyy-MM-dd HH:mm:ss");
         System.out.println("#saveSqlListProp = " + ReflectionToStringBuilder.toString(bean));
         sqlIdConfigBeanHandler.save(bean);
         System.out.println("儲存檔案路徑 : " + sqlIdListFile);
@@ -2781,6 +2793,9 @@ public class FastDBQueryUI extends JFrame {
 
             // 紀錄sql執行類型
             mSqlIdExecuteTypeHandler.logExecuteType();
+
+            // 更新查詢時間
+            sqlIdConfigBeanHandler.updateQueryTime();
 
             // 設定新開視窗預設值
             if (TAB_UI1 != null) {
@@ -5031,6 +5046,14 @@ public class FastDBQueryUI extends JFrame {
             init("");
         }
 
+        public void updateQueryTime() {
+            SqlIdConfigBean bean = getCurrentEditSqlIdConfigBean();
+            if (bean != null) {
+                bean.latestQueryTime = DateFormatUtils.format(System.currentTimeMillis(), "yyyy-MM-dd HH:mm:ss.SSS");
+                save(bean);
+            }
+        }
+
         public void remove(SqlIdConfigBean sqlBean) {
             init("");
             boolean removeOk = lst.remove(sqlBean);
@@ -5048,6 +5071,8 @@ public class FastDBQueryUI extends JFrame {
                 b2.sql = b.sql;
                 b2.sqlId = b.sqlId;
                 b2.sqlComment = b.sqlComment;
+                b2.latestQueryTime = b.latestQueryTime;
+                b2.latestUpdateTime = b.latestUpdateTime;
             } else {
                 lst.add(b);
             }
@@ -5123,14 +5148,18 @@ public class FastDBQueryUI extends JFrame {
     }
 
     public static class SqlIdConfigBean {
-        private static String[] KEYS_DEF = new String[] { "color", "category", "sqlId", "sqlComment" };
+        private static String[] KEYS_DEF = new String[] { "color", "category", "sqlId", "sqlComment", "latestUpdateTime", "latestQueryTime" };
         private static String[] VALUES_DEF = new String[] { "sql" };
+
+        public static int SHOW_TIME_STATUS = -1;
 
         String color;
         String category;
         String sqlId;
         String sql;
         String sqlComment;
+        String latestUpdateTime;
+        String latestQueryTime;
 
         public String getCategory() {
             return category;
@@ -5178,15 +5207,6 @@ public class FastDBQueryUI extends JFrame {
         }
 
         @Override
-        public int hashCode() {
-            final int prime = 31;
-            int result = 1;
-            result = prime * result + ((sql == null) ? 0 : sql.hashCode());
-            result = prime * result + ((sqlId == null) ? 0 : sqlId.hashCode());
-            return result;
-        }
-
-        @Override
         public boolean equals(Object obj) {
             if (this == obj)
                 return true;
@@ -5195,17 +5215,50 @@ public class FastDBQueryUI extends JFrame {
             if (getClass() != obj.getClass())
                 return false;
             SqlIdConfigBean other = (SqlIdConfigBean) obj;
-            if (sql == null) {
-                if (other.sql != null)
-                    return false;
-            } else if (!sql.equals(other.sql))
-                return false;
             if (sqlId == null) {
                 if (other.sqlId != null)
                     return false;
             } else if (!sqlId.equals(other.sqlId))
                 return false;
             return true;
+        }
+
+        public String toString() {
+            String latestUpdateTimeStr = "";
+            if (SHOW_TIME_STATUS == 1) {
+                latestUpdateTimeStr = StringUtils.trimToEmpty(latestUpdateTime) + "  ";
+            } else if (SHOW_TIME_STATUS == 2) {
+                latestUpdateTimeStr = StringUtils.trimToEmpty(latestQueryTime) + "  ";
+            }
+            if (StringUtils.isNotBlank(category)) {
+                return String.format("<html><body %5$s>"//
+                        + "<font color=\"BLUE\">%4$s</font>"//
+                        + "<font style=\"background-color: YELLOW;\">"//
+                        + "<b></b>%2$s</font>"//
+                        + "&nbsp;&nbsp;"//
+                        + "<font color=\"%1$s\">%3$s</font>"//
+                        + "</body></html>", //
+                        StringUtils.trimToEmpty(color), //
+                        "『" + StringUtils.trimToEmpty(category) + "』  ", //
+                        StringUtils.trimToEmpty(sqlId), //
+                        latestUpdateTimeStr, //
+                        "" //
+                );
+            } else {
+                return String.format("<html><body %5$s>"//
+                        + "<font color=\"BLUE\">%4$s</font>"//
+                        + "<font style=\"background-color: YELLOW;\">"//
+                        + "<b></b>%2$s</font>"//
+                        + "&nbsp;&nbsp;"//
+                        + "<font color=\"%1$s\">%3$s</font>"//
+                        + "</body></html>", //
+                        StringUtils.trimToEmpty(color), //
+                        StringUtils.trimToEmpty(category), //
+                        StringUtils.trimToEmpty(sqlId), //
+                        latestUpdateTimeStr, //
+                        "" //
+                );
+            }
         }
 
         public boolean equalsAll(Object obj) {
@@ -5226,6 +5279,16 @@ public class FastDBQueryUI extends JFrame {
                     return false;
             } else if (!color.equals(other.color))
                 return false;
+            if (latestQueryTime == null) {
+                if (other.latestQueryTime != null)
+                    return false;
+            } else if (!latestQueryTime.equals(other.latestQueryTime))
+                return false;
+            if (latestUpdateTime == null) {
+                if (other.latestUpdateTime != null)
+                    return false;
+            } else if (!latestUpdateTime.equals(other.latestUpdateTime))
+                return false;
             if (sql == null) {
                 if (other.sql != null)
                     return false;
@@ -5242,34 +5305,6 @@ public class FastDBQueryUI extends JFrame {
             } else if (!sqlId.equals(other.sqlId))
                 return false;
             return true;
-        }
-
-        public String toString() {
-            if (StringUtils.isNotBlank(category)) {
-                return String.format("<html><body %4$s>"//
-                        + "<font style=\"background-color: YELLOW;\">"//
-                        + "<b></b>%2$s</font>"//
-                        + "&nbsp;&nbsp;"//
-                        + "<font color=\"%1$s\">%3$s</font>"//
-                        + "</body></html>", //
-                        StringUtils.trimToEmpty(color), //
-                        "『" + StringUtils.trimToEmpty(category) + "』  ", //
-                        StringUtils.trimToEmpty(sqlId), //
-                        "" //
-                );
-            } else {
-                return String.format("<html><body %4$s>"//
-                        + "<font style=\"background-color: YELLOW;\">"//
-                        + "<b></b>%2$s</font>"//
-                        + "&nbsp;&nbsp;"//
-                        + "<font color=\"%1$s\">%3$s</font>"//
-                        + "</body></html>", //
-                        StringUtils.trimToEmpty(color), //
-                        StringUtils.trimToEmpty(category), //
-                        StringUtils.trimToEmpty(sqlId), //
-                        "" //
-                );
-            }
         }
 
         // getter & setter ----------------------------------------------
@@ -5299,6 +5334,22 @@ public class FastDBQueryUI extends JFrame {
 
         public void setSqlComment(String sqlComment) {
             this.sqlComment = sqlComment;
+        }
+
+        public String getLatestUpdateTime() {
+            return latestUpdateTime;
+        }
+
+        public void setLatestUpdateTime(String latestUpdateTime) {
+            this.latestUpdateTime = latestUpdateTime;
+        }
+
+        public String getLatestQueryTime() {
+            return latestQueryTime;
+        }
+
+        public void setLatestQueryTime(String latestQueryTime) {
+            this.latestQueryTime = latestQueryTime;
         }
     }
 
@@ -5854,6 +5905,7 @@ public class FastDBQueryUI extends JFrame {
             bean.category = category;
             bean.color = color;
             bean.sqlComment = sqlComment;
+            bean.latestUpdateTime = DateFormatUtils.format(System.currentTimeMillis(), "yyyy-MM-dd HH:mm:ss");
 
             File newFile = sqlParameterConfigLoadHandler.getFile(bean.getUniqueKey());
             File oldFile = sqlParameterConfigLoadHandler.getFile(sqlBean.getUniqueKey());
@@ -7863,6 +7915,8 @@ public class FastDBQueryUI extends JFrame {
         }
     }
 
+    // --------------------------------------------------------------------------------------------------------------------------
+
     private class TitleSetLabel {
         private int getIndex(String columnName, int colIndex) {
             List<String> lst = JTableUtil.newInstance(queryResultTable).getColumnTitleStringArray();
@@ -7916,4 +7970,128 @@ public class FastDBQueryUI extends JFrame {
             return false;
         }
     }
+
+    // --------------------------------------------------------------------------------------------------------------------------
+
+    private enum SqlListSortCombobox_SortEnum {
+        NAME_DESC("名子 desc"), //
+        NAME_ASC("名子 asc"), //
+        SAVETIME_DESC("修改日期 desc"), //
+        SAVETIME_ASC("修改日期 asc"), //
+        QUERYTIME_DESC("查詢日期 desc"), //
+        QUERYTIME_ASC("查詢日期 asc"),//
+        ;
+
+        String label;
+
+        SqlListSortCombobox_SortEnum(String label) {
+            this.label = label;
+        }
+
+        public String toString() {
+            return label;
+        }
+
+        static DefaultComboBoxModel getModel() {
+            DefaultComboBoxModel model = new DefaultComboBoxModel();
+            for (SqlListSortCombobox_SortEnum e : SqlListSortCombobox_SortEnum.values()) {
+                model.addElement(e);
+            }
+            return model;
+        }
+    }
+
+    private void sortSqlListProcess(List<SqlIdConfigBean> sqlIdList) {
+        SqlListSortCombobox_SortEnum sortType = (SqlListSortCombobox_SortEnum) sqlListSortCombobox.getSelectedItem();
+        if (sortType != null) {
+            switch (sortType) {
+            case NAME_DESC:
+                SqlIdConfigBean.SHOW_TIME_STATUS = -1;
+                Collections.sort(sqlIdList, new Comparator<SqlIdConfigBean>() {
+                    @Override
+                    public int compare(SqlIdConfigBean o1, SqlIdConfigBean o2) {
+                        int compare1 = -1 * StringUtils.trimToEmpty(o1.category).toLowerCase().compareTo(StringUtils.trimToEmpty(o2.category).toLowerCase());
+                        int compare2 = -1 * StringUtils.trimToEmpty(o1.sqlId).toLowerCase().compareTo(StringUtils.trimToEmpty(o2.sqlId).toLowerCase());
+                        if (compare1 != 0) {
+                            return compare1;
+                        }
+                        return compare2;
+                    }
+                });
+                break;
+            case NAME_ASC:
+                SqlIdConfigBean.SHOW_TIME_STATUS = -1;
+                Collections.sort(sqlIdList, new Comparator<SqlIdConfigBean>() {
+                    @Override
+                    public int compare(SqlIdConfigBean o1, SqlIdConfigBean o2) {
+                        int compare1 = StringUtils.trimToEmpty(o1.category).toLowerCase().compareTo(StringUtils.trimToEmpty(o2.category).toLowerCase());
+                        int compare2 = StringUtils.trimToEmpty(o1.sqlId).toLowerCase().compareTo(StringUtils.trimToEmpty(o2.sqlId).toLowerCase());
+                        if (compare1 != 0) {
+                            return compare1;
+                        }
+                        return compare2;
+                    }
+                });
+                break;
+            case SAVETIME_DESC:
+                SqlIdConfigBean.SHOW_TIME_STATUS = 1;
+                Collections.sort(sqlIdList, new Comparator<SqlIdConfigBean>() {
+                    @Override
+                    public int compare(SqlIdConfigBean o1, SqlIdConfigBean o2) {
+                        int compare1 = -1 * StringUtils.trimToEmpty(o1.latestUpdateTime).toLowerCase().compareTo(StringUtils.trimToEmpty(o2.latestUpdateTime).toLowerCase());
+                        return compare1;
+                    }
+                });
+                break;
+            case SAVETIME_ASC:
+                SqlIdConfigBean.SHOW_TIME_STATUS = 1;
+                Collections.sort(sqlIdList, new Comparator<SqlIdConfigBean>() {
+                    @Override
+                    public int compare(SqlIdConfigBean o1, SqlIdConfigBean o2) {
+                        int compare1 = StringUtils.trimToEmpty(o1.latestUpdateTime).toLowerCase().compareTo(StringUtils.trimToEmpty(o2.latestUpdateTime).toLowerCase());
+                        return compare1;
+                    }
+                });
+                break;
+            case QUERYTIME_DESC:
+                SqlIdConfigBean.SHOW_TIME_STATUS = 2;
+                Collections.sort(sqlIdList, new Comparator<SqlIdConfigBean>() {
+                    @Override
+                    public int compare(SqlIdConfigBean o1, SqlIdConfigBean o2) {
+                        int compare1 = -1 * StringUtils.trimToEmpty(o1.latestQueryTime).toLowerCase().compareTo(StringUtils.trimToEmpty(o2.latestQueryTime).toLowerCase());
+                        return compare1;
+                    }
+                });
+                break;
+            case QUERYTIME_ASC:
+                SqlIdConfigBean.SHOW_TIME_STATUS = 2;
+                Collections.sort(sqlIdList, new Comparator<SqlIdConfigBean>() {
+                    @Override
+                    public int compare(SqlIdConfigBean o1, SqlIdConfigBean o2) {
+                        int compare1 = StringUtils.trimToEmpty(o1.latestQueryTime).toLowerCase().compareTo(StringUtils.trimToEmpty(o2.latestQueryTime).toLowerCase());
+                        return compare1;
+                    }
+                });
+                break;
+            }
+        } else {
+            SqlIdConfigBean.SHOW_TIME_STATUS = -1;
+            Collections.sort(sqlIdList, new Comparator<SqlIdConfigBean>() {
+                @Override
+                public int compare(SqlIdConfigBean o1, SqlIdConfigBean o2) {
+                    int compare1 = StringUtils.trimToEmpty(o1.category).toLowerCase().compareTo(StringUtils.trimToEmpty(o2.category).toLowerCase());
+                    int compare2 = StringUtils.trimToEmpty(o1.sqlId).toLowerCase().compareTo(StringUtils.trimToEmpty(o2.sqlId).toLowerCase());
+                    if (compare1 != 0) {
+                        return compare1;
+                    }
+                    return compare2;
+                }
+            });
+        }
+    }
+
+    // --------------------------------------------------------------------------------------------------------------------------
+    // --------------------------------------------------------------------------------------------------------------------------
+    // --------------------------------------------------------------------------------------------------------------------------
+    // --------------------------------------------------------------------------------------------------------------------------
 }
