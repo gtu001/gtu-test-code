@@ -5060,7 +5060,9 @@ public class FastDBQueryUI extends JFrame {
                 }
                 bean.queryTimes = queryTimes;
                 bean.latestQueryTime = DateFormatUtils.format(System.currentTimeMillis(), "yyyy-MM-dd HH:mm:ss.SSS");
-                save(bean);
+                if (StringUtils.isNotBlank(bean.sqlId) && StringUtils.isNotBlank(bean.sql)) {
+                    save(bean);
+                }
             }
         }
 
@@ -7996,13 +7998,13 @@ public class FastDBQueryUI extends JFrame {
     // --------------------------------------------------------------------------------------------------------------------------
 
     private enum SqlListSortCombobox_SortEnum {
-        NAME_DESC("名子 desc"), //
         NAME_ASC("名子 asc"), //
+        NAME_DESC("名子 desc"), //
         SAVETIME_DESC("修改日期 desc"), //
         SAVETIME_ASC("修改日期 asc"), //
         QUERYTIME_DESC("查詢日期 desc"), //
         QUERYTIME_ASC("查詢日期 asc"), //
-        QUERYTIME_COUNT_DESC("查詢次數 asc"), //
+        QUERYTIME_COUNT_DESC("查詢次數 desc"), //
         QUERYTIME_COUNT_ASC("查詢次數 asc"),//
         ;
 
