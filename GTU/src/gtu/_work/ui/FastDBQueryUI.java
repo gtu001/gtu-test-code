@@ -4866,6 +4866,42 @@ public class FastDBQueryUI extends JFrame {
                     sqlTextArea.setText(prefix + sb + suffix);
                 }
             });//
+            jpopUtil.addJMenuItem("以記事本為Table新開視窗查詢", new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    FastDBQueryUI cloneFromFrame1 = (FastDBQueryUI) TAB_UI1.getCurrentChildJFrame();
+                    String tableName = cloneFromFrame1.sqlTextArea.getSelectedText();
+                    if (StringUtils.isBlank(tableName)) {
+                        tableName = ClipboardUtil.getInstance().getContents();
+                    }
+                    if (StringUtils.isBlank(tableName)) {
+                        return;
+                    }
+                    if (TAB_UI1 != null) {
+                        FastDBQueryUI cloneToFrame1 = (FastDBQueryUI) TAB_UI1.addTab("未命名", true);
+                        if (cloneFromFrame1 != null) {
+                            String dbName = cloneFromFrame1.mDBNameIdTextHandler.dbNameIdText_getText();
+                            cloneToFrame1.mDBNameIdTextHandler.dbNameIdText_setText(dbName);
+                        }
+                        SqlIdConfigBean sqlBean1 = new SqlIdConfigBean();
+                        sqlBean1.category = "";
+                        sqlBean1.sql = "\n\n\n\n\t\t\t\t select * \n" + //
+                        "\t\t\t\t from " + tableName + "\n" + //
+                        "\t\t\t\t where 1=1 \n";//
+                        sqlBean1.sqlComment = "";
+                        sqlBean1.sqlId = "";
+                        if (StringUtils.isBlank(sqlBean1.sqlId)) {
+                            sqlBean1.sqlId = "未命名";
+                        }
+                        cloneToFrame1.sqlIdText.setText(sqlBean1.sqlId);
+                        if (StringUtils.isNotBlank(sqlBean1.sql)) {
+                            cloneToFrame1.sqlTextArea.setText(sqlBean1.sql);
+                        }
+                        cloneToFrame1.sqlListMouseClicked(null, sqlBean1);
+                        cloneToFrame1.executeSqlButtonClick();
+                    }
+                }
+            });//
             jpopUtil.addJMenuItem("插入系統日", new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
