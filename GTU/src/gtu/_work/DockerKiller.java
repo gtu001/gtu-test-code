@@ -34,6 +34,8 @@ public class DockerKiller {
         String inputMsg = proc.getInputStreamToString();
         System.out.println("ERR : " + errorMsg);
         System.out.println("OUTPUT : " + inputMsg);
+        inputMsg = RuntimeBatPromptModeUtil.getFixBatInputString_ByOS(inputMsg, 2, null);
+        System.out.println("FIX OUTPUT : " + inputMsg);
         List<String> lst = StringUtil_.readContentToList(inputMsg, false, false, false);
         if (lst.size() <= 1) {
             return Collections.EMPTY_LIST;
@@ -60,6 +62,8 @@ public class DockerKiller {
         String inputMsg = proc.getInputStreamToString();
         System.out.println("ERR : " + errorMsg);
         System.out.println("OUTPUT : " + inputMsg);
+        inputMsg = RuntimeBatPromptModeUtil.getFixBatInputString_ByOS(inputMsg, 2, null);
+        System.out.println("FIX OUTPUT : " + inputMsg);
         List<String> lst = StringUtil_.readContentToList(inputMsg, false, false, false);
         if (lst.size() <= 1) {
             return Collections.EMPTY_LIST;
@@ -86,6 +90,9 @@ public class DockerKiller {
         String inputMsg = proc.getInputStreamToString();
         System.out.println("ERR : " + errorMsg);
         System.out.println("OUTPUT : " + inputMsg);
+        if (StringUtils.isNotBlank(errorMsg)) {
+            throw new RuntimeException(errorMsg);
+        }
     }
 
     public void deleteImage(String imageId) {
@@ -98,6 +105,9 @@ public class DockerKiller {
         String inputMsg = proc.getInputStreamToString();
         System.out.println("ERR : " + errorMsg);
         System.out.println("OUTPUT : " + inputMsg);
+        if (StringUtils.isNotBlank(errorMsg)) {
+            throw new RuntimeException(errorMsg);
+        }
     }
 
     private Map<String, Integer> fistBlockSetting(String line) {

@@ -1368,6 +1368,19 @@ public class JCommonUtil {
         KeyboardFocusManager.getCurrentKeyboardFocusManager().focusNextComponent();
     }
 
+    public static abstract class ActionListenerHex implements ActionListener {
+        public abstract void actionPerformedInner(ActionEvent e);
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            try {
+                actionPerformedInner(e);
+            } catch (Exception ex) {
+                JCommonUtil.handleException(ex);
+            }
+        }
+    }
+
     public static void main(String[] args) {
     }
 }

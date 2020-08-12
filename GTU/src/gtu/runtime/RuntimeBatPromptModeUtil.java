@@ -188,7 +188,9 @@ public class RuntimeBatPromptModeUtil {
                     File tmpSh = File.createTempFile(prefix, ".sh");
                     cmd.insert(0, "#!/bin/bash\r\n");
                     FileUtil.saveToFile(tmpSh, __fixCommand(cmd.toString()), encode);
-                    String linuxCommand = String.format("gnome-terminal --working-directory=\"/\" -- bash -c \"%s\" &", tmpSh);//-x => -- 
+                    String linuxCommand = String.format("gnome-terminal --working-directory=\"/\" -- bash -c \"%s\" &", tmpSh);// -x
+                                                                                                                               // =>
+                                                                                                                               // --
                     System.out.println("linuxCommand : " + linuxCommand);
                     Runtime.getRuntime().exec(String.format("chmod u+x %s", tmpSh));
                     return Runtime.getRuntime().exec(linuxCommand);
@@ -215,6 +217,13 @@ public class RuntimeBatPromptModeUtil {
     public String getCommand() {
         String tmpCmd = __fixCommand(cmd.toString());
         return tmpCmd != null ? tmpCmd.toString() : "";
+    }
+
+    public static String getFixBatInputString_ByOS(String inputString, Integer startOffset, Integer endOffset) {
+        if (!isWindows) {
+            return inputString;
+        }
+        return getFixBatInputString(inputString, startOffset, endOffset);
     }
 
     public static String getFixBatInputString(String inputString, Integer startOffset, Integer endOffset) {

@@ -29,6 +29,7 @@ import gtu._work.DockerKiller.DockerImage;
 import gtu._work.ui.JMenuBarUtil.JMenuAppender;
 import gtu.swing.util.HideInSystemTrayHelper;
 import gtu.swing.util.JCommonUtil;
+import gtu.swing.util.JCommonUtil.ActionListenerHex;
 import gtu.swing.util.JFrameRGBColorPanel;
 import gtu.swing.util.JFrameUtil;
 import gtu.swing.util.JMouseEventUtil;
@@ -235,9 +236,9 @@ public class DockerKillerUI extends JFrame {
 
                 if (JMouseEventUtil.buttonRightClick(1, (MouseEvent) evt)) {
                     JPopupMenuUtil.newInstance((JComponent) evt.getSource())//
-                            .addJMenuItem("刪除", new ActionListener() {
+                            .addJMenuItem("刪除", new ActionListenerHex() {
                                 @Override
-                                public void actionPerformed(ActionEvent arg0) {
+                                public void actionPerformedInner(ActionEvent arg0) {
                                     boolean deleteConfirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("是否刪除：" + deleteId, "刪除");
                                     if (deleteConfirm) {
                                         mDockerKiller.deleteContainer(deleteId);
@@ -266,9 +267,9 @@ public class DockerKillerUI extends JFrame {
 
                 if (JMouseEventUtil.buttonRightClick(1, (MouseEvent) evt)) {
                     JPopupMenuUtil.newInstance((JComponent) evt.getSource())//
-                            .addJMenuItem("刪除", new ActionListener() {
+                            .addJMenuItem("刪除", new ActionListenerHex() {
                                 @Override
-                                public void actionPerformed(ActionEvent arg0) {
+                                public void actionPerformedInner(ActionEvent e) {
                                     boolean deleteConfirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("是否刪除：" + deleteId, "刪除");
                                     if (deleteConfirm) {
                                         mDockerKiller.deleteImage(deleteId);
