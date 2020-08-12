@@ -667,6 +667,28 @@ public class JCommonUtil {
     }
 
     /**
+     * 顯示confirm視窗, 按OK回傳true
+     */
+    public static char _JOptionPane_showConfirmDialog_yesNoCancelOption(Object message, String title) {
+        FrameAlwaysOnTopHandler t = new FrameAlwaysOnTopHandler();
+        int rtnVal = JOptionPane.showConfirmDialog(null, message, title, JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, null);
+        char strVal = ' ';
+        switch (rtnVal) {
+        case JOptionPane.YES_OPTION:
+            strVal = 'Y';
+            break;
+        case JOptionPane.NO_OPTION:
+            strVal = 'N';
+            break;
+        case JOptionPane.CANCEL_OPTION:
+            strVal = 'C';
+            break;
+        }
+        t.done();
+        return strVal;
+    }
+
+    /**
      * 顯示輸入下拉項目
      */
     public static Object _JOptionPane_showInputDialog(Object message, String title, Object[] drowdown, Object defaultValue) {

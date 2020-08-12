@@ -3,7 +3,7 @@
 	<loadproperties srcFile="build_swing_jar.properties" />
 
 	<!--<property name="src_dir" location="D:\workstuff\workspace\gtu-test-code\GTU\src" />
-	<property name="bin_dir" location="D:\workstuff\workspace\gtu-test-code\GTU\target\classes" />-->
+		<property name="bin_dir" location="D:\workstuff\workspace\gtu-test-code\GTU\target\classes" />-->
 	<property name="build_dir" location="build" />
 	<property name="jars_dir" location="jars" />
 	<!--<property name="desktop" value="C:\Users\gtu001\Desktop" />-->
@@ -13,6 +13,11 @@
 	<property name="rename_jarname" value="${main_class}" />
 	<property name="icon_name" value="janna.ico" />
 	<!--<property name="launch4jExe" value="C:\Program Files (x86)\Launch4j\launch4j.exe" />-->
+	<!--<property name="mavenExe" value="I:/‪/apps/apache-maven-3.3.9/bin/mvn" />
+	<property name="gtu_pom_file" value="‪I://workstuff/workspace/gtu-test-code/GTU/pom.xml" />
+	-->
+	<property name="obfuscator_dir" value="/media/gtu001/OLD_D/workstuff/workspace/gtu-test-code/GTU/Allatori-6.9" />
+	<!--<property name="jdk_javac" value="/usr/lib/jvm/java-1.8.0-openjdk-amd64/bin/javac" /> -->
 	<!--${main_class}-->
 
 
@@ -30,12 +35,20 @@
 	<typedef name="antDebug" classname="gtu.ant.AntDebug" classpathref="my_test_classpath" />
 	<typedef name="jarToExe" classname="gtu.ant.AntJarToExe" classpathref="my_test_classpath" />
 	<typedef name="notify" classname="gtu.ant.AntNotify" classpathref="my_test_classpath" />
-
+	<typedef name="obfuscator" classname="gtu.ant.AntObfuscator" classpathref="my_test_classpath" />
+	<typedef name="baseFolderChanger" classname="gtu.ant.AntBaseFolderChanger" classpathref="my_test_classpath" />
+	
 	<!-- 參考的jar -->
 	<path id="class_path">
 		<fileset dir="${jar_repsitory}">
 			<filename name="**/*.jar" />
 		</fileset>
+	</path>
+	<path id="javafx_class_path">
+		<fileset dir="/media/gtu001/OLD_D/my_tool/jfxrt">
+			<filename name="**/*.jar" />
+		</fileset>
+		<pathelement path="${build.dir}" />
 	</path>
 
 	<!--
@@ -45,6 +58,14 @@
 		<echo># buildTest ..</echo>
 	</target>
 	-->
+
+	<target name="baseFolderChanger" if="${enable}">
+		<echo># baseFolderChanger = ${enable}</echo>
+		<baseFolderChanger>
+			<FolderPlaceholder name="build_dir">${build_dir}</FolderPlaceholder>
+			<FolderPlaceholder name="jars_dir">${jars_dir}</FolderPlaceholder>
+		</baseFolderChanger>
+	</target>
 
 	<target name="jarToExe" if="${enable}">
 		<echo># jarToExe = ${enable}</echo>
@@ -65,16 +86,14 @@
 			<pomconfig mavenExe="${mavenExe}">${gtu_pom_file}</pomconfig>
 
 			<packagename mode="exact" name="commons-lang-2.6.jar">org.apache.commons.lang.StringUtils</packagename>
-			<packagename mode="small">org.apache.commons.collections.Transformer</packagename>
+			<packagename mode="small" name="commons-collections-3.2.jar">org.apache.commons.collections.Transformer</packagename>
 			<packagename mode="exact" name="commons-lang3-3.4.jar">org.apache.commons.lang3.Validate</packagename>
 			<packagename mode="exact" name="commons-io-2.2.jar">org.apache.commons.io.IOUtils</packagename>
-			<packagename mode="small">net.sf.image4j.codec.ico</packagename>
-			<packagename mode="small">com.jgoodies.forms.factories.FormFactory</packagename>
+			<packagename mode="small" name="image4j-0.7.jar">net.sf.image4j.codec.ico</packagename>
+			<packagename mode="small" name="forms-1.3.0.jar">com.jgoodies.forms.factories.FormFactory</packagename>
+			<packagename mode="pom" name="commons-beanutils-1.8.0.jar">org/apache/commons/beanutils/DynaBean</packagename>
 			
-			<!--
-			<packagename mode="pom">com.jgoodies.forms.layout.FormSpecs</packagename>
-			<packagename mode="pom">com/jgoodies/common/base/Preconditions</packagename>
-			-->
+
 		</jarfinder>
 
 		<!-- 特別指定要使用的jar檔 -->
@@ -101,18 +120,24 @@
 	<target name="main">
 		<antcall target="clean">
 			<!--清除-->
-			<param name="enable" value="true" />
+			<param name="enable" value="true" /><!--false -->
+		</antcall>
+
+		<antcall target="baseFolderChanger">
+			<param name="enable" value="true" /><!--false -->
 		</antcall>
 
 		<antcall target="buildClassSet">
-			<param name="enable" value="true" />
+			<param name="enable" value="true" /><!--false -->
 		</antcall>
 
 		<antcall target="copyReference">
-			<param name="enable" value="true" />
+			<param name="enable" value="true" /><!--false -->
 		</antcall>
 
-		<antcall target="compiler" />
+		<antcall target="compiler">
+			<param name="enable" value="true" />
+		</antcall>
 
 		<antcall target="runClass">
 			<param name="enable" value="false" />
@@ -123,6 +148,10 @@
 		</antcall>
 
 		<antcall target="runJar">
+			<param name="enable" value="false" />
+		</antcall>
+	
+		<antcall target="obfuscator">
 			<param name="enable" value="false" />
 		</antcall>
 
@@ -136,7 +165,7 @@
 
 		<antcall target="clean">
 			<!--清除-->
-			<param name="enable" value="true" />
+			<param name="enable" value="true" /><!--false -->
 		</antcall>
 
 		<antcall target="jarToExe">
@@ -158,13 +187,14 @@
 		<notify type="info" title="build完成" message="create ${main_class}.jar complete!!" />
 	</target>
 
-	<target name="compiler">
+	<target name="compiler" if="${enable}">
 		<echo># compiler ...</echo>
-		<javac compiler="javac1.6" source="1.6" target="1.6" includeantruntime="true" srcdir="${src_dir}" destdir="${build_dir}" deprecation="no" nowarn="true" encoding="UTF-8" debug="on">
-			<include name="**/${main_class}.java" />
+		<javac fork="yes" compiler="javac1.6" source="1.6" target="1.6" includeantruntime="true" srcdir="${src_dir}" destdir="${build_dir}" deprecation="no" nowarn="true" encoding="UTF-8" debug="on"><!-- -->
+			<include name="**/${main_class}.java" /><!--executable="${jdk_javac}" fork="yes" -->
 			<classpath>
 				<path location="${build_dir}" />
 			</classpath>
+			<!--<classpath refid="javafx_class_path" />-->
 		</javac>
 	</target>
 
@@ -180,12 +210,12 @@
 	<target name="createJar" if="${enable}">
 		<echo># create ${main_class}.jar</echo>
 		<!--
-				<jar destfile="${main_class}.jar" basedir="${build_dir}">
-					<manifest>
-						<attribute name="Main-Class" value="${main_class_full}" />
-					</manifest>
-				</jar>
-				-->
+			<jar destfile="${main_class}.jar" basedir="${build_dir}">
+				<manifest>
+					<attribute name="Main-Class" value="${main_class_full}" />
+				</manifest>
+			</jar>
+			-->
 		<jar destfile="${main_class}.jar">
 			<zipfileset dir="${build_dir}">
 				<exclude name="META-INF/**" />
@@ -195,7 +225,7 @@
 			<manifest>
 				<attribute name="Main-Class" value="${main_class_full}" />
 				<attribute name="Class-Path" value="." />
-				<!--<attribute name="Rsrc-Class-Path" value="./ ojdbc14.jar" />-->
+				<attribute name="Rsrc-Class-Path" value="./ ojdbc14.jar" />
 			</manifest>
 		</jar>
 	</target>
@@ -246,5 +276,10 @@
 				<include name="**/*.jar" />
 			</fileset>
 		</unjar>
+	</target>
+
+	<target name="obfuscator" if="${enable}">
+		<echo># obfuscator = ${enable}</echo>
+		<obfuscator jarDir="${obfuscator_dir}" inJar="${basedir}/${main_class}.jar" />
 	</target>
 </project>

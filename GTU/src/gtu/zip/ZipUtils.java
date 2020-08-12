@@ -12,6 +12,9 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
+
 public class ZipUtils {
 
     public static void main(String[] a) throws Exception {
@@ -172,6 +175,43 @@ public class ZipUtils {
             } else {
                 System.out.println("找到資料夾:" + file.getName());
                 dir += file.getName() + File.separator;
+                String[] fileNames = file.list();
+                if (fileNames != null) {
+                    for (int i = 0; i < fileNames.length; i++) {
+                        recurseFiles(new File(file, fileNames[i]), zos, dir);
+                    }
+                }
+            }
+        }
+        zos.close();
+    }
+
+    public void zipMultiFile_Rename(List<Pair<File, String>> fileLst, File destinationFile) throws IOException {
+        ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(destinationFile));
+        String dir = "";
+        for (Pair<File, String> fileZ : fileLst) {
+            File file = fileZ.getLeft();
+            String rename = fileZ.getRight();
+            if (StringUtils.isBlank(rename)) {
+                rename = file.getName();
+            }
+            if (file.isFile()) {
+                System.out.println("壓縮檔案:" + file.getName());
+                byte[] buf = new byte[1024];
+                int len;
+                dir = dir.substring(dir.indexOf(File.separator) + 1);
+                ZipEntry zipEntry = new ZipEntry(dir + rename);
+                FileInputStream fin = new FileInputStream(file);
+                BufferedInputStream in = new BufferedInputStream(fin);
+                zos.putNextEntry(zipEntry);
+                while ((len = in.read(buf)) >= 0) {
+                    zos.write(buf, 0, len);
+                }
+                in.close();
+                zos.closeEntry();
+            } else {
+                System.out.println("找到資料夾:" + rename);
+                dir += rename + File.separator;
                 String[] fileNames = file.list();
                 if (fileNames != null) {
                     for (int i = 0; i < fileNames.length; i++) {

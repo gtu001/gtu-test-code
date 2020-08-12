@@ -67,6 +67,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
 import com.jgoodies.forms.factories.FormFactory;
 import com.jgoodies.forms.layout.ColumnSpec;
@@ -163,6 +164,8 @@ public class ExecuteOpener extends javax.swing.JFrame {
     private PropertiesUtilBean remarkConfig = new PropertiesUtilBean(ExecuteOpener.class, ExecuteOpener.class.getSimpleName() + "_Remark");
     private HideInSystemTrayHelper hideInSystemTrayHelper = HideInSystemTrayHelper.newInstance();
     private SearchConfigHandler mSearchConfigHandler = new SearchConfigHandler();
+
+    private static final String TORTOISE_DIFF_FORMAT = "tortoiseDiffFormat";
 
     /**
      * Auto-generated main method to display this JFrame
@@ -744,8 +747,8 @@ public class ExecuteOpener extends javax.swing.JFrame {
                     }
 
                     {
-                        button = new JButton("儲存設定");
-                        jPanel2.add(button);
+                        saveConfigBtn = new JButton("儲存設定TODO");
+                        jPanel2.add(saveConfigBtn);
                     }
                     {
                         setExeConfigBtn = new JButton("設定exe路徑");
@@ -781,6 +784,15 @@ public class ExecuteOpener extends javax.swing.JFrame {
                     jPanel2.add(jFrameRGBColorPanel.getToggleButton(false));
                     jPanel2.add(hideInSystemTrayHelper.getToggleButton(false));
                 }
+            }
+            {
+                saveDiffExeFormatBtn = new JButton("設定比對exe format");
+                saveDiffExeFormatBtn.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        swingUtil.invokeAction("saveDiffExeFormatBtn.mouseClick", e);
+                    }
+                });
+                jPanel2.add(saveDiffExeFormatBtn);
             }
 
             swingUtil.addAction("moveFiles.actionPerformed", new Action() {
@@ -1662,7 +1674,15 @@ public class ExecuteOpener extends javax.swing.JFrame {
                     JFileExecuteUtil_ConfigDlg.newInstance();
                 }
             });
-            swingUtil.addAction("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX", new Action() {
+            swingUtil.addActionHex("saveDiffExeFormatBtn.mouseClick", new Action() {
+                public void action(EventObject evt) throws Exception {
+                    String command = StringUtils.trimToEmpty(config.getConfigProp().getProperty(TORTOISE_DIFF_FORMAT));
+                    command = StringUtils.trimToEmpty(JCommonUtil._jOptionPane_showInputDialog("編輯執行路徑format", command));
+                    config.getConfigProp().setProperty(TORTOISE_DIFF_FORMAT, command);
+                    config.store();
+                }
+            });
+            swingUtil.addActionHex("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX", new Action() {
                 public void action(EventObject evt) throws Exception {
                 }
             });
@@ -1749,8 +1769,9 @@ public class ExecuteOpener extends javax.swing.JFrame {
     private JTextField innerContentFilterText;
     private JPanel panel_8;
     private JPanel panel_9;
-    private JButton button;
+    private JButton saveConfigBtn;
     private JButton setExeConfigBtn;
+    private JButton saveDiffExeFormatBtn;
 
     void reloadCurrentDirPropertiesList() {
         final String $filterText = StringUtils.trimToEmpty(propertiesListFilterText.getText()).toLowerCase();
@@ -2097,25 +2118,31 @@ public class ExecuteOpener extends javax.swing.JFrame {
                             for (Object f : files) {
                                 fileLst.add((ZFile) f);
                             }
-                            File logFile = RevertBackFileHelper.createLogFile(fileLst);
-                            if (logFile != null && logFile.exists()) {
-                                fileLst.add(logFile);
+                            Pair<File, Map<String, File>> logFileInfo = RevertBackFileHelper.createLogFile(fileLst);
+                            if (logFileInfo != null && logFileInfo.getLeft().exists()) {
+                                List<Pair<File, String>> zipLst = new ArrayList<>();
+                                for (String name : logFileInfo.getRight().keySet()) {
+                                    zipLst.add(Pair.of(logFileInfo.getRight().get(name), name));
+                                }
+                                zipLst.add(Pair.of(logFileInfo.getLeft(), ""));
+
+                                SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+                                File zipfile = new File(FileUtil.DESKTOP_DIR, "zip_" + sdf.format(new Date()) + ".zip");
+                                ZipUtils t = new ZipUtils();
+                                try {
+                                    t.zipMultiFile_Rename(zipLst, zipfile);
+                                    JOptionPaneUtil.newInstance().iconPlainMessage().showMessageDialog("zip selected : \n" + zipfile, "zip");
+                                } catch (Exception e1) {
+                                    JCommonUtil.handleException(e1);
+                                }
                             }
-                            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
-                            File zipfile = new File(FileUtil.DESKTOP_DIR, "zip_" + sdf.format(new Date()) + ".zip");
-                            ZipUtils t = new ZipUtils();
-                            try {
-                                t.zipMultiFile(fileLst, zipfile);
-                                JOptionPaneUtil.newInstance().iconPlainMessage().showMessageDialog("zip selected : \n" + zipfile, "zip");
-                            } catch (Exception e1) {
-                                JCommonUtil.handleException(e1);
-                            }
+
                         }
                     });
             popupUtil//
                     .addJMenuItem("zip revert back", new ActionListener() {
                         public void actionPerformed(ActionEvent e) {
-                            RevertBackFileHelper.revertLogFile();
+                            RevertBackFileHelper.revertLogFile(StringUtils.trimToEmpty(config.getConfigProp().getProperty(TORTOISE_DIFF_FORMAT)));
                         }
                     });
             // SimpleCheckListDlg
