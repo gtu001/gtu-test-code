@@ -36,7 +36,8 @@
 	<typedef name="jarToExe" classname="gtu.ant.AntJarToExe" classpathref="my_test_classpath" />
 	<typedef name="notify" classname="gtu.ant.AntNotify" classpathref="my_test_classpath" />
 	<typedef name="obfuscator" classname="gtu.ant.AntObfuscator" classpathref="my_test_classpath" />
-
+	<typedef name="baseFolderChanger" classname="gtu.ant.AntBaseFolderChanger" classpathref="my_test_classpath" />
+	
 	<!-- 參考的jar -->
 	<path id="class_path">
 		<fileset dir="${jar_repsitory}">
@@ -57,6 +58,14 @@
 		<echo># buildTest ..</echo>
 	</target>
 	-->
+
+	<target name="baseFolderChanger" if="${enable}">
+		<echo># baseFolderChanger = ${enable}</echo>
+		<baseFolderChanger>
+			<FolderPlaceholder name="build_dir">${build_dir}</FolderPlaceholder>
+			<FolderPlaceholder name="jars_dir">${jars_dir}</FolderPlaceholder>
+		</baseFolderChanger>
+	</target>
 
 	<target name="jarToExe" if="${enable}">
 		<echo># jarToExe = ${enable}</echo>
@@ -103,7 +112,7 @@
 			<packagename mode="pom" name="jnativehook-2.1.0.jar">org.jnativehook.keyboard.NativeKeyListener</packagename>
 			<packagename mode="small" name="commons-codec-1.6.jar">org.apache.commons.codec.binary</packagename>
 			
-			
+
 		</jarfinder>
 
 		<!-- 特別指定要使用的jar檔 -->
@@ -130,6 +139,10 @@
 	<target name="main">
 		<antcall target="clean">
 			<!--清除-->
+			<param name="enable" value="true" /><!--false -->
+		</antcall>
+
+		<antcall target="baseFolderChanger">
 			<param name="enable" value="true" /><!--false -->
 		</antcall>
 
@@ -195,12 +208,12 @@
 
 	<target name="compiler" if="${enable}">
 		<echo># compiler ...</echo>
-		<javac fork="yes" executable="${jdk_javac}" compiler="javac1.6" source="1.6" target="1.6" includeantruntime="true" srcdir="${src_dir}" destdir="${build_dir}" deprecation="no" nowarn="true" encoding="UTF-8" debug="on"><!-- -->
+		<javac fork="yes" compiler="javac1.6" source="1.6" target="1.6" includeantruntime="true" srcdir="${src_dir}" destdir="${build_dir}" deprecation="no" nowarn="true" encoding="UTF-8" debug="on"><!-- -->
 			<include name="**/${main_class}.java" /><!--executable="${jdk_javac}" fork="yes" -->
 			<classpath>
 				<path location="${build_dir}" />
 			</classpath>
-			<classpath refid="javafx_class_path" />
+			<!--<classpath refid="javafx_class_path" />-->
 		</javac>
 	</target>
 
