@@ -23,7 +23,6 @@ import org.apache.commons.collections4.IterableUtils;
 import org.apache.commons.collections4.Predicate;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.testng.internal.RunInfo;
 
 import gtu.collection.ListUtil;
 import gtu.file.FileCopyOverwrite;
@@ -445,11 +444,11 @@ public class JFileExecuteUtil {
                 });
                 final Map<String, File> logFiles = getLogFileList(logFile);
                 final List<String> mvLst = new ArrayList<String>();
-                for (String name : logFiles.keySet()) {
+                for (final String name : logFiles.keySet()) {
                     final File toFile = logFiles.get(name);
                     final File fromZipFile = CollectionUtils.find(lst2, new Predicate<File>() {
                         @Override
-                        public boolean evaluate(File object) {
+                        public boolean evaluate(final File object) {
                             return StringUtils.equals(object.getName(), name);
                         }
                     });

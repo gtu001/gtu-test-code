@@ -2120,7 +2120,7 @@ public class ExecuteOpener extends javax.swing.JFrame {
                             }
                             Pair<File, Map<String, File>> logFileInfo = RevertBackFileHelper.createLogFile(fileLst);
                             if (logFileInfo != null && logFileInfo.getLeft().exists()) {
-                                List<Pair<File, String>> zipLst = new ArrayList<>();
+                                List<Pair<File, String>> zipLst = new ArrayList<Pair<File, String>>();
                                 for (String name : logFileInfo.getRight().keySet()) {
                                     zipLst.add(Pair.of(logFileInfo.getRight().get(name), name));
                                 }
