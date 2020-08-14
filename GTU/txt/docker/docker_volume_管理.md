@@ -1,10 +1,42 @@
 docker_volume_管理.md
 ---
+	**重要 (win7 系統 docker )**
+		必須位置為user底下 
+			如 -v /C/Users/wistronits/:/app
+				Ex : docker run -d  --name devtest   -v /C/Users/wistronits/MyDockerVolume001:/app   nginx:latest
+		然後還要用 
+			"C:\Program Files\Docker Toolbox\kitematic\Kitematic.exe"
+			去修改 volume 的 share folder
+
+
+
 	列出所有volume
 		$ docker volume ls
 
 	建立volume
 		$ docker volume create my-vol
+
+
+	建立volume 自訂位置
+		$ docker volume create --driver local --opt type=none --opt device=//d:/docker_volume_001 --opt o=bind test_vol
+		  docker volume create --driver local --opt type=none --opt device=//C/Users/wistronits/MyDockerVolume001 --opt o=bind test_vol
+		  docker volume create --driver local --opt type=none --opt device=/d/docker_volume_001 --opt o=bind test_vol
+		  docker volume create --driver local --opt type=nfs --opt o=addr=192.168.1.1,rw --opt device=/d/docker_volume_001  test_vol
+
+
+		** 對應run指令 **
+			$ docker run -it --rm \
+			    --mount type=volume,dst=/container/path,volume-driver=local,volume-opt=type=none,volume-opt=o=bind,volume-opt=device=/home/user/test \
+			    foo
+		** 對應docker-compose **
+			  volumes:
+			    bind-test:
+			      driver: local
+			      driver_opts:
+			        type: none
+			        o: bind
+			        device: /home/user/test
+
 
 	移除volume
 		$ docker volume rm my-vol

@@ -10,3 +10,6 @@
 	開啟虛擬機 : minikube --> 存放裝置 boot2docker.iso
 
 	在下指令就可以連了 
+
+
+	或是開這個 "C:\Program Files\Docker Toolbox\kitematic\Kitematic.exe"

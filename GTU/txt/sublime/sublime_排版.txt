@@ -9,3 +9,4 @@ sublime
 按ctrl + shift + p 輸入 key bindings
 右邊 user 視窗內中括號加入以下
 { "keys": ["alt+shift+F"], "command": "reindent" , "args": { "single_line": false } },
+
