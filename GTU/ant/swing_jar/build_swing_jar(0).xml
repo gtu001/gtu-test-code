@@ -118,12 +118,12 @@
 	</path>
 
 	<target name="main">
-		<antcall target="clean">
-			<!--清除-->
+		<antcall target="baseFolderChanger">
 			<param name="enable" value="true" /><!--false -->
 		</antcall>
 
-		<antcall target="baseFolderChanger">
+		<antcall target="clean">
+			<!--清除-->
 			<param name="enable" value="true" /><!--false -->
 		</antcall>
 

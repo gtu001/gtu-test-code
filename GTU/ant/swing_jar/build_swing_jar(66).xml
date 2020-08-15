@@ -92,7 +92,10 @@
 			<packagename mode="small" name="image4j-0.7.jar">net.sf.image4j.codec.ico</packagename>
 			<packagename mode="small" name="forms-1.3.0.jar">com.jgoodies.forms.factories.FormFactory</packagename>
 			<packagename mode="small" name="commons-beanutils-1.7.0.jar">org.apache.commons.beanutils.ConvertUtils</packagename>
-			
+			<packagename mode="small" name="commons-codec-1.6.jar">org.apache.commons.codec.binary.Base64</packagename>
+			<packagename mode="small" name="jcc-bate-0.7.3.jar">taobe.tec.jcc.JChineseConvertor</packagename>
+
+
 
 		</jarfinder>
 
@@ -118,12 +121,12 @@
 	</path>
 
 	<target name="main">
-		<antcall target="clean">
-			<!--清除-->
+		<antcall target="baseFolderChanger">
 			<param name="enable" value="true" /><!--false -->
 		</antcall>
 
-		<antcall target="baseFolderChanger">
+		<antcall target="clean">
+			<!--清除-->
 			<param name="enable" value="true" /><!--false -->
 		</antcall>
 

@@ -269,7 +269,6 @@ public class DockerKillerUI extends JFrame {
                 initVolumeTable();
             }
         });
-
         swingUtil.addActionHex("psMinusATable.click", new Action() {
             @Override
             public void action(EventObject evt) throws Exception {
@@ -307,7 +306,15 @@ public class DockerKillerUI extends JFrame {
                                     initPsMinusATable();
                                 }
                             })//
-                            .addJMenuItem("console", new ActionListenerHex() {
+                            .addJMenuItem("Log", new ActionListenerHex() {
+                                @Override
+                                public void actionPerformedInner(ActionEvent arg0) {
+                                    String outputMsg = mDockerKiller.commandContainer("logs", deleteId);
+                                    SimpleTextDlg mSimpleTextDlg = new SimpleTextDlg(outputMsg, deleteId, new Dimension(650, 450));
+                                    mSimpleTextDlg.show();
+                                }
+                            })//
+                            .addJMenuItem("Console", new ActionListenerHex() {
                                 @Override
                                 public void actionPerformedInner(ActionEvent arg0) {
                                     mDockerKiller.openConsoleContainer(deleteId);
@@ -359,7 +366,6 @@ public class DockerKillerUI extends JFrame {
                 }
             }
         });
-
         swingUtil.addActionHex("volumeTable.click", new Action() {
             @Override
             public void action(EventObject evt) throws Exception {

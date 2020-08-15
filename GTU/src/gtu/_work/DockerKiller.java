@@ -109,7 +109,7 @@ public class DockerKiller {
         return rtnLst;
     }
 
-    public void commandContainer(String command, String containerId) {
+    public String commandContainer(String command, String containerId) {
         RuntimeBatPromptModeUtil _inst = RuntimeBatPromptModeUtil.newInstance();
         _inst.runInBatFile(false);
         _inst.command("docker " + command + " " + containerId);
@@ -117,11 +117,13 @@ public class DockerKiller {
         proc.getStreamSync();
         String errorMsg = proc.getErrorStreamToString();
         String inputMsg = proc.getInputStreamToString();
+        inputMsg = RuntimeBatPromptModeUtil.getFixBatInputString_ByOS(inputMsg, 2, null);
         System.out.println("ERR : " + errorMsg);
         System.out.println("OUTPUT : " + inputMsg);
         if (StringUtils.isNotBlank(errorMsg)) {
             throw new RuntimeException(errorMsg);
         }
+        return inputMsg;
     }
 
     public void openConsoleContainer(String containerId) {

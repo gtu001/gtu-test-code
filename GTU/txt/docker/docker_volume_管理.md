@@ -18,10 +18,16 @@ docker_volume_管理.md
 
 
 	建立volume 自訂位置
-		$ docker volume create --driver local --opt type=none --opt device=//d:/docker_volume_001 --opt o=bind test_vol
-		  docker volume create --driver local --opt type=none --opt device=//C/Users/wistronits/MyDockerVolume001 --opt o=bind test_vol
-		  docker volume create --driver local --opt type=none --opt device=/d/docker_volume_001 --opt o=bind test_vol
-		  docker volume create --driver local --opt type=nfs --opt o=addr=192.168.1.1,rw --opt device=/d/docker_volume_001  test_vol
+		win 非常難用
+			$ docker volume create --driver local --opt type=none --opt device=//d:/docker_volume_001 --opt o=bind test_vol
+			  docker volume create --driver local --opt type=none --opt device=//C/Users/wistronits/MyDockerVolume001 --opt o=bind test_vol
+			  docker volume create --driver local --opt type=none --opt device=/d/docker_volume_001 --opt o=bind test_vol
+			  docker volume create --driver local --opt type=nfs --opt o=addr=192.168.1.1,rw --opt device=/d/docker_volume_001  test_vol
+
+		ubuntu 測試可用
+			  docker volume create --driver local --opt type=none --opt device=/media/gtu001/OLD_D --opt o=bind test_vol
+			  docker run -d --name devtest   --mount source=test_vol,target=/app    nginx:latest
+		  
 
 
 		** 對應run指令 **
