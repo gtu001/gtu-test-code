@@ -16,7 +16,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
@@ -60,10 +59,8 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
 
-import gtu._work.ui.FastDBQueryUI.S2T_And_T2S_EventHandler;
 import gtu._work.ui.FastDBQueryUI_ColumnSearchFilter.FindTextHandler;
 import gtu._work.ui.JMenuBarUtil.JMenuAppender;
-import gtu.binary.Base64JdkUtil;
 import gtu.binary.StringUtil4FullChar;
 import gtu.collection.MapUtil;
 import gtu.db.JdbcDBUtil;
@@ -82,7 +79,7 @@ import gtu.swing.util.JPopupMenuUtil;
 import gtu.swing.util.JTableUtil;
 import gtu.swing.util.JTextUndoUtil;
 import gtu.swing.util.KeyEventExecuteHandler;
-import taobe.tec.jcc.JChineseConvertor;
+import gtu.swing.util.S2T_And_T2S_EventHandler;
 
 public class FastDBQueryUI_CrudDlgUI extends JDialog {
 

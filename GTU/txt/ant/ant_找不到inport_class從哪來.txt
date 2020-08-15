@@ -1,5 +1,5 @@
 當遇到沒有預期會include 的 class
 又找不到是誰import 
-解法事先把這個class 改副檔名
+解法事先把這個 java 改副檔名
 從build 以後會發現某個引用他的 class 名子冒出來
 在修改這個 java 即可

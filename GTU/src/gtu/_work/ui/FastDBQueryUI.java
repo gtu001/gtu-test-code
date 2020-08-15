@@ -114,7 +114,6 @@ import gtu.binary.Base64JdkUtil;
 import gtu.clipboard.ClipboardUtil;
 import gtu.collection.ListUtil;
 import gtu.collection.MapUtil;
-import gtu.date.DateFormatUtil;
 import gtu.db.ExternalJDBCDriverJarLoader;
 import gtu.db.JdbcDBUtil;
 import gtu.db.jdbc.util.DBDateUtil.DBDateFormat;
@@ -162,6 +161,7 @@ import gtu.swing.util.JTextUndoUtil;
 import gtu.swing.util.JTooltipUtil;
 import gtu.swing.util.KeyEventExecuteHandler;
 import gtu.swing.util.KeyEventUtil;
+import gtu.swing.util.S2T_And_T2S_EventHandler;
 import gtu.swing.util.SimpleTextDlg;
 import gtu.swing.util.SwingTabTemplateUI;
 import gtu.swing.util.SwingTabTemplateUI.ChangeTabHandlerGtu001;
@@ -172,7 +172,6 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONException;
 import net.sf.json.JSONObject;
 import net.sf.json.util.JSONUtils;
-import taobe.tec.jcc.JChineseConvertor;
 
 public class FastDBQueryUI extends JFrame {
 
@@ -7586,137 +7585,6 @@ public class FastDBQueryUI extends JFrame {
     }
 
     // ======================================================================================================================
-
-    public static class S2T_And_T2S_EventHandler {
-
-        JTextComponent input;
-
-        public S2T_And_T2S_EventHandler(JTextComponent input) {
-            this.input = input;
-        }
-
-        final Transformer trans = new Transformer() {
-            public Object transform(final Object _input) {
-                String text = input.getText();
-                try {
-                    boolean s2t = (Boolean) _input;
-                    if (StringUtils.isNotBlank(input.getSelectedText())) {
-                        String before = StringUtils.substring(text, 0, input.getSelectionStart());
-                        String middle = input.getSelectedText();
-                        if (s2t) {
-                            middle = JChineseConvertor.getInstance().s2t(middle);
-                        } else {
-                            middle = JChineseConvertor.getInstance().t2s(middle);
-                        }
-                        String after = StringUtils.substring(text, input.getSelectionEnd());
-                        return before + middle + after;
-                    } else {
-                        if (s2t) {
-                            text = JChineseConvertor.getInstance().s2t(text);
-                        } else {
-                            text = JChineseConvertor.getInstance().t2s(text);
-                        }
-                        return text;
-                    }
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-                return text;
-            }
-        };
-
-        final Transformer trans2 = new Transformer() {
-            public Object transform(final Object _input) {
-                String text = input.getText();
-                try {
-                    boolean isEncode = (Boolean) _input;
-                    if (StringUtils.isNotBlank(input.getSelectedText())) {
-                        String before = StringUtils.substring(text, 0, input.getSelectionStart());
-                        String middle = input.getSelectedText();
-                        if (isEncode) {
-                            middle = Base64JdkUtil.encode(middle);
-                        } else {
-                            middle = Base64JdkUtil.decodeToString(middle);
-                        }
-                        String after = StringUtils.substring(text, input.getSelectionEnd());
-                        return before + middle + after;
-                    } else {
-                        if (isEncode) {
-                            text = Base64JdkUtil.encode(text);
-                        } else {
-                            text = Base64JdkUtil.decodeToString(text);
-                        }
-                        return text;
-                    }
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-                return text;
-            }
-        };
-
-        public JMenuItem getMenuItem(final boolean isS2t) {
-            JMenuItem item = new JMenuItem(isS2t ? "簡轉繁" : "繁轉簡");
-            item.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    input.setText((String) trans.transform(isS2t));
-                }
-            });
-            return item;
-        }
-
-        public JMenuItem getMenuItem2(final boolean isEncode) {
-            JMenuItem item = new JMenuItem(isEncode ? "Encode" : "Decode");
-            item.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    input.setText((String) trans2.transform(isEncode));
-                }
-            });
-            return item;
-        }
-
-        public MouseAdapter getEvent() {
-            return new MouseAdapter() {
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                    try {
-                        final JTextField input = (JTextField) e.getSource();
-                        if (JMouseEventUtil.buttonRightClick(1, e)) {
-
-                            JPopupMenuUtil.newInstance(input)//
-                                    .addJMenuItem("繁轉簡", new ActionListener() {
-                                        @Override
-                                        public void actionPerformed(ActionEvent e) {
-                                            input.setText((String) trans.transform(false));
-                                        }
-                                    }).addJMenuItem("簡轉繁", new ActionListener() {
-
-                                        @Override
-                                        public void actionPerformed(ActionEvent e) {
-                                            input.setText((String) trans.transform(true));
-                                        }
-                                    }).addJMenuItem("Encode", new ActionListener() {
-                                        @Override
-                                        public void actionPerformed(ActionEvent e) {
-                                            input.setText((String) trans2.transform(true));
-                                        }
-                                    }).addJMenuItem("Decode", new ActionListener() {
-                                        @Override
-                                        public void actionPerformed(ActionEvent e) {
-                                            input.setText((String) trans2.transform(false));
-                                        }
-                                    }).applyEvent(e).show();
-                        }
-                    } catch (Exception ex1) {
-                        JCommonUtil.handleException(ex1);
-                    }
-                }
-            };
-        }
-    }
-
     // ======================================================================================================================
     // alt + 左右切換頁籤工具
     private class MoveTabsNativeKeyListener implements NativeKeyListener {

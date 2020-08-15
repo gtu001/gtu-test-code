@@ -2,7 +2,6 @@ package gtu._work.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -15,10 +14,8 @@ import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.DefaultCellEditor;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -27,13 +24,11 @@ import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumn;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
-import gtu._work.ui.FastDBQueryUI.S2T_And_T2S_EventHandler;
 import gtu._work.ui.FastDBQueryUI_ColumnSearchFilter.FindTextHandler;
 import gtu.db.jdbc.util.DBDateUtil;
 import gtu.db.sqlMaker.DbSqlCreater.FieldInfo4DbSqlCreater;
@@ -44,7 +39,6 @@ import gtu.swing.util.JFrameRGBColorPanel;
 import gtu.swing.util.JMouseEventUtil;
 import gtu.swing.util.JPopupMenuUtil;
 import gtu.swing.util.JTableUtil;
-import gtu.swing.util.KeyEventExecuteHandler;
 
 public class FastDBQueryUI_TwoTableDlgUI extends JDialog {
 
