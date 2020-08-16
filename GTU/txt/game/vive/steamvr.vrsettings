@@ -1,0 +1,130 @@
+{
+   "DesktopUI" : {
+      "controllerbinding_desktop" : "0,23,1920,1017,0",
+      "pairing" : "568,271,800,600,0",
+      "settings_desktop" : "1112,432,800,600,1"
+   },
+   "DismissedWarnings" : {
+      "DismissableWarning_BasestationSingleBaseModeHint" : true
+   },
+   "GpuSpeed" : {
+      "gpuSpeed0" : 1058,
+      "gpuSpeed1" : 1089,
+      "gpuSpeed2" : 1121,
+      "gpuSpeed3" : 935,
+      "gpuSpeed4" : 1136,
+      "gpuSpeed5" : 1137,
+      "gpuSpeed6" : 1134,
+      "gpuSpeed7" : 934,
+      "gpuSpeedCount" : 8,
+      "gpuSpeedDriver" : "26.21.14.3200",
+      "gpuSpeedHorsepower" : 1100,
+      "gpuSpeedRenderTargetScale" : 0.87999999523162842,
+      "gpuSpeedVendor" : "NVIDIA GeForce GTX 1080 Ti",
+      "gpuSpeedVersion" : 2
+   },
+   "LastKnown" : {
+      "HMDManufacturer" : "Pimax VR, Inc.",
+      "HMDModel" : "Pimax 5K Plus"
+   },
+   "audio" : {
+      "activePlaybackMirrorDevice" : "{0.0.0.00000000}.{fc561998-0f46-461f-93f8-3f974af12e6f}",
+      "enablePlaybackDeviceOverride" : true,
+      "enablePlaybackDeviceOverride_HTC_Vive MV" : false,
+      "enablePlaybackDeviceOverride_Pimax VR, Inc._Pimax 5K Plus" : false,
+      "enablePlaybackMirror" : true,
+      "enablePlaybackMirrorIndependentVolume" : true,
+      "enableRecordingDeviceOverride" : true,
+      "enableRecordingDeviceOverride_Pimax VR, Inc._Pimax 5K Plus" : false,
+      "playbackDeviceOverrideName_Pimax VR, Inc._Pimax 5K Plus" : "喇叭 (9- USB Audio Device)",
+      "playbackDeviceOverride_Pimax VR, Inc._Pimax 5K Plus" : "{0.0.0.00000000}.{efa2ae4b-92ae-4e97-bc14-d92ce0178a23}",
+      "playbackMirrorDevice" : "{0.0.0.00000000}.{fc561998-0f46-461f-93f8-3f974af12e6f}",
+      "playbackMirrorDeviceName" : "喇叭 (2- High Definition Audio Device)",
+      "recordingDeviceOverrideName_Pimax VR, Inc._Pimax 5K Plus" : "麥克風 (9- USB Audio Device)",
+      "recordingDeviceOverride_Pimax VR, Inc._Pimax 5K Plus" : "{0.0.1.00000000}.{942a8f1b-7040-4b4f-9e27-f85534eb7e6a}",
+      "viveHDMIGain" : false
+   },
+   "camera" : {
+      "cameraRoomViewMode" : 4,
+      "enableCamera" : true,
+      "enableCameraForRoomView" : true,
+      "enableCameraInDashboard" : true
+   },
+   "collisionBounds" : {
+      "CollisionBoundsFadeDistance" : 0.69999998807907104,
+      "CollisionBoundsStyle" : 4,
+      "CollisionBoundsWallHeight" : 2.3999999999999999
+   },
+   "dashboard" : {
+      "desktopScale1" : 1.2332945478723403,
+      "lastAccessedExternalOverlayKey" : "Stop Sign\nVR - 0002 - Copyright 2020 Reality Inside Ltd. / s.r.o. (reality-inside.com) - 0",
+      "position_2" : 2
+   },
+   "driver_lighthouse" : {
+      "PowerManagedBaseStations2" : "LHB-DCF1C4A3:BS1:1,LHB-BB10EE39:BS1:1"
+   },
+   "openvr.tool.steamvr_environments" : {
+      "resolutionScale" : 100
+   },
+   "steam.app.1147970" : {
+      "resolutionScale" : 210
+   },
+   "steam.app.275850" : {
+      "resolutionScale" : 199
+   },
+   "steam.app.382110" : {
+      "resolutionScale" : 199
+   },
+   "steam.app.611660" : {
+      "resolutionScale" : 100
+   },
+   "steam.app.835950" : {
+      "resolutionScale" : 149
+   },
+   "steam.app.896890" : {
+      "resolutionScale" : 250
+   },
+   "steam.app.908520" : {
+      "resolutionScale" : 100
+   },
+   "steamvr" : {
+      "background" : "#FF000000",
+      "installID" : "8904483702769362182",
+      "lastVersionNotice" : "1.13.10",
+      "lastVersionNoticeDate" : "1594678162",
+      "maxRecommendedResolution" : 16384,
+      "overlayRenderQuality_2" : 0,
+      "showAdvancedSettings" : true,
+      "supersampleManualOverride" : true,
+      "supersampleScale" : 0.5
+   },
+   "system.generated.ai.exe" : {
+      "resolutionScale" : 199
+   },
+   "system.generated.amtrucks.exe" : {
+      "resolutionScale" : 199
+   },
+   "system.generated.boxvr.exe" : {
+      "resolutionScale" : 500
+   },
+   "system.generated.drugdealersimulator-win64-shipping.exe" : {
+      "resolutionScale" : 250
+   },
+   "system.generated.eurotrucks2.exe" : {
+      "resolutionScale" : 149
+   },
+   "system.generated.gta5.exe" : {
+      "resolutionScale" : 300
+   },
+   "system.generated.jotg.exe" : {
+      "vive_controller_250820_AutosaveURL" : "vr-input-workshop://1982883011",
+      "vive_controller_250820_NeedToUpdateAutosave" : false,
+      "vive_controller_250820_PreviousURL_legacy" : "vr-input-workshop://1982883460"
+   },
+   "system.generated.persistence-win64-shipping.exe" : {
+      "resolutionScale" : 500
+   },
+   "system.generated.walkingdead101.exe" : {
+      "resolutionScale" : 199
+   }
+}
