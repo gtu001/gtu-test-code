@@ -326,9 +326,10 @@ public class SwingTabTemplateUI {
         }
     }
 
-    public void addTab(String tabName, boolean moveToNew) {
+    public JFrame addTab(String tabName, boolean moveToNew) {
+        JFrame childFrame = null;
         try {
-            JFrame childFrame = (JFrame) this.uiJframeClass.newInstance();
+            childFrame = (JFrame) this.uiJframeClass.newInstance();
             JPanel panel = new JPanel();
             tabbedPane.addTab(tabName, null, panel, null);
             panel.setLayout(new BorderLayout(0, 0));
@@ -340,6 +341,7 @@ public class SwingTabTemplateUI {
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
         }
+        return childFrame;
     }
 
     public JFrame getJframe() {
@@ -386,5 +388,13 @@ public class SwingTabTemplateUI {
 
     public void setCloneTabInterface(CloneTabInterfaceGtu001 cloneTabInterfaceGtu001) {
         this.cloneTabInterfaceGtu001 = cloneTabInterfaceGtu001;
+    }
+    
+    public JFrame getCurrentChildJFrame() {
+        int index = tabbedPane.getSelectedIndex();
+        if(index >= 0 &&  index < getJframeKeeperLst().size()) {
+            return getJframeKeeperLst().get(index);
+        }
+        return null;
     }
 }

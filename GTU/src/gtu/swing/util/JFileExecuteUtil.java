@@ -8,7 +8,9 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -19,15 +21,16 @@ import org.apache.commons.collections4.Closure;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.IterableUtils;
 import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.Transformer;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
 import gtu.collection.ListUtil;
 import gtu.file.FileCopyOverwrite;
 import gtu.file.FileUtil;
+import gtu.number.RandomUtil;
 import gtu.properties.PropertiesUtilBean;
 import gtu.runtime.DesktopUtil;
-import gtu.swing.util.JFileExecuteUtil.RevertBackFileHelper;
+import gtu.runtime.RuntimeBatPromptModeUtil;
 import gtu.zip.ZipUtils;
 
 public class JFileExecuteUtil {
@@ -361,40 +364,64 @@ public class JFileExecuteUtil {
     }
 
     public static class RevertBackFileHelper {
-        public static File createLogFile(List<File> fileLst) {
+        public static Pair<File, Map<String, File>> createLogFile(List<File> fileLst) {
             try {
                 File tmpFile = File.createTempFile("FileListLog_", "_.txt");
                 List<String> lst = new ArrayList<String>();
+                List<String> fileNameHolder = new ArrayList<String>();
+                Map<String, File> rtnMap = new LinkedHashMap<String, File>();
                 for (File f : fileLst) {
-                    lst.add(f.getAbsolutePath());
+                    String fname = f.getName();
+                    if (fileNameHolder.contains(fname)) {
+                        do {
+                            fname = f.getName() + "_" + RandomUtil.randomStr(5);
+                        } while (fileNameHolder.contains(fname));
+                    }
+                    fileNameHolder.add(fname);
+                    lst.add(fname + "\t" + f.getAbsolutePath());
+                    rtnMap.put(fname, f);
                 }
                 String content = "檔案清單：\r\n" + StringUtils.join(lst, "\r\n");
                 FileUtil.saveToFile(tmpFile, content, "UTF8");
-                return tmpFile;
+                return Pair.of(tmpFile, rtnMap);
             } catch (Exception ex) {
                 return null;
             }
         }
 
-        public static List<File> getLogFileList(File logFile) {
+        public static Map<String, File> getLogFileList(final File logFile) {
             List<String> lst = FileUtil.loadFromFile_asList(logFile, "UTF8");
             lst = ListUtil.subList(lst, 1, lst.size());
-            List<File> rtnLst = (List<File>) CollectionUtils.collect(lst, new Transformer<String, File>() {
+            final Map<String, File> rtnMap = new LinkedHashMap<String, File>();
+            IterableUtils.forEach(lst, new Closure<String>() {
                 @Override
-                public File transform(String input) {
-                    return new File((String) input);
+                public void execute(String input) {
+                    String[] arry = input.split("\t", -1);
+                    String name = arry[0];
+                    String file = arry[1];
+                    rtnMap.put(name, new File(file));
                 }
             });
-            return rtnLst;
+            return rtnMap;
         }
 
-        private static boolean fileMove(String soucepath, String despath) {
-            File f = new File(soucepath);
-            File des = new File(despath);
+        private static boolean fileMoveDiff(final String soucepath, final String despath, final String tortoiseGitExeFormat) {
+            final File f = new File(soucepath);
+            final File des = new File(despath);
             if (des.exists()) {
-                boolean overwrite = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("是否要覆蓋檔案 : " + des.getName(), "覆蓋檔案");
-                if (overwrite) {
+                char result = JCommonUtil._JOptionPane_showConfirmDialog_yesNoCancelOption("是:覆蓋,否:diff = " + des.getName(), "覆蓋或比對");
+                switch (result) {
+                case 'Y':
                     return FileCopyOverwrite.doCopy(f, des);
+                case 'N':
+                    RuntimeBatPromptModeUtil inst = RuntimeBatPromptModeUtil.newInstance();
+                    inst.runInBatFile(false);
+                    String command = String.format(tortoiseGitExeFormat, soucepath, despath);
+                    inst.command(command);
+                    inst.apply();
+                    break;
+                case 'C':
+                    break;
                 }
             } else {
                 return FileCopyOverwrite.doCopy(f, des);
@@ -402,36 +429,34 @@ public class JFileExecuteUtil {
             return false;
         }
 
-        public static boolean revertLogFile() {
+        public static boolean revertLogFile(String tortoiseGitExeFormat) {
             try {
                 final File choiceDir = JCommonUtil._jFileChooser_selectDirectoryOnly();
                 if (choiceDir == null || !choiceDir.exists()) {
                     return false;
                 }
                 final List<File> lst2 = ListUtil.toList(choiceDir.listFiles());
-                File logFile = CollectionUtils.find(lst2, new Predicate<File>() {
+                final File logFile = CollectionUtils.find(lst2, new Predicate<File>() {
                     @Override
                     public boolean evaluate(File object) {
                         return object.getName().matches("FileListLog\\w+\\.txt");
                     }
                 });
-                final List<File> logFiles = getLogFileList(logFile);
+                final Map<String, File> logFiles = getLogFileList(logFile);
                 final List<String> mvLst = new ArrayList<String>();
-                IterableUtils.forEach(logFiles, new Closure<File>() {
-                    @Override
-                    public void execute(final File input) {
-                        File toFile = CollectionUtils.find(lst2, new Predicate<File>() {
-                            @Override
-                            public boolean evaluate(final File object) {
-                                return StringUtils.equals(object.getName(), input.getName());
-                            }
-                        });
-                        boolean moveOk = fileMove(toFile.getAbsolutePath(), input.getAbsolutePath());
-                        if (!moveOk) {
-                            mvLst.add(input.getName());
+                for (final String name : logFiles.keySet()) {
+                    final File toFile = logFiles.get(name);
+                    final File fromZipFile = CollectionUtils.find(lst2, new Predicate<File>() {
+                        @Override
+                        public boolean evaluate(final File object) {
+                            return StringUtils.equals(object.getName(), name);
                         }
+                    });
+                    boolean moveOk = fileMoveDiff(fromZipFile.getAbsolutePath(), toFile.getAbsolutePath(), tortoiseGitExeFormat);
+                    if (!moveOk) {
+                        mvLst.add(toFile.getName());
                     }
-                });
+                }
                 JCommonUtil._jOptionPane_showMessageDialog_info(("搬運數：" + CollectionUtils.size(logFiles) + "\r\n以下為失敗：" + StringUtils.join(mvLst, "\r\n")));
             } catch (Exception ex) {
                 JCommonUtil.handleException(ex);

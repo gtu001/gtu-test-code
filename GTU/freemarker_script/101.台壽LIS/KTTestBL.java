@@ -373,6 +373,21 @@ public class ${ct.getBlObj()['blClass']} implements BusinessService {
         return null;
     }
 
+    private void queryCustom002() {
+        SQLwithBindVariables sqlbv = new SQLwithBindVariables();
+        sqlbv.sql("select CALCODE,RISKCODE,TYPE,CALSQL,REMARK from lmcalmode where calcode like 'PCT%'");
+        sqlbv.put("CONTNO", "XXXXXXXX");
+        sqlbv.put("CONTNO", "XXXXXXXX");
+        ExeSQL tExeSQL = new ExeSQL();
+        SSRS tSSRS = tExeSQL.execSQL(sqlbv);
+        for (int j = 0; j < tSSRS.getMaxRow(); j++) {
+            System.out.println("-------------");
+            for (int c = 1; c <= tSSRS.getMaxCol(); c++) {
+                System.out.println(tSSRS.GetText(j + 1, c));
+            }
+        }
+    }
+
     /////////////////////////////////////////////////////////////////////////
 
     private boolean sbmtData(VData data) {

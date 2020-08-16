@@ -2,11 +2,12 @@
 ---
 	docker pull elasticsearch:7.8.1
 
-	docker run -p 9200:9200 -p 9300:9300 -e -d "discovery.type=single-node" -e "cluster.name=MyTestCluster"  'elasticsearch:7.8.1' 
+	docker run -p 9200:9200 -p 9300:9300 -d -e "discovery.type=single-node" -e "cluster.name=MyTestCluster"  elasticsearch:7.8.1
 
 	測試是否成功
 	---
 	 	curl -X GET "localhost:9200/_cat/nodes?v&pretty"
+	 	
 
 
 

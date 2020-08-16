@@ -18,8 +18,6 @@ import javax.swing.JTextArea;
 
 import org.apache.commons.lang.StringUtils;
 
-import gtu._work.ui.FastDBQueryUI.S2T_And_T2S_EventHandler;
-
 public class SimpleTextDlg {
     final JDialog dlg;
     final JLabel lbl;

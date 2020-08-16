@@ -1,5 +1,6 @@
 package gtu._work;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,6 +35,8 @@ public class DockerKiller {
         String inputMsg = proc.getInputStreamToString();
         System.out.println("ERR : " + errorMsg);
         System.out.println("OUTPUT : " + inputMsg);
+        inputMsg = RuntimeBatPromptModeUtil.getFixBatInputString_ByOS(inputMsg, 2, null);
+        System.out.println("FIX OUTPUT : " + inputMsg);
         List<String> lst = StringUtil_.readContentToList(inputMsg, false, false, false);
         if (lst.size() <= 1) {
             return Collections.EMPTY_LIST;
@@ -60,6 +63,8 @@ public class DockerKiller {
         String inputMsg = proc.getInputStreamToString();
         System.out.println("ERR : " + errorMsg);
         System.out.println("OUTPUT : " + inputMsg);
+        inputMsg = RuntimeBatPromptModeUtil.getFixBatInputString_ByOS(inputMsg, 2, null);
+        System.out.println("FIX OUTPUT : " + inputMsg);
         List<String> lst = StringUtil_.readContentToList(inputMsg, false, false, false);
         if (lst.size() <= 1) {
             return Collections.EMPTY_LIST;
@@ -76,16 +81,65 @@ public class DockerKiller {
         return rtnLst;
     }
 
-    public void deleteContainer(String containerId) {
+    public List<DockerVolume> volume_ls() {
         RuntimeBatPromptModeUtil _inst = RuntimeBatPromptModeUtil.newInstance();
         _inst.runInBatFile(false);
-        _inst.command("docker rm " + containerId);
+        _inst.command("docker volume ls");
         ProcessWatcher proc = ProcessWatcher.newInstance(_inst.apply());
         proc.getStreamSync();
         String errorMsg = proc.getErrorStreamToString();
         String inputMsg = proc.getInputStreamToString();
         System.out.println("ERR : " + errorMsg);
         System.out.println("OUTPUT : " + inputMsg);
+        inputMsg = RuntimeBatPromptModeUtil.getFixBatInputString_ByOS(inputMsg, 2, null);
+        System.out.println("FIX OUTPUT : " + inputMsg);
+        List<String> lst = StringUtil_.readContentToList(inputMsg, false, false, false);
+        if (lst.size() <= 1) {
+            return Collections.EMPTY_LIST;
+        }
+        Map<String, Integer> firstBlocks = fistBlockSetting(lst.get(0));
+        List<DockerVolume> rtnLst = new ArrayList<DockerVolume>();
+        for (int ii = 1; ii < lst.size(); ii++) {
+            String line = lst.get(ii);
+            Map<String, String> blocks = divideToBlocks(line, firstBlocks);
+            DockerVolume container = blocksToBean(blocks, DockerVolume.class);
+            System.out.println(container);
+            rtnLst.add(container);
+        }
+        return rtnLst;
+    }
+
+    public String commandContainer(String command, String containerId) {
+        RuntimeBatPromptModeUtil _inst = RuntimeBatPromptModeUtil.newInstance();
+        _inst.runInBatFile(false);
+        _inst.command("docker " + command + " " + containerId);
+        ProcessWatcher proc = ProcessWatcher.newInstance(_inst.apply());
+        proc.getStreamSync();
+        String errorMsg = proc.getErrorStreamToString();
+        String inputMsg = proc.getInputStreamToString();
+        inputMsg = RuntimeBatPromptModeUtil.getFixBatInputString_ByOS(inputMsg, 2, null);
+        System.out.println("ERR : " + errorMsg);
+        System.out.println("OUTPUT : " + inputMsg);
+        if (StringUtils.isNotBlank(errorMsg)) {
+            throw new RuntimeException(errorMsg);
+        }
+        return inputMsg;
+    }
+
+    public void openConsoleContainer(String containerId) {
+        RuntimeBatPromptModeUtil _inst = RuntimeBatPromptModeUtil.newInstance();
+        _inst.runInBatFile(true);
+        _inst.command(" docker exec -it " + containerId + " bash ");// winpty
+        _inst.command(" pause ");
+        ProcessWatcher proc = ProcessWatcher.newInstance(_inst.apply());
+        proc.getStreamSync();
+        String errorMsg = proc.getErrorStreamToString();
+        String inputMsg = proc.getInputStreamToString();
+        System.out.println("ERR : " + errorMsg);
+        System.out.println("OUTPUT : " + inputMsg);
+        if (StringUtils.isNotBlank(errorMsg)) {
+            throw new RuntimeException(errorMsg);
+        }
     }
 
     public void deleteImage(String imageId) {
@@ -98,6 +152,41 @@ public class DockerKiller {
         String inputMsg = proc.getInputStreamToString();
         System.out.println("ERR : " + errorMsg);
         System.out.println("OUTPUT : " + inputMsg);
+        if (StringUtils.isNotBlank(errorMsg)) {
+            throw new RuntimeException(errorMsg);
+        }
+    }
+
+    public void deleteVolume(String volumeId) {
+        RuntimeBatPromptModeUtil _inst = RuntimeBatPromptModeUtil.newInstance();
+        _inst.runInBatFile(false);
+        _inst.command("docker volume rm " + volumeId);
+        ProcessWatcher proc = ProcessWatcher.newInstance(_inst.apply());
+        proc.getStreamSync();
+        String errorMsg = proc.getErrorStreamToString();
+        String inputMsg = proc.getInputStreamToString();
+        System.out.println("ERR : " + errorMsg);
+        System.out.println("OUTPUT : " + inputMsg);
+        if (StringUtils.isNotBlank(errorMsg)) {
+            throw new RuntimeException(errorMsg);
+        }
+    }
+
+    public String inspectVolume(String volumeId) {
+        RuntimeBatPromptModeUtil _inst = RuntimeBatPromptModeUtil.newInstance();
+        _inst.runInBatFile(false);
+        _inst.command("docker volume inspect " + volumeId);
+        ProcessWatcher proc = ProcessWatcher.newInstance(_inst.apply());
+        proc.getStreamSync();
+        String errorMsg = proc.getErrorStreamToString();
+        String inputMsg = proc.getInputStreamToString();
+        inputMsg = RuntimeBatPromptModeUtil.getFixBatInputString_ByOS(inputMsg, 2, null);
+        System.out.println("ERR : " + errorMsg);
+        System.out.println("OUTPUT : " + inputMsg);
+        if (StringUtils.isNotBlank(errorMsg)) {
+            throw new RuntimeException(errorMsg);
+        }
+        return inputMsg;
     }
 
     private Map<String, Integer> fistBlockSetting(String line) {
@@ -115,6 +204,10 @@ public class DockerKiller {
                         StringUtils.equals(mth.group(), "ID")) {
                     tmpKey = tmpKey + "_ID";
                     ignoreLatestPos = true;
+                } else if (ArrayUtils.contains(new String[] { "VOLUME" }, tmpKey) && //
+                        StringUtils.equals(mth.group(), "NAME")) {
+                    tmpKey = tmpKey + "_NAME";
+                    ignoreLatestPos = true;
                 } else {
                     setting.put(tmpKey, Math.abs(latestPos - latestEndPos));
                 }
@@ -129,6 +222,31 @@ public class DockerKiller {
         }
         System.out.println("setting : " + setting);
         return setting;
+    }
+
+    public static class DockerVolume {
+        String DRIVER;
+        String VOLUME_NAME;
+
+        public Object[] toRows() {
+            return new Object[] { DRIVER, VOLUME_NAME, this };
+        }
+
+        public String getDRIVER() {
+            return DRIVER;
+        }
+
+        public void setDRIVER(String dRIVER) {
+            DRIVER = dRIVER;
+        }
+
+        public String getVOLUME_NAME() {
+            return VOLUME_NAME;
+        }
+
+        public void setVOLUME_NAME(String vOLUME_NAME) {
+            VOLUME_NAME = vOLUME_NAME;
+        }
     }
 
     public static class DockerContainer {
@@ -262,6 +380,7 @@ public class DockerKiller {
         public void setSIZE(String sIZE) {
             SIZE = sIZE;
         }
+
     }
 
     private String fixBlockTitleName(String fname) {

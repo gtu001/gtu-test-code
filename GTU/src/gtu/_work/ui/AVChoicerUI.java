@@ -1274,7 +1274,7 @@ public class AVChoicerUI extends JFrame {
         }
 
         private void replay_for_mplayer(String rotate) {
-            playAvFile_for_mplayer(historyConfigHandler.getPlayFile(new Callable<File>() {
+            playAvFile_for_VLC(historyConfigHandler.getPlayFile(new Callable<File>() {
                 @Override
                 public File call() throws Exception {
                     return tempFile.get();
@@ -1440,6 +1440,59 @@ public class AVChoicerUI extends JFrame {
                 JCommonUtil.handleException(e);
                 throw new RuntimeException("HistoryConfigHandler ERR : " + e.getMessage(), e);
             }
+        }
+    }
+
+    private void playAvFile_for_VLC(File avFile, String rotate) {
+        try {
+            File exe = new File(avExeText.getText());
+            String commandFormat = "\"%3$s\" %1$s \"%2$s\" ";
+            String encoding = avExeEncodeText.getText();
+
+            // --transform-type {90,180,270,hflip,vflip}
+            String rotateString = "";
+            switch (rotate) {
+            case "mirror":
+                rotateString = " --vout-filter=transform --transform-type=hflip --video-filter \"transform{true}\" ";
+                break;
+            case "90":
+                rotateString = " --vout-filter=transform --transform-type=90 --video-filter \"transform{true}\" ";
+                break;
+            case "180":
+                rotateString = " --vout-filter=transform --transform-type=180 --video-filter \"transform{true}\" ";
+                break;
+            case "270":
+                rotateString = " --vout-filter=transform --transform-type=270 --video-filter \"transform{true}\" ";
+                break;
+            case "180_mirror":
+                rotateString = " --vout-filter=transform --transform-type=vflip --video-filter \"transform{true}\" ";
+                break;
+            default:
+                rotateString = " ";
+                break;
+            }
+
+            currentFileHandler.setFile(avFile);
+            System.out.println("檔案存在 : " + avFile.exists() + " -> " + avFile);
+
+            RuntimeBatPromptModeUtil t = RuntimeBatPromptModeUtil.newInstance();
+            String command = String.format(commandFormat, rotateString, avFile.getCanonicalPath(), exe);
+            System.out.println("CMD ==> " + command);
+            System.out.println("encoding ==> " + encoding);
+            t.command(command);
+            t.runInBatFile(true);
+
+            ProcessWatcher watcher = ProcessWatcher.newInstance(t.apply("tmpPlayer_", encoding));
+            String str1 = watcher.getInputStreamToString();
+            String err1 = watcher.getErrorStreamToString();
+            System.out.println("Input=============================================Start");
+            System.out.println(str1);
+            System.out.println("Input=============================================End");
+            System.out.println("Error=============================================Start");
+            System.out.println(err1);
+            System.out.println("Error=============================================End");
+        } catch (Throwable ex) {
+            JCommonUtil.handleException(ex);
         }
     }
 
