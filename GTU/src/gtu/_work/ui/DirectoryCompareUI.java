@@ -17,7 +17,10 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.EventObject;
 import java.util.HashMap;
 import java.util.List;
@@ -35,13 +38,13 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 import javax.swing.WindowConstants;
 import javax.swing.border.LineBorder;
@@ -62,6 +65,7 @@ import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
 
+import gtu._work.ui.JMenuBarUtil.JMenuAppender;
 import gtu.clipboard.ClipboardUtil;
 import gtu.file.FileUtil;
 import gtu.file.FileUtil.FileZ;
@@ -113,6 +117,12 @@ public class DirectoryCompareUI extends javax.swing.JFrame {
     private JLabel jLabel2;
     private JComboBox compareStyleComboBox;
     private JComboBox diffToolComboBox;
+    private static File NOT_EXIST_FILE;
+    private boolean mergeSwap;
+    private PropertiesUtilBean configBean = new PropertiesUtilBean(DirectoryCompareUI.class);
+    private static final String STARTEAM_KEY = "starTeamConfig";
+    private static final String CUSTOM_COMPARE_URL_KEY = "customCompareUrl";
+    private FileMenuHandler mFileMenuHandler;
 
     /**
      * Auto-generated main method to display this JFrame
@@ -341,17 +351,14 @@ public class DirectoryCompareUI extends javax.swing.JFrame {
 
             JCommonUtil.setJFrameIcon(this, "resource/images/ico/file_merge.ico");
 
+            mFileMenuHandler = new FileMenuHandler();
+            mFileMenuHandler.reloadMenu();
+
             initConfigBean();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-
-    private static File NOT_EXIST_FILE;
-    private boolean mergeSwap;
-    private PropertiesUtilBean configBean = new PropertiesUtilBean(DirectoryCompareUI.class);
-    private static final String STARTEAM_KEY = "starTeamConfig";
-    private static final String CUSTOM_COMPARE_URL_KEY = "customCompareUrl";
 
     static {
         int failTime = 0;
@@ -387,6 +394,8 @@ public class DirectoryCompareUI extends javax.swing.JFrame {
             Validate.notBlank(rightStr, "右邊目錄不可為空");
 
             initComponents();
+
+            mFileMenuHandler.addProperty(leftStr, rightStr);
 
             File leftFile = new File(StringUtils.trim(leftStr));
             File rightFile = new File(StringUtils.trim(rightStr));
@@ -500,6 +509,8 @@ public class DirectoryCompareUI extends javax.swing.JFrame {
             } else {
                 Validate.isTrue(false, "不支援的操作!");
             }
+
+            mFileMenuHandler.reloadMenu();
         } catch (Exception ex) {
             JCommonUtil.handleException(ex, false);
         }
@@ -1697,5 +1708,106 @@ public class DirectoryCompareUI extends javax.swing.JFrame {
     static class ExtensionNameCache {
         SingletonMap extensionNameMessageMap = new SingletonMap();
         SingletonMap extensionNameMap = new SingletonMap();
+    }
+
+    private class FileMenuHandler {
+        PropertiesUtilBean config = new PropertiesUtilBean(DirectoryCompareUI.class, "history");
+
+        private SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        private class FileConf {
+            String name;
+            String left;
+            String right;
+            String latestClickTime;
+        }
+
+        private List<FileConf> getList() {
+            config.reload();
+            List<FileConf> lst = new ArrayList<FileConf>();
+            for (Enumeration<?> enu = config.getConfigProp().keys(); enu.hasMoreElements();) {
+                FileConf conf = new FileConf();
+                String key = (String) enu.nextElement();
+                String[] leftRight = config.getConfigProp().getProperty(key).split("\\#\\^\\#", -1);
+                conf.name = key;
+                conf.left = leftRight[0];
+                conf.right = leftRight[1];
+                conf.latestClickTime = leftRight[2];
+                lst.add(conf);
+            }
+            long currentTime = System.currentTimeMillis();
+            long fithDay = 15 * 24 * 60 * 60 * 1000;
+            boolean delOk = false;
+            for (int ii = 0; ii < lst.size(); ii++) {
+                FileConf conf = lst.get(ii);
+                if ((currentTime - Long.parseLong(conf.latestClickTime)) > fithDay) {
+                    lst.remove(ii);
+                    config.getConfigProp().remove(conf.name);
+                    ii--;
+                    delOk = true;
+                }
+            }
+            if (delOk) {
+                config.store();
+            }
+            Collections.sort(lst, new Comparator<FileConf>() {
+                @Override
+                public int compare(FileConf o1, FileConf o2) {
+                    return StringUtils.trimToEmpty(o1.name).compareTo(StringUtils.trimToEmpty(o2.name));
+                }
+            });
+            return lst;
+        }
+
+        private void addProperty(String left, String right) {
+            left = StringUtils.trimToEmpty(left);
+            right = StringUtils.trimToEmpty(right);
+            File f1 = new File(left);
+            File f2 = new File(right);
+            if (f1.exists() && f1.isFile()) {
+                if (f2.exists() && f2.isFile()) {
+                    addProperty(f2.getName(), left, right);
+                }
+            }
+        }
+
+        private void addProperty(String name, String left, String right) {
+            String value = StringUtils.trimToEmpty(left) + "#^#" + //
+                    StringUtils.trimToEmpty(right) + "#^#" + //
+                    System.currentTimeMillis();
+            config.getConfigProp().setProperty(StringUtils.trimToEmpty(name), value);
+            config.store();
+        }
+
+        private void addProperty(FileConf conf) {
+            String name = conf.name;
+            String left = conf.left;
+            String right = conf.right;
+            String value = StringUtils.trimToEmpty(left) + "#^#" + //
+                    StringUtils.trimToEmpty(right) + "#^#" + //
+                    System.currentTimeMillis();
+            config.getConfigProp().setProperty(StringUtils.trimToEmpty(name), value);
+            config.store();
+        }
+
+        private void reloadMenu() {
+            JMenuAppender menuAppender = JMenuAppender.newInstance("history");
+            for (final FileConf conf : getList()) {
+                menuAppender.addMenuItem(conf.name, new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        leftDirText.setText(conf.left);
+                        rightDirText.setText(conf.right);
+                        addProperty(conf);
+                    }
+                });
+            }
+            JMenu mainMenu = JMenuAppender.newInstance("file")//
+                    // .addMenuItem("----", null)//
+                    // .addMenuItem("歷史", null)//
+                    .addChildrenMenu(menuAppender.getMenu())//
+                    .getMenu();
+            JMenuBarUtil.newInstance().addMenu(mainMenu).apply(DirectoryCompareUI.this);
+        }
     }
 }

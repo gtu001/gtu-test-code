@@ -389,10 +389,10 @@ public class SwingTabTemplateUI {
     public void setCloneTabInterface(CloneTabInterfaceGtu001 cloneTabInterfaceGtu001) {
         this.cloneTabInterfaceGtu001 = cloneTabInterfaceGtu001;
     }
-    
+
     public JFrame getCurrentChildJFrame() {
         int index = tabbedPane.getSelectedIndex();
-        if(index >= 0 &&  index < getJframeKeeperLst().size()) {
+        if (index >= 0 && index < getJframeKeeperLst().size()) {
             return getJframeKeeperLst().get(index);
         }
         return null;

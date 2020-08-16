@@ -11,16 +11,19 @@ import gtu.properties.PropertiesUtilBean;
 public class JSwingCommonConfigUtil {
 
     public static PropertiesUtilBean checkTestingPropertiesUtilBean(PropertiesUtilBean config, Class<?> mainFrameClz, String cfgSimpleClassName) {
+        File dir = null;
         if (!PropertiesUtil.isClassInJar(mainFrameClz)) {
-            File dir = null;
             if (OsInfoUtil.isWindows()) {
                 dir = new File("D:/my_tool");
             } else {
                 dir = new File("/media/gtu001/OLD_D/my_tool/");
             }
-            if (dir.exists()) {
-                return new PropertiesUtilBean(dir, cfgSimpleClassName);
-            }
+        }
+        if (dir == null || dir.exists()) {
+            dir = PropertiesUtil.getJarCurrentPath(mainFrameClz);
+        }
+        if (dir.exists()) {
+            return new PropertiesUtilBean(dir, cfgSimpleClassName);
         }
         return config;
     }
