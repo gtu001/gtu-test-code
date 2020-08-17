@@ -73,7 +73,7 @@
 			<searchdir>${jar_repsitory}</searchdir>
 			<searchdir>${jar_repsitory_custom}</searchdir>
 			<searchdir>${jar_repsitory_gtu_lib}</searchdir>
-
+			
 			<pomconfig mavenExe="${mavenExe}">${gtu_pom_file}</pomconfig>
 
 			<packagename mode="exact" name="commons-lang-2.6.jar">org.apache.commons.lang.StringUtils</packagename>
@@ -176,12 +176,12 @@
 
 	<target name="compiler" if="${enable}">
 		<echo># compiler ...</echo>
-		<javac fork="yes" executable="${jdk_javac}" compiler="javac1.6" source="1.6" target="1.6" includeantruntime="true" srcdir="${src_dir}" destdir="${build_dir}" deprecation="no" nowarn="true" encoding="UTF-8" debug="on"><!-- -->
+		<javac fork="yes" compiler="javac1.6" source="1.6" target="1.6" includeantruntime="true" srcdir="${src_dir}" destdir="${build_dir}" deprecation="no" nowarn="true" encoding="UTF-8" debug="on"><!-- -->
 			<include name="**/${main_class}.java" /><!--executable="${jdk_javac}" fork="yes" -->
 			<classpath>
 				<path location="${build_dir}" />
 			</classpath>
-			<classpath refid="javafx_class_path" />
+			<!--<classpath refid="javafx_class_path" />-->
 		</javac>
 	</target>
 

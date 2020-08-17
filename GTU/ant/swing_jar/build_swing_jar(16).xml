@@ -12,6 +12,12 @@
 	<property name="main_class" value="DirectoryCompareUI" />
 	<property name="rename_jarname" value="${main_class}" />
 	<property name="icon_name" value="file_merge.ico" />
+	<!--<property name="launch4jExe" value="C:\Program Files (x86)\Launch4j\launch4j.exe" />-->
+	<!--<property name="mavenExe" value="I:/‪/apps/apache-maven-3.3.9/bin/mvn" />
+	<property name="gtu_pom_file" value="‪I://workstuff/workspace/gtu-test-code/GTU/pom.xml" />
+	-->
+	<property name="obfuscator_dir" value="/media/gtu001/OLD_D/workstuff/workspace/gtu-test-code/GTU/Allatori-6.9" />
+	<!--<property name="jdk_javac" value="/usr/lib/jvm/java-1.8.0-openjdk-amd64/bin/javac" /> -->
 	<!--${main_class}-->
 
 
@@ -30,7 +36,8 @@
 	<typedef name="jarToExe" classname="gtu.ant.AntJarToExe" classpathref="my_test_classpath" />
 	<typedef name="notify" classname="gtu.ant.AntNotify" classpathref="my_test_classpath" />
 	<typedef name="obfuscator" classname="gtu.ant.AntObfuscator" classpathref="my_test_classpath" />
-
+	<typedef name="baseFolderChanger" classname="gtu.ant.AntBaseFolderChanger" classpathref="my_test_classpath" />
+	
 	<!-- 參考的jar -->
 	<path id="class_path">
 		<fileset dir="${jar_repsitory}">
@@ -52,6 +59,14 @@
 	</target>
 	-->
 
+	<target name="baseFolderChanger" if="${enable}">
+		<echo># baseFolderChanger = ${enable}</echo>
+		<baseFolderChanger>
+			<FolderPlaceholder name="build_dir">${build_dir}</FolderPlaceholder>
+			<FolderPlaceholder name="jars_dir">${jars_dir}</FolderPlaceholder>
+		</baseFolderChanger>
+	</target>
+
 	<target name="jarToExe" if="${enable}">
 		<echo># jarToExe = ${enable}</echo>
 		<jarToExe jarPath="${desktop}/${main_class}.jar" exePath="${desktop}/${main_class}.exe" launch4jExe="${launch4jExe}">
@@ -68,13 +83,15 @@
 			<searchdir>${jar_repsitory_custom}</searchdir>
 			<searchdir>${jar_repsitory_gtu_lib}</searchdir>
 
+			<pomconfig mavenExe="${mavenExe}">${gtu_pom_file}</pomconfig>
+
 			<packagename mode="exact" name="commons-lang-2.6.jar">org.apache.commons.lang.StringUtils</packagename>
-			<packagename mode="small">org.apache.commons.collections.Transformer</packagename>
+			<packagename mode="small" name="commons-collections-3.2.jar">org.apache.commons.collections.Transformer</packagename>
 			<packagename mode="exact" name="commons-lang3-3.4.jar">org.apache.commons.lang3.Validate</packagename>
 			<packagename mode="exact" name="commons-io-2.2.jar">org.apache.commons.io.IOUtils</packagename>
-			<packagename mode="small">net.sf.image4j.codec.ico</packagename>
-			<packagename mode="small">com.jgoodies.forms.factories.FormFactory</packagename>
-			<packagename mode="small">org.apache.commons.beanutils.ConvertUtils</packagename>
+			<packagename mode="small" name="image4j-0.7.jar">net.sf.image4j.codec.ico</packagename>
+			<packagename mode="small" name="forms-1.3.0.jar">com.jgoodies.forms.factories.FormFactory</packagename>
+			<packagename mode="pom" name="commons-beanutils-1.8.0.jar">org/apache/commons/beanutils/DynaBean</packagename>
 
 			<packagename mode="small">com.google.common.collect.Multimap</packagename>
 			<packagename mode="small">org.apache.commons.collections.map.SingletonMap</packagename>
@@ -103,6 +120,10 @@
 	</path>
 
 	<target name="main">
+		<antcall target="baseFolderChanger">
+			<param name="enable" value="true" /><!--false -->
+		</antcall>
+
 		<antcall target="clean">
 			<!--清除-->
 			<param name="enable" value="true" /><!--false -->
@@ -119,8 +140,6 @@
 		<antcall target="compiler">
 			<param name="enable" value="true" />
 		</antcall>
-
-		<antcall target="compiler" />
 
 		<antcall target="runClass">
 			<param name="enable" value="false" />
@@ -172,12 +191,12 @@
 
 	<target name="compiler" if="${enable}">
 		<echo># compiler ...</echo>
-		<javac fork="yes" executable="${jdk_javac}" compiler="javac1.6" source="1.6" target="1.6" includeantruntime="true" srcdir="${src_dir}" destdir="${build_dir}" deprecation="no" nowarn="true" encoding="UTF-8" debug="on"><!-- -->
+		<javac fork="yes" compiler="javac1.6" source="1.6" target="1.6" includeantruntime="true" srcdir="${src_dir}" destdir="${build_dir}" deprecation="no" nowarn="true" encoding="UTF-8" debug="on"><!-- -->
 			<include name="**/${main_class}.java" /><!--executable="${jdk_javac}" fork="yes" -->
 			<classpath>
 				<path location="${build_dir}" />
 			</classpath>
-			<classpath refid="javafx_class_path" />
+			<!--<classpath refid="javafx_class_path" />-->
 		</javac>
 	</target>
 

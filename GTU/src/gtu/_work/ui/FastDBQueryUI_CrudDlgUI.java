@@ -23,12 +23,15 @@ import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -95,6 +98,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
     private JRadioButton rdbtnUpdate;
     private JRadioButton rdbtnDelete;
     private JComboBox dbTypeComboBox;
+
     private AtomicReference<Map<String, ColumnConf>> rowMap = new AtomicReference<Map<String, ColumnConf>>();
     private JRadioButton rdbtnOthers;
     private FastDBQueryUI _parent;
@@ -104,33 +108,44 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
     private List<String> columnsLst;
     private DBTypeFormatHandler dBTypeFormatHandler;
     private KeyEventExecuteHandler keyEventExecuteHandler;
+    private RecordsHandler mRecordsHandler;
 
     private static final String KEY_DBDateFormat = FastDBQueryUI_CrudDlgUI.class.getSimpleName() + "_" + DBDateFormat.class.getSimpleName();
+    private JButton previousRecordBtn;
+    private JButton nextRecordBtn;
+    private JLabel recordsLbl;
+    private JButton resetRecordBtn;
 
     private enum ColumnOrderDef {
-        columnName("欄位", 25), //
-        value("值", 25), //
-        currentLength("現在長度", 5), //
-        maxLength("最大長度", 5), //
-        dtype("資料類型", 25), //
-        isPk("過濾條件", 13), //
-        isIgnore("省略", 12), //
+        columnName("欄位", 25, false), //
+        value("值", 25, true), //
+        currentLength("現在長度", 5, false), //
+        maxLength("最大長度", 5, false), //
+        dtype("資料類型", 25, true), //
+        isPk("過濾條件", 13, true), //
+        isIgnore("省略", 12, true), //
         ;
 
         final int width;
         final String label;
+        final boolean editable;
 
-        ColumnOrderDef(String label, int width) {
+        ColumnOrderDef(String label, int width, boolean editable) {
             this.label = label;
             this.width = width;
+            this.editable = editable;
         }
 
         private static DefaultTableModel createDefaultTableModel() {
             List<String> dlst = new ArrayList<String>();
+            List<Integer> editableLst = new ArrayList<Integer>();
             for (ColumnOrderDef d : ColumnOrderDef.values()) {
                 dlst.add(d.label);
+                if (d.editable) {
+                    editableLst.add(d.ordinal());
+                }
             }
-            return JTableUtil.createModel(false, dlst.toArray(new String[0]));
+            return JTableUtil.createModel(ArrayUtils.toPrimitive(editableLst.toArray(new Integer[0])), dlst.toArray(new String[0]));
         }
 
         private static void resetColumnWidth(JTable rowTable) {
@@ -151,6 +166,12 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
         boolean isIgnore;
         boolean isModify = false;
         Integer maxLength;
+
+        boolean IsModifyGo() {
+            String v1 = value != null ? String.valueOf(value) : null;
+            String v2 = orignValue != null ? String.valueOf(orignValue) : null;
+            return !StringUtils.equals(v1, v2);
+        }
 
         Object[] toArry() {
             int currentLength = 0;
@@ -251,34 +272,12 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
             dialog.setVisible(true);
 
             JTable rowTable = dialog.rowTable;
-            DefaultTableModel model = dialog.initRowTable();
 
             final JTableUtil tableUtil = JTableUtil.newInstance(rowTable);
-            ValueFixHandler valueFixHandler = dialog.new ValueFixHandler();
 
             dialog.columnsLst = new ArrayList<String>();
-            Map<String, Object> rowMap = rowMapLst.get(0);
 
-            Map<String, ColumnConf> rowMapForBackup = MapUtil.createIngoreCaseMap();
-            dialog.rowMap.set(rowMapForBackup);
-            for (String col : rowMap.keySet()) {
-                Object value = rowMap.get(col);
-                value = valueFixHandler.getValueFix(value);
-
-                ColumnConf df = new ColumnConf();
-                df.columnName = col;
-                df.dtype = DataType.isTypeOf(value);
-                df.isPk = false;
-                df.value = value;
-                df.orignValue = value;
-                rowMapForBackup.put(col, df);
-
-                model.addRow(df.toArry());
-                dialog.columnsLst.add(col);
-            }
-
-            JTableUtil.newInstance(rowTable).setRowHeightByFontSize();
-            System.out.println("-------------init size : " + dialog.rowMap.get().size());
+            dialog.mRecordsHandler = dialog.new RecordsHandler(rowMapLst);
 
             dialog.searchText.getDocument().addDocumentListener(JCommonUtil.getDocumentListener(new HandleDocumentEvent() {
                 @Override
@@ -328,14 +327,11 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                         Set<String> numberCol = new HashSet<String>();
                         Set<String> dateCol = new HashSet<String>();
                         Set<String> timestampCol = new HashSet<String>();
-
                         Set<String> ignoreSet = new HashSet<String>();
-                        Set<String> modifyColSet = new HashSet<String>();
 
                         List<Map<String, String>> maybeMultiRowLst = new ArrayList<Map<String, String>>();
 
                         // 第一筆的處理
-                        Map<String, String> map = new LinkedHashMap<String, String>();
                         for (String columnName : dialog.rowMap.get().keySet()) {
                             columnName = StringUtils.trimToEmpty(columnName);
                             ColumnConf df = dialog.rowMap.get().get(columnName);
@@ -345,7 +341,6 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                             if (df.isIgnore) {
                                 ignoreSet.add(columnName);
                             }
-                            map.put(columnName, value);
                             if (isPk) {
                                 pkColumns.add(columnName);
                                 noNullsCol.add(columnName);
@@ -357,34 +352,11 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                             } else if (dtype == DataType.number) {
                                 numberCol.add(columnName);
                             }
-                            if (df.isModify) {
-                                modifyColSet.add(columnName);
-                            }
                         }
-                        maybeMultiRowLst.add(map);
 
                         // 其他筆的處理
-                        if (rowMapLst.size() > 1) {
-                            for (int ii = 1; ii < rowMapLst.size(); ii++) {
-                                Map<String, Object> fromMap = rowMapLst.get(ii);
-                                Map<String, String> toMap = new LinkedHashMap<String, String>();
-
-                                for (String columnName : dialog.rowMap.get().keySet()) {
-                                    columnName = StringUtils.trimToEmpty(columnName);
-                                    ColumnConf df = dialog.rowMap.get().get(columnName);
-                                    String valueOrign = fromMap.get(columnName) != null ? String.valueOf(fromMap.get(columnName)) : null;
-                                    String valueClone = df.value != null ? String.valueOf(df.value) : null;
-
-                                    // 只覆蓋有改的
-                                    if (modifyColSet.contains(columnName)) {
-                                        toMap.put(columnName, valueClone);
-                                    } else {
-                                        toMap.put(columnName, valueOrign);
-                                    }
-                                }
-
-                                maybeMultiRowLst.add(toMap);
-                            }
+                        if (dialog.mRecordsHandler.size() > 0) {
+                            maybeMultiRowLst.addAll(dialog.mRecordsHandler.getMultiMapList());
                         }
 
                         // ------------------------------------------------
@@ -400,6 +372,8 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
 
                         this.maybeMultiRowLst = maybeMultiRowLst;
                         ignoreColumns = ignoreSet;
+
+                        System.out.println("maybeMultiRowLst size : " + this.maybeMultiRowLst.size());
                     }
 
                     List<Map<String, String>> getAllRecoreds() {
@@ -628,6 +602,31 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
         JTableUtil.setColumnAlign(rowTable, ColumnOrderDef.currentLength.ordinal(), JLabel.RIGHT);
         JTableUtil.setColumnAlign(rowTable, ColumnOrderDef.maxLength.ordinal(), JLabel.RIGHT);
 
+        JTableUtil.newInstance(rowTable).setColumnColor_byCondition(ColumnOrderDef.value.ordinal(), new JTableUtil.TableColorDef() {
+            public Pair<Color, Color> getTableColour(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                JTableUtil util = JTableUtil.newInstance(rowTable);
+                String columnName = (String) util.getRealValueAt(row, ColumnOrderDef.columnName.ordinal());
+                // String v1 = (String) util.getRealValueAt(row,
+                // ColumnOrderDef.value.ordinal());
+                Map<String, ColumnConf> conf = rowMap.get();
+                if (conf.containsKey(columnName)) {
+                    ColumnConf cf = conf.get(columnName);
+                    String orignValue = "";
+                    String value1 = "";
+                    if (cf.orignValue != null) {
+                        orignValue = String.valueOf(cf.orignValue);
+                    }
+                    if (cf.value != null) {
+                        value1 = String.valueOf(cf.value);
+                    }
+                    if (!StringUtils.equals(orignValue, value1)) {
+                        return Pair.of(Color.GREEN, null);
+                    }
+                }
+                return null;
+            }
+        });
+
         JTableUtil.newInstance(rowTable).setColumnColor_byCondition(ColumnOrderDef.currentLength.ordinal(), new JTableUtil.TableColorDef() {
             public Pair<Color, Color> getTableColour(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 JTableUtil util = JTableUtil.newInstance(rowTable);
@@ -771,33 +770,40 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                 List<String> success = new ArrayList<String>();
                 List<String> failed = new ArrayList<String>();
 
+                Map<String, ColumnConf> columnPkConf = new HashMap<String, ColumnConf>();
+
                 for (String columnName : rowMap.get().keySet()) {
-                    ColumnConf df = rowMap.get().get(columnName);
+                    ColumnConf df = new ColumnConf();
                     df.isPk = false;
+                    columnPkConf.put(columnName, df);
                 }
 
-                for (String rowColumnName : rowMap.get().keySet()) {
+                for (String rowColumnName : columnPkConf.keySet()) {
                     boolean findOk = false;
                     for (String columnName : tableInfo.getColumnInfo().keySet()) {
                         if (StringUtils.equals(rowColumnName, columnName)) {
                             FieldInfo4DbSqlCreater info = tableInfo.getColumnInfo().get(columnName);
-                            rowMap.get().get(rowColumnName).maxLength = info.getColumnDisplaySize();
+                            columnPkConf.get(rowColumnName).maxLength = info.getColumnDisplaySize();
                             findOk = true;
                         }
                     }
                     if (!findOk) {
-                        rowMap.get().get(rowColumnName).maxLength = null;
+                        columnPkConf.get(rowColumnName).maxLength = null;
                     }
                 }
 
                 for (String columnName : tableInfo.getNoNullsCol()) {
-                    if (rowMap.get().containsKey(columnName)) {
-                        rowMap.get().get(columnName).isPk = true;
+                    if (columnPkConf.containsKey(columnName)) {
+                        columnPkConf.get(columnName).isPk = true;
                         success.add(columnName);
                     } else {
                         failed.add(columnName);
                     }
                 }
+
+                // 重新設定 pk
+                mRecordsHandler.setColumnPkConf(columnPkConf);
+                mRecordsHandler.mergePkConfig();
 
                 // 刷新table
                 searchTextFilter();
@@ -1250,6 +1256,37 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
             JPanel panel = new JPanel();
             contentPanel.add(panel, BorderLayout.NORTH);
             {
+                previousRecordBtn = new JButton("<");
+                previousRecordBtn.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        mRecordsHandler.previousRecordBtnAction();
+                    }
+                });
+                {
+                    recordsLbl = new JLabel("");
+                    panel.add(recordsLbl);
+                }
+                panel.add(previousRecordBtn);
+            }
+            {
+                nextRecordBtn = new JButton(">");
+                nextRecordBtn.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        mRecordsHandler.nextRecordBtnAction();
+                    }
+                });
+                panel.add(nextRecordBtn);
+            }
+            {
+                resetRecordBtn = new JButton("reset");
+                resetRecordBtn.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        mRecordsHandler.resetRecordBtnAction();
+                    }
+                });
+                panel.add(resetRecordBtn);
+            }
+            {
                 JLabel label = new JLabel("搜尋");
                 panel.add(label);
             }
@@ -1352,7 +1389,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
             }
             btnGroup = JButtonGroupUtil.createRadioButtonGroup(rdbtnInsert, rdbtnUpdate, rdbtnDelete, rdbtnOthers, rdbtnSelect);
             {
-                applyAllQueryResultCheckBox = new JCheckBox("多筆匯出");
+                applyAllQueryResultCheckBox = new JCheckBox("匯出所有查詢");
                 panel.add(applyAllQueryResultCheckBox);
             }
         }
@@ -1524,5 +1561,133 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
             }
         }
         _parent.getEditColumnConfig().store();
+    }
+
+    private class RecordsHandler {
+        List<Map<String, Object>> rowMapLst;
+        Map<Integer, Map<String, ColumnConf>> rowMapLstHolder = new TreeMap<Integer, Map<String, ColumnConf>>();
+        int index = 0;
+        Map<String, ColumnConf> columnPkConf = Collections.EMPTY_MAP;
+
+        ValueFixHandler valueFixHandler = new ValueFixHandler();
+
+        private void setColumnPkConf(Map<String, ColumnConf> columnPkConf) {
+            this.columnPkConf = columnPkConf;
+        }
+
+        private void mergePkConfig() {
+            if (this.columnPkConf != null && !this.columnPkConf.isEmpty()) {
+                for (String columnName : this.columnPkConf.keySet()) {
+                    ColumnConf c1 = this.columnPkConf.get(columnName);
+                    ColumnConf c2 = rowMap.get().get(columnName);
+                    if (c1 == null) {
+                        System.out.println("mergePkConfig ==null pk setting== : " + columnName);
+                        continue;
+                    }
+                    c2.isPk = c1.isPk;
+                    c2.maxLength = c1.maxLength;
+                }
+            }
+        }
+
+        private void init(boolean reset) {
+            String recordLblText = index + "/" + rowMapLst.size();
+            recordsLbl.setText(recordLblText);
+
+            DefaultTableModel model = initRowTable();
+            JTableUtil.newInstance(rowTable).setRowHeightByFontSize();
+
+            Map<String, Object> rowMapZ = rowMapLst.get(index);
+
+            Map<String, ColumnConf> rowMapForBackup = MapUtil.createIngoreCaseMap();
+            if (rowMapLstHolder.containsKey(index)) {
+                rowMapForBackup = rowMapLstHolder.get(index);
+            } else {
+                rowMapLstHolder.put(index, rowMapForBackup);
+            }
+            rowMap.set(rowMapForBackup);
+
+            for (String col : rowMapZ.keySet()) {
+                ColumnConf df = null;
+                if (rowMapForBackup.containsKey(col) && !reset) {
+                    df = rowMapForBackup.get(col);
+                } else {
+                    Object value = rowMapZ.get(col);
+                    value = valueFixHandler.getValueFix(value);
+
+                    df = new ColumnConf();
+                    df.columnName = col;
+                    df.dtype = DataType.isTypeOf(value);
+                    df.value = value;
+                    df.orignValue = value;
+
+                    rowMapForBackup.put(col, df);
+                }
+            }
+
+            // 將表設定值拉進來
+            mergePkConfig();
+
+            columnsLst = new ArrayList<String>();
+            for (String col : rowMap.get().keySet()) {
+                ColumnConf df = rowMap.get().get(col);
+                model.addRow(df.toArry());
+                columnsLst.add(col);
+            }
+
+            System.out.println("-------------init size : " + rowMap.get().size());
+        }
+
+        private List<Map<String, String>> getMultiMapList() {
+            List<Map<String, String>> maybeMultiRowLst = new ArrayList<Map<String, String>>();
+            for (Map<String, ColumnConf> conf : rowMapLstHolder.values()) {
+                Map<String, String> toMap = new LinkedHashMap<String, String>();
+                for (String columnName : conf.keySet()) {
+                    ColumnConf df = conf.get(columnName);
+                    String value = null;
+                    if (df.isModify) {
+                        value = df.value != null ? String.valueOf(df.value) : null;
+                    } else {
+                        value = df.orignValue != null ? String.valueOf(df.orignValue) : null;
+                    }
+                    toMap.put(columnName, value);
+                }
+                maybeMultiRowLst.add(toMap);
+            }
+            return maybeMultiRowLst;
+        }
+
+        private RecordsHandler(List<Map<String, Object>> rowMapLst) {
+            this.rowMapLst = rowMapLst;
+            init(true);
+        }
+
+        private void previousRecordBtnAction() {
+            if (index > 0) {
+                index--;
+            }
+            init(false);
+            // 刷新table
+            searchTextFilter();
+        }
+
+        private void nextRecordBtnAction() {
+            if (index < this.rowMapLst.size() - 1) {
+                index++;
+            }
+            init(false);
+            // 刷新table
+            searchTextFilter();
+        }
+
+        private void resetRecordBtnAction() {
+            init(true);
+            // 刷新table
+            searchTextFilter();
+        }
+
+        private int size() {
+            return rowMapLst.size();
+        }
     }
 }

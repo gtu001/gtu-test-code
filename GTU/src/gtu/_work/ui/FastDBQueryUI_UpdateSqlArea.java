@@ -7,6 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -19,7 +20,9 @@ import javax.swing.JTextArea;
 import javax.swing.border.EmptyBorder;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.time.DateFormatUtils;
 
+import gtu.file.FileUtil;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JFrameRGBColorPanel;
 import gtu.swing.util.JTextAreaUtil;
@@ -133,6 +136,15 @@ public class FastDBQueryUI_UpdateSqlArea extends JDialog {
             buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
             getContentPane().add(buttonPane, BorderLayout.SOUTH);
             {
+                JButton exportSqlBtn = new JButton("匯出檔案");
+                exportSqlBtn.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        exportSqlBtnAction();
+                    }
+                });
+                buttonPane.add(exportSqlBtn);
+            }
+            {
                 okButton = new JButton("OK");
                 okButton.setActionCommand("OK");
                 buttonPane.add(okButton);
@@ -174,4 +186,24 @@ public class FastDBQueryUI_UpdateSqlArea extends JDialog {
         jFrameRGBColorPanel.setStop(jFrameRGBColorPanel_isStop);
     }
 
+    private void exportSqlBtnAction() {
+        String sqlText = StringUtils.defaultString(updateSqlArea.getText());
+        if (sqlText.contains("^;^")) {
+            sqlText = sqlText.replaceAll("\\^\\;\\^", ";");
+            sqlText += ";";
+        }
+        String filename = JCommonUtil._jOptionPane_showInputDialog("請輸入匯出檔名",
+                FastDBQueryUI.class.getSimpleName() + "_" + DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMdd_HHmmss") + ".sql");
+        if (StringUtils.isBlank(filename)) {
+            JCommonUtil._jOptionPane_showMessageDialog_error("檔名有誤!");
+            return;
+        }
+        File outputFile = new File(FileUtil.DESKTOP_DIR, filename);
+        if (outputFile.exists()) {
+            JCommonUtil._jOptionPane_showMessageDialog_error("檔案已存在!");
+            return;
+        }
+        FileUtil.saveToFile(outputFile, sqlText, "UTF8");
+        JCommonUtil._jOptionPane_showMessageDialog_info("匯出完成 : " + outputFile);
+    }
 }

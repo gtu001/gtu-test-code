@@ -80,6 +80,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.commons.lang3.reflect.MethodUtils;
 
+import gtu.clipboard.ClipboardUtil;
 import gtu.date.DateUtil;
 import gtu.file.FileUtil;
 import gtu.image.ImageUtil;
@@ -950,8 +951,8 @@ public class JCommonUtil {
                             System.out.println("parse to file error :　" + ffile.get() + " , msg : " + e1.getMessage());
                         }
                     }
+                    JPopupMenuUtil popUtil = JPopupMenuUtil.newInstance(jTextField1);
                     if (ffile.get().exists()) {
-                        JPopupMenuUtil popUtil = JPopupMenuUtil.newInstance(jTextField1);
                         popUtil.addJMenuItem("開啟" + (ffile.get().isFile() ? "檔案" : "目錄"), new ActionListener() {
                             @Override
                             public void actionPerformed(ActionEvent e) {
@@ -966,9 +967,18 @@ public class JCommonUtil {
                                 }
                             }
                         });
-                        popUtil.applyEvent(evt);//
-                        popUtil.show();
                     }
+                    final String copyText = ClipboardUtil.getInstance().getContents();
+                    if (StringUtils.isNotBlank(copyText)) {
+                        popUtil.addJMenuItem("貼上", new ActionListener() {
+                            @Override
+                            public void actionPerformed(ActionEvent e) {
+                                jTextField1.setText(copyText);
+                            }
+                        });
+                    }
+                    popUtil.applyEvent(evt);//
+                    popUtil.show();
                 }
             }
         });

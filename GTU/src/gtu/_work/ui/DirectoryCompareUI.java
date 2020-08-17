@@ -208,6 +208,7 @@ public class DirectoryCompareUI extends javax.swing.JFrame {
                             jPanel2.add(leftDirText);
                             JTextFieldUtil.setupDragDropFilePath(leftDirText, null);
                             leftDirText.addMouseListener(pasteEvent);
+                            JCommonUtil.jTextFieldSetFilePathMouseEvent(leftDirText, true);
                         }
                         {
                             rightDirText = new JTextArea();
@@ -223,6 +224,7 @@ public class DirectoryCompareUI extends javax.swing.JFrame {
                             jPanel2.add(rightDirText);
                             JTextFieldUtil.setupDragDropFilePath(rightDirText, null);
                             rightDirText.addMouseListener(pasteEvent);
+                            JCommonUtil.jTextFieldSetFilePathMouseEvent(rightDirText, true);
                         }
                         {
                             executeBtn = new JButton();
