@@ -143,9 +143,9 @@ public class FileUtil {
      * 換副檔名
      * 
      * @param file
-     *                    要換的檔案
+     *            要換的檔案
      * @param subName
-     *                    要換的副檔名
+     *            要換的副檔名
      * @return
      */
     public static File changeSubName(File file, String subName) {
@@ -189,7 +189,7 @@ public class FileUtil {
      * 讀取檔案
      * 
      * @param fileName
-     *                     完整檔案路徑
+     *            完整檔案路徑
      * @return
      */
     public static byte[] loadFromFile(String fileName) {
@@ -200,7 +200,7 @@ public class FileUtil {
      * 讀取檔案
      * 
      * @param fileName
-     *                     完整檔案路徑
+     *            完整檔案路徑
      * @return
      */
     public static byte[] loadFromFile(File file) {
@@ -240,9 +240,9 @@ public class FileUtil {
      * 存檔案
      * 
      * @param fileName
-     *                     完整檔案路徑
+     *            完整檔案路徑
      * @param data
-     *                     若為字串 .getBytes() 轉為byte[]
+     *            若為字串 .getBytes() 轉為byte[]
      */
     public static void saveToFile(String fileName, byte[] data) {
         saveToFile(new File(fileName), data);
@@ -252,9 +252,9 @@ public class FileUtil {
      * 存檔案
      * 
      * @param fileName
-     *                     完整檔案路徑
+     *            完整檔案路徑
      * @param data
-     *                     若為字串 .getBytes() 轉為byte[]
+     *            若為字串 .getBytes() 轉為byte[]
      */
     public static void saveToFile(File file, byte[] data) {
         try {
@@ -424,6 +424,17 @@ public class FileUtil {
         return list;
     }
 
+    public static long getFreespace(File copyTo) {
+        long freespace = 0;
+        for (File root : File.listRoots()) {
+            if (copyTo.getAbsolutePath().contains(root.getAbsolutePath())) {
+                freespace = root.getFreeSpace();
+                break;
+            }
+        }
+        return freespace;
+    }
+
     /**
      * 檔案複製
      * 
@@ -434,6 +445,11 @@ public class FileUtil {
      */
     public static boolean copyFile(File copyFrom, File copyTo) {
         try {
+            long fromSize = copyFrom.length();
+            long freespace = getFreespace(copyTo);
+            if (fromSize >= freespace) {
+                throw new RuntimeException("空間不足 , src : " + fromSize + " , dst freespace : " + freespace);
+            }
             if (!isLockingSupported()) {
                 return copyFileNormal(copyFrom, copyTo);
             } else {
@@ -463,20 +479,34 @@ public class FileUtil {
      * @return
      * @throws IOException
      */
-    public static boolean copyFileNormal(File copyFrom, File copyTo) throws IOException {
+    public static boolean copyFileNormal(File copyFrom, File copyTo) {
+        BufferedInputStream input = null;
+        BufferedOutputStream output = null;
+        try {
+            byte[] arrayOfByte = new byte[4096];
+            input = new BufferedInputStream(new FileInputStream(copyFrom));
+            output = new BufferedOutputStream(new FileOutputStream(copyTo, false));
+            int i;
+            while ((i = input.read(arrayOfByte, 0, arrayOfByte.length)) != -1) {
+                output.write(arrayOfByte, 0, i);
+            }
+            output.close();
+            input.close();
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        } finally {
+            try {
+                input.close();
+            } catch (Exception e) {
+            }
+            try {
+                output.close();
+            } catch (Exception e) {
+            }
+        }
         if (!copyFrom.exists() || copyTo == null) {
             return false;
         }
-
-        byte[] arrayOfByte = new byte[4096];
-        BufferedInputStream input = new BufferedInputStream(new FileInputStream(copyFrom));
-        BufferedOutputStream output = new BufferedOutputStream(new FileOutputStream(copyTo, false));
-        int i;
-        while ((i = input.read(arrayOfByte, 0, arrayOfByte.length)) != -1) {
-            output.write(arrayOfByte, 0, i);
-        }
-        output.close();
-        input.close();
         return true;
     }
 
@@ -493,9 +523,10 @@ public class FileUtil {
         if ((!(copyFrom.exists())) || (copyTo == null)) {
             return false;
         }
-        byte[] arrayOfByte = new byte[4096];
-        FileOutputStream fileOutput = new FileOutputStream(copyTo, true);
+        FileOutputStream fileOutput = null;
         try {
+            byte[] arrayOfByte = new byte[4096];
+            fileOutput = new FileOutputStream(copyTo, true);
             FileChannel channel = fileOutput.getChannel();
             FileLock fileLock = channel.tryLock();
             if (fileLock != null) {
@@ -529,7 +560,7 @@ public class FileUtil {
      * 刪除檔案
      * 
      * @param fileName
-     *                     檔案路徑
+     *            檔案路徑
      */
     public static void deleteFile(String fileName) {
         File f = new File(fileName);
@@ -551,9 +582,9 @@ public class FileUtil {
      * 檔案搬移 (可換檔名或資料夾名)
      * 
      * @param soucepath
-     *                      來源檔路徑名
+     *            來源檔路徑名
      * @param despath
-     *                      目的檔路徑名
+     *            目的檔路徑名
      * @return
      */
     public static boolean fileMove(String soucepath, String despath) {
@@ -566,7 +597,7 @@ public class FileUtil {
      * 傳回目錄底下所有檔案 File的 List物件
      * 
      * @param fileName
-     *                     目錄路徑
+     *            目錄路徑
      * @param fileList
      * @return
      */
@@ -588,11 +619,11 @@ public class FileUtil {
      * targetBasepath，filePath前面的路徑replaceBasePath將會被targetBasepath給取代
      * 
      * @param filePath
-     *                            來源檔案或目錄路徑(可為檔案或目錄)
+     *            來源檔案或目錄路徑(可為檔案或目錄)
      * @param replaceBasePath
-     *                            來源檔案根目錄
+     *            來源檔案根目錄
      * @param targetBasepath
-     *                            新建立目錄結構的根目錄
+     *            新建立目錄結構的根目錄
      * @return
      * @throws IOException
      */
@@ -628,11 +659,11 @@ public class FileUtil {
      * targetBasepath，filePath前面的路徑replaceBasePath將會被targetBasepath給取代
      * 
      * @param srcFile
-     *                          來源檔案或目錄路徑(可為檔案或目錄)
+     *            來源檔案或目錄路徑(可為檔案或目錄)
      * @param srcBaseDir
-     *                          來源檔案根目錄
+     *            來源檔案根目錄
      * @param targetBaseDir
-     *                          新建立目錄結構的根目錄
+     *            新建立目錄結構的根目錄
      * @return
      * @throws IOException
      */
@@ -704,11 +735,11 @@ public class FileUtil {
      * 搜尋目標符合pattern的檔案(matches)
      * 
      * @param file
-     *                     搜尋的目錄
+     *            搜尋的目錄
      * @param pattern
-     *                     regex pattern
+     *            regex pattern
      * @param fileList
-     *                     找到符合的檔案
+     *            找到符合的檔案
      */
     public static void searchFileContains(File file, String containsText, boolean ignoreCase, List<File> fileList) {
         if (!file.exists()) {
@@ -735,11 +766,11 @@ public class FileUtil {
      * 搜尋目標符合pattern的檔案(matches)
      * 
      * @param file
-     *                     搜尋的目錄
+     *            搜尋的目錄
      * @param pattern
-     *                     regex pattern
+     *            regex pattern
      * @param fileList
-     *                     找到符合的檔案
+     *            找到符合的檔案
      */
     public static void searchFileMatchs(File file, String pattern, List<File> fileList) {
         if (!file.exists()) {
@@ -762,11 +793,11 @@ public class FileUtil {
      * 搜尋目標符合pattern的檔案(find)
      * 
      * @param file
-     *                     搜尋的目錄
+     *            搜尋的目錄
      * @param pattern
-     *                     regex pattern
+     *            regex pattern
      * @param fileList
-     *                     找到符合的檔案
+     *            找到符合的檔案
      */
     public static void searchFilefind(File file, String pattern, List<File> fileList) {
         if (!file.exists()) {
@@ -789,9 +820,9 @@ public class FileUtil {
      * 將檔案清單前置路徑截掉
      * 
      * @param cutPath
-     *                     截掉的路徑
+     *            截掉的路徑
      * @param fileList
-     *                     要截掉的清單
+     *            要截掉的清單
      * @return
      */
     public static List<String> cutRootPath(File cutPath, List<File> fileList) {
@@ -1169,9 +1200,9 @@ public class FileUtil {
      * 從class目錄底下取得檔案成字串
      * 
      * @param clz
-     *                     clz所在位置
+     *            clz所在位置
      * @param fileName
-     *                     檔名Ex : xxx.txt(不用路徑)
+     *            檔名Ex : xxx.txt(不用路徑)
      * @return
      */
     public static String getFileFromClass(Class<?> clz, String fileName) {
@@ -1279,7 +1310,7 @@ public class FileUtil {
      * 
      * @param filename
      * @param ignoreNotEscapeFileSepator
-     *                                       false = 要把 \/轉成全形, true = 不把 \/轉成全形
+     *            false = 要把 \/轉成全形, true = 不把 \/轉成全形
      * @return
      */
     public static String escapeFilename_replaceToFullChar(String filename, boolean ignoreNotEscapeFileSepator) {

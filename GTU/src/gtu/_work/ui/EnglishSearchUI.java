@@ -179,7 +179,7 @@ public class EnglishSearchUI extends JFrame {
         // File("/media/gtu001/OLD_D/my_tool/EnglishSearchUI/EnglishSearchUI_linux_config.properties"));
         // }
         // }
-        propertyBean = JSwingCommonConfigUtil.checkTestingPropertiesUtilBean_diffConfig(propertyBean, EnglishSearchUI.class, "EnglishSearchUI/");
+        propertyBean = JSwingCommonConfigUtil.checkTestingPropertiesUtilBean_diffConfig(propertyBean, EnglishSearchUI.class, ""); //EnglishSearchUI/
         System.out.println("configFile : " + propertyBean.getPropFile());
     }
 
