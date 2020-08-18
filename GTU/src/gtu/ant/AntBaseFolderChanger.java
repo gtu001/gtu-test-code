@@ -1,11 +1,11 @@
 package gtu.ant;
 
 import java.io.File;
+import java.util.Enumeration;
+import java.util.Hashtable;
 import java.util.LinkedHashSet;
 import java.util.Set;
-import java.util.regex.Pattern;
 
-import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
 
@@ -38,14 +38,33 @@ public class AntBaseFolderChanger extends Task {
                     } while (folder2.exists());
                     log("folder 目錄已存在建立新暫存目錄! : " + folder2);
 
+                    this.getProject().setUserProperty(folder.name, folder2.getAbsolutePath());
+                    this.getProject().setNewProperty(folder.name, folder2.getAbsolutePath());
                     this.getProject().setProperty(folder.name, folder2.getAbsolutePath());
+                    System.setProperty(folder.name, folder2.getAbsolutePath());
                 }
-                log("final目錄 : " + folder.name + "\t" + config.getParseAfterValue(folder.text));
+
+                // 建立目錄
+                String mkdirPath = config.getParseAfterValue(folder.text);
+                new File(mkdirPath).mkdirs();
+
+                log("final目錄 : " + folder.name + "\t" + mkdirPath);
             }
+
             this.log("[AntBaseFolderChanger]" + "---- end");
         } catch (Exception e) {
             throw new BuildException(e);
         }
+    }
+
+    private void showInfoMap(Hashtable tab) {
+        log("#-----------------------------------------------------------Start");
+        for (Enumeration enu = tab.keys(); enu.hasMoreElements();) {
+            String key = (String) enu.nextElement();
+            Object val = tab.get(key);
+            log("\t" + key + "\t" + val);
+        }
+        log("#-----------------------------------------------------------End");
     }
 
     public FolderPlaceholder createFolderPlaceholder() {

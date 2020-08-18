@@ -37,6 +37,18 @@
 	<typedef name="notify" classname="gtu.ant.AntNotify" classpathref="my_test_classpath" />
 	<typedef name="obfuscator" classname="gtu.ant.AntObfuscator" classpathref="my_test_classpath" />
 	<typedef name="baseFolderChanger" classname="gtu.ant.AntBaseFolderChanger" classpathref="my_test_classpath" />
+
+	<macrodef name="set" >
+        <attribute name="name"/>
+        <attribute name="value"/>
+        <sequential>
+            <script language="javascript">
+                <![CDATA[
+                project.setProperty("@{name}", "@{value}");
+                ]]>
+            </script>
+        </sequential>
+    </macrodef>
 	
 	<!-- 參考的jar -->
 	<path id="class_path">
@@ -62,9 +74,11 @@
 	<target name="baseFolderChanger" if="${enable}">
 		<echo># baseFolderChanger = ${enable}</echo>
 		<baseFolderChanger>
-			<FolderPlaceholder name="build_dir">${build_dir}</FolderPlaceholder>
-			<FolderPlaceholder name="jars_dir">${jars_dir}</FolderPlaceholder>
+			<FolderPlaceholder name="build_dir_fix">${build_dir}</FolderPlaceholder>
+			<FolderPlaceholder name="jars_dir_fix">${jars_dir}</FolderPlaceholder>
 		</baseFolderChanger>
+		<set name="build_dir" value="${build_dir_fix}" />
+		<set name="jars_dir" value="${jars_dir_fix}" />
 	</target>
 
 	<target name="jarToExe" if="${enable}">
@@ -251,8 +265,12 @@
 
 	<target name="clean" if="${enable}">
 		<echo># clean = ${enable}</echo>
+		<echo># clean1 = ${build_dir}</echo>
+		<echo># clean1 = ${jars_dir}</echo>
+		<!--
 		<delete dir="${build_dir}" />
 		<delete dir="${jars_dir}" />
+	-->
 	</target>
 
 	<target name="copyReference" if="${enable}">

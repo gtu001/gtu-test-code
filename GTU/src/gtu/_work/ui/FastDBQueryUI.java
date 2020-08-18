@@ -5335,11 +5335,6 @@ public class FastDBQueryUI extends JFrame {
                     return false;
             } else if (!latestQueryTime.equals(other.latestQueryTime))
                 return false;
-            if (latestUpdateTime == null) {
-                if (other.latestUpdateTime != null)
-                    return false;
-            } else if (!latestUpdateTime.equals(other.latestUpdateTime))
-                return false;
             if (sql == null) {
                 if (other.sql != null)
                     return false;
