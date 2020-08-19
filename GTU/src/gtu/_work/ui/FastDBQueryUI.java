@@ -3166,24 +3166,22 @@ public class FastDBQueryUI extends JFrame {
 
             while (mth.find()) {
                 String key = mth.group(1);
+                int length = mth.group().length();
                 if (isNotParam(key)) {
                     continue;
                 }
                 paramList.add(key);
                 paramSet.add(key);
-                String questMark = StringUtils.rightPad("?", key.length(), " ");
+                String questMark = StringUtils.rightPad("?", length, " ");
                 mth.appendReplacement(sb2, questMark);
             }
             mth.appendTail(sb2);
 
             // -------------------------------------------------------------------------------------------------
             // 拖曳 字串部分 "'" 後置處理 ↓↓↓↓↓↓↓↓↓↓↓↓↓↓
-            String sqlForQuote = sb2.toString();
             for (Pair<Integer, Integer> p : repMap.keySet()) {
                 String orignSqlGroup = repMap.get(p);
-                String before = StringUtils.substring(sqlForQuote, 0, p.getLeft());
-                String after = StringUtils.substring(sqlForQuote, p.getRight());
-                sqlForQuote = before + orignSqlGroup + after;
+                sb2 = sb2.replace(p.getLeft(), p.getRight(), orignSqlGroup);
             }
             // 拖曳 字串部分 "'" 後置處理 ↑↑↑↑↑↑↑↑↑↑↑↑↑↑
             // -------------------------------------------------------------------------------------------------
@@ -3191,7 +3189,7 @@ public class FastDBQueryUI extends JFrame {
             SqlParam sqlParam = new SqlParam();
             sqlParam.orginialSql = orignSQL;
             sqlParam.paramSet = paramSet;
-            sqlParam.questionSql = sqlForQuote;
+            sqlParam.questionSql = sb2.toString();
             sqlParam.paramList = paramList;
             sqlParam.parseToSqlInjectionMap(orignSQL);
             return sqlParam;
