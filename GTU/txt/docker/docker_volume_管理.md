@@ -18,10 +18,11 @@ docker_volume_管理.md
 
 
 	建立volume 自訂位置
-		win 非常難用
-			$ docker volume create --driver local --opt type=none --opt device=//d:/docker_volume_001 --opt o=bind test_vol
+		win 非常難用(新版docker desktop可用)
+			以下兩者同
+			$ docker volume create --driver local --opt type=none --opt device=/d/docker_volume_001 --opt o=bind test_vol
+			  docker volume create --driver local --opt type=none --opt device=d:\docker_volume_001 --opt o=bind test_vol
 			  docker volume create --driver local --opt type=none --opt device=//C/Users/wistronits/MyDockerVolume001 --opt o=bind test_vol
-			  docker volume create --driver local --opt type=none --opt device=/d/docker_volume_001 --opt o=bind test_vol
 			  docker volume create --driver local --opt type=nfs --opt o=addr=192.168.1.1,rw --opt device=/d/docker_volume_001  test_vol
 
 		ubuntu 測試可用
@@ -45,18 +46,18 @@ docker_volume_管理.md
 
 
 	移除volume
-		$ docker volume rm my-vol
+		$ docker volume rm test_vol
 
 	看詳細
-		$ docker volume inspect my-vol
+		$ docker volume inspect test_vol
 
 
 	PS : container 刪除後才能刪除 volume
 
 
 
-	Ex : $ docker run -d  --name devtest  --mount src=my-vol,dst=/app,readonly    nginx:latest
-		 $ docker run -d  --name devtest  -v my-vol:/app:ro  nginx:latest
+	Ex : $ docker run -d  --name devtest  --mount src=test_vol,dst=/app,readonly    nginx:latest
+		 $ docker run -d  --name devtest  -v test_vol:/app:ro  nginx:latest
 
 
 
