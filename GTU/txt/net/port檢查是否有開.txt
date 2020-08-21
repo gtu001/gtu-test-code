@@ -5,7 +5,7 @@
 netstat -an | findstr 50000
 --看port被誰占用
 netstat -a -b 
---看port被哪個PID占用(工作管理員->詳細資料[可看PID])
+--看port被哪個PID占用(工作管理員->詳細資料[可看PID])  <---**重要**
 netstat -ano | findstr 50000
 --看有在監聽的port 
 netstat -an |find /i "listening"

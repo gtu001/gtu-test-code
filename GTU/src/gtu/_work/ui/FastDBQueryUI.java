@@ -2565,6 +2565,7 @@ public class FastDBQueryUI extends JFrame {
             }
 
             if (saveSqlIdConfig) {
+                mergeWithSqlListSelection(bean);
                 bean = this.saveSqlListProp(bean);
             }
             // 儲存DS設定
@@ -2586,6 +2587,18 @@ public class FastDBQueryUI extends JFrame {
             sqlIdConfigBeanHandler.updateSqlIdCategoryComboBox4Tab1();
         } catch (Throwable ex) {
             JCommonUtil.handleException(ex);
+        }
+    }
+
+    private void mergeWithSqlListSelection(SqlIdConfigBean bean) {
+        SqlIdConfigBean bean1 = (SqlIdConfigBean) sqlList.getSelectedValue();
+        if (bean1 == null) {
+            return;
+        }
+        if (bean.equals(bean1)) {
+            bean.setLatestQueryTime(bean1.getLatestQueryTime());
+            bean.setLatestUpdateTime(bean1.getLatestUpdateTime());
+            bean.setQueryTimes(bean1.getQueryTimes());
         }
     }
 
@@ -3818,22 +3831,28 @@ public class FastDBQueryUI extends JFrame {
                     public void actionPerformed(ActionEvent e) {
                         try {
                             DefaultTableModel model = JTableUtil.newInstance(queryResultTable).getModel();
-                            int rowPos = JTableUtil.getRealRowPos(queryResultTable.getSelectedRow(), queryResultTable);
-                            List<Object> columnLst = JTableUtil.newInstance(queryResultTable).getColumnTitleArray();
-                            List<Triple<String, Class, Object>> sqlLst = new ArrayList<Triple<String, Class, Object>>();
-                            for (int jj = 0; jj < columnLst.size(); jj++) {
-                                String columnN = String.valueOf(columnLst.get(jj));
-                                if (QUERY_RESULT_COLUMN_NO.equals(columnN)) {
-                                    continue;
-                                }
-                                for (int ii = 0; ii < model.getColumnCount(); ii++) {
-                                    String column = model.getColumnName(ii);
-                                    if (StringUtils.equals(column, columnN)) {
-                                        Object value = model.getValueAt(rowPos, ii);
-                                        sqlLst.add(Triple.of(column, getValueClz(column), value));
+
+                            List<List<Triple<String, Class, Object>>> sqlLst = new ArrayList<List<Triple<String, Class, Object>>>();
+                            for (int row : queryResultTable.getSelectedRows()) {
+                                int rowPos = JTableUtil.getRealRowPos(row, queryResultTable);
+                                List<Object> columnLst = JTableUtil.newInstance(queryResultTable).getColumnTitleArray();
+                                List<Triple<String, Class, Object>> innerSqlLst = new ArrayList<Triple<String, Class, Object>>();
+                                for (int jj = 0; jj < columnLst.size(); jj++) {
+                                    String columnN = String.valueOf(columnLst.get(jj));
+                                    if (QUERY_RESULT_COLUMN_NO.equals(columnN)) {
+                                        continue;
+                                    }
+                                    for (int ii = 0; ii < model.getColumnCount(); ii++) {
+                                        String column = model.getColumnName(ii);
+                                        if (StringUtils.equals(column, columnN)) {
+                                            Object value = model.getValueAt(rowPos, ii);
+                                            innerSqlLst.add(Triple.of(column, getValueClz(column), value));
+                                        }
                                     }
                                 }
+                                sqlLst.add(innerSqlLst);
                             }
+
                             if (mFastDBQueryUI_ReserveSqlDlg != null) {
                                 mFastDBQueryUI_ReserveSqlDlg.dispose();
                             }
