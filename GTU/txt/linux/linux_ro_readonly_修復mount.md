@@ -31,9 +31,11 @@
 		sudo mount -o  remount,bind,rw  /dev/sdb1  /media/gtu001/OLD_D
 
 
-	
-		sudo umount -v /dev/sdb1 
 
-		sudo ntfsfix /dev/sdb1
-		sudo mkdir /media/gtu001/OLD_D
-		sudo mount -o rw /dev/sdb1  /media/gtu001/OLD_D
+最後證實有效
+---
+	sudo umount -v /dev/sdb1 
+
+	sudo ntfsfix /dev/sdb1
+	sudo mkdir /media/gtu001/OLD_D
+	sudo mount -o rw /dev/sdb1  /media/gtu001/OLD_D
