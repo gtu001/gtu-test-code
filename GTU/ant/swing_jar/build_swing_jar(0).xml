@@ -128,6 +128,9 @@
 	<path id="config">
 		<fileset dir="${src_dir}">
 			<exclude name="**/*.java" />
+			<exclude name="**/log4j.properties" />
+			<exclude name="**/logback.xml" />
+			<exclude name="**/velocity.properties" />
 		</fileset>
 	</path>
 
@@ -265,12 +268,8 @@
 
 	<target name="clean" if="${enable}">
 		<echo># clean = ${enable}</echo>
-		<echo># clean1 = ${build_dir}</echo>
-		<echo># clean1 = ${jars_dir}</echo>
-		<!--
 		<delete dir="${build_dir}" />
 		<delete dir="${jars_dir}" />
-	-->
 	</target>
 
 	<target name="copyReference" if="${enable}">
