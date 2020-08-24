@@ -123,6 +123,7 @@ public class DirectoryCompareUI extends javax.swing.JFrame {
     private static final String STARTEAM_KEY = "starTeamConfig";
     private static final String CUSTOM_COMPARE_URL_KEY = "customCompareUrl";
     private FileMenuHandler mFileMenuHandler;
+    private static SwingTabTemplateUI TAB_UI;
 
     /**
      * Auto-generated main method to display this JFrame
@@ -138,7 +139,7 @@ public class DirectoryCompareUI extends javax.swing.JFrame {
         // gtu.swing.util.JFrameUtil.setVisible(true, inst);
         // }
         // });
-        SwingTabTemplateUI tabUI = SwingTabTemplateUI.newInstance(null, "file_merge.ico", DirectoryCompareUI.class, true, new SwingTabTemplateUI.SwingTabTemplateUI_Callback() {
+        TAB_UI = SwingTabTemplateUI.newInstance(null, "file_merge.ico", DirectoryCompareUI.class, true, new SwingTabTemplateUI.SwingTabTemplateUI_Callback() {
             @Override
             public void beforeInit(SwingTabTemplateUI self) {
             }
@@ -147,8 +148,15 @@ public class DirectoryCompareUI extends javax.swing.JFrame {
             public void afterInit(SwingTabTemplateUI self) {
             }
         });
-        tabUI.setSize(864, 563 + 25);
-        tabUI.startUI();
+        TAB_UI.setSize(864, 563 + 25);
+        TAB_UI.startUI(new Runnable() {
+            @Override
+            public void run() {
+                // after init ...
+                DirectoryCompareUI inst = (DirectoryCompareUI) TAB_UI.getCurrentChildJFrame();
+                inst.mFileMenuHandler.reloadMenu();
+            }
+        });
         System.out.println("done...");
     }
 
@@ -354,7 +362,6 @@ public class DirectoryCompareUI extends javax.swing.JFrame {
             JCommonUtil.setJFrameIcon(this, "resource/images/ico/file_merge.ico");
 
             mFileMenuHandler = new FileMenuHandler();
-            mFileMenuHandler.reloadMenu();
 
             initConfigBean();
         } catch (Exception e) {
@@ -1794,7 +1801,8 @@ public class DirectoryCompareUI extends javax.swing.JFrame {
 
         private void reloadMenu() {
             JMenuAppender menuAppender = JMenuAppender.newInstance("history");
-            for (final FileConf conf : getList()) {
+            List<FileConf> lst = getList();
+            for (final FileConf conf : lst) {
                 menuAppender.addMenuItem(conf.name, new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
@@ -1804,12 +1812,17 @@ public class DirectoryCompareUI extends javax.swing.JFrame {
                     }
                 });
             }
+            System.out.println("reloadMenu : " + lst.size());
             JMenu mainMenu = JMenuAppender.newInstance("file")//
                     // .addMenuItem("----", null)//
                     // .addMenuItem("歷史", null)//
                     .addChildrenMenu(menuAppender.getMenu())//
                     .getMenu();
-            JMenuBarUtil.newInstance().addMenu(mainMenu).apply(DirectoryCompareUI.this);
+            if (TAB_UI != null) {
+                JMenuBarUtil.newInstance().addMenu(mainMenu).apply(TAB_UI.getJframe());
+                TAB_UI.getJframe().repaint();
+                System.out.println("reloadMenu ok ");
+            }
         }
     }
 }

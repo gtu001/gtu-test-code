@@ -258,10 +258,17 @@ public class SwingTabTemplateUI {
     }
 
     public void startUI() {
+        startUI(null);
+    }
+
+    public void startUI(Runnable afterStartRun) {
         EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
                     jframe.setVisible(true);
+                    if (afterStartRun != null) {
+                        afterStartRun.run();
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
