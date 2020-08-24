@@ -7,8 +7,10 @@ import java.io.StringReader;
 import java.security.MessageDigest;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Scanner;
+import java.util.Set;
 import java.util.UUID;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
@@ -22,7 +24,8 @@ import org.apache.commons.lang.StringUtils;
 public class StringUtil_ {
 
     public static void main(String[] args) {
-        System.out.println(StringUtil_.oracleDecodeAsString("X", "A", "=A", "B", "=B", "C"));
+        String content = StringUtil_.appendReplacementEscape("aaa\\ \\bbb\nddd\t bbb");
+        System.out.println(content);
         System.out.println("done...");
     }
 
@@ -679,6 +682,9 @@ public class StringUtil_ {
             if (StringUtils.isBlank(result)) {
                 return;
             }
+            // ---------↓↓↓↓↓↓ 測試中
+            result = replaceCharDelimit(result);
+            // ---------↑↑↑↑↑↑ 測試中
             if (result.indexOf('$') != -1) {
                 result = replaceChar(result, '$');
             }
@@ -688,10 +694,35 @@ public class StringUtil_ {
             if ("\\".equals(result)) {
                 result = "\\\\";
             }
-            /*
-             * if (result.indexOf('\\') != -1) { result = replaceChar(result,
-             * '\\'); }
-             */
+        }
+
+        private String replaceCharDelimit(String content) {
+            StringBuffer sb = new StringBuffer();
+            char[] arry = content.toCharArray();
+            for (int ii = 0; ii < arry.length; ii++) {
+                char a = arry[ii];
+                if (a == '\\') {
+                    boolean ignore = false;
+                    Character before = null;
+                    Character after = null;
+                    if (ii - 1 >= 0) {
+                        before = arry[ii - 1];
+                    }
+                    if (ii + 1 <= arry.length - 1) {
+                        after = arry[ii + 1];
+                    }
+                    if (before != null && ArrayUtils.contains(ESCAPE_ARRY, before)) {
+                        ignore = true;
+                    } else if (after != null && ArrayUtils.contains(ESCAPE_ARRY, after)) {
+                        ignore = true;
+                    }
+                    if (!ignore) {
+                        sb.append('\\');
+                    }
+                }
+                sb.append(a);
+            }
+            return sb.toString();
         }
 
         private String replaceChar(String content, char from) {

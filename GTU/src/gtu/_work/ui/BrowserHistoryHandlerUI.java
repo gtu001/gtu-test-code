@@ -2635,6 +2635,25 @@ public class BrowserHistoryHandlerUI extends JFrame {
             String command = d.remark;
             command = StringUtils.trimToEmpty(command);
 
+            {
+                Pattern paramPtn = Pattern.compile("\\_\\#(.*?)\\#\\_", Pattern.MULTILINE | Pattern.DOTALL);
+                Matcher mth = paramPtn.matcher(command);
+                StringBuffer sb = new StringBuffer();
+                while (mth.find()) {
+                    String[] arry = mth.group(1).split("\\^");
+                    String question = arry[0];
+                    String defaultVal = "";
+                    if (arry.length > 1) {
+                        defaultVal = arry[1];
+                    }
+                    defaultVal = JCommonUtil._jOptionPane_showInputDialog(question, defaultVal);
+                    defaultVal = StringUtil_.appendReplacementEscape(defaultVal);
+                    mth.appendReplacement(sb, defaultVal);
+                }
+                mth.appendTail(sb);
+                command = sb.toString();
+            }
+
             if (StringUtil_.isUUID(d.url) && StringUtils.isNotBlank(command) && "Y".equalsIgnoreCase(d.isUseRemarkOpen)) {
                 // 純BAT命令
             } else {
