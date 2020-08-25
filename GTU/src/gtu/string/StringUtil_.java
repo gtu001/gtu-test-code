@@ -662,6 +662,21 @@ public class StringUtil_ {
         return ConvertUtils.convert(value, targetClz);
     }
 
+    public static String replaceToSpaceKeepStructure(String strVal) {
+        final char[] ESCAPE_ARRY = new char[] { '\t', '\b', '\n', '\r', '\f' };
+        strVal = StringUtils.defaultString(strVal);
+        char[] arry = strVal.toCharArray();
+        StringBuffer sb = new StringBuffer();
+        for (char c : arry) {
+            if (ArrayUtils.contains(ESCAPE_ARRY, c)) {
+                sb.append(c);
+            } else {
+                sb.append(' ');
+            }
+        }
+        return sb.toString();
+    }
+
     public static String appendReplacementEscape(String content) {
         try {
             return new AppendReplacementEscaper(content).getResult();

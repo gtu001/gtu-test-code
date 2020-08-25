@@ -82,6 +82,14 @@ SSH 遠端 volume
 
 
 
+
+keyword 對應
+---
+	linux : $(pwd)
+	win : %CD%
+
+
+
 ###
 後面還沒看
 	https://docs.docker.com/storage/volumes/

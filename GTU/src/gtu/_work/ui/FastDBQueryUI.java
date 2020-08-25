@@ -3138,10 +3138,10 @@ public class FastDBQueryUI extends JFrame {
 
         protected static String getIgnoreCommonentSql(String sql) {
             StringBuffer sb = new StringBuffer();
-            Pattern ptn1 = Pattern.compile("\\/\\*(?:.|\n)*?\\*\\/", Pattern.MULTILINE | Pattern.DOTALL);
+            Pattern ptn1 = Pattern.compile("\\/\\*.*?\\*\\/", Pattern.MULTILINE | Pattern.DOTALL);
             Matcher mth = ptn1.matcher(sql);
             while (mth.find()) {
-                mth.appendReplacement(sb, StringUtils.leftPad("", StringUtils.length(mth.group())));
+                mth.appendReplacement(sb, StringUtil_.replaceToSpaceKeepStructure(mth.group()));
             }
             mth.appendTail(sb);
 

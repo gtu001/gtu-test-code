@@ -261,7 +261,7 @@ public class SwingTabTemplateUI {
         startUI(null);
     }
 
-    public void startUI(Runnable afterStartRun) {
+    public void startUI(final Runnable afterStartRun) {
         EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
