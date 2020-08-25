@@ -221,8 +221,10 @@ public class Mp3PlayerHandler {
                 mp3PlayerHandler.applyOf(lst.get(findIndex).getUrl(), context);
                 mp3PlayerHandler.mediaplayer.start();
 
+
                 if (currentPosition > 0) {
                     mp3PlayerHandler.mediaplayer.seekTo(currentPosition);
+                    currentPosition = 0;
                 }
 
                 Log.v(TAG, "onCompletion : " + findIndex + "/" + lst.size());

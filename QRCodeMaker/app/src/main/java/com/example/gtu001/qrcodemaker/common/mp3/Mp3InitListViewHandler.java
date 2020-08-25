@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Mp3InitListViewHandler {
     private static final String TAG = Mp3InitListViewHandler.class.getSimpleName();
