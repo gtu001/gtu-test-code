@@ -963,12 +963,15 @@ public class RegexReplacer extends javax.swing.JFrame {
             String toFormat = toFormatLst.get(iii);
             try {
                 int patternFlag = 0;
-                
+
                 boolean isNotOnlyMatch = !config.isOnlyMatch || config.splitFullLst.contains(iii);
 
                 // 多行判斷
                 if (isMultiLine) {
-                    patternFlag = Pattern.DOTALL | Pattern.MULTILINE;
+                    patternFlag = patternFlag | Pattern.DOTALL | Pattern.MULTILINE;
+                }
+                if (config.ignoreCase) {
+                    patternFlag = patternFlag | Pattern.CASE_INSENSITIVE;
                 }
 
                 Pattern pattern = Pattern.compile(fromPattern, patternFlag);
@@ -1048,6 +1051,7 @@ public class RegexReplacer extends javax.swing.JFrame {
         String suffix;
         String split;
         boolean isOnlyMatch = false;
+        boolean ignoreCase = false;
         JSONObject json;
         List<File> sourceFiles = new ArrayList<File>();
         List<Integer> splitFullLst = new ArrayList<Integer>();
@@ -1059,6 +1063,9 @@ public class RegexReplacer extends javax.swing.JFrame {
             }
             if (json.containsKey(SelectionObj.only_match.key)) {
                 isOnlyMatch = json.getBoolean(SelectionObj.only_match.key);
+            }
+            if (json.containsKey(SelectionObj.ignore_case.key)) {
+                ignoreCase = json.getBoolean(SelectionObj.ignore_case.key);
             }
             if (json.containsKey(SelectionObj.prefix.key)) {
                 prefix = json.getString(SelectionObj.prefix.key);
@@ -1479,7 +1486,8 @@ public class RegexReplacer extends javax.swing.JFrame {
         suffix("suffix", "suffix (後置文字)", "strKey"), //
         split("split", "split (分頁)", "strKey"), //
         splitFull("splitFull", "splitFull (分頁完整Index)", "arryKey"), //
-        sourceFiles("sourceFiles", "sourceFiles (固定來源檔)", "arryKey"),//
+        sourceFiles("sourceFiles", "sourceFiles (固定來源檔)", "arryKey"), //
+        ignore_case("ignore_case", "ignore_case (忽略大小寫, true|false)", "boolKey"), //
         ;
 
         final String key;

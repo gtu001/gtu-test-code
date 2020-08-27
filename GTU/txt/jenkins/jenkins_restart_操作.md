@@ -16,6 +16,7 @@ jenkins_restart_操作.md
 
 window
 ---
+	已系統管理者執行cmd
 	"C:\Program Files (x86)\Jenkins\jenkins.exe"  start
 	"C:\Program Files (x86)\Jenkins\jenkins.exe"  stop
 	"C:\Program Files (x86)\Jenkins\jenkins.exe"  restart

@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Random = UnityEngine.Random;
 using System.Collections.Specialized;
+using static Log;
 
 public class BoardManager : MonoBehaviour
 {
@@ -36,6 +37,7 @@ public class BoardManager : MonoBehaviour
 
     void InitialiseList()
     {
+        Log.debug("#InitialiseList --- " + "Start");
         gridPositions.Clear();
         for(int x = 1; x < columns - 1; x ++)
         {
@@ -48,6 +50,7 @@ public class BoardManager : MonoBehaviour
 
     void BoardSetup()
     {
+        Log.debug("#BoardSetup --- " + "Start");
         boardHolder = new GameObject("Board").transform;
         for (int x = -1; x < columns + 1; x++)
         {
@@ -66,6 +69,7 @@ public class BoardManager : MonoBehaviour
 
     Vector3 RandomPosition()
     {
+        Log.debug("#RandomPosition --- " + "Start");
         int randomIndex = Random.Range(0, gridPositions.Count);
         Vector3 randomPosition = gridPositions[randomIndex];
         gridPositions.RemoveAt(randomIndex);
@@ -74,6 +78,7 @@ public class BoardManager : MonoBehaviour
 
     void LayoutObjectRandom(GameObject[] tileArray, int minimum, int maximum)
     {
+        Log.debug("#LayoutObjectRandom --- " + "Start");
         int objectCount = Random.Range(minimum, maximum + 1);
         for(int i = 0; i < objectCount; i ++)
         {
@@ -85,6 +90,7 @@ public class BoardManager : MonoBehaviour
 
     public void SetupScene(int level)
     {
+        Log.debug("#SetupScene --- " + "Start");
         BoardSetup();
         InitialiseList();
         LayoutObjectRandom(wallTiles, wallCount.minimum, wallCount.maximum);
@@ -96,10 +102,13 @@ public class BoardManager : MonoBehaviour
 
     void Start()
     {
+        Log.debug("#Start --- " + "Start");
+        SetupScene(1);
     }
 
     void Update()
     {
+        // Log.debug("#Update --- " + "Start");
     }
 
     /*
@@ -117,5 +126,4 @@ public class BoardManager : MonoBehaviour
         }
     }
     */
-
 }

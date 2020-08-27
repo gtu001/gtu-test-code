@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 1d4dd805822d24f469acedc03f7c41d2
+guid: c82474e76f56af04394c3936956c92f1
 TextureImporter:
   internalIDToNameTable:
   - first:
@@ -20,9 +20,6 @@ TextureImporter:
   - first:
       213: -4101412294073354408
     second: Scavengers_SpriteSheet_5
-  - first:
-      213: -7049184469652251429
-    second: Scavengers_SpriteSheet_4
   - first:
       213: -4251768712096742070
     second: Scavengers_SpriteSheet_6
@@ -170,30 +167,6 @@ TextureImporter:
   - first:
       213: -7795444107844065276
     second: Scavengers_SpriteSheet_54
-  - first:
-      213: -8790975625616888157
-    second: Scavengers_SpriteSheet_0
-  - first:
-      213: 6506151171285976791
-    second: Scavengers_SpriteSheet_1
-  - first:
-      213: -3608863352557636677
-    second: Scavengers_SpriteSheet_2
-  - first:
-      213: 2597015664721196649
-    second: Scavengers_SpriteSheet_3
-  - first:
-      213: -5845336838966443247
-    second: Scavengers_SpriteSheet_5
-  - first:
-      213: -5583456955023581339
-    second: Scavengers_SpriteSheet_6
-  - first:
-      213: -197405380886854219
-    second: Scavengers_SpriteSheet_7
-  - first:
-      213: -1049303403744357813
-    second: Scavengers_SpriteSheet_8
   externalObjects: {}
   serializedVersion: 11
   mipmaps:
@@ -215,6 +188,7 @@ TextureImporter:
   isReadable: 0
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
+  vTOnly: 0
   grayScaleToAlpha: 0
   generateCubemap: 6
   cubemapConvolution: 0
@@ -249,6 +223,7 @@ TextureImporter:
   maxTextureSizeSet: 0
   compressionQualitySet: 0
   textureFormatSet: 0
+  ignorePngGamma: 0
   applyGammaDecoding: 0
   platformSettings:
   - serializedVersion: 3
@@ -275,42 +250,9 @@ TextureImporter:
     overridden: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 3
-    buildTarget: WebGL
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 1
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
-    - serializedVersion: 2
-      name: Scavengers_SpriteSheet_4
-      rect:
-        serializedVersion: 2
-        x: 128
-        y: 192
-        width: 32
-        height: 32
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: bdc5d22b2144c2e90800000000000000
-      internalID: -7049184469652251429
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
     - serializedVersion: 2
       name: Scavengers_SpriteSheet_0
       rect:
@@ -326,8 +268,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 3aeecfdbe3e200680800000000000000
-      internalID: -8790975625616888157
+      spriteID: f3ea470f806514620800000000000000
+      internalID: 2756579043321359935
       vertices: []
       indices: 
       edges: []
@@ -347,8 +289,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 7d60e7be40e7a4a50800000000000000
-      internalID: 6506151171285976791
+      spriteID: d2d63b33cc00840b0800000000000000
+      internalID: -5744340447670342355
       vertices: []
       indices: 
       edges: []
@@ -368,8 +310,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: bb370e3c6edbaedc0800000000000000
-      internalID: -3608863352557636677
+      spriteID: 29ca1a42b457dca00800000000000000
+      internalID: 778407276202536082
       vertices: []
       indices: 
       edges: []
@@ -389,8 +331,29 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 966f4dbccf37a0420800000000000000
-      internalID: 2597015664721196649
+      spriteID: 473e524278746a850800000000000000
+      internalID: 6387871767224247156
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Scavengers_SpriteSheet_4
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 192
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 64d4666502aef92f0800000000000000
+      internalID: -963794370624598714
       vertices: []
       indices: 
       edges: []
@@ -410,8 +373,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 11386e86d1131eea0800000000000000
-      internalID: -5845336838966443247
+      spriteID: 857765eaf3bd417c0800000000000000
+      internalID: -4101412294073354408
       vertices: []
       indices: 
       edges: []
@@ -431,8 +394,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 56f92295b739382b0800000000000000
-      internalID: -5583456955023581339
+      spriteID: a458a5812eeaef4c0800000000000000
+      internalID: -4251768712096742070
       vertices: []
       indices: 
       edges: []
@@ -452,8 +415,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 5b50d7b1adca24df0800000000000000
-      internalID: -197405380886854219
+      spriteID: ef10e3c1cb7713a20800000000000000
+      internalID: 3040342873263178238
       vertices: []
       indices: 
       edges: []
@@ -473,8 +436,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: b42953e1d102071f0800000000000000
-      internalID: -1049303403744357813
+      spriteID: 9c9bee8899d80d8c0800000000000000
+      internalID: -3976522780401288759
       vertices: []
       indices: 
       edges: []
