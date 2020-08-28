@@ -98,10 +98,12 @@ public class BoardManager : MonoBehaviour
         int enemyCount = (int)Mathf.Log(level, 2f);
         LayoutObjectRandom(enemyTiles, enemyCount, enemyCount);
         Instantiate(exit, new Vector3(columns - 1, rows - 1, 0F), Quaternion.identity);
+        Log.debug("#SetupScene --- " + "End");
     }
 
     void Start()
     {
+
         Log.debug("#Start --- " + "Start");
         SetupScene(1);
     }

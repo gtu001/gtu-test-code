@@ -206,7 +206,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1468230389
+--- !u!1 &1203024514
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -214,22 +214,36 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 1468230391}
-  - component: {fileID: 1468230390}
+  - component: {fileID: 1203024517}
+  - component: {fileID: 1203024516}
+  - component: {fileID: 1203024515}
   m_Layer: 0
-  m_Name: GameObject
+  m_Name: GameManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1468230390
+--- !u!114 &1203024515
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1468230389}
+  m_GameObject: {fileID: 1203024514}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 546d7094e8877ea498fdad23b7f7cb2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  boardScript: {fileID: 0}
+--- !u!114 &1203024516
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1203024514}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 538ad490639be0e4182ad759343e1b5a, type: 3}
@@ -243,7 +257,7 @@ MonoBehaviour:
   foodCount:
     minimum: 1
     maximum: 5
-  exit: {fileID: 5108820434974989076, guid: 1caef63021ff10b489fc7b05b45cd5db, type: 3}
+  exit: {fileID: 0}
   floorTiles:
   - {fileID: 2863228216104471108, guid: 502b163458e67e24fa0f4abcf1b018ad, type: 3}
   - {fileID: 6609908006603964509, guid: 0624203828e0413468a71bc137fbc75e, type: 3}
@@ -258,8 +272,6 @@ MonoBehaviour:
   - {fileID: 9194464643755098769, guid: ddcd4cf51ff0766449a51847d328a31c, type: 3}
   - {fileID: 6753709395622439905, guid: 3dd9bfd0975a563408fe5090bad8638d, type: 3}
   - {fileID: 3607498313040032122, guid: 5c7e2a597bd9c5043a12d3b2ec091688, type: 3}
-  - {fileID: 2930612823754205945, guid: 84fb47e2ab9729243a7756ffc7505068, type: 3}
-  - {fileID: 5302804260985413141, guid: a3a9b1be888e1d44bb26dd1c1c2f45a9, type: 3}
   - {fileID: 7224614944092579794, guid: 946d2a62a591cc340a0e607ba9307410, type: 3}
   - {fileID: 2422629670747641073, guid: 3964d1a34bb930a4795c295fff2eaffe, type: 3}
   - {fileID: 2881965885904245445, guid: 5511a9b34e15cae4e830eee6f978a80b, type: 3}
@@ -273,27 +285,23 @@ MonoBehaviour:
   - {fileID: 3679425766201665211, guid: 75cee34f63158274f9c35bbad6c67f3a, type: 3}
   - {fileID: 5111535297327382145, guid: 1ed9738f8c8eadc48a58bb00bc96e1c0, type: 3}
   foodTiles:
-  - {fileID: 2062744205060863452, guid: 4334943aa3418604ea7e1076e999fba5, type: 3}
   - {fileID: 7236982816610016299, guid: 766a169d869066041ab89b98262ac8b6, type: 3}
+  - {fileID: 2062744205060863452, guid: 4334943aa3418604ea7e1076e999fba5, type: 3}
   enemyTiles:
-  - {fileID: 6011702975821085005, guid: 37506c8ee92d1a04b9925a2da0af8c91, type: 3}
-  - {fileID: 5133152337688915161, guid: 4fae3d2e8703df8429589d960fff772c, type: 3}
+  - {fileID: 6953805270073659304, guid: 4a5301c8595a5e04dab6c586c3b7fe11, type: 3}
+  - {fileID: 4942019361440978074, guid: 4fae3d2e8703df8429589d960fff772c, type: 3}
   outerWallTiles:
   - {fileID: 2930612823754205945, guid: 84fb47e2ab9729243a7756ffc7505068, type: 3}
   - {fileID: 5302804260985413141, guid: a3a9b1be888e1d44bb26dd1c1c2f45a9, type: 3}
-  - {fileID: 7224614944092579794, guid: 946d2a62a591cc340a0e607ba9307410, type: 3}
-  - {fileID: 2422629670747641073, guid: 3964d1a34bb930a4795c295fff2eaffe, type: 3}
-  - {fileID: 2881965885904245445, guid: 5511a9b34e15cae4e830eee6f978a80b, type: 3}
-  - {fileID: 7939853726377107187, guid: 834712564e435e44498f728812303222, type: 3}
---- !u!4 &1468230391
+--- !u!4 &1203024517
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1468230389}
+  m_GameObject: {fileID: 1203024514}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 4.2988906, y: -4.7561483, z: -5.7692466}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
