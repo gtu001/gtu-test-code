@@ -361,6 +361,13 @@
            ondblclick="return showCodeList('#3#',[this,#2#Name],[0,1],null,[3],['risktype3'],1,'200');"
            onkeyup="return showCodeListKey('#3#',[this,#2#Name],[0,1],null,[3],['risktype3'],1,'500');">
     <input class=codename name=#2#Name id="#2#Name" readonly=true>
+
+    <input style="background:url(../common/images/select--bg_03.png) no-repeat right center" class=codeno 
+    	   name=EdorType id=EdorType
+           onclick="return showCodeList('edortype',[this,EdorTypeName],[0,1]);"
+           ondblclick="return showCodeList('edortype',[this,EdorTypeName],[0,1]);"
+           onkeyup="return showCodeListKey('edortype',[this,EdorTypeName],[0,1]);">
+    <input class=codename name=EdorTypeName id=EdorTypeName readonly>
 */
 	//setDropdownValue("#EdorType", "#EdorTypeName", "edortype", "PT");
     function setDropdownValue(field, cField, strCodeName, value) {

@@ -490,5 +490,69 @@ public class ${ct.getBlObj()['blClass']} implements BusinessService {
         }
         logger.info("//////////////////////////////////////////////////////////////////////");
     }
+
+    public static boolean getInfo(Object schema) {
+        try {
+            Boolean result = (Boolean) MethodUtils.invokeMethod(schema, "getInfo");
+            if (result) {
+                return true;
+            } else {
+                Object set = MethodUtils.invokeMethod(schema, "query");
+                Integer result2 = (Integer) MethodUtils.invokeMethod(set, "size");
+                if (result2 > 0) {
+                    return true;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public static String getCalculatorReplaceSQL(Calculator calculator) {
+        String replaceSQL = "";
+        String orignSql = "";
+        try {
+            String calCode = (String) FieldUtils.readDeclaredField(calculator, "CalCode", true);
+
+            StringBuffer tSBSql = new StringBuffer();
+            tSBSql.append("select CALSQL  from lmcalmode t  where  t.CALCODE = '?CALCODE?' ");
+            SQLwithBindVariables tSBV = new SQLwithBindVariables();
+            tSBV.sql(tSBSql.toString());
+            tSBV.put("CALCODE", calCode);
+            ExeSQL tExeSQL = new ExeSQL();
+            SSRS tResult = tExeSQL.execSQL(tSBV);
+            for (int i = 0; i < tResult.getMaxRow(); i++) {
+                orignSql = tResult.GetText(i + 1, 1);
+            }
+
+            Map<String, String> map = new LinkedHashMap<String, String>();
+            LMCalFactorSet set = (LMCalFactorSet) FieldUtils.readDeclaredField(calculator, "mCalFactors1", true);
+            for (int ii = 1; ii <= set.size(); ii++) {
+                map.put(set.get(ii).getFactorCode(), set.get(ii).getFactorDefault());
+            }
+            String sql = orignSql;
+            StringBuffer sb = new StringBuffer();
+            Pattern ptn = Pattern.compile("\\?(\\w+)\\?");
+            Matcher mth = ptn.matcher(sql);
+            while (mth.find()) {
+                String key = mth.group(1);
+                String value = "#####" + key + "#####";
+                if (map.containsKey(key)) {
+                    value = map.get(key);
+                }
+                mth.appendReplacement(sb, value);
+            }
+            mth.appendTail(sb);
+            replaceSQL = sb.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+            replaceSQL = e.getMessage();
+        } finally {
+            logger.debug("#[1]Calculator = " + orignSql);
+            logger.debug("#[2]Calculator = " + replaceSQL);
+        }
+        return replaceSQL;
+    }
 }
 ////////////////////////////////////////////////////

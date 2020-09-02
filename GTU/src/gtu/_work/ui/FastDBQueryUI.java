@@ -5329,7 +5329,7 @@ public class FastDBQueryUI extends JFrame {
             }
         }
 
-        public boolean equalsAll(Object obj) {
+        public boolean equalsForEditor(Object obj) {
             if (this == obj)
                 return true;
             if (obj == null)
@@ -5347,11 +5347,21 @@ public class FastDBQueryUI extends JFrame {
                     return false;
             } else if (!color.equals(other.color))
                 return false;
-            if (latestQueryTime == null) {
-                if (other.latestQueryTime != null)
-                    return false;
-            } else if (!latestQueryTime.equals(other.latestQueryTime))
-                return false;
+//            if (latestQueryTime == null) {
+//                if (other.latestQueryTime != null)
+//                    return false;
+//            } else if (!latestQueryTime.equals(other.latestQueryTime))
+//                return false;
+//            if (latestUpdateTime == null) {
+//                if (other.latestUpdateTime != null)
+//                    return false;
+//            } else if (!latestUpdateTime.equals(other.latestUpdateTime))
+//                return false;
+//            if (queryTimes == null) {
+//                if (other.queryTimes != null)
+//                    return false;
+//            } else if (!queryTimes.equals(other.queryTimes))
+//                return false;
             if (sql == null) {
                 if (other.sql != null)
                     return false;
@@ -6268,7 +6278,7 @@ public class FastDBQueryUI extends JFrame {
             String text = sqlTextArea.getText();
             boolean isNotEqual = false;
             if (sqlBean != null) {
-                if (!sqlBean.equalsAll(getCurrentEditSqlIdConfigBean())) {
+                if (!sqlBean.equalsForEditor(getCurrentEditSqlIdConfigBean())) {
                     isNotEqual = true;
                 }
             } else {
