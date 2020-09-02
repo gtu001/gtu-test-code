@@ -157,24 +157,39 @@ public class FastDBQueryUI_ColumnSearchFilter {
         String searchText;
         String delimit;
 
+        boolean isAnd = false;
+        boolean isAllMatch;
+        String[] searchTextArry;
+
         FindTextHandler(String searchText, String delimit) {
             this.searchText = searchText;
             this.delimit = delimit;
-        }
+            // --------------------------------------
+            Pattern ptn = Pattern.compile("(and|\\&{2})\\s+(.*)", Pattern.CASE_INSENSITIVE);
+            Matcher mth = ptn.matcher(searchText);
+            if (mth.find()) {
+                isAnd = true;
+                this.searchText = mth.group(2);
+            }
 
-        boolean isAllMatch() {
-            return StringUtils.isBlank(searchText);
-        }
-
-        String[] getArry() {
-            String[] arry = StringUtils.trimToEmpty(searchText).toLowerCase().split(Pattern.quote(delimit), -1);
+            // ---------------------------------------
+            isAllMatch = StringUtils.isBlank(this.searchText);
+            String[] arry = StringUtils.trimToEmpty(this.searchText).toLowerCase().split(Pattern.quote(delimit), -1);
             List<String> rtnLst = new ArrayList<String>();
             for (int ii = 0; ii < arry.length; ii++) {
                 if (StringUtils.isNotBlank(arry[ii])) {
                     rtnLst.add(StringUtils.trimToEmpty(arry[ii]));
                 }
             }
-            return rtnLst.toArray(new String[0]);
+            searchTextArry = rtnLst.toArray(new String[0]);
+        }
+
+        boolean isAllMatch() {
+            return isAllMatch;
+        }
+
+        String[] getArry() {
+            return searchTextArry;
         }
 
         String valueToString(Object value) {
@@ -261,19 +276,31 @@ public class FastDBQueryUI_ColumnSearchFilter {
                 }
 
                 String value = finder.valueToString(rows[ii]);
-                for (String text : finder.getArry()) {
-                    if (value.contains(text)) {
-                        int realCol = ii;
-                        if (hasNoColumn) {
-                            realCol = realCol + 1;
+
+                int realCol = ii;
+                if (hasNoColumn) {
+                    realCol = realCol + 1;
+                }
+
+                if (!finder.isAnd) {
+                    // is or
+                    for (String text : finder.getArry()) {
+                        if (value.contains(text)) {
+                            this._____addMatchRow_____(realCol, rowIdx, isKeepMatchOnly, rows, qList);
+                            break B;
                         }
-                        if (isKeepMatchOnly) {
-                            addColorCellMatch(qList.size(), realCol, changeColorRowCellIdxMap);
-                        } else {
-                            addColorCellMatch(rowIdx, realCol, changeColorRowCellIdxMap);
+                    }
+                } else {
+                    // is and
+                    boolean isAllOk = true;
+                    C: for (String text : finder.getArry()) {
+                        if (!value.contains(text)) {
+                            isAllOk = false;
+                            break C;
                         }
-                        qList.add(rows);
-                        break B;
+                    }
+                    if (isAllOk) {
+                        this._____addMatchRow_____(realCol, rowIdx, isKeepMatchOnly, rows, qList);
                     }
                 }
             }
@@ -288,6 +315,15 @@ public class FastDBQueryUI_ColumnSearchFilter {
         } else {
             rowFilterResult = queryList;
         }
+    }
+
+    private void _____addMatchRow_____(int realCol, int rowIdx, boolean isKeepMatchOnly, Object[] rows, List<Object[]> qList) {
+        if (isKeepMatchOnly) {
+            addColorCellMatch(qList.size(), realCol, changeColorRowCellIdxMap);
+        } else {
+            addColorCellMatch(rowIdx, realCol, changeColorRowCellIdxMap);
+        }
+        qList.add(rows);
     }
 
     public Pair<Triple<List<String>, List<Class<?>>, List<Object[]>>, Map<Integer, List<Integer>>> getResultFinal() {

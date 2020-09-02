@@ -27,6 +27,7 @@ import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.Triple;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.hssf.util.HSSFColor;
@@ -143,7 +144,7 @@ public class FastDBQueryUI_RowCompareDlg_Ver2 extends JDialog {
                                 String text = StringUtils.trimToEmpty(columnFilterText.getText());
                                 DefaultTableModel model = initImportRowTable(row1Label, row2Label);
 
-                                Pair<String[], Pattern[]> condition = FastDBQueryUI_XlsColumnDefLoader.RegExpAndTextFilter.toSearchCondition(text);
+                                Triple<Boolean, String[], Pattern[]> condition = FastDBQueryUI_XlsColumnDefLoader.RegExpAndTextFilter.toSearchCondition(text);
                                 initTab1(titleLst, row1, row2, condition, model);
                             }
                         }));
@@ -282,7 +283,7 @@ public class FastDBQueryUI_RowCompareDlg_Ver2 extends JDialog {
         }
     }
 
-    private void initTab1(List<String> titleLst, List<Object> row1, List<Object> row2, Pair<String[], Pattern[]> condition, DefaultTableModel model) {
+    private void initTab1(List<String> titleLst, List<Object> row1, List<Object> row2, Triple<Boolean, String[], Pattern[]> condition, DefaultTableModel model) {
         Validate.isTrue((titleLst.size() == row1.size()) && (titleLst.size() == row2.size()), "資料欄位數目應該相同!");
         for (int ii = 0; ii < titleLst.size(); ii++) {
             String col = titleLst.get(ii);
@@ -291,14 +292,14 @@ public class FastDBQueryUI_RowCompareDlg_Ver2 extends JDialog {
 
             boolean findOk = false;
             if (!RegExpAndTextFilter.isEmptyCondition(condition)) {
-                if (RegExpAndTextFilter.isTextContain(col, condition.getLeft()) || //
-                        RegExpAndTextFilter.isTextContain(String.valueOf(value1), condition.getLeft()) || //
-                        RegExpAndTextFilter.isTextContain(String.valueOf(value2), condition.getLeft())) {
+                if (RegExpAndTextFilter.isTextContain(condition.getLeft(), col, condition.getMiddle()) || //
+                        RegExpAndTextFilter.isTextContain(condition.getLeft(), String.valueOf(value1), condition.getMiddle()) || //
+                        RegExpAndTextFilter.isTextContain(condition.getLeft(), String.valueOf(value2), condition.getMiddle())) {
                     findOk = true;
                 }
-                if (!findOk && (FastDBQueryUI_XlsColumnDefLoader.RegExpAndTextFilter.isRegexMatch(col, condition.getRight()) || //
-                        FastDBQueryUI_XlsColumnDefLoader.RegExpAndTextFilter.isRegexMatch(String.valueOf(value1), condition.getRight()) || //
-                        FastDBQueryUI_XlsColumnDefLoader.RegExpAndTextFilter.isRegexMatch(String.valueOf(value2), condition.getRight()) //
+                if (!findOk && (FastDBQueryUI_XlsColumnDefLoader.RegExpAndTextFilter.isRegexMatch(condition.getLeft(), col, condition.getRight()) || //
+                        FastDBQueryUI_XlsColumnDefLoader.RegExpAndTextFilter.isRegexMatch(condition.getLeft(), String.valueOf(value1), condition.getRight()) || //
+                        FastDBQueryUI_XlsColumnDefLoader.RegExpAndTextFilter.isRegexMatch(condition.getLeft(), String.valueOf(value2), condition.getRight()) //
                 )) {
                     findOk = true;
                 }
