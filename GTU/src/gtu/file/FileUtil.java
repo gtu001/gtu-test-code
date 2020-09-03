@@ -504,11 +504,18 @@ public class FileUtil {
             if (fromSize >= freespace) {
                 throw new RuntimeException("空間不足 , src : " + fromSize + " , dst freespace : " + freespace);
             }
-            if (!isLockingSupported()) {
-                return copyFileNormal(copyFrom, copyTo);
-            } else {
-                return copyFileLocking(copyFrom, copyTo);
+            // if (!isLockingSupported()) {
+            // return copyFileNormal(copyFrom, copyTo);
+            // } else {
+            // return copyFileLocking(copyFrom, copyTo);
+            // }
+            doCopyFile(copyFrom, copyTo, true);
+            if (copyTo.exists()) {
+                if (copyTo.length() == copyFrom.length()) {
+                    return true;
+                }
             }
+            return false;
         } catch (Exception ex) {
             throw new RuntimeException("copyFile ERR : " + ex.getMessage(), ex);
         }
@@ -618,6 +625,56 @@ public class FileUtil {
             fileOutput.close();
         }
         throw new IOException("Unable to acquire file lock for " + copyTo);
+    }
+
+    private static void doCopyFile(final File srcFile, final File destFile, final boolean preserveFileDate) throws IOException {
+        if (destFile.exists() && destFile.isDirectory()) {
+            throw new IOException("Destination '" + destFile + "' exists but is a directory");
+        }
+
+        final long ONE_KB = 1024;// 1kb
+        final long ONE_MB = ONE_KB * ONE_KB; // 1mb
+        final long FILE_COPY_BUFFER_SIZE = ONE_MB * 30;// 30mb
+
+        FileInputStream fis = null;
+        FileChannel input = null;
+        FileOutputStream fos = null;
+        FileChannel output = null;
+
+        try {
+            fis = new FileInputStream(srcFile);
+            input = fis.getChannel();
+            fos = new FileOutputStream(destFile);
+            output = fos.getChannel();
+
+            final long size = input.size(); // TODO See IO-386
+            long pos = 0;
+            long count = 0;
+            while (pos < size) {
+                final long remain = size - pos;
+                count = remain > FILE_COPY_BUFFER_SIZE ? FILE_COPY_BUFFER_SIZE : remain;
+                final long bytesCopied = output.transferFrom(input, pos, count);
+                if (bytesCopied == 0) { // IO-385 - can happen if file is
+                                        // truncated after caching the size
+                    break; // ensure we don't loop forever
+                }
+                pos += bytesCopied;
+            }
+        } catch (IOException ex) {
+            throw ex;
+        } finally {
+            fis.close();
+            fos.close();
+        }
+
+        final long srcLen = srcFile.length(); // TODO See IO-386
+        final long dstLen = destFile.length(); // TODO See IO-386
+        if (srcLen != dstLen) {
+            throw new IOException("Failed to copy full contents from '" + srcFile + "' to '" + destFile + "' Expected length: " + srcLen + " Actual: " + dstLen);
+        }
+        if (preserveFileDate) {
+            destFile.setLastModified(srcFile.lastModified());
+        }
     }
 
     /**
