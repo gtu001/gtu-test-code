@@ -51,6 +51,8 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.tuple.Pair;
 
+import gtu.swing.util.JCommonUtil;
+
 /**
  * @author Troy 2009/05/04
  * 
@@ -435,6 +437,58 @@ public class FileUtil {
         return freespace;
     }
 
+    public static boolean copyDirectory(File copyFromDir, File copyToDir) {
+        if (copyFromDir.isDirectory() && copyToDir.isDirectory()) {
+            boolean isAllOk = true;
+            List<File> fileLst = new ArrayList<File>();
+            FileUtil.searchFilefind(copyFromDir, ".*", fileLst);
+
+            File copyToDirStarter = new File(copyToDir, copyFromDir.getName());
+            if (copyToDirStarter.exists()) {
+                boolean confirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("複製目的目錄存在 : " + copyToDirStarter + "\n是否繼續?", "複製目錄");
+                if (!confirm) {
+                    return false;
+                }
+            }
+
+            for (File copyFromFile : fileLst) {
+                if (copyFromFile.isDirectory()) {
+                    File destFile = exportFileToTargetPath(copyFromFile, copyFromDir, copyToDirStarter);
+                    destFile.mkdirs();
+                }
+            }
+
+            String replaceBasePath = copyFromDir.getAbsolutePath();
+            String targetBasepath = copyToDirStarter.getAbsolutePath();
+            for (File copyFromFile : fileLst) {
+                if (copyFromFile.isFile()) {
+                    String filePath = copyFromFile.getAbsolutePath();
+                    try {
+                        File toFile = exportFileToTarget(filePath, replaceBasePath, targetBasepath);
+                        if (copyFromFile.length() != toFile.length()) {
+                            System.out.println("檔案複製大小不一致 : " + toFile);
+                            isAllOk = false;
+                        }
+                    } catch (IOException e) {
+                        System.out.println("檔案複製錯誤 : " + e.getMessage());
+                        isAllOk = false;
+                    }
+                }
+            }
+            return isAllOk;
+        } else {
+            return false;
+        }
+    }
+
+    public static boolean moveDirectory(File copyFromDir, File copyToDir) {
+        boolean result = copyDirectory(copyFromDir, copyToDir);
+        if (result) {
+            return FileUtils.deleteQuietly(copyFromDir);
+        }
+        return false;
+    }
+
     /**
      * 檔案複製
      * 
@@ -458,6 +512,16 @@ public class FileUtil {
         } catch (Exception ex) {
             throw new RuntimeException("copyFile ERR : " + ex.getMessage(), ex);
         }
+    }
+
+    public static boolean moveFile(File copyFrom, File copyTo) {
+        boolean result = copyFile(copyFrom, copyTo);
+        if (result) {
+            if (copyFrom.length() == copyTo.length()) {
+                return FileUtils.deleteQuietly(copyFrom);
+            }
+        }
+        return false;
     }
 
     /**
@@ -627,7 +691,7 @@ public class FileUtil {
      * @return
      * @throws IOException
      */
-    public static void exportFileToTarget(String filePath, String replaceBasePath, String targetBasepath) throws IOException {
+    public static File exportFileToTarget(String filePath, String replaceBasePath, String targetBasepath) throws IOException {
         File file = new File(filePath);
         if (!file.exists()) {
             throw new RuntimeException("檔案路徑不存在 : " + filePath);
@@ -647,11 +711,14 @@ public class FileUtil {
         if (!makeDirFile.exists()) {
             makeDirFile.mkdirs();
         }
+        File fromFile = new File(filePath);
+        File toFile = new File(makeNewFile);
         if (isfile) {
-            if (!copyFile(new File(filePath), new File(makeNewFile))) {
+            if (!copyFile(fromFile, toFile)) {
                 throw new RuntimeException("檔案複製失敗 : " + makeNewFile);
             }
         }
+        return toFile;
     }
 
     /**

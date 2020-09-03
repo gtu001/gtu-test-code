@@ -1762,16 +1762,26 @@ public class AVChoicerUI extends JFrame {
                     } else {
                         if (file.file.isDirectory()) {
                             try {
-                                FileUtils.moveDirectory(file.file, moveTo);
-                            } catch (IOException e) {
+                                // FileUtils.moveDirectory(file.file, moveTo);
+                                boolean result = FileUtil.moveDirectory(file.file, targetDir);
+                                if (!result) {
+                                    file.moveStateChs = "Error...";
+                                    file.moveStateColor = "RED";
+                                }
+                            } catch (Exception e) {
                                 e.printStackTrace();
                                 file.moveStateChs = "Error...";
                                 file.moveStateColor = "RED";
                             }
                         } else if (file.file.isFile()) {
                             try {
-                                FileUtils.moveFile(file.file, moveTo);
-                            } catch (IOException e) {
+                                // FileUtils.moveFile(file.file, moveTo);
+                                boolean result = FileUtil.moveFile(file.file, moveTo);
+                                if (!result) {
+                                    file.moveStateChs = "Error...";
+                                    file.moveStateColor = "RED";
+                                }
+                            } catch (Exception e) {
                                 e.printStackTrace();
                                 file.moveStateChs = "Error...";
                                 file.moveStateColor = "RED";
