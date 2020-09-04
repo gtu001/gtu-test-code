@@ -51,8 +51,6 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.tuple.Pair;
 
-import gtu.swing.util.JCommonUtil;
-
 /**
  * @author Troy 2009/05/04
  * 
@@ -443,12 +441,13 @@ public class FileUtil {
             List<File> fileLst = new ArrayList<File>();
             FileUtil.searchFilefind(copyFromDir, ".*", fileLst);
 
+            FileMoveSpeedCalculator mFileMoveSpeedCalculator = new FileMoveSpeedCalculator(null, fileLst);
+            mFileMoveSpeedCalculator.start();
+
             File copyToDirStarter = new File(copyToDir, copyFromDir.getName());
             if (copyToDirStarter.exists()) {
-                boolean confirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("複製目的目錄存在 : " + copyToDirStarter + "\n是否繼續?", "複製目錄");
-                if (!confirm) {
-                    return false;
-                }
+                System.out.println("檔案複製錯誤 : 複製目的目錄存在 : " + copyToDirStarter + "");
+                return false;
             }
 
             for (File copyFromFile : fileLst) {
@@ -475,6 +474,8 @@ public class FileUtil {
                     }
                 }
             }
+
+            mFileMoveSpeedCalculator.end("copyDirectory");
             return isAllOk;
         } else {
             return false;
@@ -484,7 +485,7 @@ public class FileUtil {
     public static boolean moveDirectory(File copyFromDir, File copyToDir) {
         boolean result = copyDirectory(copyFromDir, copyToDir);
         if (result) {
-            return FileUtils.deleteQuietly(copyFromDir);
+            return FileDeleteHelper.deleteQuietly(copyFromDir);
         }
         return false;
     }
@@ -509,7 +510,10 @@ public class FileUtil {
             // } else {
             // return copyFileLocking(copyFrom, copyTo);
             // }
+            FileMoveSpeedCalculator mFileMoveSpeedCalculator = new FileMoveSpeedCalculator(copyFrom, null);
+            mFileMoveSpeedCalculator.start();
             doCopyFile(copyFrom, copyTo, true);
+            mFileMoveSpeedCalculator.end("copyFile");
             if (copyTo.exists()) {
                 if (copyTo.length() == copyFrom.length()) {
                     return true;
@@ -525,10 +529,69 @@ public class FileUtil {
         boolean result = copyFile(copyFrom, copyTo);
         if (result) {
             if (copyFrom.length() == copyTo.length()) {
-                return FileUtils.deleteQuietly(copyFrom);
+                return FileDeleteHelper.deleteQuietly(copyFrom);
             }
         }
         return false;
+    }
+
+    private static class FileMoveSpeedCalculator {
+        List<File> fileLst;
+        long startTime = -1;
+        long endTime = -1;
+        long totalSize = 0;
+        String totalSizeDesc;
+
+        private FileMoveSpeedCalculator(File fromFile, List<File> fromFileLst) {
+            this.fileLst = fromFileLst;
+            if (fromFileLst == null) {
+                List<File> fileLst = new ArrayList<File>();
+                if (fromFile != null) {
+                    if (fromFile.isDirectory()) {
+                        FileUtil.searchFilefind(fromFile, ".*", fileLst);
+                    } else {
+                        fileLst.add(fromFile);
+                    }
+                }
+                this.fileLst = fileLst;
+            }
+            for (File f : this.fileLst) {
+                totalSize += f.length();
+            }
+            totalSizeDesc = FileUtil.getSizeDescription(totalSize);
+        }
+
+        private void start() {
+            startTime = System.currentTimeMillis();
+        }
+
+        private void end(String label) {
+            endTime = System.currentTimeMillis();
+            String duringDesc = compareDate(startTime, endTime);
+            System.out.println("搬運結束 :[" + label + "] 檔案數 : " + fileLst.size() + " , 總大小 : " + totalSizeDesc + " , 耗時 : " + duringDesc + " , 均速 : " + getResult());
+        }
+
+        private String getResult() {
+            long duringTime = endTime - startTime;
+            long duringSecond = (duringTime / 1000);
+            BigDecimal result = new BigDecimal(totalSize).divide(new BigDecimal(duringSecond), 3, BigDecimal.ROUND_HALF_UP);
+            String desc = FileUtil.getSizeDescription(result.longValue());
+            return desc;
+        }
+
+        private String compareDate(long d1, long d2) {
+            long tmp = (d1 > d2) ? (d1 - d2) : (d2 - d1);
+            int day = 0, hour = 0, min = 0, sec = 0;
+            for (; tmp >= 24 * 60 * 60 * 1000; tmp -= 24 * 60 * 60 * 1000, day++)
+                ;
+            for (; tmp >= 60 * 60 * 1000; tmp -= 60 * 60 * 1000, hour++)
+                ;
+            for (; tmp >= 60 * 1000; tmp -= 60 * 1000, min++)
+                ;
+            for (; tmp >= 60; tmp -= 60, sec++)
+                ;
+            return String.valueOf(day) + "," + String.valueOf(hour) + "," + String.valueOf(min) + "," + String.valueOf(sec) + "," + String.valueOf(tmp);
+        }
     }
 
     /**
@@ -1590,6 +1653,98 @@ public class FileUtil {
 
     public void writeBOM(FileOutputStream writer) throws IOException {
         writer.write(new byte[] { (byte) 0xEF, (byte) 0xBB, (byte) 0xBF });
+    }
+
+    private static class FileDeleteHelper {
+        public static boolean deleteQuietly(final File file) {
+            if (file == null) {
+                return false;
+            }
+            try {
+                if (file.isDirectory()) {
+                    cleanDirectory(file);
+                }
+            } catch (final Exception ignored) {
+            }
+
+            try {
+                return file.delete();
+            } catch (final Exception ignored) {
+                return false;
+            }
+        }
+
+        public static void cleanDirectory(final File directory) throws IOException {
+            final File[] files = verifiedListFiles(directory);
+
+            IOException exception = null;
+            for (final File file : files) {
+                try {
+                    forceDelete(file);
+                } catch (final IOException ioe) {
+                    exception = ioe;
+                }
+            }
+
+            if (null != exception) {
+                throw exception;
+            }
+        }
+
+        private static File[] verifiedListFiles(final File directory) throws IOException {
+            if (!directory.exists()) {
+                final String message = directory + " does not exist";
+                throw new IllegalArgumentException(message);
+            }
+
+            if (!directory.isDirectory()) {
+                final String message = directory + " is not a directory";
+                throw new IllegalArgumentException(message);
+            }
+
+            final File[] files = directory.listFiles();
+            if (files == null) { // null if security restricted
+                throw new IOException("Failed to list contents of " + directory);
+            }
+            return files;
+        }
+
+        public static void forceDelete(final File file) throws IOException {
+            if (file.isDirectory()) {
+                deleteDirectory(file);
+            } else {
+                final boolean filePresent = file.exists();
+                if (!file.delete()) {
+                    if (!filePresent) {
+                        throw new FileNotFoundException("File does not exist: " + file);
+                    }
+                    final String message = "Unable to delete file: " + file;
+                    throw new IOException(message);
+                }
+            }
+        }
+
+        public static void deleteDirectory(final File directory) throws IOException {
+            if (!directory.exists()) {
+                return;
+            }
+
+            if (!isSymlink(directory)) {
+                cleanDirectory(directory);
+            }
+
+            if (!directory.delete()) {
+                final String message = "Unable to delete directory " + directory + ".";
+                throw new IOException(message);
+            }
+        }
+
+        public static boolean isSymlink(final File file) throws IOException {
+            if (file == null) {
+                throw new NullPointerException("File must not be null");
+            }
+            return Files.isSymbolicLink(file.toPath());
+        }
     }
 
     public static class FileZ {
