@@ -572,11 +572,15 @@ public class FileUtil {
         }
 
         private String getResult() {
-            long duringTime = endTime - startTime;
-            long duringSecond = (duringTime / 1000);
-            BigDecimal result = new BigDecimal(totalSize).divide(new BigDecimal(duringSecond), 3, BigDecimal.ROUND_HALF_UP);
-            String desc = FileUtil.getSizeDescription(result.longValue());
-            return desc;
+            try {
+                long duringTime = endTime - startTime;
+                long duringSecond = (duringTime / 1000);
+                BigDecimal result = new BigDecimal(totalSize).divide(new BigDecimal(duringSecond), 3, BigDecimal.ROUND_HALF_UP);
+                String desc = FileUtil.getSizeDescription(result.longValue());
+                return desc;
+            } catch (Exception ex) {
+                return "NA";
+            }
         }
 
         private String compareDate(long d1, long d2) {
