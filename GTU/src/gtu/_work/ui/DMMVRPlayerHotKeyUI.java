@@ -337,9 +337,10 @@ public class DMMVRPlayerHotKeyUI extends JFrame {
             Point p = MouseInfo.getPointerInfo().getLocation();
             Robot robot = new Robot();
             robot.mouseMove(pair.getLeft(), pair.getRight());
-            robot.wait(100);
             robot.mousePress(InputEvent.BUTTON1_MASK);
+            Thread.sleep(50);
             robot.mouseRelease(InputEvent.BUTTON1_MASK);
+            Thread.sleep(50);
             robot.mouseMove(p.x, p.y);
         } catch (Exception e) {
             e.printStackTrace();
