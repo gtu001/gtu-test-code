@@ -57,6 +57,15 @@ public class DbConstant {
         bds.setInitialSize(1);
         bds.setMaxIdle(600000);
     }
+    
+    public static void getTestConnection_Sqlite() {
+        BasicDataSource bds = new BasicDataSource();
+        bds.setUrl("jdbc:sqlite:/home/gtu001/.local/share/DBeaverData/workspace6/.metadata/sample-database-sqlite-1/Chinook.db");
+        bds.setUsername("sa");
+        bds.setPassword("");
+        bds.setDriverClassName("org.sqlite.JDBC");
+        applyToConnectionPool(bds);
+    }
 
     public static Connection getTestConnection_H2() throws SQLException {
         DriverManager.registerDriver(new org.h2.Driver());
