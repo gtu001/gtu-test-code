@@ -51,6 +51,8 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.tuple.Pair;
 
+import gtu.date.DateUtil;
+
 /**
  * @author Troy 2009/05/04
  * 
@@ -567,7 +569,7 @@ public class FileUtil {
 
         private void end(String label) {
             endTime = System.currentTimeMillis();
-            String duringDesc = compareDate(startTime, endTime);
+            String duringDesc = DateUtil.compareDateFullDesc(startTime, endTime);
             System.out.println("搬運結束 :[" + label + "] 檔案數 : " + fileLst.size() + " , 總大小 : " + totalSizeDesc + " , 耗時 : " + duringDesc + " , 均速 : " + getResult());
         }
 
@@ -581,20 +583,6 @@ public class FileUtil {
             } catch (Exception ex) {
                 return "NA";
             }
-        }
-
-        private String compareDate(long d1, long d2) {
-            long tmp = (d1 > d2) ? (d1 - d2) : (d2 - d1);
-            int day = 0, hour = 0, min = 0, sec = 0;
-            for (; tmp >= 24 * 60 * 60 * 1000; tmp -= 24 * 60 * 60 * 1000, day++)
-                ;
-            for (; tmp >= 60 * 60 * 1000; tmp -= 60 * 60 * 1000, hour++)
-                ;
-            for (; tmp >= 60 * 1000; tmp -= 60 * 1000, min++)
-                ;
-            for (; tmp >= 60; tmp -= 60, sec++)
-                ;
-            return String.valueOf(day) + "," + String.valueOf(hour) + "," + String.valueOf(min) + "," + String.valueOf(sec) + "," + String.valueOf(tmp);
         }
     }
 
