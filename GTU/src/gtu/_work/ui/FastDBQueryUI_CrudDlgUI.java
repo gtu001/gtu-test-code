@@ -356,7 +356,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
 
                         // 其他筆的處理
                         if (dialog.mRecordsHandler.size() > 0) {
-                            maybeMultiRowLst.addAll(dialog.mRecordsHandler.getAllRecoreds());
+                            maybeMultiRowLst.addAll(dialog.mRecordsHandler.getAllRecoreds(false));
                         }
 
                         // ------------------------------------------------
@@ -492,11 +492,9 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                         } else {
                             // 套用所有資料
                             AbstractButton btn = JButtonGroupUtil.getSelectedButton(dialog.btnGroup);
-                            List<Map<String, String>> qlst = process.getAllRecoreds();
-                            List<Map<String, String>> qlst2 = dialog.mRecordsHandler.getAllRecoreds();
-                            if(qlst.size() == qlst2.size()) {
-                                qlst = qlst2;
-                            }
+                            // List<Map<String, String>> qlst =
+                            // process.getAllRecoreds();
+                            List<Map<String, String>> qlst = dialog.mRecordsHandler.getAllRecoreds(true);
 
                             String filename = JCommonUtil._jOptionPane_showInputDialog("請輸入匯出檔名",
                                     FastDBQueryUI.class.getSimpleName() + "_" + DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMdd_HHmmss") + ".sql");
@@ -1732,17 +1730,47 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
             System.out.println("fix value done...");
         }
 
-        private List<Map<String, String>> getAllRecoreds() {
-            List<Map<String, String>> rtnLst = new ArrayList<Map<String, String>>();
+        private List<Map<String, String>> getAllRecoreds(boolean isAllData) {
+            Map<Integer, Map<String, String>> rtnMap = new LinkedHashMap<Integer, Map<String, String>>();
             List<String> cols = queryList.getLeft();
+            if (isAllData) {
+                // List<Object[]> qlst = queryList.getRight();
+                // for (int iii = 0; iii < qlst.size(); iii++) {
+                // Object[] row = qlst.get(iii);
+                // Map<String, String> map = new LinkedHashMap<String,
+                // String>();
+                // for (int ii = 0; ii < cols.size(); ii++) {
+                // String col = cols.get(ii);
+                // String value = row[ii] != null ? String.valueOf(row[ii]) :
+                // null;
+                // map.put(col, value);
+                // }
+                // rtnMap.put(iii, map);
+                // }
+                for (int iii = 0; iii < rowMapLst.size(); iii++) {
+                    Map<String, Object> map = rowMapLst.get(iii);
+                    Map<String, String> map2 = new LinkedHashMap<String, String>();
+                    for (String key : map.keySet()) {
+                        String strVal = null;
+                        Object val = map.get(key);
+                        if (val != null) {
+                            strVal = String.valueOf(val);
+                        }
+                        map2.put(key, strVal);
+                    }
+                    rtnMap.put(iii, map2);
+                }
+            }
             for (Integer index : rowMapLstHolder.keySet()) {
                 Map<String, ColumnConf> confMap = rowMapLstHolder.get(index);
                 Map<String, String> map = new LinkedHashMap<String, String>();
+                boolean hasModify = false;
                 for (String col : cols) {
                     ColumnConf df = confMap.get(col);
                     String strVal = "";
                     if (df != null) {
                         if (df.isModify) {
+                            hasModify = true;
                             if (df.value != null) {
                                 strVal = String.valueOf(df.value);
                             }
@@ -1754,9 +1782,11 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                     }
                     map.put(col, strVal);
                 }
-                rtnLst.add(map);
+                if (hasModify) {
+                    rtnMap.put(index, map);
+                }
             }
-            return rtnLst;
+            return new ArrayList<Map<String, String>>(rtnMap.values());
         }
     }
 
