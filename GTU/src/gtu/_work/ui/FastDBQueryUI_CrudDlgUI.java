@@ -277,7 +277,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
 
             dialog.columnsLst = new ArrayList<String>();
 
-            dialog.mRecordsHandler = dialog.new RecordsHandler(rowMapLst);
+            dialog.mRecordsHandler = dialog.new RecordsHandler(rowMapLst, queryList);
 
             dialog.searchText.getDocument().addDocumentListener(JCommonUtil.getDocumentListener(new HandleDocumentEvent() {
                 @Override
@@ -356,7 +356,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
 
                         // 其他筆的處理
                         if (dialog.mRecordsHandler.size() > 0) {
-                            maybeMultiRowLst.addAll(dialog.mRecordsHandler.getMultiMapList());
+                            maybeMultiRowLst.addAll(dialog.mRecordsHandler.getAllRecoreds());
                         }
 
                         // ------------------------------------------------
@@ -493,6 +493,10 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                             // 套用所有資料
                             AbstractButton btn = JButtonGroupUtil.getSelectedButton(dialog.btnGroup);
                             List<Map<String, String>> qlst = process.getAllRecoreds();
+                            List<Map<String, String>> qlst2 = dialog.mRecordsHandler.getAllRecoreds();
+                            if(qlst.size() == qlst2.size()) {
+                                qlst = qlst2;
+                            }
 
                             String filename = JCommonUtil._jOptionPane_showInputDialog("請輸入匯出檔名",
                                     FastDBQueryUI.class.getSimpleName() + "_" + DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMdd_HHmmss") + ".sql");
@@ -1418,6 +1422,8 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                 @Override
                 public void mouseClicked(MouseEvent e) {
                     if (JMouseEventUtil.buttonRightClick(1, e)) {
+                        final AtomicReference<String> columnHolder = new AtomicReference<String>();
+                        final AtomicReference<String> valueHolder = new AtomicReference<String>();
                         final AtomicReference<List<String>> valueLst = new AtomicReference<List<String>>();
                         valueLst.set(new ArrayList<String>());
                         final AtomicInteger rowPos = new AtomicInteger(-1);
@@ -1426,8 +1432,14 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                             if ($rowPos != -1) {
                                 $rowPos = JTableUtil.getRealRowPos($rowPos, rowTable);
                                 rowPos.set($rowPos);
+
                                 String column = (String) rowTable.getValueAt($rowPos, ColumnOrderDef.columnName.ordinal());
                                 column = StringUtils.trimToEmpty(column);//
+                                columnHolder.set(column);
+
+                                String value = (String) rowTable.getValueAt($rowPos, ColumnOrderDef.value.ordinal());
+                                valueHolder.set(value);
+
                                 valueLst.set(_parent.getEditColumnConfig().getColumnValues(column));
                             }
                         } catch (Exception ex) {
@@ -1460,6 +1472,13 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                                 });
                             }
                             inst.addJMenuItem(chdMenu.getMenu());
+
+                            inst.addJMenuItem("全部用此值", new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    applyThisValueToAll(columnHolder.get(), valueHolder.get());
+                                }
+                            });
                         }
                         inst.applyEvent(e).show();
                     }
@@ -1568,6 +1587,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
         Map<Integer, Map<String, ColumnConf>> rowMapLstHolder = new TreeMap<Integer, Map<String, ColumnConf>>();
         int index = 0;
         Map<String, ColumnConf> columnPkConf = Collections.EMPTY_MAP;
+        Triple<List<String>, List<Class<?>>, List<Object[]>> queryList;
 
         ValueFixHandler valueFixHandler = new ValueFixHandler();
 
@@ -1638,27 +1658,9 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
             System.out.println("-------------init size : " + rowMap.get().size());
         }
 
-        private List<Map<String, String>> getMultiMapList() {
-            List<Map<String, String>> maybeMultiRowLst = new ArrayList<Map<String, String>>();
-            for (Map<String, ColumnConf> conf : rowMapLstHolder.values()) {
-                Map<String, String> toMap = new LinkedHashMap<String, String>();
-                for (String columnName : conf.keySet()) {
-                    ColumnConf df = conf.get(columnName);
-                    String value = null;
-                    if (df.isModify) {
-                        value = df.value != null ? String.valueOf(df.value) : null;
-                    } else {
-                        value = df.orignValue != null ? String.valueOf(df.orignValue) : null;
-                    }
-                    toMap.put(columnName, value);
-                }
-                maybeMultiRowLst.add(toMap);
-            }
-            return maybeMultiRowLst;
-        }
-
-        private RecordsHandler(List<Map<String, Object>> rowMapLst) {
+        private RecordsHandler(List<Map<String, Object>> rowMapLst, Triple<List<String>, List<Class<?>>, List<Object[]>> queryList2) {
             this.rowMapLst = rowMapLst;
+            this.queryList = queryList2;
             init(true);
         }
 
@@ -1689,5 +1691,76 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
         private int size() {
             return rowMapLst.size();
         }
+
+        private void applyThisValueToAll(boolean reset, String column, Object value1) {
+            for (int ii = 0; ii < rowMapLst.size(); ii++) {
+                Map<String, Object> rowMapZ = rowMapLst.get(ii);
+
+                Map<String, ColumnConf> rowMapForBackup = MapUtil.createIngoreCaseMap();
+                if (rowMapLstHolder.containsKey(ii)) {
+                    rowMapForBackup = rowMapLstHolder.get(ii);
+                } else {
+                    rowMapLstHolder.put(ii, rowMapForBackup);
+                }
+                // rowMap.set(rowMapForBackup);
+
+                for (String col : rowMapZ.keySet()) {
+                    ColumnConf df = null;
+                    if (rowMapForBackup.containsKey(col) && !reset) {
+                        df = rowMapForBackup.get(col);
+                    } else {
+                        Object value = rowMapZ.get(col);
+                        value = valueFixHandler.getValueFix(value);
+
+                        df = new ColumnConf();
+                        df.columnName = col;
+                        df.dtype = DataType.isTypeOf(value);
+                        df.value = value;
+                        df.orignValue = value;
+
+                        rowMapForBackup.put(col, df);
+                    }
+
+                    // fix value here ↓↓↓↓↓↓
+                    if (StringUtils.equalsIgnoreCase(column, col)) {
+                        df.value = value1;
+                        df.isModify = true;
+                    }
+                    // fix value here ↑↑↑↑↑↑
+                }
+            }
+            System.out.println("fix value done...");
+        }
+
+        private List<Map<String, String>> getAllRecoreds() {
+            List<Map<String, String>> rtnLst = new ArrayList<Map<String, String>>();
+            List<String> cols = queryList.getLeft();
+            for (Integer index : rowMapLstHolder.keySet()) {
+                Map<String, ColumnConf> confMap = rowMapLstHolder.get(index);
+                Map<String, String> map = new LinkedHashMap<String, String>();
+                for (String col : cols) {
+                    ColumnConf df = confMap.get(col);
+                    String strVal = "";
+                    if (df != null) {
+                        if (df.isModify) {
+                            if (df.value != null) {
+                                strVal = String.valueOf(df.value);
+                            }
+                        } else {
+                            if (df.orignValue != null) {
+                                strVal = String.valueOf(df.orignValue);
+                            }
+                        }
+                    }
+                    map.put(col, strVal);
+                }
+                rtnLst.add(map);
+            }
+            return rtnLst;
+        }
+    }
+
+    private void applyThisValueToAll(String column, String value) {
+        mRecordsHandler.applyThisValueToAll(false, column, value);
     }
 }

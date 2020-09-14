@@ -1,12 +1,46 @@
-尋找遠端 branch
-$ git branch -r --all | grep T028
-  remotes/origin/Feature/#NCSPOS-T028
-  remotes/origin/feature/#NCSPOS-T028
+	尋找遠端 branch
+	$ git branch -r --all | grep T028
+	  remotes/origin/Feature/#NCSPOS-T028
+	  remotes/origin/feature/#NCSPOS-T028
 
-切遠端 branch
-$ git checkout origin/feature/#NCSPOS-T028
-$ git checkout -b feature/#NCSPOS-T028 origin/feature/#NCSPOS-T028
 
-$ git checkout -b <local branch>  --track <remote>
-	Ex : git checkout -b feature/#NCSPOS-T028 --track origin/feature/#NCSPOS-T028
 
+	切遠端 branch
+	$ git checkout origin/feature/#NCSPOS-T028
+	$ git checkout -b feature/#NCSPOS-T028 origin/feature/#NCSPOS-T028
+
+	$ git checkout -b <local branch>  --track <remote>
+		Ex : git checkout -b feature/#NCSPOS-T028 --track origin/feature/#NCSPOS-T028
+
+
+
+
+
+ 	$ git push -u origin feature/#NCSPOS-T046
+ 	當出現 fatal: feature/#NCSPOS-T046 cannot be resolved to branch
+ 	解法 : 
+	 	開啟 <project>\.git\refs\heads
+	 	會看到資料夾 Feature 裡面有 #NCSPOS-T046 檔
+	 	將 Feature 改成小寫開頭 feature 再次執行該指令即可
+
+
+	branch 改名
+	---
+		$ git checkout <old_name>
+		$ git branch -m <new_name>  改名本地
+		$ git push origin -u <new_name>  建立新遠端
+		$ git push origin --delete <old_name>   刪除舊遠端
+
+
+	設定本地 branch track 遠端 branch
+		假設 foo = local, origin = remote
+		Git 1.8
+			git branch -u origin/foo
+			git branch -u origin/foo  foo
+			git branch --set-upstream-to=origin/foo 
+			git branch --set-upstream-to=origin/foo  foo
+		Git 1.7
+			git branch --set-upstream foo origin/foo
+
+
+			

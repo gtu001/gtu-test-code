@@ -1755,7 +1755,9 @@ public class AVChoicerUI extends JFrame {
                     file.moveStateChs = "移動中...";
                     file.moveStateColor = "BLUE";
                     File moveTo = new File(targetDir, file.file.getName());
-                    file.moveToFile = moveTo;
+                    if (file.moveToFile == null) {
+                        file.moveToFile = moveTo;
+                    }
                     if (!file.file.exists()) {
                         file.moveStateChs = "NotExists...";
                         file.moveStateColor = "RED";
@@ -1802,6 +1804,11 @@ public class AVChoicerUI extends JFrame {
     private static class MoveFileZ extends FileZ {
         MoveFileZ(File file) {
             super(file);
+        }
+
+        MoveFileZ(File file, File moveToFile) {
+            super(file);
+            this.moveToFile = moveToFile;
         }
 
         String moveStateColor = "Blue";
