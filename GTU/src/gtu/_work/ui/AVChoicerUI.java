@@ -869,7 +869,7 @@ public class AVChoicerUI extends JFrame {
 
                                 JCommonUtil._jOptionPane_showMessageDialog_info(sb1.toString());
                             } catch (Exception e) {
-                                e.printStackTrace();
+                                JCommonUtil.handleException(e);
                             }
                         }
                     });
