@@ -1,0 +1,25 @@
+{
+  "name": "typescript_test_01",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "nyc mocha --timeout 1000 ",
+    "start": "npm run build:live",
+    "build:live": "nodemon --exec ./node_modules/.bin/ts-node -- ./index.ts",
+    "build": "tsc index.ts"
+  },
+  "author": "",
+  "license": "ISC",
+  "keywords": [],
+  "description": "",
+  "dependencies": {
+    "-": "0.0.1",
+    "@types/node": "^14.10.1",
+    "save-dev": "0.0.1-security",
+    "typescript": "^4.0.2"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.4",
+    "ts-node": "^9.0.0"
+  }
+}

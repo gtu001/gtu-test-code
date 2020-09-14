@@ -123,8 +123,9 @@
 
 	git log  --name-only           <---只有檔名
 	git log  --name-status         <---次推薦
-	git log  --stat                <---推薦
-	git log  -5					<--看最近五次commit
+	git log  --stat                <---推薦 (看檔案清單)
+	git log  -5					   <--看最近五次commit
+	git log  --graph			   <--看樹狀結構 
 
 --------------------------------------------------------------------------
 merge 處理

@@ -1,4 +1,4 @@
-�إ߱M��
+建立專案
 
         yarn create react-app react_gtu2 --typescript
         

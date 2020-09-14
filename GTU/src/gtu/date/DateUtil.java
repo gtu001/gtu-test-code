@@ -38,8 +38,7 @@ import org.apache.commons.lang3.tuple.Pair;
 public class DateUtil {
 
     public static void main(String[] args) {
-        System.out.println(DateUtil.getTaiwanDate());
-        System.out.println(System.currentTimeMillis());
+        System.out.println(DateUtil.wasteTotalTime(49527345893L));
     }
 
     // @Test
@@ -360,25 +359,6 @@ public class DateUtil {
             ;
         return String.valueOf(day) + "," + String.valueOf(hour) + "," + String.valueOf(min) + "," + String.valueOf(sec) + "," + String.valueOf(tmp);
     }
-    
-    public static String compareDateFullDesc(long d1, long d2) {
-        long tmp = (d1 > d2) ? (d1 - d2) : (d2 - d1);
-        int day = 0, hour = 0, min = 0, sec = 0;
-        for (; tmp >= 24 * 60 * 60 * 1000; tmp -= 24 * 60 * 60 * 1000, day++)
-            ;
-        for (; tmp >= 60 * 60 * 1000; tmp -= 60 * 60 * 1000, hour++)
-            ;
-        for (; tmp >= 60 * 1000; tmp -= 60 * 1000, min++)
-            ;
-        for (; tmp >= 60; tmp -= 60, sec++)
-            ;
-        String rtnString = (day == 0 ? "" : day + "天") + //
-                (hour == 0 ? "" : hour + "時") + //
-                (min == 0 ? "" : min + "分") + //
-                (sec == 0 ? "" : sec + "秒") + //
-                (tmp == 0 ? "" : tmp + ""); //
-        return rtnString;
-    }
 
     /**
      * 取得兩日期相差天數
@@ -466,7 +446,7 @@ public class DateUtil {
         wasteTotal = wasteTotal / 60;
         long hours = wasteTotal % 24;
         wasteTotal = wasteTotal / 24;
-//        return wasteTotal + "天" + hours + "時" + min + "分" + sec_ + "秒";
+        // return wasteTotal + "天" + hours + "時" + min + "分" + sec_ + "秒";
         StringBuilder sb = new StringBuilder();
         sb.append((wasteTotal == 0 ? "" : wasteTotal + "天"));
         sb.append((hours == 0 ? "" : hours + "時"));
@@ -599,7 +579,8 @@ public class DateUtil {
         System.out.println(timeZone2);
         // -Duser.timezone=Asia/Taipei
         // -Duser.timezone=GMT+8
-        //Jboss 的 standalone.conf 加入 JAVA_OPTS="$JAVA_OPTS -Duser.timezone=GMT+8"
+        // Jboss 的 standalone.conf 加入 JAVA_OPTS="$JAVA_OPTS
+        // -Duser.timezone=GMT+8"
     }
 
     /**
@@ -631,11 +612,11 @@ public class DateUtil {
         cal.setTime(date.get(Calendar.HOUR_OF_DAY), date.get(Calendar.MINUTE), date.get(Calendar.SECOND));
         return cal;
     }
-    
+
     public static Pair<Long, Long> getDayPair(int addDay) {
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DATE, addDay);
-        
+
         cal.set(Calendar.HOUR_OF_DAY, 0);
         cal.set(Calendar.MINUTE, 0);
         cal.set(Calendar.SECOND, 0);

@@ -569,7 +569,7 @@ public class FileUtil {
 
         private void end(String label) {
             endTime = System.currentTimeMillis();
-            String duringDesc = DateUtil.compareDateFullDesc(startTime, endTime);
+            String duringDesc = DateUtil.wasteTotalTime(endTime - startTime);
             System.out.println("搬運結束 :[" + label + "] 檔案數 : " + fileLst.size() + " , 總大小 : " + totalSizeDesc + " , 耗時 : " + duringDesc + " , 均速 : " + getResult());
         }
 
