@@ -1622,7 +1622,7 @@ public class EnglishSearchUI extends JFrame {
                         }
                         if (!wordMap.isEmpty()) {
                             if (mSimpleCheckListDlg != null) {
-                                mSimpleCheckListDlg.setVisible(false);
+                                mSimpleCheckListDlg.dispose();
                             }
                             mSimpleCheckListDlg = SimpleCheckListDlg.newInstance("相似單字", wordMap, new ActionListener() {
                                 @Override

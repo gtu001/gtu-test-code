@@ -856,16 +856,19 @@ public class AVChoicerUI extends JFrame {
                 boolean moveChk = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption(sb.toString(), "移動");
 
                 if (moveChk) {
+                    EventQueue.invokeLater(new Runnable() {
+                        public void run() {
+                            Object[] p1 = fileMove(currentFileHandler.getAvFile(), getMoveTargetFile(dir, currentFileHandler.getAvFile()));
+                            Object[] p2 = fileMove(currentFileHandler.getJpgFile(), getMoveTargetFile(dir, currentFileHandler.getJpgFile()));
 
-                    Object[] p1 = fileMove(currentFileHandler.getAvFile(), getMoveTargetFile(dir, currentFileHandler.getAvFile()));
-                    Object[] p2 = fileMove(currentFileHandler.getJpgFile(), getMoveTargetFile(dir, currentFileHandler.getJpgFile()));
+                            StringBuffer sb1 = new StringBuffer();
+                            sb1.append("移動結果 : \r\n");
+                            sb1.append("檔案1 : " + Arrays.toString(p1) + "\r\n");
+                            sb1.append("檔案1 : " + Arrays.toString(p2) + "\r\n");
 
-                    StringBuffer sb1 = new StringBuffer();
-                    sb1.append("移動結果 : \r\n");
-                    sb1.append("檔案1 : " + Arrays.toString(p1) + "\r\n");
-                    sb1.append("檔案1 : " + Arrays.toString(p2) + "\r\n");
-
-                    JCommonUtil._jOptionPane_showMessageDialog_info(sb1.toString());
+                            JCommonUtil._jOptionPane_showMessageDialog_info(sb1.toString());
+                        }
+                    });
                 } else {
                     JCommonUtil._jOptionPane_showMessageDialog_info("移動取消!");
                 }
