@@ -1609,7 +1609,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
         }
 
         private void init(boolean reset) {
-            String recordLblText = index + "/" + rowMapLst.size();
+            String recordLblText = (index + 1) + "/" + rowMapLst.size();
             recordsLbl.setText(recordLblText);
 
             DefaultTableModel model = initRowTable();

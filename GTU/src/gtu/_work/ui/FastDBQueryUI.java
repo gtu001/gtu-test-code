@@ -4967,6 +4967,36 @@ public class FastDBQueryUI extends JFrame {
                     sqlTextArea.setText(prefix + column + suffix);
                 }
             });//
+
+            jpopUtil.addJMenuItem("以java code方式將sql匯出[簡]", new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    String sql = getCurrentSQL();
+                    List<String> lst = StringUtil_.readContentToList(sql, false, true, false);
+                    StringBuffer sb = new StringBuffer();
+                    for (String strVal : lst) {
+                        strVal = StringUtils.replaceChars(strVal, "\"", "\\\"");
+                        strVal = "\" " + strVal + " \\n\"+//\n";
+                        sb.append(strVal);
+                    }
+                    ClipboardUtil.getInstance().setContents(sb.toString());
+                }
+            });//
+            jpopUtil.addJMenuItem("以java code方式將sql匯出[繁]", new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    String sql = getCurrentSQL();
+                    List<String> lst = StringUtil_.readContentToList(sql, false, true, false);
+                    StringBuffer sb = new StringBuffer();
+                    for (String strVal : lst) {
+                        strVal = StringUtils.replaceChars(strVal, "\"", "\\\"");
+                        strVal = "sb.append(\" " + strVal + " \\n\");//\n";
+                        sb.append(strVal);
+                    }
+                    ClipboardUtil.getInstance().setContents(sb.toString());
+                }
+            });//
+
             jpopUtil.addJMenuItem("以記事本為Table新開視窗查詢", new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -5347,21 +5377,21 @@ public class FastDBQueryUI extends JFrame {
                     return false;
             } else if (!color.equals(other.color))
                 return false;
-//            if (latestQueryTime == null) {
-//                if (other.latestQueryTime != null)
-//                    return false;
-//            } else if (!latestQueryTime.equals(other.latestQueryTime))
-//                return false;
-//            if (latestUpdateTime == null) {
-//                if (other.latestUpdateTime != null)
-//                    return false;
-//            } else if (!latestUpdateTime.equals(other.latestUpdateTime))
-//                return false;
-//            if (queryTimes == null) {
-//                if (other.queryTimes != null)
-//                    return false;
-//            } else if (!queryTimes.equals(other.queryTimes))
-//                return false;
+            // if (latestQueryTime == null) {
+            // if (other.latestQueryTime != null)
+            // return false;
+            // } else if (!latestQueryTime.equals(other.latestQueryTime))
+            // return false;
+            // if (latestUpdateTime == null) {
+            // if (other.latestUpdateTime != null)
+            // return false;
+            // } else if (!latestUpdateTime.equals(other.latestUpdateTime))
+            // return false;
+            // if (queryTimes == null) {
+            // if (other.queryTimes != null)
+            // return false;
+            // } else if (!queryTimes.equals(other.queryTimes))
+            // return false;
             if (sql == null) {
                 if (other.sql != null)
                     return false;
@@ -6575,8 +6605,8 @@ public class FastDBQueryUI extends JFrame {
 
         private List<String> getTableName(String tableAlias) {
             List<String> tables = new ArrayList<String>();
-            String tmpSql = StringUtils.trimToEmpty(sqlTextArea.getText());
-            Pattern ptn = Pattern.compile("[,\\s\n\t]([\\.\\w\\_]+)[\\s\t]+" + tableAlias + "[,\\s\n\t]", Pattern.DOTALL | Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
+            String tmpSql = " " + sqlTextArea.getText() + " ";
+            Pattern ptn = Pattern.compile("[,\\s\r\n\t]([\\.\\w\\_]+)[\\s\t]+" + tableAlias + "[,\\s\r\n\t]", Pattern.DOTALL | Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
             Matcher mth = ptn.matcher(tmpSql);
             while (mth.find()) {
                 tables.add(mth.group(1));
