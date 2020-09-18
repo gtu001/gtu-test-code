@@ -4972,28 +4972,16 @@ public class FastDBQueryUI extends JFrame {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     String sql = getCurrentSQL();
-                    List<String> lst = StringUtil_.readContentToList(sql, false, true, false);
-                    StringBuffer sb = new StringBuffer();
-                    for (String strVal : lst) {
-                        strVal = StringUtils.replaceChars(strVal, "\"", "\\\"");
-                        strVal = "\" " + strVal + " \\n\"+//\n";
-                        sb.append(strVal);
-                    }
-                    ClipboardUtil.getInstance().setContents(sb.toString());
+                    String resultSql = getExportSqlToJavaCode(sql, false, true);
+                    ClipboardUtil.getInstance().setContents(resultSql);
                 }
             });//
             jpopUtil.addJMenuItem("以java code方式將sql匯出[繁]", new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     String sql = getCurrentSQL();
-                    List<String> lst = StringUtil_.readContentToList(sql, false, true, false);
-                    StringBuffer sb = new StringBuffer();
-                    for (String strVal : lst) {
-                        strVal = StringUtils.replaceChars(strVal, "\"", "\\\"");
-                        strVal = "sb.append(\" " + strVal + " \\n\");//\n";
-                        sb.append(strVal);
-                    }
-                    ClipboardUtil.getInstance().setContents(sb.toString());
+                    String resultSql = getExportSqlToJavaCode(sql, true, true);
+                    ClipboardUtil.getInstance().setContents(resultSql);
                 }
             });//
 
@@ -5050,6 +5038,27 @@ public class FastDBQueryUI extends JFrame {
             jpopUtil.applyEvent(e)//
                     .show();
         }
+    }
+
+    private String getExportSqlToJavaCode(String sql, boolean isUseStringBuilder, boolean isCaculateMaxLength) {
+        List<String> lst = StringUtil_.readContentToList(sql, false, true, false);
+        int maxLength = 0;
+        if (isCaculateMaxLength) {
+            for (String strVal : lst) {
+                maxLength = Math.max(StringUtils.length(strVal), maxLength);
+            }
+        }
+        StringBuffer sb = new StringBuffer();
+        for (String strVal : lst) {
+            strVal = StringUtils.replaceChars(strVal, "\"", "\\\"");
+            if (isUseStringBuilder) {
+                strVal = "sb.append(\" " + StringUtils.rightPad(strVal, maxLength) + " \\n\");//\n";
+            } else {
+                strVal = "\" " + StringUtils.rightPad(strVal, maxLength) + " \\n\"+//\n";
+            }
+            sb.append(strVal);
+        }
+        return sb.toString();
     }
 
     private void deleteSqlIdConfigBean(SqlIdConfigBean sqlBean) {
