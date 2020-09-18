@@ -111,6 +111,7 @@ import gtu._work.ui.FastDBQueryUI_XlsColumnDefLoader.XlsColumnDefClz;
 import gtu._work.ui.FastDBQueryUI_XlsColumnDefLoader.XlsColumnDefType;
 import gtu._work.ui.JMenuBarUtil.JMenuAppender;
 import gtu.binary.Base64JdkUtil;
+import gtu.binary.StringUtil4FullChar;
 import gtu.clipboard.ClipboardUtil;
 import gtu.collection.ListUtil;
 import gtu.collection.MapUtil;
@@ -5045,7 +5046,7 @@ public class FastDBQueryUI extends JFrame {
         int maxLength = 0;
         if (isCaculateMaxLength) {
             for (String strVal : lst) {
-                maxLength = Math.max(StringUtils.length(strVal), maxLength);
+                maxLength = Math.max(StringUtil4FullChar.length(strVal), maxLength);
             }
         }
         StringBuffer sb = new StringBuffer();
