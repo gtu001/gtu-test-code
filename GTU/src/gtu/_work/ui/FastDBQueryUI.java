@@ -5049,6 +5049,11 @@ public class FastDBQueryUI extends JFrame {
             }
         }
         StringBuffer sb = new StringBuffer();
+        if (isUseStringBuilder) {
+            sb.append("StringBuilder sb = new StringBuilder(); \n");
+        } else {
+            sb.append("String sql = // \n");
+        }
         for (String strVal : lst) {
             strVal = StringUtils.replaceChars(strVal, "\"", "\\\"");
             if (isUseStringBuilder) {
@@ -5057,6 +5062,9 @@ public class FastDBQueryUI extends JFrame {
                 strVal = "\" " + StringUtils.rightPad(strVal, maxLength) + " \\n\"+//\n";
             }
             sb.append(strVal);
+        }
+        if (!isUseStringBuilder) {
+            sb.append("\"\"; // \n");
         }
         return sb.toString();
     }
