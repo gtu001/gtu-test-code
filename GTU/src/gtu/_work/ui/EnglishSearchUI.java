@@ -179,7 +179,7 @@ public class EnglishSearchUI extends JFrame {
         // File("/media/gtu001/OLD_D/my_tool/EnglishSearchUI/EnglishSearchUI_linux_config.properties"));
         // }
         // }
-        propertyBean = JSwingCommonConfigUtil.checkTestingPropertiesUtilBean_diffConfig(propertyBean, EnglishSearchUI.class, ""); //EnglishSearchUI/
+        propertyBean = JSwingCommonConfigUtil.checkTestingPropertiesUtilBean_diffConfig(propertyBean, EnglishSearchUI.class, "EnglishSearchUI/"); // EnglishSearchUI/
         System.out.println("configFile : " + propertyBean.getPropFile());
     }
 
@@ -198,6 +198,7 @@ public class EnglishSearchUI extends JFrame {
     private EnglishIdDropdownHandler mEnglishIdDropdownHandler;
     private JFrameRGBColorPanel jFrameRGBColorPanel;
     private SimpleCheckListDlg mSimpleCheckListDlg;
+    private AtomicReference<String> notFoundWord = new AtomicReference<String>();
 
     /**
      * Launch the application.
@@ -760,6 +761,36 @@ public class EnglishSearchUI extends JFrame {
                                         }
                                         text = URLEncoder.encode(text, "UTF-8");
                                         String url = String.format("https://translate.google.com.tw/?hl=zh-TW#en/zh-TW/%s", text);
+                                        DesktopUtil.browse(url);
+                                    } catch (Exception ex) {
+                                        JCommonUtil.handleException(ex);
+                                    }
+                                }
+                            }).addJMenuItem("google查詢", new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent arg0) {
+                                    try {
+                                        String text = StringUtils.trimToEmpty(searchEnglishIdTextController.get().getText());
+                                        if (StringUtils.isBlank(text)) {
+                                            return;
+                                        }
+                                        text = URLEncoder.encode(text, "UTF-8");
+                                        String url = String.format("https://www.google.com.tw/search?q=%s&oi=ddle&ct=144867951&hl=en", text);
+                                        DesktopUtil.browse(url);
+                                    } catch (Exception ex) {
+                                        JCommonUtil.handleException(ex);
+                                    }
+                                }
+                            }).addJMenuItem("google圖片", new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent arg0) {
+                                    try {
+                                        String text = StringUtils.trimToEmpty(searchEnglishIdTextController.get().getText());
+                                        if (StringUtils.isBlank(text)) {
+                                            return;
+                                        }
+                                        text = URLEncoder.encode(text, "UTF-8");
+                                        String url = String.format("https://www.google.com.tw/search?hl=zh-TW&tbm=isch&source=hp&biw=1362&bih=798&q=%s", text);
                                         DesktopUtil.browse(url);
                                     } catch (Exception ex) {
                                         JCommonUtil.handleException(ex);
@@ -1408,7 +1439,8 @@ public class EnglishSearchUI extends JFrame {
             System.out.println("DEBUG MODE -----");
             File dir1 = new File("D:/gtu001_dropbox/Dropbox/Apps/gtu001_test/");
             File dir2 = new File("E:/gtu001_dropbox/Dropbox/Apps/gtu001_test/");
-            for (File f1 : new File[] { dir1, dir2 }) {
+            File dir3 = PropertiesUtil.getJarCurrentPath(getClass());
+            for (File f1 : new File[] { dir1, dir2, dir3 }) {
                 if (f1.exists() && f1.isDirectory()) {
                     int max = -1;
                     Pattern ptn = Pattern.compile("bak(\\d+)");
@@ -1609,46 +1641,49 @@ public class EnglishSearchUI extends JFrame {
                     ex.printStackTrace();
                 } finally {
                     if (findOk.get() == false && offlineProp != null && !offlineProp.isEmpty()) {
-                        //
-                        List<String> wordLst = similarityWordList(text);
-                        int limit = 20;
-                        Map<String, String> wordMap = new LinkedHashMap<String, String>();
-                        for (int ii = 0; ii < wordLst.size(); ii++) {
-                            String t1 = wordLst.get(ii);
-                            wordMap.put(t1, offlineProp.getProperty(t1));
-                            if (ii >= limit) {
-                                break;
+                        if (!StringUtils.equalsIgnoreCase(text, notFoundWord.get())) {
+                            //
+                            List<String> wordLst = similarityWordList(text);
+                            int limit = 20;
+                            Map<String, String> wordMap = new LinkedHashMap<String, String>();
+                            for (int ii = 0; ii < wordLst.size(); ii++) {
+                                String t1 = wordLst.get(ii);
+                                wordMap.put(t1, offlineProp.getProperty(t1));
+                                if (ii >= limit) {
+                                    break;
+                                }
                             }
-                        }
-                        if (!wordMap.isEmpty()) {
-                            if (mSimpleCheckListDlg != null) {
-                                mSimpleCheckListDlg.dispose();
-                            }
-                            mSimpleCheckListDlg = SimpleCheckListDlg.newInstance("相似單字", wordMap, new ActionListener() {
-                                @Override
-                                public void actionPerformed(ActionEvent e) {
-                                    List<String> wordLst2 = ((SimpleCheckListDlg) e.getSource()).getCheckedList();
-                                    if (!wordLst2.isEmpty()) {
-                                        String deleteWord = StringUtils.trimToEmpty(searchEnglishIdText_auto.getTextComponent().getText());
-                                        try {
-                                            writeNewData2(deleteWord, true);
-                                        } catch (IOException e1) {
-                                            e1.printStackTrace();
+                            if (!wordMap.isEmpty()) {
+                                if (mSimpleCheckListDlg != null) {
+                                    mSimpleCheckListDlg.dispose();
+                                }
+                                notFoundWord.set(text);
+                                mSimpleCheckListDlg = SimpleCheckListDlg.newInstance("相似單字", wordMap, new ActionListener() {
+                                    @Override
+                                    public void actionPerformed(ActionEvent e) {
+                                        List<String> wordLst2 = ((SimpleCheckListDlg) e.getSource()).getCheckedList();
+                                        if (!wordLst2.isEmpty()) {
+                                            String deleteWord = StringUtils.trimToEmpty(searchEnglishIdText_auto.getTextComponent().getText());
+                                            try {
+                                                writeNewData2(deleteWord, true);
+                                            } catch (IOException e1) {
+                                                e1.printStackTrace();
+                                            }
+                                            try {
+                                                writeNewData2(wordLst2.get(0), false);
+                                            } catch (IOException e1) {
+                                                e1.printStackTrace();
+                                            }
+                                            searchEnglishIdText_auto.getTextComponent().setText(wordLst2.get(0));
                                         }
-                                        try {
-                                            writeNewData2(wordLst2.get(0), false);
-                                        } catch (IOException e1) {
-                                            e1.printStackTrace();
-                                        }
-                                        searchEnglishIdText_auto.getTextComponent().setText(wordLst2.get(0));
                                     }
-                                }
-                            }, new ActionListener() {
+                                }, new ActionListener() {
 
-                                @Override
-                                public void actionPerformed(ActionEvent e) {
-                                }
-                            });
+                                    @Override
+                                    public void actionPerformed(ActionEvent e) {
+                                    }
+                                });
+                            }
                         }
                     }
                 }
