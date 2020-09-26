@@ -115,6 +115,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
     private JButton nextRecordBtn;
     private JLabel recordsLbl;
     private JButton resetRecordBtn;
+    private JCheckBox forAllQueryResultCheckBox;
 
     private enum ColumnOrderDef {
         columnName("欄位", 25, false), //
@@ -356,7 +357,8 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
 
                         // 其他筆的處理
                         if (dialog.mRecordsHandler.size() > 0) {
-                            maybeMultiRowLst.addAll(dialog.mRecordsHandler.getAllRecoreds(false));
+                            boolean isAllRecord = dialog.forAllQueryResultCheckBox.isSelected();
+                            maybeMultiRowLst.addAll(dialog.mRecordsHandler.getAllRecoreds(isAllRecord));
                         }
 
                         // ------------------------------------------------
@@ -420,7 +422,6 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                     try {
                         Process process = new Process();
                         if (!dialog.applyAllQueryResultCheckBox.isSelected()) {
-
                             List<String> updateSqlLst = new ArrayList<String>();
                             for (Map<String, String> singleRecordMap : process.maybeMultiRowLst) {
                                 // 套用單筆資料
@@ -1391,7 +1392,11 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
             }
             btnGroup = JButtonGroupUtil.createRadioButtonGroup(rdbtnInsert, rdbtnUpdate, rdbtnDelete, rdbtnOthers, rdbtnSelect);
             {
-                applyAllQueryResultCheckBox = new JCheckBox("匯出所有查詢");
+                forAllQueryResultCheckBox = new JCheckBox("全部");
+                panel.add(forAllQueryResultCheckBox);
+            }
+            {
+                applyAllQueryResultCheckBox = new JCheckBox("匯出SQL");
                 panel.add(applyAllQueryResultCheckBox);
             }
         }

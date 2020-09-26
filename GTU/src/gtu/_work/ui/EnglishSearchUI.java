@@ -75,7 +75,7 @@ import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.map.LRUMap;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang3.Range;
 import org.apache.commons.lang3.StringUtils;
@@ -107,7 +107,6 @@ import gtu.binary.StringUtil4FullChar;
 import gtu.clipboard.ClipboardListener;
 import gtu.clipboard.ClipboardUtil;
 import gtu.file.FileUtil;
-import gtu.file.OsInfoUtil;
 import gtu.keyboard_mouse.JnativehookKeyboardMouseHelper;
 import gtu.number.RandomUtil;
 import gtu.properties.PropertiesUtil;
@@ -199,6 +198,7 @@ public class EnglishSearchUI extends JFrame {
     private JFrameRGBColorPanel jFrameRGBColorPanel;
     private SimpleCheckListDlg mSimpleCheckListDlg;
     private AtomicReference<String> notFoundWord = new AtomicReference<String>();
+    private LRUMap propOtherMap = new LRUMap(3000);
 
     /**
      * Launch the application.
@@ -1531,6 +1531,12 @@ public class EnglishSearchUI extends JFrame {
             googleTranslateArea_SetTooltip(text, content);
             this.appendMemoryBank(text, content);
             return true;
+        } else if (propOtherMap.containsKey(text)) {
+            String content = (String)propOtherMap.get(text);
+            meaningText.setText(content);
+            googleTranslateArea_SetTooltip(text, content);
+            this.appendMemoryBank(text, content);
+            return true;
         } else {
             meaningText.setText("查無此字!!");
             googleTranslateArea_SetTooltip(text, "查無此字!!");
@@ -1603,6 +1609,8 @@ public class EnglishSearchUI extends JFrame {
                             appendMemoryBank(text, info2.getMeaning2());
                         }
                     }
+
+                    propOtherMap.put(text, meaningText.getText());
 
                     // ---------------------------------------------------------
                     int maxLoop = simpleSentanceChk.isSelected() ? 1 : 10;
