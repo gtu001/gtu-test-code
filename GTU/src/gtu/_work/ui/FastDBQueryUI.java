@@ -5256,7 +5256,8 @@ public class FastDBQueryUI extends JFrame {
         }
 
         private void updateSqlIdCategoryComboBox4Tab1() {
-            sqlIdCategoryComboBox4Tab1_Auto.applyComboxBoxList(sqlIdCategoryComboBox_Auto.getDropdownList());
+            String defaultText = sqlIdCategoryComboBox4Tab1_Auto.getTextComponent().getText();
+            sqlIdCategoryComboBox4Tab1_Auto.applyComboxBoxList(sqlIdCategoryComboBox_Auto.getDropdownList(), defaultText);
         }
     }
 

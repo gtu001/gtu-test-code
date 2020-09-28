@@ -19,7 +19,7 @@ public class JSwingCommonConfigUtil {
                 dir = new File("/media/gtu001/OLD_D/my_tool/");
             }
         }
-        if (dir == null || dir.exists()) {
+        if (dir == null || !dir.exists()) {
             dir = PropertiesUtil.getJarCurrentPath(mainFrameClz);
         }
         if (dir.exists()) {
