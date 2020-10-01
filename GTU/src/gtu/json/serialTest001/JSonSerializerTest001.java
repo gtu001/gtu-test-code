@@ -63,7 +63,7 @@ public class JSonSerializerTest001 {
     @Data
     @JsonSerialize(using = CustomJsonSerializer.class) // 自己加的
     public static class ZsDoCalLimitDatasResDTO {
-        @JsonProperty("TTTTTT")
+//        @JsonProperty("TTTTTT")
         @MapAsField
         private Map<String, ZsDoCalLimitS122531322ResDTO> dynamicMap = null;
     }
