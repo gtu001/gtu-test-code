@@ -209,8 +209,10 @@ public class DropboxTestUI extends JFrame {
                     JFile jfile = (JFile) selectItem.getUserObject();
 
                     if (jfile.isFolder) {
-                        JCommonUtil._jOptionPane_showMessageDialog_error("不提供目錄刪除!");
-                        return;
+                        boolean confirmDeleteFolder = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption(jfile.path, "是目錄!!,確定刪除!!!");
+                        if (!confirmDeleteFolder) {
+                            return;
+                        }
                     }
 
                     StringBuilder sb = new StringBuilder();
@@ -233,6 +235,36 @@ public class DropboxTestUI extends JFrame {
             }
         });
         panel_2.add(btnNewButton);
+
+        {
+            JButton btnNewButton1 = new JButton("mkdir");
+            btnNewButton1.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent paramActionEvent) {
+                    try {
+                        DefaultMutableTreeNode selectItem = jTreeUtil.getSelectItem();
+                        JFile jfile = (JFile) selectItem.getUserObject();
+
+                        if (!jfile.isFolder) {
+                            JCommonUtil._jOptionPane_showMessageDialog_error("此處無法建立目錄!");
+                            return;
+                        }
+
+                        String folderName = JCommonUtil._jOptionPane_showInputDialog("請輸入目錄名稱?");
+                        if (StringUtils.isNotBlank(folderName)) {
+                            util.mkdir(jfile.path, folderName);
+                            JCommonUtil._jOptionPane_showMessageDialog_info("已建立 : " + folderName);
+                            initReloadBtnAction();
+                        } else {
+                            JCommonUtil._jOptionPane_showMessageDialog_info("沒建立成功！");
+                        }
+                    } catch (Exception e2) {
+                        logger.error(e2.getMessage(), e2);
+                        JCommonUtil.handleException(e2);
+                    }
+                }
+            });
+            panel_2.add(btnNewButton1);
+        }
 
         downloadTree = new JTree();
         downloadTree.addMouseListener(new MouseAdapter() {
@@ -336,13 +368,26 @@ public class DropboxTestUI extends JFrame {
             return true;
         }
 
+        protected void mkdir(String basepath, String folder) {
+            FileInputStream inputStream = null;
+            try {
+                String uploadPath = basepath + "/" + folder;
+                System.out.println("mkdir >>" + uploadPath);
+                DropboxUtilV2.mkdir(uploadPath, false, getClient());
+            } catch (Exception ex) {
+                JCommonUtil.handleException(ex);
+            } finally {
+                CloseUtil.close(inputStream);
+            }
+        }
+
         protected void upload(File inputFile, String basePath) throws DbxException, IOException {
             FileInputStream inputStream = null;
             try {
                 String uploadPath = basePath + "/" + inputFile.getName();
                 inputStream = new FileInputStream(inputFile);
                 System.out.println("upload >>" + uploadPath);
-                DropboxUtilV2.upload(uploadPath, inputStream, getClient());
+                DropboxUtilV2.upload(uploadPath, inputStream, false, getClient());
             } catch (Exception ex) {
                 JCommonUtil.handleException(ex);
             } finally {

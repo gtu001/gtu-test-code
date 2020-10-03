@@ -21,6 +21,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
@@ -37,7 +38,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -140,6 +140,7 @@ public class AVChoicerUI extends JFrame {
     private HistoryConfigHandler historyConfigHandler = new HistoryConfigHandler();
     private JTextField historyBetweenConfigText;
     private JCheckBox ignoreHistoryConfigChk;
+    private JButton renameBtn;
 
     private static AVChoicerUI mAVChoicerUI;
 
@@ -254,7 +255,7 @@ public class AVChoicerUI extends JFrame {
             }
         });
 
-        JButton renameBtn = new JButton("改名");
+        renameBtn = new JButton("改名");
         renameBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 // currentFileHandler.rename();
@@ -271,6 +272,12 @@ public class AVChoicerUI extends JFrame {
                                 @Override
                                 public void actionPerformed(ActionEvent arg0) {
                                     currentFileHandler.awsomeRename();
+                                }
+                            })//
+                            .addJMenuItem("開啟封面", new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent arg0) {
+                                    currentFileHandler.openFindCoverPic();
                                 }
                             })//
                             .applyEvent(arg0).show();
@@ -859,14 +866,14 @@ public class AVChoicerUI extends JFrame {
                     EventQueue.invokeLater(new Runnable() {
                         public void run() {
                             try {
-                                Object[] p1 = fileMove(currentFileHandler.getAvFile(), getMoveTargetFile(dir, currentFileHandler.getAvFile()));
-                                Object[] p2 = fileMove(currentFileHandler.getJpgFile(), getMoveTargetFile(dir, currentFileHandler.getJpgFile()));
-
                                 StringBuffer sb1 = new StringBuffer();
+                                Object[] p1 = fileMove(currentFileHandler.getAvFile(), getMoveTargetFile(dir, currentFileHandler.getAvFile()));
                                 sb1.append("移動結果 : \r\n");
                                 sb1.append("檔案1 : " + Arrays.toString(p1) + "\r\n");
-                                sb1.append("檔案1 : " + Arrays.toString(p2) + "\r\n");
-
+                                for (File jpg : currentFileHandler.getJpgFile()) {
+                                    Object[] p2 = fileMove(jpg, getMoveTargetFile(dir, jpg));
+                                    sb1.append("檔案1 : " + Arrays.toString(p2) + "\r\n");
+                                }
                                 JCommonUtil._jOptionPane_showMessageDialog_info(sb1.toString());
                             } catch (Exception e) {
                                 JCommonUtil.handleException(e);
@@ -1153,21 +1160,35 @@ public class AVChoicerUI extends JFrame {
 
     private class CurrentFileHandler {
         private AtomicReference<File> tempFile = new AtomicReference<File>();
-        private AtomicReference<File> tempJpgFile = new AtomicReference<File>();
+        private AtomicReference<List<File>> tempJpgFile = new AtomicReference<List<File>>();
         private AtomicReference<File> tempDir = new AtomicReference<File>();
 
-        private File __findJpgFile(File avFile) {
-            try {
-                String currentFileName = FileUtil.getNameNoSubName(avFile);
-                Pattern ptn = Pattern.compile(currentFileName, Pattern.CASE_INSENSITIVE);
-                return Stream.of(avFile.getParentFile().listFiles()).filter(f -> f.getName().endsWith(".jpg")).filter(f -> {
-                    String jpgName = FileUtil.getNameNoSubName(f);
-                    Matcher mth = ptn.matcher(jpgName);
-                    return mth.find();
-                }).findAny().orElse(null);
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                return null;
+        // private File __findJpgFile(File avFile) {
+        // try {
+        // String currentFileName = FileUtil.getNameNoSubName(avFile);
+        // Pattern ptn = Pattern.compile(currentFileName,
+        // Pattern.CASE_INSENSITIVE);
+        // return Stream.of(avFile.getParentFile().listFiles()).filter(f ->
+        // f.getName().endsWith(".jpg")).filter(f -> {
+        // String jpgName = FileUtil.getNameNoSubName(f);
+        // Matcher mth = ptn.matcher(jpgName);
+        // return mth.find();
+        // }).findAny().orElse(null);
+        // } catch (Exception ex) {
+        // ex.printStackTrace();
+        // return null;
+        // }
+        // }
+
+        public void openFindCoverPic() {
+            if (this.tempJpgFile.get() != null && !this.tempJpgFile.get().isEmpty()) {
+                for (File f : this.tempJpgFile.get()) {
+                    try {
+                        Desktop.getDesktop().open(f);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
         }
 
@@ -1175,14 +1196,23 @@ public class AVChoicerUI extends JFrame {
             return tempFile.get();
         }
 
-        public File getJpgFile() {
+        public List<File> getJpgFile() {
             return tempJpgFile.get();
         }
 
         private void setFile(File avFile) {
             tempFile.set(avFile);
-            tempJpgFile.set(__findJpgFile(avFile));// 找圖片
-
+            tempJpgFile.set(findCoverPic(avFile));// 找圖片
+            try {
+                int val = tempJpgFile.get().size();
+                if (val != 0) {
+                    renameBtn.setText("" + val);
+                } else {
+                    renameBtn.setText("改名");
+                }
+            } catch (Exception ex) {
+                renameBtn.setText("改名");
+            }
             choiceAVBtn.setToolTipText(avFile.getName());
             tempDir.set(avFile.getParentFile());
             setTitle(avFile.getParentFile().getName() + "/" + avFile.getName());
@@ -1361,6 +1391,51 @@ public class AVChoicerUI extends JFrame {
             } catch (Exception e) {
                 JCommonUtil.handleException(e);
             }
+        }
+
+        private List<File> findCoverPic(File avFile) {
+            try {
+                if (avFile == null) {
+                    JCommonUtil._jOptionPane_showMessageDialog_error("檔案不存在!");
+                    return Collections.EMPTY_LIST;
+                }
+                File file = avFile;
+                if (file == null || !file.exists()) {
+                    JCommonUtil._jOptionPane_showMessageDialog_error("檔案不存在!");
+                    return Collections.EMPTY_LIST;
+                }
+                String name = FileUtil.getNameNoSubName(file);
+
+                Pattern coverJpgPtn = Pattern.compile("([a-zA-Z]{2,5})[\\-\\_]?([0-9]{2,5})");
+                Matcher mth = coverJpgPtn.matcher(name);
+                if (!mth.find()) {
+                    JCommonUtil._jOptionPane_showMessageDialog_error("無法匹配名子");
+
+                }
+                String cover1 = mth.group(1).toLowerCase();
+                String cover2 = mth.group(2).toLowerCase();
+
+                if (file.getParentFile() != null) {
+                    List<File> coverLst = new ArrayList<File>();
+                    File[] lst = file.getParentFile().listFiles();
+                    if (lst != null) {
+                        for (File jpg : lst) {
+                            String jpgName = jpg.getName().toLowerCase();
+                            if (jpgName.matches(".*\\." + PatternCollection.PICTURE_PATTERN)) {
+                                if (jpgName.contains(cover1) && jpgName.contains(cover2)) {
+                                    coverLst.add(jpg);
+                                }
+                            }
+                        }
+                        if (!coverLst.isEmpty()) {
+                            return coverLst;
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                JCommonUtil.handleException(e);
+            }
+            return Collections.EMPTY_LIST;
         }
     }
 

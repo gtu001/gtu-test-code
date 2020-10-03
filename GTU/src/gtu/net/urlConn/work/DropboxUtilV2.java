@@ -1,5 +1,7 @@
 package gtu.net.urlConn.work;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -42,6 +44,30 @@ public class DropboxUtilV2 {
         }
     }
 
+    public static boolean mkdir(String path, boolean overwrite, DbxClientV2 client) {
+        try {
+            String orignPath = path;
+            path = path + "/mkdir_test.md";
+            File testFile = File.createTempFile("dropbox_", "_mkdir.txt");
+            FileInputStream in = new FileInputStream(testFile);
+            UploadBuilder uploadBuilder = client.files().uploadBuilder(path);
+            WriteMode mode = WriteMode.ADD;
+            if (overwrite) {
+                mode = WriteMode.OVERWRITE;
+            }
+            uploadBuilder.withMode(mode);
+            uploadBuilder.uploadAndFinish(in);
+            UploadUploader builder = uploadBuilder.start();
+            DropboxUtilV2.delete(path, client);
+            System.out.println("mkdir : " + orignPath);
+            return true;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            throw new RuntimeException(ex);
+            // return false;
+        }
+    }
+
     public static boolean exists(String path, DbxClientV2 client) {
         try {
             client.files().getMetadata(path);
@@ -55,10 +81,14 @@ public class DropboxUtilV2 {
         }
     }
 
-    public static boolean upload(String path, InputStream in, DbxClientV2 client) {
+    public static boolean upload(String path, InputStream in, boolean overwrite, DbxClientV2 client) {
         try {
             UploadBuilder uploadBuilder = client.files().uploadBuilder(path);
-            uploadBuilder.withMode(WriteMode.ADD);
+            WriteMode mode = WriteMode.ADD;
+            if (overwrite) {
+                mode = WriteMode.OVERWRITE;
+            }
+            uploadBuilder.withMode(mode);
             uploadBuilder.uploadAndFinish(in);
             UploadUploader builder = uploadBuilder.start();
             System.out.println("upload done : " + path);
