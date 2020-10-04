@@ -404,6 +404,20 @@ public class PropertyEditUI extends javax.swing.JFrame {
                     }
 
                     {
+                        JMenuItem jMenuItem7 = new JMenuItem();
+                        jMenu1.add(jMenuItem7);
+                        jMenuItem7.setText("移除錯誤英文");
+                        jMenuItem7.addActionListener(new ActionListener() {
+                            public void actionPerformed(ActionEvent evt) {
+                                if (currentFile == null) {
+                                    return;
+                                }
+                                resetPropTable_onlyWorngEnglish_removeErrors();
+                            }
+                        });
+                    }
+
+                    {
                         JMenuItem jMenuItem8 = new JMenuItem();
                         jMenu1.add(jMenuItem8);
                         jMenuItem8.setText("載入校正檔");
@@ -834,6 +848,27 @@ public class PropertyEditUI extends javax.swing.JFrame {
         for (Triple<Integer, String, String> p : backupModel) {
             String desc = p.getRight();
             if (StringUtils.isBlank(desc) || !StringUtil_.hasChineseWord(desc)) {
+                model.addRow(new Object[] { p.getLeft(), p.getMiddle(), p.getRight() });
+                wordLst.add(p.getMiddle());
+            }
+        }
+        propTable.setModel(model);
+        JTableUtil.newInstance(propTable).columnIsJTextArea("key", 20);
+        JTableUtil.newInstance(propTable).columnIsJTextArea("value", 20);
+        JTableUtil.setColumnWidths_Percent(propTable, new float[] { 5, 30, 65 });
+        applyPropTableOnBlurEvent();
+        FileUtil.saveToFile(new File(FileUtil.DESKTOP_DIR, "GoogleWord.txt"), StringUtils.join(wordLst, "\r\n"), "utf8");
+    }
+
+    private void resetPropTable_onlyWorngEnglish_removeErrors() {
+        List<String> wordLst = new ArrayList<String>();
+        propTable.setFont(new Font("Serif", Font.PLAIN, 20));
+        DefaultTableModel model = JTableUtil.createModel(false, "index", "key", "value");
+        for (Triple<Integer, String, String> p : backupModel) {
+            String desc = p.getRight();
+            if (StringUtils.isBlank(desc) || !StringUtil_.hasChineseWord(desc)) {
+                // do nothing
+            } else {
                 model.addRow(new Object[] { p.getLeft(), p.getMiddle(), p.getRight() });
                 wordLst.add(p.getMiddle());
             }

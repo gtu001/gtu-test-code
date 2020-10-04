@@ -1409,8 +1409,8 @@ public class AVChoicerUI extends JFrame {
                 Pattern coverJpgPtn = Pattern.compile("([a-zA-Z]{2,5})[\\-\\_]?([0-9]{2,5})");
                 Matcher mth = coverJpgPtn.matcher(name);
                 if (!mth.find()) {
-                    JCommonUtil._jOptionPane_showMessageDialog_error("無法匹配名子");
-
+//                    JCommonUtil._jOptionPane_showMessageDialog_error("無法匹配名子");
+                    return Collections.EMPTY_LIST;
                 }
                 String cover1 = mth.group(1).toLowerCase();
                 String cover2 = mth.group(2).toLowerCase();
