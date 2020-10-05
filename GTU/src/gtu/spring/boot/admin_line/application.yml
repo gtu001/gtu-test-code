@@ -1,0 +1,43 @@
+# email
+
+spring:
+  application:
+    name: 'ServiceAdmin'
+  mail:
+    host: "mail.xxx.com"
+    username: "ecs@xxx.com"
+    password: "xxxxxxxxxxx"
+  boot:
+    admin:
+      notify:
+        mail:
+          enabled: true
+          from: 'ec@xxxxxx.com'
+          to: 'sam@xxxxxx.com,chu@xxxxxx.com'
+          
+# slack
+
+spring:
+  application:
+    name: 'ServiceAdmin'
+  boot:
+    admin:
+      notify:
+        slack:
+          enabled: true
+          webhook-url: 'https://hooks.slack.com/services'
+
+          
+# line
+
+spring:
+  application:
+    name: ServiceAdmin
+  boot:
+    admin:
+      notify:
+        line:
+          enabled: true
+          channelSecret: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+          channelToken: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+          to: 'xxxxxxxxxxxxxxxxxxxxxxxxx'

@@ -13,6 +13,8 @@ import org.apache.commons.lang.Validate;
 
 /**
  * https://notify-bot.line.me/my/
+ * https://notify-bot.line.me/my/services/
+ * 
  * https://poychang.github.io/line-notify-1-basic/
  * 
  * @author gtu001
