@@ -27,7 +27,7 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter</artifactId>
-			<version>2.3.1.RELEASE</version>
+			<version>1.5.3.RELEASE</version>
 		</dependency>
 
 		<dependency>
@@ -37,7 +37,6 @@
 		</dependency>
 
 		<!-- spring admin -->
-		<!-- 
 		<dependency>
 			<groupId>de.codecentric</groupId>
 			<artifactId>spring-boot-admin-server</artifactId>
@@ -48,19 +47,31 @@
 			<artifactId>spring-boot-admin-starter-client</artifactId>
 			<version>1.5.5</version>
 		</dependency>
-		<dependency>
-			<groupId>de.codecentric</groupId>
-			<artifactId>spring-boot-admin-starter-server</artifactId>
-			<version>1.5.5</version>
-		</dependency>
-		 -->
 
-		<!-- spring security -->
+		<!-- zuul proxy -->
 		<dependency>
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-config</artifactId>
-			<version>5.3.4.RELEASE</version>
+			<groupId>com.netflix.hystrix</groupId>
+			<artifactId>hystrix-javanica</artifactId>
+			<version>1.5.2</version>
 		</dependency>
+
+		<!-- ribbon -->
+		<!-- <dependency> <groupId>com.netflix.ribbon</groupId> <artifactId>ribbon-core</artifactId> 
+			<version>2.0.0</version> </dependency> -->
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+			<version>2.2.4.RELEASE</version>
+		</dependency>
+
+
+		<dependency>
+			<!-- slf4j-api-1.7.5.jar -->
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.7.5</version>
+		</dependency>
+
 
 	</dependencies>
 

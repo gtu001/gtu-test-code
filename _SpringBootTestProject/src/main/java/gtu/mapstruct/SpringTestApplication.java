@@ -5,9 +5,19 @@ import java.util.Arrays;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.netflix.zuul.EnableZuulProxy;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 
+import de.codecentric.boot.admin.config.EnableAdminServer;
+
+/**
+ * https://ithelp.ithome.com.tw/articles/10191946?sc=iThelpR
+ */
+@ComponentScan("gtu.mapstruct")
+@EnableAdminServer
+@EnableZuulProxy
 @SpringBootApplication
 public class SpringTestApplication {
 
