@@ -1,32 +1,38 @@
 spring:
-  # 配置SBA Client连接的安全账号密码
-  security:
-    user:
-      name: admin
-      password: admin
-  boot:
-    admin:
-      ui:
-        # 修改网页显示的tab标题
-        title: "应用监控管理"
-        # 修改网页的brand的图标和标题
-        brand: "<img src='assets/img/icon-spring-boot-admin.svg'><span>应用监控管理</span>"
+  application:
+    name: limits-service
+    
+---
+
+spring:
+  profiles:
+    active: native
+
+
+---
+
 server:
-  port: 7070
+  port: ${port:8090}
+  compression:
+    enabled: true
+---
+
+
+
+limits-service:
+  minimum=99  
+  maximum=9999  
   
   
 ---
 spring:
-  profiles: default
+  cloud:
+    config:
+      server:
+        native:
+          searchLocations=file://C:/Users/wistronits/Desktop/application.yml
+        bootstrap: true
+          
 
-zuul:
-  routes:
-    cloud:
-      path: /cardsvcs/acs/**
-      sensitiveHeaders: 
-      url: https://vst0.mapi.checkFin.com/cardsvcs/acs/
-      stripPrefix: false
-
-ribbon:
-  eureka:
-    enabled: false
+          
+          
