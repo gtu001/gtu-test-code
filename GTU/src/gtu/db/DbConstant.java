@@ -1,6 +1,7 @@
 package gtu.db;
 
 import java.sql.Connection;
+import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
@@ -15,7 +16,7 @@ public class DbConstant {
         DataSource ds = null;
         Connection conn = null;
         try {
-            conn = getTestConnection_H2();
+            // conn = getTestConnection_H2();
             System.out.println("test fine ...");
 
             int v = Integer.parseInt("01");
@@ -31,7 +32,7 @@ public class DbConstant {
             }
         }
     }
-    
+
     public static DataSource getTestDataSource_CTBC() {
         BasicDataSource ds2 = new BasicDataSource();
         ds2.setUrl("jdbc:sqlserver://10.1.117.144;databaseName=CASH_UUAT");
@@ -57,7 +58,7 @@ public class DbConstant {
         bds.setInitialSize(1);
         bds.setMaxIdle(600000);
     }
-    
+
     public static void getTestConnection_Sqlite() {
         BasicDataSource bds = new BasicDataSource();
         bds.setUrl("jdbc:sqlite:/home/gtu001/.local/share/DBeaverData/workspace6/.metadata/sample-database-sqlite-1/Chinook.db");
@@ -67,22 +68,64 @@ public class DbConstant {
         applyToConnectionPool(bds);
     }
 
-    public static Connection getTestConnection_H2() throws SQLException {
-        DriverManager.registerDriver(new org.h2.Driver());
-        String url = "jdbc:h2:tcp://localhost/~/test";
-        String user = "sa";
-        String pwd = "";
-        Connection conn = DriverManager.getConnection(url, user, pwd);
-        return conn;
+    // http://localhost:8082/h2-console
+    public static Connection getTestConnection_H2() {
+        try {
+            DriverManager.registerDriver((Driver) Class.forName("org.h2.Driver").newInstance());
+            String url = "jdbc:h2:tcp://localhost/~/test";
+            String user = "sa";
+            String pwd = "";
+            Connection conn = DriverManager.getConnection(url, user, pwd);
+            return conn;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public static Connection getTestConnection() throws SQLException {
-        DriverManager.registerDriver(new oracle.jdbc.driver.OracleDriver());
-        String url = "jdbc:oracle:thin:@172.16.7.189:1524:c189u1";
-        String user = "tgl_main_dev_o12";
-        String pwd = "tgl_main_dev_o12pwd";
-        Connection conn = DriverManager.getConnection(url, user, pwd);
-        return conn;
+    // http://localhost:8082/h2-console
+    public static DataSource getTestDataSource_H2_File() {
+        BasicDataSource bds = new BasicDataSource();
+        bds.setUrl("jdbc:h2:file:C:/temp/test");
+        bds.setUsername("sa");
+        bds.setPassword("");
+        bds.setDriverClassName("org.h2.Driver");
+        applyToConnectionPool(bds);
+        return bds;
+    }
+
+    // http://localhost:8082/h2-console
+    public static DataSource getTestDataSource_H2_Tcp() {
+        BasicDataSource bds = new BasicDataSource();
+        bds.setUrl("jdbc:h2:tcp://localhost/~/test");
+        bds.setUsername("scott");
+        bds.setPassword("");
+        bds.setDriverClassName("org.h2.Driver");
+        applyToConnectionPool(bds);
+        return bds;
+    }
+
+    // http://localhost:8082/h2-console
+    public static DataSource getTestDataSource_H2_InMemory() {
+        BasicDataSource bds = new BasicDataSource();
+        bds.setUrl("jdbc:h2:~/test");
+        bds.setUsername("scott");
+        bds.setPassword("");
+        bds.setDriverClassName("org.h2.Driver");
+        applyToConnectionPool(bds);
+        return bds;
+    }
+
+    public static Connection getTestConnection() {
+        try {
+            DriverManager.registerDriver((Driver) Class.forName("oracle.jdbc.driver.OracleDriver").newInstance());
+            String url = "jdbc:oracle:thin:@172.16.7.189:1524:c189u1";
+            String user = "tgl_main_dev_o12";
+            String pwd = "tgl_main_dev_o12pwd";
+            Connection conn = DriverManager.getConnection(url, user, pwd);
+            return conn;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static DataSource getTestDataSource() {
@@ -293,23 +336,19 @@ public class DbConstant {
             throw new RuntimeException(e);
         }
     }
-    
+
     /*
-    public DataSource getPoolDataSource() throws Exception {
-        PoolDataSource pds = (PoolDataSourceImpl) PoolDataSourceFactory.getPoolDataSource();
-        pds.setUser("xxxxxxxxxxxxx");
-        pds.setPassword("xxxxxxxxxxxxx");
-        pds.setURL(
-                "jdbc:oracle:thin:@(DESCRIPTION_LIST=(LOAD_BALANCE=off)(FAILOVER=on)(DESCRIPTION=(ENABLE=BROKEN)(CONNECT_TIMEOUT=3)(RETRY_COUNT=3)(ADDRESS_LIST=(LOAD_BALANCE=on)(ADDRESS=(PROTOCOL=TCP)(HOST=pdctcomracl3-scan.cathaybk.intra.uwccb)(PORT=1521)))(CONNECT_DATA=(SERVICE_NAME=OINVINSTSRV)))(DESCRIPTION=(ENABLE=BROKEN)( ADDRESS_LIST=(LOAD_BALANCE=on)(ADDRESS=(PROTOCOL=TCP)(HOST= pdctcomracr3-scan.cathaybk.intra.uwccb)(PORT=1521)))(CONNECT_DATA=(SERVICE_NAME= OINVINSTSRV))))");
-        pds.setConnectionFactoryClassName("oracle.jdbc.pool.OracleDataSource");
-        pds.setFastConnectionFailoverEnabled(true);
-        pds.setMinPoolSize(5);
-        pds.setMaxPoolSize(10);
-        pds.setValidateConnectionOnBorrow(true);
-        pds.setSQLForValidateConnection("select user from dual");
-        return pds;
-    }
-    */
+     * public DataSource getPoolDataSource() throws Exception { PoolDataSource
+     * pds = (PoolDataSourceImpl) PoolDataSourceFactory.getPoolDataSource();
+     * pds.setUser("xxxxxxxxxxxxx"); pds.setPassword("xxxxxxxxxxxxx");
+     * pds.setURL(
+     * "jdbc:oracle:thin:@(DESCRIPTION_LIST=(LOAD_BALANCE=off)(FAILOVER=on)(DESCRIPTION=(ENABLE=BROKEN)(CONNECT_TIMEOUT=3)(RETRY_COUNT=3)(ADDRESS_LIST=(LOAD_BALANCE=on)(ADDRESS=(PROTOCOL=TCP)(HOST=pdctcomracl3-scan.cathaybk.intra.uwccb)(PORT=1521)))(CONNECT_DATA=(SERVICE_NAME=OINVINSTSRV)))(DESCRIPTION=(ENABLE=BROKEN)( ADDRESS_LIST=(LOAD_BALANCE=on)(ADDRESS=(PROTOCOL=TCP)(HOST= pdctcomracr3-scan.cathaybk.intra.uwccb)(PORT=1521)))(CONNECT_DATA=(SERVICE_NAME= OINVINSTSRV))))"
+     * );
+     * pds.setConnectionFactoryClassName("oracle.jdbc.pool.OracleDataSource");
+     * pds.setFastConnectionFailoverEnabled(true); pds.setMinPoolSize(5);
+     * pds.setMaxPoolSize(10); pds.setValidateConnectionOnBorrow(true);
+     * pds.setSQLForValidateConnection("select user from dual"); return pds; }
+     */
 
     public static final String DRIVER_HSQL = "org.hsqldb.jdbcDriver";
     public static final String DRIVER_MYSQL = "com.mysql.jdbc.Driver";

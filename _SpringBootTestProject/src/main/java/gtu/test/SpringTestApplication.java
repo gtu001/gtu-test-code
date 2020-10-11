@@ -20,7 +20,7 @@ import org.springframework.context.annotation.ComponentScan;
 //@EnableAdminServer
 //@EnableZuulProxy
 @SpringBootApplication
-@EnableConfigServer 
+//@EnableConfigServer 
 public class SpringTestApplication {
 
     public static void main(String[] args) {

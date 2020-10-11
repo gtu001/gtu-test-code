@@ -12,6 +12,7 @@ public class LimitsConfigurationController {
 
     @GetMapping("/limits")
     public LimitConfiguration retriveLimitsFromConfigurations() {
+        System.out.println("#...  retriveLimitsFromConfigurations");
         // getting values from the properties file
         LimitConfiguration limit = new LimitConfiguration();
         limit.setMaximum(configuration.getMaximum());
