@@ -97,7 +97,7 @@ public class DbConstant {
     public static DataSource getTestDataSource_H2_Tcp() {
         BasicDataSource bds = new BasicDataSource();
         bds.setUrl("jdbc:h2:tcp://localhost/~/test");
-        bds.setUsername("scott");
+        bds.setUsername("sa");
         bds.setPassword("");
         bds.setDriverClassName("org.h2.Driver");
         applyToConnectionPool(bds);
@@ -108,7 +108,7 @@ public class DbConstant {
     public static DataSource getTestDataSource_H2_InMemory() {
         BasicDataSource bds = new BasicDataSource();
         bds.setUrl("jdbc:h2:~/test");
-        bds.setUsername("scott");
+        bds.setUsername("sa");
         bds.setPassword("");
         bds.setDriverClassName("org.h2.Driver");
         applyToConnectionPool(bds);

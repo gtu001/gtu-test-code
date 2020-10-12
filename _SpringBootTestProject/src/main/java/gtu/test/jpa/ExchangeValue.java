@@ -59,4 +59,20 @@ public class ExchangeValue {
     public BigDecimal getConversionMultiple() {
         return conversionMultiple;
     }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setFrom(String from) {
+        this.from = from;
+    }
+
+    public void setTo(String to) {
+        this.to = to;
+    }
+
+    public void setConversionMultiple(BigDecimal conversionMultiple) {
+        this.conversionMultiple = conversionMultiple;
+    }
 }

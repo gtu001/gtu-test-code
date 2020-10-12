@@ -15,6 +15,8 @@ import org.springframework.context.annotation.ComponentScan;
 
 /**
  * https://ithelp.ithome.com.tw/articles/10191946?sc=iThelpR
+ * https://www.javatpoint.com/creating-a-jpa-repository
+ * 
  */
 @ComponentScan("gtu.test")
 //@EnableAdminServer

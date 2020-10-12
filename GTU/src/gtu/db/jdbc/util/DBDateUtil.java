@@ -55,7 +55,7 @@ public class DBDateUtil {
 
             @Override
             public String sysdate() {
-                return " (current date) "; //(current timestamp)
+                return " (current date) "; // (current timestamp)
             }
         }, //
         Postgres {
@@ -104,10 +104,10 @@ public class DBDateUtil {
             public String varchar2Date(String columnName) {
                 return String.format(" DATE(%s) ", columnName);
             }
-            
+
             @Override
             public String sysdate() {
-                return " current_date ";//current_timestamp
+                return " current_date ";// current_timestamp
             }
         }, //
         SqlServer {
@@ -161,6 +161,32 @@ public class DBDateUtil {
             public String sysdate() {
                 return " datetime('now', 'localtime') ";
             }
+        },
+        H2 {
+            @Override
+            public String date2Varchar(String columnName) {
+                return String.format(" parsedatetime(%s, 'yyyy-MM-dd') ", columnName);
+            }
+
+            @Override
+            public String timestamp2Varchar(String columnName) {
+                return String.format(" parsedatetime(%s, 'yyyy-MM-dd hh:mm:ss.SS') ", columnName);
+            }
+
+            @Override
+            public String varchar2Timestamp(String columnName) {
+                return String.format(" parsedatetime(%s, 'yyyy-MM-dd hh:mm:ss.SS') ", columnName);
+            }
+
+            @Override
+            public String varchar2Date(String columnName) {
+                return String.format(" parsedatetime(%s, 'yyyy-MM-dd') ", columnName);
+            }
+
+            @Override
+            public String sysdate() {
+                return " CURRENT_TIMESTAMP() ";
+            }
         };
 
         public abstract String date2Varchar(String columnName);
@@ -170,7 +196,7 @@ public class DBDateUtil {
         public abstract String varchar2Timestamp(String columnName);
 
         public abstract String varchar2Date(String columnName);
-        
+
         public abstract String sysdate();
     }
 }

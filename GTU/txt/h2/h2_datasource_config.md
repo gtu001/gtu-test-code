@@ -1,41 +1,3 @@
-spring:
-  application:
-    name: test001
-    
-
-
-
----
-
-server:
-  port: ${port:8090}
-  compression:
-    enabled: true
----
-
-
-
-limits-service:
-  minimum=99  
-  maximum=9999  
-  
-  
----
-spring:
-  cloud:
-    config:
-      server:
-        native:
-          searchLocations=file://C:/Users/wistronits/Desktop/application.yml
-#        bootstrap: true
----
-spring:
-  profiles:
-#    active: native
-          
-
-
-
 ---
 #jpa
 spring:
@@ -53,9 +15,4 @@ spring:
     driverClassName: org.h2.Driver
     testWhileIdle: true
     validationQuery: SELECT 1
-
-
-
-
-
 
