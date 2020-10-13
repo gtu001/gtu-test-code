@@ -1,10 +1,9 @@
 package gtu.test;
 
-import java.math.BigDecimal;
-import java.util.List;
+import java.io.File;
 
-import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import gtu.test.jpa.ExchangeValue;
 import gtu.test.jpa.ExchangeValueRepository;
+import gtu.test.jpa.H2RunScriptAction;
 
 @SpringBootApplication
 @RestController
@@ -24,34 +24,27 @@ public class CurrencyExchangeController {
     @Autowired
     private ExchangeValueRepository mExchangeValueRepository;
 
+    @Autowired
+    private H2RunScriptAction mH2RunScriptAction;
+
+    @Value("${spring.h2.script}")
+    private String h2ScriptSql;
+    
+    // http://localhost:8090/currency-exchange/from/USD/to/INR
     @GetMapping("/currency-exchange/from/{from}/to/{to}")
     public ExchangeValue retrieveExchangeValue(@PathVariable String from, @PathVariable String to) {
-        ExchangeValue exchangeValue = new ExchangeValue(1000L, from, to, BigDecimal.valueOf(65));
+        ExchangeValue exchangeValue = mExchangeValueRepository.findByFromAndTo(from, to);
         exchangeValue.setPort(Integer.parseInt(environment.getProperty("local.server.port")));
         return exchangeValue;
     }
 
-    @GetMapping("/currency-exchange/test001")
-    public ExchangeValue test001() {
-        ExchangeValue exchangeValue = new ExchangeValue();
-        exchangeValue.setPort(Integer.parseInt(environment.getProperty("local.server.port")));
-        exchangeValue.setConversionMultiple(new BigDecimal(1000));
-        exchangeValue.setFrom("CHN");
-        exchangeValue.setTo("AMN");
-        exchangeValue.setId(1000L);
-        mExchangeValueRepository.save(exchangeValue);
-        mExchangeValueRepository.flush();
+    // http://localhost:8090/currency-exchange/run-script
+    @GetMapping("/currency-exchange/run-script")
+    public long runScript() {
+        File h2File = new File(h2ScriptSql);
+        mH2RunScriptAction.runScript(h2File);
         long count = mExchangeValueRepository.count();
         System.out.println("count - " + count);
-        return exchangeValue;
-    }
-
-    @GetMapping("/currency-exchange/test002")
-    public List<ExchangeValue> test002() {
-        List<ExchangeValue> lst = mExchangeValueRepository.findAll();
-        for (ExchangeValue vo : lst) {
-            System.out.println("\t>>" + ReflectionToStringBuilder.toString(vo));
-        }
-        return lst;
+        return count;
     }
 }
