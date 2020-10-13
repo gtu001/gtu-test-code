@@ -16,3 +16,10 @@ spring:
     testWhileIdle: true
     validationQuery: SELECT 1
 
+
+
+
+
+
+可接受其它連線
+	;AUTO_SERVER=TRUE
