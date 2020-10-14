@@ -15,7 +15,7 @@ import org.springframework.context.annotation.ComponentScan;
 
 /**
  * https://ithelp.ithome.com.tw/articles/10191946?sc=iThelpR
- * https://www.javatpoint.com/creating-a-jpa-repository
+ * https://www.javatpoint.com/using-feign-rest-client-for-service-invocation
  * 
  */
 @ComponentScan("gtu.test")
