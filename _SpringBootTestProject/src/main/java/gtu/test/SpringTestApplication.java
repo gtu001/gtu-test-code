@@ -5,6 +5,7 @@ import java.util.Arrays;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 //import org.springframework.cloud.config.server.EnableConfigServer;
 //import org.springframework.cloud.netflix.zuul.EnableZuulProxy;
 import org.springframework.context.ApplicationContext;
@@ -23,6 +24,7 @@ import org.springframework.context.annotation.ComponentScan;
 //@EnableZuulProxy
 @SpringBootApplication
 //@EnableConfigServer 
+@EnableFeignClients
 public class SpringTestApplication {
 
     public static void main(String[] args) {
