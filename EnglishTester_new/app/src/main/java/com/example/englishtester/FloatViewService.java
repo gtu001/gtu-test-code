@@ -490,6 +490,7 @@ public class FloatViewService extends Service {
                                 String text = redPlusLst.get(position);
                                 noteText.setText(text);
                                 doOpenCloseEditPanel(true);
+                                ClipboardHelper.copyToClipboard(FloatViewService.this.getApplicationContext(), text);
                             }
                         });
                     } catch (Exception ex) {

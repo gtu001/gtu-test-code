@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import gtu.test.jpa.ExchangeValue;
 
-@FeignClient(name = "XXXXX", url = "http://localhost:8090/")//currency-exchange-service
+@FeignClient(name = "currency-exchange-service", url = "http://localhost:8090/")//
 public interface FeignStoreProxy {
 
     @RequestMapping(method = RequestMethod.GET, value = "/currency-exchange/from/{from}/to/{to}")

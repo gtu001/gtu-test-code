@@ -35,6 +35,8 @@
 		<java-version>1.7</java-version>
 		<maven.compiler.source>1.7</maven.compiler.source>
 		<maven.compiler.target>1.7</maven.compiler.target>
+		<org.mapstruct.version>1.3.1.Final</org.mapstruct.version>
+		<m2e.apt.activation>jdt_apt</m2e.apt.activation>
 	</properties>
 
 	<parent>
@@ -659,8 +661,8 @@
 			<!-- <systemPath>C:\Program Files\Java\jdk1.8.0_171\jre\lib\ext\jfxrt.jar</systemPath> -->
 			<!-- <systemPath>C:\Program Files\Java\jre1.8.0_211\lib\ext\jfxrt.jar</systemPath> -->
 			<!-- <systemPath>/usr/java/jdk1.8.0_221-amd64/jre/lib/ext/jfxrt.jar</systemPath> -->
-			<!-- <systemPath>C:\Program Files\Java\jdk1.8.0_171\jre\lib\ext\jfxrt.jar</systemPath>-->
-			<systemPath>/media/gtu001/OLD_D/my_tool/jfxrt/jfxrt.jar</systemPath>
+			<!-- <systemPath>C:\Program Files\Java\jdk1.8.0_171\jre\lib\ext\jfxrt.jar</systemPath> -->
+			<systemPath>C:\Program Files\Java\jdk1.8.0_171\jre\lib\ext\jfxrt.jar</systemPath>
 		</dependency>
 
 		<dependency>
@@ -881,6 +883,13 @@
 			<version>RELEASE</version>
 		</dependency>
 
+		<!-- MapStruct -->
+		<dependency>
+			<groupId>org.mapstruct</groupId>
+			<artifactId>mapstruct</artifactId>
+			<version>${org.mapstruct.version}</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>
@@ -904,11 +913,12 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
-					<testSource>1.6</testSource>
-					<testTarget>1.6</testTarget>
+					<source>1.8</source>
+					<target>1.8</target>
+					<testSource>1.8</testSource>
+					<testTarget>1.8</testTarget>
 					<encoding>UTF-8</encoding>
+					<failOnError>false</failOnError>
 				</configuration>
 			</plugin>
 
@@ -1001,7 +1011,7 @@
 						<configuration>
 							<finalName>DC</finalName>
 							<appendAssemblyId>false</appendAssemblyId>
-							<outputDirectory>I:/Deploy_File/SCSB</outputDirectory>
+							<outputDirectory>D:/Deploy_File/SCSB</outputDirectory>
 						</configuration>
 					</execution>
 				</executions>
@@ -1029,6 +1039,33 @@
 						</goals>
 					</execution>
 				</executions>
+			</plugin>
+
+			<!-- MapStruct -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.5.1</version>
+				<executions>
+					<execution>
+						<id>mapstruct</id>
+						<goals>
+							<goal>compile</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<source>1.8</source>
+					<target>1.8</target>
+					<annotationProcessorPaths>
+						<path>
+							<groupId>org.mapstruct</groupId>
+							<artifactId>mapstruct-processor</artifactId>
+							<version>${org.mapstruct.version}</version>
+						</path>
+					</annotationProcessorPaths>
+					<failOnError>false</failOnError>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>

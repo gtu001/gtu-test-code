@@ -58,4 +58,15 @@ spring:
 
 
 
+---
+#feign
+employee-producer:
+  ribbon:
+    listOfServers: http://localhost:8090
+    
+eureka:
+  client:
+    fetchRegistry: true
+
+
 
