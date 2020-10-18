@@ -3,6 +3,7 @@ package gtu.test.jpa;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.ArrayBlockingQueue;
 
@@ -12,6 +13,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -29,12 +31,17 @@ public class H2RunScriptAction {
     @Value("${spring.h2.jar.position}")
     private String h2JarPosition;
     @Value("${spring.h2.script}")
-    private String h2ScriptSql;
+    private Resource h2ScriptSql;
 
     @PostConstruct
     public void init() {
-        File h2File = new File(h2ScriptSql);
-        runScript(h2File);
+        try {
+            File h2File = h2ScriptSql.getFile();
+            System.out.println("h2File " + h2File.exists());
+            runScript(h2File);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void runScript(File file) {
@@ -48,7 +55,8 @@ public class H2RunScriptAction {
             appendSb(" -user ", h2Username, sb);
             appendSb(" -password ", h2Password, sb);
             sb.append(" -script ");//
-            sb.append("\"" + file + "\"");//
+//            sb.append("\"" + file + "\"");//
+            sb.append(" " + file + " ");//
             System.out.println("## RunScript : " + sb);
             Process proc = Runtime.getRuntime().exec(sb.toString());
 

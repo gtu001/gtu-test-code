@@ -47,14 +47,15 @@ spring:
   h2.console.enabled: true
   datasource:
     platform: h2
-    url: jdbc:h2:file:/D:\workstuff\gtu-test-code\_SpringBootTestProject\h2\testDB;DB_CLOSE_ON_EXIT=FALSE;AUTO_RECONNECT=TRUE;AUTO_SERVER=TRUE
+    url: jdbc:h2:file:/media/gtu001/OLD_D/workstuff/workspace/gtu-test-code/_SpringBootTestProject\h2\testDB;DB_CLOSE_ON_EXIT=FALSE;AUTO_RECONNECT=TRUE;AUTO_SERVER=TRUE
     username: sa
     password:
     driverClassName: org.h2.Driver
     testWhileIdle: true
     validationQuery: SELECT 1
-  h2.jar.position: D:/my_tool/FastDBQueryUI/h2-1.4.197.jar
-  h2.script: D:/workstuff/gtu-test-code/_SpringBootTestProject/src/main/java/gtu/test/jpa/exchange_value_01.sql
+  h2.jar.position: /media/gtu001/OLD_D/my_tool/FastDBQueryUI/h2-1.4.197.jar
+  h2.script: classpath:gtu/test/jpa/exchange_value_01.sql
+
 
 
 
@@ -67,6 +68,8 @@ employee-producer:
 eureka:
   client:
     fetchRegistry: true
+    register-with-eureka: false
+
 
 
 

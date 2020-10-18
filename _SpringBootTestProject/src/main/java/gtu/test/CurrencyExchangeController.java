@@ -1,11 +1,13 @@
 package gtu.test;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.core.env.Environment;
+import org.springframework.core.io.Resource;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,8 +30,8 @@ public class CurrencyExchangeController {
     private H2RunScriptAction mH2RunScriptAction;
 
     @Value("${spring.h2.script}")
-    private String h2ScriptSql;
-    
+    private Resource h2ScriptSql;
+
     // http://localhost:8090/currency-exchange/from/USD/to/INR
     @GetMapping("/currency-exchange/from/{from}/to/{to}")
     public ExchangeValue retrieveExchangeValue(@PathVariable String from, @PathVariable String to) {
@@ -41,10 +43,14 @@ public class CurrencyExchangeController {
     // http://localhost:8090/currency-exchange/run-script
     @GetMapping("/currency-exchange/run-script")
     public long runScript() {
-        File h2File = new File(h2ScriptSql);
-        mH2RunScriptAction.runScript(h2File);
-        long count = mExchangeValueRepository.count();
-        System.out.println("count - " + count);
-        return count;
+        try {
+            File h2File = h2ScriptSql.getFile();
+            mH2RunScriptAction.runScript(h2File);
+            long count = mExchangeValueRepository.count();
+            System.out.println("count - " + count);
+            return count;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }
