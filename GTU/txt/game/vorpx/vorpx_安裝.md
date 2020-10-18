@@ -17,3 +17,5 @@ vorpx_申請download
 		A45B6-53945-98281-3ECC6
 
 
+===
+	遊戲中按 DELETE 開啟視窗

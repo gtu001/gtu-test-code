@@ -47,13 +47,13 @@ spring:
   h2.console.enabled: true
   datasource:
     platform: h2
-    url: jdbc:h2:file:/media/gtu001/OLD_D/workstuff/workspace/gtu-test-code/_SpringBootTestProject\h2\testDB;DB_CLOSE_ON_EXIT=FALSE;AUTO_RECONNECT=TRUE;AUTO_SERVER=TRUE
+    url: jdbc:h2:file:C:\workstuff\workspace\gtu-test-code\_SpringBootTestProject\h2\testDB;DB_CLOSE_ON_EXIT=FALSE;AUTO_RECONNECT=TRUE;AUTO_SERVER=TRUE
     username: sa
     password:
     driverClassName: org.h2.Driver
     testWhileIdle: true
     validationQuery: SELECT 1
-  h2.jar.position: /media/gtu001/OLD_D/my_tool/FastDBQueryUI/h2-1.4.197.jar
+  h2.jar.position: C:\my_tool\FastDBQueryUI/h2-1.4.197.jar
   h2.script: classpath:gtu/test/jpa/exchange_value_01.sql
 
 
@@ -64,10 +64,14 @@ spring:
 employee-producer:
   ribbon:
     listOfServers: http://localhost:8090
+
+github-test-producer:
+  ribbon:
+    listOfServers: https://my-json-server.typicode.com/gtu001/fake_json_server/
     
 eureka:
   client:
-    fetchRegistry: true
+    fetchRegistry: false
     register-with-eureka: false
 
 
