@@ -6,20 +6,21 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
+import javax.swing.JSlider;
+import javax.swing.JTextArea;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JFrameUtil;
-
-import javax.swing.JSlider;
-import javax.swing.JTextArea;
 
 public class EnglishSearchUI_TVModeDlg extends JDialog {
 
@@ -162,6 +163,12 @@ public class EnglishSearchUI_TVModeDlg extends JDialog {
                     }
                 });
             }
+            addFocusListener(new FocusAdapter() {
+                @Override
+                public void focusLost(FocusEvent e) {
+                    EnglishSearchUI_TVModeDlg.this.dispose();
+                }
+            });
         }
         JFrameUtil.setSizeWithPercent(0.7f, 0.7f, this);
         JCommonUtil.setJFrameCenter(this);

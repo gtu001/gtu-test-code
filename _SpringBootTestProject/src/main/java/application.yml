@@ -20,21 +20,6 @@ limits-service:
   maximum=9999  
   
   
----
-spring:
-  cloud:
-    config:
-      server:
-        native:
-          searchLocations=file://C:/Users/wistronits/Desktop/application.yml
-#        bootstrap: true
----
-spring:
-  profiles:
-#    active: native
-          
-
-
 
 ---
 #jpa
@@ -47,13 +32,13 @@ spring:
   h2.console.enabled: true
   datasource:
     platform: h2
-    url: jdbc:h2:file:C:\workstuff\workspace\gtu-test-code\_SpringBootTestProject\h2\testDB;DB_CLOSE_ON_EXIT=FALSE;AUTO_RECONNECT=TRUE;AUTO_SERVER=TRUE
+    url: jdbc:h2:file:D:\workstuff\gtu-test-code\_SpringBootTestProject\h2\testDB;DB_CLOSE_ON_EXIT=FALSE;AUTO_RECONNECT=TRUE;AUTO_SERVER=TRUE
     username: sa
     password:
     driverClassName: org.h2.Driver
     testWhileIdle: true
     validationQuery: SELECT 1
-  h2.jar.position: C:\my_tool\FastDBQueryUI/h2-1.4.197.jar
+  h2.jar.position: D:\my_tool\FastDBQueryUI/h2-1.4.197.jar
   h2.script: classpath:gtu/test/jpa/exchange_value_01.sql
 
 
@@ -69,10 +54,21 @@ github-test-producer:
   ribbon:
     listOfServers: https://my-json-server.typicode.com/gtu001/fake_json_server/
     
+XXXXXXXXXXXXXXXXXXXXXXX:
+  ribbon:
+    listOfServers: https://my-json-server.typicode.com/gtu001/fake_json_server/
+
+ 
 eureka:
+  instance:
+    hostname: localhost
   client:
-    fetchRegistry: false
-    register-with-eureka: false
+    #register-with-eureka: false
+    register-with-eureka: true
+    fetch-registry: false
+    #注册中心地址
+    service-url:
+      defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/
 
 
 

@@ -18,6 +18,8 @@ import javax.swing.JTextArea;
 
 import org.apache.commons.lang.StringUtils;
 
+import gtu.clipboard.ClipboardUtil;
+
 public class SimpleTextDlg {
     final JDialog dlg;
     final JLabel lbl;
@@ -67,6 +69,12 @@ public class SimpleTextDlg {
 
         S2T_And_T2S_EventHandler mS2T_And_T2S_EventHandler = new S2T_And_T2S_EventHandler(text);
         final JPopupMenuUtil jpopUtil = JPopupMenuUtil.newInstance(text)//
+                .addJMenuItem("複製", new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        ClipboardUtil.getInstance().setContents(text);
+                    }
+                })//
                 .addJMenuItem(mS2T_And_T2S_EventHandler.getMenuItem(true))//
                 .addJMenuItem(mS2T_And_T2S_EventHandler.getMenuItem(false))//
                 .addJMenuItem(mS2T_And_T2S_EventHandler.getMenuItem2(true))//

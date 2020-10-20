@@ -6,6 +6,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.cloud.netflix.ribbon.RibbonClient;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 //import org.springframework.cloud.config.server.EnableConfigServer;
 //import org.springframework.cloud.netflix.zuul.EnableZuulProxy;
@@ -23,12 +24,13 @@ import org.springframework.context.annotation.ComponentScan;
 @ComponentScan("gtu.test")
 // @EnableAdminServer
 // @EnableZuulProxy
-@SpringBootApplication
+//@SpringBootApplication
 // @EnableConfigServer
 @EnableFeignClients
-//@EnableFeignClients(basePackages = {"com.eprogrammerz.examples"})
+// @EnableFeignClients(basePackages = {"com.eprogrammerz.examples"})
 
 @EnableDiscoveryClient
+@RibbonClient(name = "someservice1")
 public class SpringTestApplication {
 
     public static void main(String[] args) {

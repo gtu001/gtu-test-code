@@ -16,6 +16,8 @@ import org.springframework.core.env.Environment;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
+import gtu.util.OsInfoUtil;
+
 @Component
 public class H2RunScriptAction {
 
@@ -46,6 +48,10 @@ public class H2RunScriptAction {
 
     public void runScript(File file) {
         try {
+            if (!new File(h2JarPosition).exists()) {
+                throw new Exception("檔案不存在: " + h2JarPosition);
+            }
+
             StringBuilder sb = new StringBuilder();
             sb.append(" java -cp ");//
             sb.append(h2JarPosition);//
@@ -55,16 +61,20 @@ public class H2RunScriptAction {
             appendSb(" -user ", h2Username, sb);
             appendSb(" -password ", h2Password, sb);
             sb.append(" -script ");//
-//            sb.append("\"" + file + "\"");//
-            sb.append(" " + file + " ");//
+            if (OsInfoUtil.isWindows()) {
+                sb.append("\"" + file + "\"");//
+            } else {
+                sb.append(" " + file + " ");//
+            }
+
             System.out.println("## RunScript : " + sb);
             Process proc = Runtime.getRuntime().exec(sb.toString());
 
             byte[] inputArry = this.processInputStreamAsync(proc, "input");
             byte[] errorArry = this.processInputStreamAsync(proc, "error");
 
-            String inputStr = new String(inputArry, "UTF8");
-            String errorStr = new String(errorArry, "UTF8");
+            String inputStr = new String(inputArry, "BIG5");
+            String errorStr = new String(errorArry, "BIG5");
 
             if (StringUtils.isNotBlank(errorStr)) {
                 throw new Exception(errorStr);

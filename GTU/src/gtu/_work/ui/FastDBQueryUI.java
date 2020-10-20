@@ -1046,7 +1046,7 @@ public class FastDBQueryUI extends JFrame {
                                             lst.add((String) parametersTable.getValueAt(row, col));
                                         }
                                     }
-                                    ClipboardUtil.getInstance().setContents(StringUtils.join(lst, "^"));
+                                    new SimpleTextDlg(StringUtils.join(lst, "^"), "", null).show();
                                 }
                             }).applyEvent(e)//
                             .show();
@@ -1202,26 +1202,26 @@ public class FastDBQueryUI extends JFrame {
                                 JCommonUtil._jOptionPane_showMessageDialog_error("找不到欄位!");
                             }
                         }
-                    }).addJMenuItem("複製全部(逗號)", new ActionListener() {
+                    }).addJMenuItem("顯示全部(逗號)", new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
                             JTableUtil tabUtil = JTableUtil.newInstance(queryResultTable);
                             List<Object> lst = tabUtil.getColumnTitleArray();
-                            ClipboardUtil.getInstance().setContents(StringUtils.join(lst, " , "));
+                            new SimpleTextDlg(StringUtils.join(lst, " , "), "", null).show();
                         }
-                    }).addJMenuItem("複製全部(多行)", new ActionListener() {
+                    }).addJMenuItem("顯示全部(逗號)全部(多行)", new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
                             JTableUtil tabUtil = JTableUtil.newInstance(queryResultTable);
                             List<Object> lst = tabUtil.getColumnTitleArray();
-                            ClipboardUtil.getInstance().setContents(StringUtils.join(lst, "\r\n"));
+                            new SimpleTextDlg(StringUtils.join(lst, "\r\n"), "", null).show();
                         }
-                    }).addJMenuItem("複製全部(多行逗號)", new ActionListener() {
+                    }).addJMenuItem("顯示全部(逗號)全部(多行逗號)", new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
                             JTableUtil tabUtil = JTableUtil.newInstance(queryResultTable);
                             List<Object> lst = tabUtil.getColumnTitleArray();
-                            ClipboardUtil.getInstance().setContents(StringUtils.join(lst, ",\r\n"));
+                            new SimpleTextDlg(StringUtils.join(lst, ",\r\n"), "", null).show();
                         }
                     }).addJMenuItem("Sql Column IN (...)", new ActionListener() {
                         @Override
@@ -3685,6 +3685,13 @@ public class FastDBQueryUI extends JFrame {
             if (JMouseEventUtil.buttonRightClick(1, e)) {
                 JPopupMenuUtil ppap = JPopupMenuUtil.newInstance(queryResultTable);
 
+                ppap.addJMenuItem("複製", new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        ClipboardUtil.getInstance().setContents(JTableUtil.newInstance(queryResultTable).getSelectedValue());
+                    }
+                });
+
                 ppap.addJMenuItem(new JMenuItem_BasicMenu().getItem());//
 
                 ppap.addJMenuItem("選擇此列", new ActionListener() {
@@ -3938,7 +3945,6 @@ public class FastDBQueryUI extends JFrame {
         try {
             final int[] selectColIdxArry = JTableUtil.newInstance(queryResultTable).getSelectedColumns(true);
             JMenuAppender chdMenu = JMenuAppender.newInstance("欄位Column複製");
-
             chdMenu.addMenuItem("複製欄位逗號隔開", new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -3952,7 +3958,7 @@ public class FastDBQueryUI extends JFrame {
                         String column = StringUtils.trimToEmpty(String.valueOf(colLst.get(selectColIdxArry[jj])));
                         strLst.add(alias + column);
                     }
-                    ClipboardUtil.getInstance().setContents(StringUtils.join(strLst, ", "));
+                    new SimpleTextDlg(StringUtils.join(strLst, ", "), "", null).show();
                 }
             });
             chdMenu.addMenuItem("複製欄位換行", new ActionListener() {
@@ -3964,7 +3970,25 @@ public class FastDBQueryUI extends JFrame {
                         String column = StringUtils.trimToEmpty(String.valueOf(colLst.get(selectColIdxArry[jj])));
                         strLst.add(column);
                     }
-                    ClipboardUtil.getInstance().setContents(StringUtils.join(strLst, "\r\n"));
+                    new SimpleTextDlg(StringUtils.join(strLst, "\r\n"), "", null).show();
+                }
+            });
+            chdMenu.addMenuItem("複製欄位setter", new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    String alias = StringUtils.trimToEmpty(JCommonUtil._jOptionPane_showInputDialog("請輸入vo", ""));
+                    if (StringUtils.isNotBlank(alias)) {
+                        alias = alias + ".";
+                    }
+                    List<Object> colLst = JTableUtil.newInstance(queryResultTable).getColumnTitleArray();
+                    List<String> strLst = new ArrayList<String>();
+                    for (int jj = 0; jj < selectColIdxArry.length; jj++) {
+                        String column = StringUtils.trimToEmpty(String.valueOf(colLst.get(selectColIdxArry[jj])));
+                        column = StringUtilForDb.dbFieldToJava_smartCheck(column);
+                        column = "set" + StringUtils.capitalize(column) + "(XXXXXXXXXX);";
+                        strLst.add(alias + column);
+                    }
+                    new SimpleTextDlg(StringUtils.join(strLst, "\r\n"), "", null).show();
                 }
             });
             ppap.addJMenuItem(chdMenu.getMenu());
@@ -4974,7 +4998,7 @@ public class FastDBQueryUI extends JFrame {
                 public void actionPerformed(ActionEvent e) {
                     String sql = getCurrentSQL();
                     String resultSql = getExportSqlToJavaCode(sql, false, true);
-                    ClipboardUtil.getInstance().setContents(resultSql);
+                    new SimpleTextDlg(resultSql, "", null).show();
                 }
             });//
             jpopUtil.addJMenuItem("以java code方式將sql匯出[繁]", new ActionListener() {
@@ -4982,7 +5006,7 @@ public class FastDBQueryUI extends JFrame {
                 public void actionPerformed(ActionEvent e) {
                     String sql = getCurrentSQL();
                     String resultSql = getExportSqlToJavaCode(sql, true, true);
-                    ClipboardUtil.getInstance().setContents(resultSql);
+                    new SimpleTextDlg(resultSql, "", null).show();
                 }
             });//
 
@@ -6709,7 +6733,7 @@ public class FastDBQueryUI extends JFrame {
             }
             String resultSql = StringUtils.join(lst, "','");
             resultSql = "'" + resultSql + "'";
-            ClipboardUtil.getInstance().setContents(resultSql);
+            new SimpleTextDlg(resultSql, "", null).show();
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
         }
