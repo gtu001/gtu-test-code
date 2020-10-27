@@ -9,11 +9,11 @@
                 <TR class=common>
                     <TD class="title5">#1#</TD>
                     <TD class="input5">
-                        <Input class="coolDatePicker" onClick="laydate({elem: '##2#'});"  dateFormat="short" name=#2# id="#2#"><span class="icon"><a onClick="laydate({elem: '##2#'});"><img src="../common/laydate/skins/default/icon.png" /></a></span>
+                        <Input class="coolDatePicker" onClick="laydate({elem: '##2#'});"  dateFormat="short" name=#2# id="#2#"><span class="icon"><a onClick="laydate({elem: '##2#'});"><img src="../common/laydate/skins/default/icon.png" verify="#1#~i18n|DATE" /></a></span>
                     </TD>
                     <TD class=title5>#3#</TD>
                     <TD class="input5">
-                        <Input class="coolDatePicker" onClick="laydate({elem: '##4#'});"  dateFormat="short" name=#4# id="#4#"><span class="icon"><a onClick="laydate({elem: '##4#'});"><img src="../common/laydate/skins/default/icon.png" /></a></span>
+                        <Input class="coolDatePicker" onClick="laydate({elem: '##4#'});"  dateFormat="short" name=#4# id="#4#"><span class="icon"><a onClick="laydate({elem: '##4#'});"><img src="../common/laydate/skins/default/icon.png" verify="#3#~i18n|DATE" /></a></span>
                     </TD>
                 </TR>
   tradeOff: ''
@@ -585,24 +585,6 @@
   tradeOff: '{"arry":[],"not_arry":[],"sourceFiles":[],"ftl":"arry","only_match":true}'
 - comboLst: [
     ]
-  configKeyText: XXXXX
-  exampleArea: |2-
-
-        select * from sssss ffff = :ddddd and ffff = :rrrr
-  fromVal: (?:\:(\w+))
-  multiLine: false
-  toVal: |2-
-
-    String ${arry[1]} = "";
-
-    ^split^
-
-    if(${arry[1]} != null) {
-        sbv.put("${arry[1]}", ${arry[1]});
-    }
-  tradeOff: '{"arry":[],"not_arry":[],"sourceFiles":[],"ftl":"arry","only_match":true,"split":"^split^"}'
-- comboLst: [
-    ]
   configKeyText: SQL_Generate
   exampleArea: select * from LCMidValueTrace where ContNo = :ContNo and PolNo = :PolNo
   fromVal: (?:\:(\w+))
@@ -621,37 +603,894 @@
   tradeOff: '{"arry":[],"not_arry":[],"sourceFiles":[],"ftl":"arry","only_match":true,"split":"^split^","splitFull":["1"]}'
 - comboLst: [
     ]
-  configKeyText: '333333'
-  exampleArea: |-
-    EDORCODE
-    EDORACCEPTNO
-    EDORNO
-    EDORAPPNO
-    GRPCONTNO
-    CONTNO
-    VPU
-    AMNT
-    AMNT
-    POLNO
-    MODIFYDATE
-    PAYENDDATE
-    PAYTODATE
-    CVALIDATE
-    IN_THINK_PERIOD
+  configKeyText: 日歷
+  exampleArea: 生效日期  startdate
+  fromVal: (.*?)\s+(.*)
+  multiLine: false
+  toVal: |2-
+                        <TD  class= title data-i18n=""> #1# </TD>
+                        <TD  class= input><!--<Input class="multiDatePicker" readonly name=#2# >-->
+                            <Input class="coolDatePicker" onClick="laydate({elem: '##2#'});" verify="#1#~i18n|DATE" dateFormat="short" name=#2# id="#2#"><span class="icon"><a onClick="laydate({elem: '##2#'});"><img src="../common/laydate/skins/default/icon.png" /></a></span>
+                        </TD>
+  tradeOff: ''
+- comboLst: [
+    ]
+  configKeyText: param_from_row
+  exampleArea: ''
   fromVal: \w+
   multiLine: false
   toVal: var ${arry[0]} = row[${index}];
   tradeOff: '{"arry":[],"not_arry":[],"splitFull":[],"sourceFiles":[],"ftl":"arry","only_match":true}'
 - comboLst: [
     ]
-  configKeyText: 日歷
-  exampleArea: 生效日期 cValiDate
-  fromVal: (.*?)\s+(.*)
+  configKeyText: sql_combo
+  exampleArea: ''
+  fromVal: (?:\:(\w+))
   multiLine: false
   toVal: |2-
-                        <TD  class= title data-i18n=""> #1# </TD>
-                        <TD  class= input><!--<Input class="multiDatePicker" readonly name=#2# >-->
-                            <Input class="coolDatePicker" onClick="laydate({elem: '##2#'});" verify="有效开始日期~xIDx155818928601478XidX|DATE" dateFormat="short" name=#2# id="#2#"><span class="icon"><a onClick="laydate({elem: '##2#'});"><img src="../common/laydate/skins/default/icon.png" /></a></span>
-                        </TD>
+
+    String ${arry[1]} = "";
+
+    ^split^
+
+    if(${arry[1]} != null) {
+        sbv.put("${arry[1]}", ${arry[1]});
+    }
+  tradeOff: '{"arry":[],"not_arry":[],"sourceFiles":[],"ftl":"arry","only_match":true,"split":"^split^"}'
+- comboLst: [
+    ]
+  configKeyText: 必填CodeTable
+  exampleArea: 契變項目 Code cttype
+  fromVal: (.+?)\s+(\w+)
+  multiLine: false
+  toVal: |2-
+        <TD class=title data-i18n="">#1#</TD>
+        <td class="input">
+            <input class="#2#" name="#2#" id="#2#" CodeData="0|^M|必选~xIDx155818932544363XidX^C|可选~xIDx155818932545332XidX" readonly
+                                 style="background:url(../common/images/select--bg_03.png) no-repeat right center"
+                                 onClick="return showCodeListEx('',[this,#2#Chs],[0,1]);"
+                                 ondblclick="return showCodeListEx('',[this,#2#Chs],[0,1]);"
+                                 onkeyup="return showCodeListKeyEx('',[this,#2#Chs],[0,1]);"><input
+                class="codename" name="#2#Chs" id="#2#Chs" elementtype="nacessary"
+                verify="#1#~i18n|NOTNULL"><font color="red">*</font></td>
+  tradeOff: ''
+- comboLst: [
+    ]
+  configKeyText: 取消註解
+  exampleArea: "<%--  <table>--%>\n<%--   <tr>--%>\n<%--      <td class=common>--%>\n<%--        <IMG src=\"../common/images/butExpand.gif\" style=\"cursor:hand\" onClick=\"showPage(this,divLoan1);\">--%>\n<%--      </td>--%>\n<%--      <td class= titleImg data-i18n=\"xIDx155818933755945XidX\">--%>\n<%--        贷款额度信息--%>\n<%--      </td>--%>\n<%--   </tr>--%>\n<%--   </table>--%>\n<%--   <Div  id= \"divLoan1\" class=maxbox1 style= \"display: ''\">--%>\n<%--  <table  class= common>--%>\n<%--       <TR>--%>\n<%--       \t  <TD class = title data-i18n=\"xIDx155818933756685XidX\">--%>\n<%--             贷款金额--%>\n<%--          </TD>--%>\n<%--          <TD class= input>--%>\n<%--            <Input class=\"multiCurrency wid\" name=\"MaxLoan\" id=\"MaxLoan\" onblur=\"checkMaxLoan( this, '贷款金额錯誤' )\" maxLength='10' verify=\"贷款金额~xIDx155818933756685XidX|notnull\">--%>\n<%--          </TD>--%>\n<%--          <TD class = title data-i18n=\"xIDx155818933687536XidX\">--%>\n<%--             贷款利率--%>\n<%--          </TD>--%>\n<%--          <TD class= input>--%>\n<%--            <Input class=\"multiCurrency wid\" name=\"LoanRate\" id=LoanRate readonly verify=\"贷款利率~xIDx155818933687536XidX|notnull&num&value>0\" moneyprec=\"0.0000\">--%>\n<%--          </TD>--%>\n<%--          <TD class = title data-i18n=\"xIDx155818928921432XidX\">--%>\n<%--             币种--%>\n<%--          </TD>--%>\n<%--          <TD class= input>--%>\n<%--            <Input class= \"readonly wid\" name=\"Currency\" id=Currency readonly>--%>\n<%--          </TD>--%>\n\n<%--       </TR>--%>\n<%--    </table>--%>\n<%--  </Div>--%>"
+  fromVal: \<\%\-\-(.*?)\-\-\%\>
+  multiLine: false
+  toVal: '#1#'
+  tradeOff: '{"arry":[],"not_arry":[],"splitFull":[],"sourceFiles":[],"only_match":true}'
+- comboLst: [
+    ]
+  configKeyText: 尋找schema---1
+  exampleArea: |-
+    package com.sinosoft.lis.get;
+
+    import java.math.BigDecimal;
+    import java.text.DateFormat;
+    import java.text.ParseException;
+    import java.text.SimpleDateFormat;
+    import java.util.Calendar;
+    import java.util.Date;
+    import java.util.GregorianCalendar;
+    import java.util.HashMap;
+    import java.util.LinkedHashMap;
+    import java.util.Map;
+    import java.util.regex.Matcher;
+    import java.util.regex.Pattern;
+
+    import org.apache.commons.lang.reflect.FieldUtils;
+    import org.apache.commons.lang3.reflect.MethodUtils;
+    import org.json.JSONObject;
+    import org.slf4j.Logger;
+    import org.slf4j.LoggerFactory;
+
+    import com.sinosoft.lis.db.LCAppntDB;
+    import com.sinosoft.lis.db.LCBnfDB;
+    import com.sinosoft.lis.db.LCContDB;
+    import com.sinosoft.lis.db.LCInsuredDB;
+    import com.sinosoft.lis.db.LCPolDB;
+    import com.sinosoft.lis.db.LDCashBankDB;
+    import com.sinosoft.lis.db.LDCodeDB;
+    import com.sinosoft.lis.db.LDComDB;
+    import com.sinosoft.lis.db.LDPersonDB;
+    import com.sinosoft.lis.db.LMDutyGetAliveDB;
+    import com.sinosoft.lis.db.LMRiskAppDB;
+    import com.sinosoft.lis.db.LOPRTManagerDB;
+    import com.sinosoft.lis.f1print.PrintManagerBL;
+    import com.sinosoft.lis.i18n.I18nMessage;
+    import com.sinosoft.lis.pubfun.Calculator;
+    import com.sinosoft.lis.pubfun.GlobalInput;
+    import com.sinosoft.lis.pubfun.MMapGroup;
+    import com.sinosoft.lis.pubfun.PubFun;
+    import com.sinosoft.lis.pubfun.PubFun1;
+    import com.sinosoft.lis.pubfun.PubSubmit;
+    import com.sinosoft.lis.schema.LCAppntSchema;
+    import com.sinosoft.lis.schema.LCBnfSchema;
+    import com.sinosoft.lis.schema.LCContSchema;
+    import com.sinosoft.lis.schema.LCGetSchema;
+    import com.sinosoft.lis.schema.LCInsuredSchema;
+    import com.sinosoft.lis.schema.LCPolSchema;
+    import com.sinosoft.lis.schema.LDCashBankSchema;
+    import com.sinosoft.lis.schema.LDComSchema;
+    import com.sinosoft.lis.schema.LDPersonSchema;
+    import com.sinosoft.lis.schema.LMDutyGetAliveSchema;
+    import com.sinosoft.lis.schema.LMRiskAppSchema;
+    import com.sinosoft.lis.schema.LOPRTManagerSchema;
+    import com.sinosoft.lis.schema.LPPaymentAppSchema;
+    import com.sinosoft.lis.vschema.LCBnfSet;
+    import com.sinosoft.lis.vschema.LDPersonSet;
+    import com.sinosoft.lis.vschema.LMCalFactorSet;
+    import com.sinosoft.lis.vschema.LOPRTManagerSet;
+    import com.sinosoft.utility.CError;
+    import com.sinosoft.utility.CErrors;
+    import com.sinosoft.utility.ExeSQL;
+    import com.sinosoft.utility.Reflections;
+    import com.sinosoft.utility.SQLwithBindVariables;
+    import com.sinosoft.utility.SSRS;
+    import com.sinosoft.utility.TransferData;
+    import com.sinosoft.utility.VData;
+
+    /**
+     * @program: lis
+     * @description：給付通知書提前挑儅處理類
+     * @需求單號：POSR-045–給付流程
+     * @author：zhaoyifan @version：1.0 @createDate：2020-7-1
+     */
+    public class PersonPayEarlyBL {
+        private static final Logger logger = LoggerFactory.getLogger(PersonPayEarlyBL.class);
+        /** 錯誤處理類，每個需要錯誤處理的類中都放置該類 */
+        public CErrors mErrors = new CErrors();
+
+        /** 往後面傳輸數據的容器 */
+        private VData mInputData = new VData();
+
+        /** 使用者登陸資訊 */
+        private GlobalInput mGlobalInput = new GlobalInput();
+        /** 業務處理相關變量 */
+        private LCGetSchema lcGetSchema = new LCGetSchema();
+        private LCBnfSchema lcBnfSchema = new LCBnfSchema();
+        private LCPolSchema lcPolSchema = new LCPolSchema();
+        private LCContSchema lcContSchema = new LCContSchema();
+        private LCInsuredSchema lcInsuredSchema = new LCInsuredSchema();
+        private LCAppntSchema lcAppntSchema = new LCAppntSchema();
+        private String actualGetDate = "";
+        private String getMoney = "0";
+        private String batchNo = "";
+        private String exeDate = "";
+        private String gettype1 = "";
+        private MMapGroup mMap = new MMapGroup();
+
+        public PersonPayEarlyBL() {
+        }
+
+        /**
+         * 傳輸數據的公共方法
+         *
+         * @param: cInputData
+         *             輸入的數據
+         * @param: cOperate
+         *             數據操作符
+         * @return: boolean
+         */
+        public boolean submitData(VData cInputData, String cOperate) {
+            logger.debug("==> Begin to PersonPayPlanBL");
+
+            // 得到外部传入的数据,将数据备份到本类中
+            if (!getInputData(cInputData)) {
+                return false;
+            }
+
+            logger.debug("==> End InputData");
+
+            // 进行业务处理,提交催付数据
+            if (!dealData()) {
+                CError.buildErr(this, new I18nMessage("数据处理失败PersonPayPlanBL-->dealData!", "xIDx155879966172321XidX"));
+                return false;
+            }
+
+            mMap.showMMapInfo();
+            mInputData.add(this.mMap.toMMap());
+
+            PubSubmit tPubSubmit = new PubSubmit();
+            if (!tPubSubmit.submitData(mInputData)) {
+                CError.buildErr(this, new I18nMessage(tPubSubmit.mErrors.getFirstError(), null));
+                return false;
+            }
+            return true;
+        }
+
+        /**
+         * 計算給付金額
+         *
+         * @return Boolean
+         */
+        Boolean executeMoney() {
+            // select * from lmdutygetalive a; select * from lmcalmode a where
+            // a.calcode='230304';
+            LMDutyGetAliveDB lmDutyGetAliveDB = new LMDutyGetAliveDB();
+            lmDutyGetAliveDB.setGetDutyCode(lcGetSchema.getGetDutyCode());
+            lmDutyGetAliveDB.setGetDutyKind(lcGetSchema.getGetDutyKind());
+            if (!getInfo(lmDutyGetAliveDB)) {
+                CError.buildErr(this, new I18nMessage("无生存给付描述数据", "xIDx155879953945166XidX"));
+                return false;
+            }
+            LMDutyGetAliveSchema lmDutyGetAliveSchema = lmDutyGetAliveDB.getSchema();
+            String calCode = lmDutyGetAliveSchema.getCalCode();// 因为现在还没有上面那些情况，就先从calCode字段取值
+            Calculator calculator = new Calculator();
+            calculator.setCalCode(calCode);
+            calculator.addBasicFactor("Amnt", String.valueOf(lcPolSchema.getAmnt()));
+            calculator.addBasicFactor("LYADAmnt", String.valueOf(lcPolSchema.getAmnt()));
+            calculator.addBasicFactor("Prem", String.valueOf(lcPolSchema.getPrem()));
+            calculator.addBasicFactor("AppAge", String.valueOf(PubFun.calInterval(lcInsuredSchema.getBirthday(), lcPolSchema.getCValiDate(), "Y")));
+            calculator.addBasicFactor("sex", lcInsuredSchema.getSex());
+            int interval = PubFun.calInterval(lcPolSchema.getCValiDate(), PubFun.getCurrentDate(), "Y") + 1;
+            calculator.addBasicFactor("Interval", interval + "");
+            String resultStr = calculator.calculate();
+            getCalculatorReplaceSQL(calculator);
+            if (resultStr == null || "".equals(resultStr)) {
+                logger.error("保單險種(LCPol.PolNo):" + lcPolSchema.getPolNo() + "保費費用計算錯誤(calcode:" + calCode + ")");
+                return false;
+            }
+            Double result = Double.valueOf(resultStr);
+            BigDecimal resultMoney = PubFun1.calByCurrency(lcGetSchema.getCurrency(), new BigDecimal(result + ""));
+            getMoney = resultMoney + "";
+            return true;
+        }
+
+        /**
+         * 資料操作業務處理
+         *
+         * @return: boolean
+         */
+        public boolean dealData() {
+
+            // 准备计算需要的数据
+            if (!prepareGetData()) {
+                return false;
+            }
+
+            // 实际给付日期确定
+            if (!getDealDate()) {
+                return false;
+            }
+
+            // 计算实际给付金额
+            if (!executeMoney()) {
+                return false;
+            }
+
+            // 生成提前給付通知书数据
+            if (!initNotice()) {
+                return false;
+            }
+
+            return true;
+
+        }
+
+        /**
+         * 準備提交後臺的數據
+         *
+         * @return: boolean
+         */
+        private boolean getInputData(VData cInputData) {
+            // 全局变量
+            mGlobalInput.setSchema((GlobalInput) cInputData.getObjectByObjectName("GlobalInput", 0));
+            lcGetSchema.setSchema((LCGetSchema) cInputData.getObjectByObjectName("LCGetSchema", 0));
+            TransferData mTransferData = (TransferData) cInputData.getObjectByObjectName("TransferData", 0);
+            exeDate = (String) mTransferData.getValueByName("exeDate");
+            Map batchNoMap = (Map) mTransferData.getValueByName("batchNoMap");
+            batchNo = (String) batchNoMap.get("PaymentBatchNo1");
+            gettype1 = (String) batchNoMap.get("type");
+            return true;
+        }
+
+        /**
+         * 準備計算要用的數據
+         *
+         * @return
+         */
+        private boolean prepareGetData() {
+
+            // 险种信息
+            LCPolDB lcPolDB = new LCPolDB();
+            lcPolDB.setPolNo(lcGetSchema.getPolNo());
+            if (!getInfo(lcPolDB)) {
+                CError.buildErr(this, new I18nMessage("险种信息查询失败！", "xIDx155879960087490XidX"));
+                return false;
+            }
+            lcPolSchema = lcPolDB.getSchema();
+
+            // 被保险人信息
+            LCInsuredDB tLCInsuredDB = new LCInsuredDB();
+            tLCInsuredDB.setContNo(lcPolSchema.getContNo());
+            tLCInsuredDB.setInsuredNo(lcPolSchema.getInsuredNo());
+            if (!getInfo(tLCInsuredDB)) {
+                CError.buildErr(this, new I18nMessage("被保人信息查询失败！", ""));
+                return false;
+            }
+            lcInsuredSchema = tLCInsuredDB.getSchema();
+
+            // 受益人信息
+            LCBnfDB lcBnfDB = new LCBnfDB();
+            lcBnfDB.setContNo(lcGetSchema.getContNo());
+            // 如果是生存金 查询生存金受益人
+            if (gettype1.equals("2")) {
+                lcBnfDB.setBnfType("0");
+                LCBnfSet lcBnfSet = lcBnfDB.query();
+                if (lcBnfSet == null || lcBnfSet.size() == 0 || lcBnfSet.get(1) == null) {
+                    CError.buildErr(this, new I18nMessage("受益人信息查询失败！", ""));
+                    return false;
+                }
+                lcBnfSchema = lcBnfSet.get(1);
+            }
+            // 如果是健康管理回馈金 查询主被保险人
+            if (gettype1.equals("7")) {
+                lcBnfSchema.setName(lcInsuredSchema.getName());
+            }
+
+            // 获取投保人信息
+            LCAppntDB lcAppntDB = new LCAppntDB();
+            lcAppntDB.setContNo(lcGetSchema.getContNo());
+            if (!getInfo(lcAppntDB)) {
+                CError.buildErr(this, new I18nMessage("要保人信息查询失败！", ""));
+                return false;
+            }
+            lcAppntSchema = lcAppntDB.getSchema();
+
+            // 查询保单信息
+            LCContDB lcContDB = new LCContDB();
+            lcContDB.setContNo(lcPolSchema.getContNo());
+            if (!getInfo(lcContDB)) {
+                CError.buildErr(this, new I18nMessage("保单信息查询失败！", ""));
+                return false;
+            }
+            lcContSchema = lcContDB.getSchema();
+
+            return true;
+        }
+
+        /**
+         * 存储批次数据
+         *
+         * @param batchNoMap
+         * @param globalInput
+         * @return boolean
+         */
+        public boolean saveBatch(Map batchNoMap, GlobalInput globalInput) {
+            String PaymentBatchNo1 = (String) batchNoMap.get("PaymentBatchNo1");
+            String mExeDate = (String) batchNoMap.get("mExeDate");
+            LOPRTManagerDB loprtManagerDB = new LOPRTManagerDB();
+            loprtManagerDB.setStandbyFlag1(PaymentBatchNo1);
+            LOPRTManagerSet loprtManagerSet = loprtManagerDB.query();
+            if (loprtManagerSet != null && loprtManagerSet.size() > 0) {
+                LPPaymentAppSchema lpPaymentAppSchema = new LPPaymentAppSchema();
+                lpPaymentAppSchema.setBatchNo(PaymentBatchNo1);
+                lpPaymentAppSchema.setKind("1");
+                lpPaymentAppSchema.setType("4");// 1季报 2年报 3保价通知谁 4生满通知书
+                lpPaymentAppSchema.setStatus("1");// status 1待处理 2处理中 3待复核 4复核同意
+                lpPaymentAppSchema.setTotal(loprtManagerSet.size());
+                lpPaymentAppSchema.setManageCom(globalInput.ManageCom);// 机构代码
+                lpPaymentAppSchema.setMakeDate(mExeDate);
+                lpPaymentAppSchema.setMakeTime(PubFun.getCurrentTime());
+                lpPaymentAppSchema.setModifyDate(mExeDate);
+                lpPaymentAppSchema.setModifyTime(PubFun.getCurrentTime());
+                this.mMap.put(lpPaymentAppSchema, "INSERT");
+            }
+            mInputData.add(this.mMap);
+            PubSubmit tPubSubmit = new PubSubmit();
+            if (!tPubSubmit.submitData(mInputData)) {
+                CError.buildErr(this, new I18nMessage(tPubSubmit.mErrors.getFirstError(), null));
+                return false;
+            }
+            return true;
+        }
+
+        /**
+         * 計算實際給付日期
+         *
+         * @return
+         */
+        public Boolean getDealDate() {
+            try {
+                DateFormat f = new SimpleDateFormat("yyyy-MM-dd");
+                Date exeDate = null;
+                Calendar calendar = new GregorianCalendar();
+                // 确定实际给付日期
+                exeDate = f.parse(lcGetSchema.getGettoDate());
+                ExeSQL tExeSQL = new ExeSQL();
+                SQLwithBindVariables sqlDateType = new SQLwithBindVariables();
+                sqlDateType.sql("select DATETYPE from LDWorkCalendar where CALDATE=?calDate?");
+                sqlDateType.put("calDate", f.format(exeDate));
+                String dateType = tExeSQL.getOneValue(sqlDateType);
+                if (dateType == null) {
+                    logger.error("PersonPayEarlyBL.getDealDate()，未查詢到該保單的給付時間在工作日曆表中的數據  保單號碼：" + lcGetSchema.getContNo());
+                    return false;
+                }
+                while (dateType != null && "N".equals(dateType)) {// 循环结束时，就是工作日
+                    calendar.setTime(exeDate);
+                    calendar.add(calendar.DATE, -1);// 把日期往前移动一天
+                    exeDate = calendar.getTime();// 获取日期往前移动一天的结果
+                    sqlDateType.put("calDate", f.format(exeDate));
+                    dateType = tExeSQL.getOneValue(sqlDateType);
+                    if (dateType == null) {
+                        logger.error("PersonPayEarlyBL.getDealDate()，未查詢到該保單的給付時間在工作日曆表中的數據  保單號碼：" + lcGetSchema.getContNo());
+                        return false;
+                    }
+                }
+                actualGetDate = f.format(exeDate);
+                logger.info("最终确定给付日期为" + actualGetDate);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return false;
+            }
+            return true;
+        }
+
+        /**
+         * 生成通知書數據
+         *
+         * @return
+         */
+        public Boolean initNotice() {
+
+            // 用户信息
+            LDPersonDB ldPersonDB = new LDPersonDB();
+            ldPersonDB.setIDType(lcAppntSchema.getIDType());
+            ldPersonDB.setIDNo(lcAppntSchema.getIDNo());
+            LDPersonSet ldPersonSet = ldPersonDB.query();
+            if (ldPersonSet == null || ldPersonSet.size() <= 0) {
+                CError.buildErr(this, new I18nMessage("要保人用户信息获取失败!", ""));
+                return false;
+            }
+            LDPersonSchema ldPersonSchema = ldPersonSet.get(1);
+
+            // 投保人地址信息
+            ExeSQL exeSQL = new ExeSQL();
+            String address = "";
+            String zipCode = "00000";
+            String addressSql = "SELECT " + "HOMEADDRESS,COMPANYADDRESS,zipcode, " + "( SELECT placename FROM ldaddress WHERE placetype = '01' AND placecode = b.HomeProvince ) as province, "
+                    + "( SELECT placename FROM ldaddress WHERE placetype = '02' AND placecode = b.HomeCity ) as city, "
+                    + "( SELECT placename FROM ldaddress WHERE placetype = '03' AND placecode = b.HomeCounty )  as country " + "FROM " + "LCAddress b " + "WHERE " + "b.CustomerNo = '"
+                    + ldPersonSchema.getCustomerNo() + "' " + "AND b.addressno = ( SELECT addressno FROM lcappnt WHERE 1 = 1 AND contno = '" + lcGetSchema.getContNo() + "' )";
+            SQLwithBindVariables sqlAddress = new SQLwithBindVariables();
+            sqlAddress.sql(addressSql);
+            /*
+             * sqlAddress.put("CustomerNo", ldPersonSchema.getCustomerNo());
+             * sqlAddress.put("contNo", lcGetSchema.getContNo());
+             */
+            SSRS ssrs = exeSQL.execSQL(addressSql);
+            if (ssrs.MaxRow < 1 && ldPersonSet.size() > 1) {
+                ldPersonSchema = ldPersonSet.get(2);
+                addressSql = "SELECT " + "HOMEADDRESS,COMPANYADDRESS,zipcode, " + "( SELECT placename FROM ldaddress WHERE placetype = '01' AND placecode = b.HomeProvince ) as province, "
+                        + "( SELECT placename FROM ldaddress WHERE placetype = '02' AND placecode = b.HomeCity ) as city, "
+                        + "( SELECT placename FROM ldaddress WHERE placetype = '03' AND placecode = b.HomeCounty )  as country " + "FROM " + "LCAddress b " + "WHERE " + "b.CustomerNo = '"
+                        + ldPersonSchema.getCustomerNo() + "' " + "AND b.addressno = ( SELECT addressno FROM lcappnt WHERE 1 = 1 AND contno = '" + lcGetSchema.getContNo() + "' )";
+                sqlAddress.sql(addressSql);
+                /*
+                 * sqlAddress.put("CustomerNo", ldPersonSchema.getCustomerNo());
+                 * sqlAddress.put("contNo", lcGetSchema.getContNo());
+                 */
+                ssrs = exeSQL.execSQL(addressSql);
+            }
+            if (ssrs.MaxRow > 0) {
+                String homeAddress = ssrs.GetText(1, 1) == null ? "" : ssrs.GetText(1, 1);
+                String detailAddress = ssrs.GetText(1, 2) == null ? "" : ssrs.GetText(1, 2);
+                zipCode = ssrs.GetText(1, 3) == null ? "" : ssrs.GetText(1, 3);
+                String province = ssrs.GetText(1, 4) == null ? "" : ssrs.GetText(1, 4);
+                String city = ssrs.GetText(1, 5) == null ? "" : ssrs.GetText(1, 5);
+                String country = ssrs.GetText(1, 6) == null ? "" : ssrs.GetText(1, 6);
+                address = province + city + country + homeAddress + detailAddress;
+            }
+
+            // 险种名称
+            LDCodeDB ldCodeDB = new LDCodeDB();
+            ldCodeDB.setCode(lcPolSchema.getRiskCode());
+            ldCodeDB.setCodeType("riskcode");
+            LMRiskAppDB lmRiskAppDB = new LMRiskAppDB();
+            lmRiskAppDB.setRiskCode(lcPolSchema.getRiskCode());
+            String riskName1 = "";
+            String OIUType = "N";
+            if (getInfo(lmRiskAppDB)) {
+                LMRiskAppSchema lmRiskAppSchema = lmRiskAppDB.getSchema();
+                if (lmRiskAppSchema != null && lmRiskAppSchema.getRiskName() != null) {
+                    riskName1 = lmRiskAppSchema.getRiskName();
+                    if (lmRiskAppSchema.getOIUFlag() != null) {
+                        OIUType = lmRiskAppSchema.getOIUFlag();
+                    }
+                }
+            }
+
+            // 公司信息
+            LDComDB ldComDB = new LDComDB();
+            ldComDB.setComCode(mGlobalInput.ManageCom);
+            LDComSchema ldComSchema = new LDComSchema();
+            if (getInfo(ldComDB)) {
+                ldComSchema = ldComDB.getSchema();
+            }
+
+            // 服务人员信息
+            String agentName = "";
+            try {
+                String agentSql = "select (select name from LAAGENT where agentcode=a.agentCode) as agentName from LACOMMISIONDETAIL a where a.grpcontno=?contNo? order by a.busirate desc";
+                SQLwithBindVariables sqlAgent = new SQLwithBindVariables();
+                sqlAgent.sql(agentSql);
+                sqlAgent.put("contNo", lcGetSchema.getContNo());
+                ExeSQL exeSQL1 = new ExeSQL();
+                SSRS ssrs1 = exeSQL1.execSQL(sqlAgent);
+                if (ssrs1.MaxRow > 0) {
+                    agentName = ssrs1.GetText(1, 1);
+                    if (ssrs1.MaxRow > 1) {
+                        agentName = agentName + "/" + ssrs1.GetText(2, 1);
+                    }
+                }
+            } catch (Exception e) {
+                logger.info("查询服务人员失败");
+                e.printStackTrace();
+            }
+            String payDate = actualGetDate;
+            payDate = payDate.replace("-", "年");
+            payDate = payDate.replace("-", "月");
+            payDate = payDate + "日";
+
+            // 月份信息
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM");
+            Calendar c = Calendar.getInstance();
+            Date date = null;
+            try {
+                date = sdf.parse(actualGetDate);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            c.setTime(date);
+            c.add(Calendar.MONTH, -2);
+            Date m = c.getTime();
+            System.out.println(sdf.format(m));
+            String month = sdf.format(m).substring(5, 7);// 月份
+
+            String payPrem = "0";// 已垫缴保费
+            String loanMoney = "0";// 已借保单借款
+            String money1 = "0";// 应垫缴保费利息
+            String money2 = "0";// 应垫缴保费
+            String money3 = "0";// 偿还保单借款利息
+            String money4 = "0";// 偿还保单借款
+
+            String fatcaFlag = "";
+            Map printMap = new HashMap();
+            printMap.put("postCode", zipCode);// 邮寄编码
+            printMap.put("postAddress", address);// 邮寄地址
+            printMap.put("receiver", lcAppntSchema.getAppntName());// 收件人是要保人
+            printMap.put("payDate", payDate);
+            printMap.put("riskName", riskName1);
+            printMap.put("sPayMoney", getMoney);
+            printMap.put("contNo", lcGetSchema.getContNo());
+            printMap.put("payPrem", payPrem);
+            printMap.put("insuredName", lcInsuredSchema.getName());
+            printMap.put("loanMoney", loanMoney);
+            printMap.put("bnfName", lcBnfSchema.getName());
+            printMap.put("aPayMoney", getMoney);
+            printMap.put("money1", money1);
+            printMap.put("money2", money2);
+            printMap.put("money3", money3);
+            printMap.put("money4", money4);
+            printMap.put("comName", ldComSchema.getName());
+            printMap.put("operator", agentName);
+            printMap.put("comPhone", ldComSchema.getPhone());
+            printMap.put("nBnfName", lcBnfSchema.getName());
+
+            printMap.put("nPostOffice", "");
+
+            LDCashBankDB ldCashBankDB = new LDCashBankDB();
+            // 如果是生存金，从受益人账户里面拿值
+            if ("2".equals(gettype1)) {
+                ldCashBankDB.setBankCode(lcBnfSchema.getBankCode());
+                if (lcBnfSchema.getBankCode() != null && !"".equals(lcBnfSchema.getBankCode())) {
+                    ldCashBankDB.setBankCode(lcBnfSchema.getBankCode());
+                    printMap.put("nAccountNo", lcBnfSchema.getBankAccNo());
+                } else if (lcBnfSchema.getInsuranceBankCode() != null && !"".equals(lcBnfSchema.getInsuranceBankCode())) {
+                    ldCashBankDB.setBankCode(lcBnfSchema.getInsuranceBankCode());
+                    printMap.put("nAccountNo", lcBnfSchema.getAccount());
+                }
+            }
+            // 如果是健康管理回馈金，拿lcget中的字段
+            if ("7".equals(gettype1)) {
+                ldCashBankDB.setBankCode(lcGetSchema.getGetBankCode());
+                printMap.put("nAccountNo", lcGetSchema.getGetBankAccNo());
+            }
+            if (ldCashBankDB.getBankCode() != null && !"".equals(ldCashBankDB.getBankCode())) {
+                if (getInfo(ldCashBankDB)) {
+                    LDCashBankSchema ldCashBankSchema = ldCashBankDB.getSchema();
+                    if (ldCashBankSchema != null) {
+                        printMap.put("nPostOffice", ldCashBankSchema.getBankName());
+                    }
+                }
+            }
+
+            printMap.put("month", month);
+            printMap.put("OIUType", OIUType);
+            String makeDate = exeDate.replaceAll("-", "/");
+            printMap.put("makeDate", makeDate);
+            printMap.put("fatcaFlag", fatcaFlag);
+            JSONObject jsonObject = new JSONObject(printMap);
+            String stringMap = jsonObject.toString();
+
+            LOPRTManagerSchema loprtManagerSchema = new LOPRTManagerSchema();
+            String tLimit = PubFun.getNoLimit(lcGetSchema.getManageCom());
+            String prtSeqNo = PubFun1.CreateMaxNo("PRTSEQNO", tLimit);
+            loprtManagerSchema.setPrtSeq(prtSeqNo);
+            loprtManagerSchema.setOtherNo(lcGetSchema.getContNo());
+            loprtManagerSchema.setOtherNoType(PrintManagerBL.ONT_INDPOL);// 00:个单合同号,01:集体合同号
+            loprtManagerSchema.setCode(PrintManagerBL.CODE_PEdorAutoPayAG); // 个险催付通知书
+            loprtManagerSchema.setManageCom(lcGetSchema.getManageCom());
+            loprtManagerSchema.setAgentCode(lcContSchema.getAgentCode());
+            loprtManagerSchema.setReqCom(mGlobalInput.ManageCom);
+            loprtManagerSchema.setReqOperator(lcGetSchema.getOperator());
+            loprtManagerSchema.setPrtType(PrintManagerBL.PT_FRONT);
+            loprtManagerSchema.setStateFlag("0");
+            loprtManagerSchema.setMakeDate(exeDate);
+            loprtManagerSchema.setMakeTime(PubFun.getCurrentTime());
+            loprtManagerSchema.setOldPrtSeq(prtSeqNo);
+            loprtManagerSchema.setPatchFlag("0");
+            loprtManagerSchema.setRemark(stringMap);
+            loprtManagerSchema.setStandbyFlag6(lcGetSchema.getGettoDate());
+            loprtManagerSchema.setStandbyFlag1(batchNo);
+            this.mMap.put(loprtManagerSchema, "INSERT");
+
+            return true;
+        }
+
+        private void displayObject(Object a) {
+            Reflections aReflections = new Reflections();
+            aReflections.printFields(a);
+        }
+
+        public static void main(String[] args) {
+            String a = "0000064681";
+            String b = "0000006086";
+            ExeSQL exeSQL = new ExeSQL();
+            String address = "";
+            String zipCode = "00000";
+            String addressSql = "SELECT " + "HOMEADDRESS,COMPANYADDRESS,zipcode, " + "( SELECT placename FROM ldaddress WHERE placetype = '01' AND placecode = b.HomeProvince ) as province, "
+                    + "( SELECT placename FROM ldaddress WHERE placetype = '02' AND placecode = b.HomeCity ) as city, "
+                    + "( SELECT placename FROM ldaddress WHERE placetype = '03' AND placecode = b.HomeCounty )  as country " + "FROM " + "LCAddress b " + "WHERE " + "b.CustomerNo = '" + a + "' "
+                    + "AND b.addressno = ( SELECT addressno FROM lcappnt WHERE 1 = 1 AND contno = '" + b + "' )";
+            SQLwithBindVariables sqlAddress = new SQLwithBindVariables();
+            sqlAddress.sql(addressSql);
+            /*
+             * sqlAddress.put("CustomerNo", ldPersonSchema.getCustomerNo());
+             * sqlAddress.put("contNo", lcGetSchema.getContNo());
+             */
+            SSRS ssrs = exeSQL.execSQL(addressSql);
+
+            if (ssrs.MaxRow > 0) {
+                String homeAddress = ssrs.GetText(1, 1) == null ? "" : ssrs.GetText(1, 1);
+                String detailAddress = ssrs.GetText(1, 2) == null ? "" : ssrs.GetText(1, 2);
+                zipCode = ssrs.GetText(1, 3) == null ? "" : ssrs.GetText(1, 3);
+                String province = ssrs.GetText(1, 4) == null ? "" : ssrs.GetText(1, 4);
+                String city = ssrs.GetText(1, 5) == null ? "" : ssrs.GetText(1, 5);
+                String country = ssrs.GetText(1, 6) == null ? "" : ssrs.GetText(1, 6);
+                address = province + city + country + homeAddress + detailAddress;
+            }
+            System.out.println(zipCode);
+            System.out.println(address);
+            /*
+             * String agentName = "" ; String agentSql =
+             * "select (select name from LAAGENT where agentcode=a.agentCode) as agentName from LACOMMISIONDETAIL a where a.grpcontno=?contNo? order by a.busirate desc"
+             * ; SQLwithBindVariables sqlAgent = new SQLwithBindVariables();
+             * sqlAgent.sql(agentSql); sqlAgent.put("contNo", "0000006086"); ExeSQL
+             * exeSQL = new ExeSQL(); SSRS ssrs = exeSQL.execSQL(sqlAgent);
+             * if(ssrs.MaxRow>0){ agentName = ssrs.GetText(1,1); if(ssrs.MaxRow>1){
+             * agentName = agentName + ssrs.GetText(2,1); } }
+             * System.out.println(agentName);
+             */
+            /*
+             * FDate tFDate = new FDate(); GregorianCalendar bCalendar = new
+             * GregorianCalendar(); GregorianCalendar cCalendar = new
+             * GregorianCalendar(); bCalendar.setTime(tFDate.getDate("2020-06-30"));
+             * // 计算起始日期 cCalendar.setTime(tFDate.getDate("2019-12-31")); // 参考日期
+             * int mDays = bCalendar.get(Calendar.DATE); int cDays =
+             * cCalendar.get(Calendar.DATE); bCalendar.add(Calendar.MONTH, 12); //
+             * 增加时间间隔 if (mDays != cDays){ // mDays < cDays int LastDay =
+             * bCalendar.getActualMaximum(Calendar.DAY_OF_MONTH);
+             * bCalendar.set(bCalendar.get(Calendar.YEAR),
+             * bCalendar.get(Calendar.MONTH), (cDays < LastDay) ? cDays : LastDay);
+             * } Date rGetToDate = bCalendar.getTime(); logger.debug("==> 新的领至日期为："
+             * + tFDate.getString(rGetToDate));
+             */
+        }
+
+        public static boolean getInfo(Object schema) {
+            try {
+                Boolean result = (Boolean) MethodUtils.invokeMethod(schema, "getInfo");
+                if (result) {
+                    return true;
+                } else {
+                    Object set = MethodUtils.invokeMethod(schema, "query");
+                    Integer result2 = (Integer) MethodUtils.invokeMethod(set, "size");
+                    if (result2 > 0) {
+                        return true;
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return false;
+        }
+
+        public static String getCalculatorReplaceSQL(Calculator calculator) {
+            String replaceSQL = "";
+            String orignSql = "";
+            try {
+                String calCode = (String) FieldUtils.readDeclaredField(calculator, "CalCode", true);
+
+                StringBuffer tSBSql = new StringBuffer();
+                tSBSql.append("select CALSQL  from lmcalmode t  where  t.CALCODE = '?CALCODE?' ");
+                SQLwithBindVariables tSBV = new SQLwithBindVariables();
+                tSBV.sql(tSBSql.toString());
+                tSBV.put("CALCODE", calCode);
+                ExeSQL tExeSQL = new ExeSQL();
+                SSRS tResult = tExeSQL.execSQL(tSBV);
+                for (int i = 0; i < tResult.getMaxRow(); i++) {
+                    orignSql = tResult.GetText(i + 1, 1);
+                }
+
+                Map<String, String> map = new LinkedHashMap<String, String>();
+                LMCalFactorSet set = (LMCalFactorSet) FieldUtils.readDeclaredField(calculator, "mCalFactors1", true);
+                for (int ii = 1; ii <= set.size(); ii++) {
+                    map.put(set.get(ii).getFactorCode(), set.get(ii).getFactorDefault());
+                }
+                String sql = orignSql;
+                StringBuffer sb = new StringBuffer();
+                Pattern ptn = Pattern.compile("\\?(\\w+)\\?");
+                Matcher mth = ptn.matcher(sql);
+                while (mth.find()) {
+                    String key = mth.group(1);
+                    String value = "#####" + key + "#####";
+                    if (map.containsKey(key)) {
+                        value = map.get(key);
+                    }
+                    mth.appendReplacement(sb, value);
+                }
+                mth.appendTail(sb);
+                replaceSQL = sb.toString();
+            } catch (Exception e) {
+                e.printStackTrace();
+                replaceSQL = e.getMessage();
+            } finally {
+                logger.debug("#[1]Calculator = " + orignSql);
+                logger.debug("#[2]Calculator = " + replaceSQL);
+            }
+            return replaceSQL;
+        }
+    }
+  fromVal: (\w+)(?:Schema|Set|DB)
+  multiLine: false
+  toVal: '#1#'
+  tradeOff: '{"arry":[],"not_arry":[],"splitFull":[],"sourceFiles":[],"only_match":true}'
+- comboLst: [
+    ]
+  configKeyText: 一般CodeTable
+  exampleArea: 通知書寄送方式  sendnoticetype  sendnoticetype
+  fromVal: (.+?)\s+(\w+)\s+(\w+)
+  multiLine: false
+  toVal: |2-
+        <TD class=title data-i18n="">#1#</TD>
+        <td class="input">
+            <Input style="background:url(../common/images/select--bg_03.png) no-repeat right center" class=codeno
+               name=#2# id="#2#"
+               onclick="return showCodeList('#3#',[this,#2#Name],[0,1],null,[3],['risktype3'],1,'200');"
+               ondblclick="return showCodeList('#3#',[this,#2#Name],[0,1],null,[3],['risktype3'],1,'200');"
+               onkeyup="return showCodeListKey('#3#',[this,#2#Name],[0,1],null,[3],['risktype3'],1,'500');">
+            <input class=codename name=#2#Name id="#2#Name" readonly=true>
+        </td>
+  tradeOff: ''
+- comboLst: [
+    ]
+  configKeyText: 下拉_免加codetable
+  exampleArea: aaaaaaa
+  fromVal: (\w+)
+  multiLine: false
+  toVal: |2-
+            <TD class=input5><Input style="background:url(../common/images/select--bg_03.png) no-repeat right center" class=codeno name=#1# id=#1#
+                CodeData="0|^1|身份證明~XXXXXXX^2|戶籍騰本~XXXXXXX^3|其他~XXXXXXX"
+                ondblClick="showCodeListEx('#1#',[this,#1#Name],[0,1]);"
+                onMouseDown="showCodeListEx('#1#',[this,#1#Name],[0,1]);"
+                onkeyup="showCodeListKeyEx('#1#',[this,#1#Name],[0,1]);"><Input
+                class=codename name=#1#Name id=#1#Name readonly=true></TD>
+  tradeOff: ''
+- comboLst: [
+    ]
+  configKeyText: DB_Query
+  exampleArea: LCSurvivalCertificate
+  fromVal: (\w+)
+  multiLine: false
+  toVal: |2-
+
+        private #1#Schema findByPk(#1#Schema schema) {
+            #1#DB t#1#DB = new #1#DB();
+
+            t#1#DB.setserialNo(t#1#Schema.getserialNo());// 复核节点
+            t#1#DB.setpolNo(t#1#Schema.getpolNo());// 复核节点
+
+            if (t#1#DB.getInfo() != false) {
+                return t#1#DB.getSchema();
+            }
+            return null;
+        }
+
+        private #1#Schema findByPk2(#1#Schema schema) {
+            #1#DB t#1#DB = new #1#DB();
+
+            t#1#DB.setserialNo(t#1#Schema.getserialNo());// 复核节点
+            t#1#DB.setpolNo(t#1#Schema.getpolNo());// 复核节点
+
+            #1#Set t#1#Set = t#1#DB.query();
+            logger.debug("# size = " + t#1#Set.size());
+
+            if (t#1#Set.size() != 0) {
+                return t#1#Set.get(1);
+            }
+            return null;
+        }
+
+        private #1#Schema findByPk3(#1#Schema schema) {
+            #1#DB t#1#DB = new #1#DB();
+            String sql = "select * from #1# where  serialNo = '?serialNo?' and  polNo = '?polNo?'";
+            SQLwithBindVariables sqlbv = new SQLwithBindVariables();
+            sqlbv.sql(sql);
+            sqlbv.put("serialNo", schema.getSerialNo());
+            sqlbv.put("polNo", schema.getPolNo());
+
+            #1#Set t#1#Set = t#1#DB.executeQuery(sqlbv);
+            logger.debug("# size = " + t#1#Set.size());
+            if (t#1#Set.size() != 0) {
+                return t#1#Set.get(1);
+            }
+            return null;
+        }
+
+        private #1#Schema findByPk4(String serialNo, String polNo) {
+            #1#DB t#1#DB = new #1#DB();
+            #1#Set t#1#Set = t#1#DB.executeQuery("select * from #1# where  serialNo = '" + serialNo + "'  and  polNo = '" + polNo + "' ");
+            logger.debug("# size = " + t#1#Set.size());
+            if (t#1#Set.size() != 0) {
+                return t#1#Set.get(1);
+            }
+            return null;
+        }
+
+        private void queryCustom001() {
+            StringBuffer tSBSql = new StringBuffer();
+            tSBSql.append("select polno, mainpolno from #1# where contno='?CONTNO?' and appflag='1'");
+            SQLwithBindVariables tSBV = new SQLwithBindVariables();
+            tSBV.sql(tSBSql.toString());
+            tSBV.put("CONTNO", tContNo);
+            ExeSQL tExeSQL = new ExeSQL();
+            SSRS tResult = tExeSQL.execSQL(tSBV);
+            for (int i = 0; i < tResult.getMaxRow(); i++) {
+                String PolNo = tResult.GetText(i + 1, 1);
+                String MainPolNo = tResult.GetText(i + 1, 2);
+            }
+        }
+
+        private LPPolSchema findByPk3_transform(#1#Schema schema) {
+            #1#DB t#1#DB = new #1#DB();
+            String sql = "select * from #1# where  serialNo = '?serialNo?' and  polNo = '?polNo?'";
+            SQLwithBindVariables sqlbv = new SQLwithBindVariables();
+            sqlbv.sql(sql);
+            sqlbv.put("serialNo", schema.getSerialNo());
+            sqlbv.put("polNo", schema.getPolNo());
+            #1#Set t#1#Set = t#1#DB.executeQuery(sqlbv);
+            if (t#1#Set.size() != 0) {
+                #1#Schema schema = t#1#Set.get(1);
+                LPPolSchema lp = new LPPolSchema();
+                new Reflections().transFields(lp, schema);
+                return lp;
+            }
+            return null;
+        }
   tradeOff: ''
 ...

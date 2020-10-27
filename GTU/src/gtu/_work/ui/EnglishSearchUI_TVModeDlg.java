@@ -114,6 +114,13 @@ public class EnglishSearchUI_TVModeDlg extends JDialog {
             textArea.setLineWrap(true);
             textArea.setFocusable(false);
             textArea.setEditable(false);
+            textArea.addFocusListener(new FocusAdapter() {
+                @Override
+                public void focusLost(FocusEvent e) {
+                    System.out.println("-----------------------lost focus : " + "textArea");
+                    EnglishSearchUI_TVModeDlg.this.dispose();
+                }
+            });
             contentPanel.add(JCommonUtil.createScrollComponent(textArea), BorderLayout.CENTER);
         }
         {
@@ -166,6 +173,7 @@ public class EnglishSearchUI_TVModeDlg extends JDialog {
             addFocusListener(new FocusAdapter() {
                 @Override
                 public void focusLost(FocusEvent e) {
+                    System.out.println("-----------------------lost focus : " + "dlg");
                     EnglishSearchUI_TVModeDlg.this.dispose();
                 }
             });
