@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: caffeine_cache_001
+
+server:
+  port: ${port:8090}
+  compression:
+    enabled: true
+

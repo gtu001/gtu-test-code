@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: rest_test_001
+
+server:
+  port: ${port:9000}
+  compression:
+    enabled: true
+
