@@ -16,7 +16,9 @@ focused {
 
 	<script type="text/javascript">
 		window.onload=function(){
-			alert(dateFromYMD(2020, 1, 5) );
+			var date = getDate(2020, 10, 28);
+			var date2 = dateAdd(date, -2);
+			alert(dateToYMD(date2));
 		};
 
 		//----------------------------------------------------------------------------------------
@@ -61,6 +63,19 @@ focused {
 			String("0000" + month).slice(-2) + "-" +
 			String("0000" + day).slice(-2);
 			return resultStr;
+		}
+
+		function getDate(yyyy, mm, dd) {
+			yyyy = parseInt(yyyy, 10);
+			mm = parseInt(mm, 10) - 1;
+			dd = parseInt(dd, 10);
+			var d = new Date(yyyy, mm, dd);
+			return d;
+		}
+
+		function dateAdd(date, day) {
+			date.setDate(date.getDate() + day);
+			return date;
 		}
 
 
