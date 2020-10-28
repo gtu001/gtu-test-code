@@ -376,7 +376,6 @@ public class FastDBQueryUI extends JFrame {
     private JButton recordWatcherToggleBtn;
     private JCheckBox rowFilterTextKeepMatchChk;
     private JButton resetQueryBtn;
-    private JDlgHolderBringToFrontHandler mJDlgHolderBringToFrontHandler;
     private XlsColumnDefDlg mXlsColumnDefDlg;
     private JTextField columnXlsDefColumnQryText;
     private JTextField columnXlsDefOtherQryText;
@@ -2092,9 +2091,6 @@ public class FastDBQueryUI extends JFrame {
         queryResultTable.addFocusListener(new FocusAdapter() {
             @Override
             public void focusGained(FocusEvent e) {
-                if (mJDlgHolderBringToFrontHandler != null) {
-                    mJDlgHolderBringToFrontHandler.bringToFront();
-                }
             }
         });
 
@@ -2104,7 +2100,6 @@ public class FastDBQueryUI extends JFrame {
             sqlIdConfigBeanHandler = new SqlIdConfigBeanHandler();
             sqlIdListDSMappingHandler = new SqlIdListDSMappingHandler();
             mSqlIdExecuteTypeHandler = new SqlIdExecuteTypeHandler();
-            mJDlgHolderBringToFrontHandler = new JDlgHolderBringToFrontHandler();
 
             // 初始化datasource
             this.initDataSourceProperties(null);
@@ -3636,10 +3631,8 @@ public class FastDBQueryUI extends JFrame {
                     fastDBQueryUI_CrudDlgUI = FastDBQueryUI_CrudDlgUI.newInstance(rowMapLst, getRandom_TableNSchema(), allRows, new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
-                            mJDlgHolderBringToFrontHandler.remove((JDialog) e.getSource());
                         }
                     }, FastDBQueryUI.this);
-                    mJDlgHolderBringToFrontHandler.add(fastDBQueryUI_CrudDlgUI);
                 }
 
                 void openXLS_COMPARE() throws SQLException, Exception {
@@ -3660,10 +3653,8 @@ public class FastDBQueryUI extends JFrame {
                     fastDBQueryUI_RowCompareDlg = FastDBQueryUI_RowCompareDlg.newInstance(shemaTable, selectRowIndex, excelImportLst, new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
-                            mJDlgHolderBringToFrontHandler.remove((JDialog) e.getSource());
                         }
                     }, FastDBQueryUI.this);
-                    mJDlgHolderBringToFrontHandler.add(fastDBQueryUI_RowCompareDlg);
                 }
 
                 void start() throws Exception {
@@ -6881,10 +6872,8 @@ public class FastDBQueryUI extends JFrame {
                         }, new ActionListener() {
                             @Override
                             public void actionPerformed(ActionEvent e) {
-                                mJDlgHolderBringToFrontHandler.remove((JDialog) e.getSource());
                             }
                         });
-                        mJDlgHolderBringToFrontHandler.add(mFastDBQueryUI_RowDiffWatcherDlg);
                     }
                 }
                 if (!allOk) {
@@ -7019,37 +7008,6 @@ public class FastDBQueryUI extends JFrame {
             }
         }
     };
-
-    private class JDlgHolderBringToFrontHandler {
-        LRUMap map = new LRUMap(10);
-
-        public void add(JDialog dlg) {
-            map.put(dlg.getClass(), dlg);
-        }
-
-        public void remove(JDialog dlg) {
-            map.remove(dlg.getClass());
-        }
-
-        public void bringToFront() {
-            for (;;) {
-                if (map.isEmpty()) {
-                    break;
-                }
-                final JDialog dlg = (JDialog) map.get(map.firstKey());
-                if (!dlg.isVisible()) {
-                    map.remove(map.firstKey());
-                    continue;
-                }
-                EventQueue.invokeLater(new Runnable() {
-                    public void run() {
-                        JCommonUtil.setFrameAtop(dlg, false);
-                    }
-                });
-                break;
-            }
-        }
-    }
 
     // 設定預設欄位定義
     // 格式為 /*中文解釋 */
@@ -7465,10 +7423,8 @@ public class FastDBQueryUI extends JFrame {
             }, new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    mJDlgHolderBringToFrontHandler.remove((JDialog) e.getSource());
                 }
             }));
-            mJDlgHolderBringToFrontHandler.add(mFastDBQueryUI_RowDiffWatcherDlg);
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
         }
