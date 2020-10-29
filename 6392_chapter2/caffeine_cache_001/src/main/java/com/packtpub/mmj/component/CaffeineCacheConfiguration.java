@@ -12,7 +12,7 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 @Configuration
 public class CaffeineCacheConfiguration {
 
-    @Bean
+    @Bean(name="cacheManager")
     public CacheManager cacheManager() {
         CaffeineCacheManager cacheManager = new CaffeineCacheManager("customer");//
         cacheManager.setCaffeine(caffeineCacheBuilder());//

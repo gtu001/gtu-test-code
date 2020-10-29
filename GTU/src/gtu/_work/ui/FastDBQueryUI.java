@@ -76,6 +76,7 @@ import javax.swing.event.MenuKeyEvent;
 import javax.swing.event.MenuKeyListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
 import javax.swing.text.JTextComponent;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -3952,22 +3953,22 @@ public class FastDBQueryUI extends JFrame {
                     new SimpleTextDlg(StringUtils.join(strLst, ", "), "", null).show();
                 }
             });
-            chdMenu.addMenuItem("複製欄位換行", new ActionListener() {
+            chdMenu.addMenuItem("複製欄位逗號隔開 java", new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     List<Object> colLst = JTableUtil.newInstance(queryResultTable).getColumnTitleArray();
                     List<String> strLst = new ArrayList<String>();
                     for (int jj = 0; jj < selectColIdxArry.length; jj++) {
                         String column = StringUtils.trimToEmpty(String.valueOf(colLst.get(selectColIdxArry[jj])));
-                        strLst.add(column);
+                        strLst.add(StringUtilForDb.dbFieldToJava_smartCheck(column));
                     }
-                    new SimpleTextDlg(StringUtils.join(strLst, "\r\n"), "", null).show();
+                    new SimpleTextDlg(StringUtils.join(strLst, ", "), "", null).show();
                 }
             });
-            chdMenu.addMenuItem("複製欄位setter", new ActionListener() {
+            chdMenu.addMenuItem("複製欄位換行", new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    String alias = StringUtils.trimToEmpty(JCommonUtil._jOptionPane_showInputDialog("請輸入vo", ""));
+                    String alias = StringUtils.trimToEmpty(JCommonUtil._jOptionPane_showInputDialog("請輸入alias", ""));
                     if (StringUtils.isNotBlank(alias)) {
                         alias = alias + ".";
                     }
@@ -3975,9 +3976,72 @@ public class FastDBQueryUI extends JFrame {
                     List<String> strLst = new ArrayList<String>();
                     for (int jj = 0; jj < selectColIdxArry.length; jj++) {
                         String column = StringUtils.trimToEmpty(String.valueOf(colLst.get(selectColIdxArry[jj])));
-                        column = StringUtilForDb.dbFieldToJava_smartCheck(column);
-                        column = "set" + StringUtils.capitalize(column) + "(XXXXXXXXXX);";
                         strLst.add(alias + column);
+                    }
+                    new SimpleTextDlg(StringUtils.join(strLst, "\r\n"), "", null).show();
+                }
+            });
+            chdMenu.addMenuItem("複製欄位換行 java", new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    List<Object> colLst = JTableUtil.newInstance(queryResultTable).getColumnTitleArray();
+                    List<String> strLst = new ArrayList<String>();
+                    for (int jj = 0; jj < selectColIdxArry.length; jj++) {
+                        String column = StringUtils.trimToEmpty(String.valueOf(colLst.get(selectColIdxArry[jj])));
+                        strLst.add(StringUtilForDb.dbFieldToJava_smartCheck(column));
+                    }
+                    new SimpleTextDlg(StringUtils.join(strLst, "\r\n"), "", null).show();
+                }
+            });
+            chdMenu.addMenuItem("複製欄位setter", new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    List<Object> colLst = JTableUtil.newInstance(queryResultTable).getColumnTitleArray();
+                    List<String> strLst = new ArrayList<String>();
+                    for (int jj = 0; jj < selectColIdxArry.length; jj++) {
+                        String column = StringUtils.trimToEmpty(String.valueOf(colLst.get(selectColIdxArry[jj])));
+                        column = StringUtilForDb.dbFieldToJava_smartCheck(column);
+                        column = "set" + StringUtils.capitalize(column) + "( XXXXXXXXXX );";
+                        strLst.add("vo." + column);
+                    }
+                    new SimpleTextDlg(StringUtils.join(strLst, "\r\n"), "", null).show();
+                }
+            });
+            chdMenu.addMenuItem("複製欄位setter copy", new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    List<Object> colLst = JTableUtil.newInstance(queryResultTable).getColumnTitleArray();
+                    List<String> strLst = new ArrayList<String>();
+                    for (int jj = 0; jj < selectColIdxArry.length; jj++) {
+                        String column = StringUtils.trimToEmpty(String.valueOf(colLst.get(selectColIdxArry[jj])));
+                        column = StringUtilForDb.dbFieldToJava_smartCheck(column);
+                        String resultStr = "vo.set" + StringUtils.capitalize(column) + "(" + "vo2.get" + StringUtils.capitalize(column) + "()" + ");";
+                        strLst.add(resultStr);
+                    }
+                    new SimpleTextDlg(StringUtils.join(strLst, "\r\n"), "", null).show();
+                }
+            });
+            chdMenu.addMenuItem("複製欄位setter 設值", new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    JTableUtil util = JTableUtil.newInstance(queryResultTable);
+                    List<String> strLst = new ArrayList<String>();
+                    int rowIdx = queryResultTable.getSelectedRow();
+                    TableColumnModel titleModel = queryResultTable.getTableHeader().getColumnModel();
+                    for (int ii = 0; ii < titleModel.getColumnCount(); ii++) {
+                        if (!ArrayUtils.contains(selectColIdxArry, ii)) {
+                            continue;
+                        }
+                        TableColumn col = titleModel.getColumn(ii);
+                        String column = String.valueOf(col.getHeaderValue());
+                        if (QUERY_RESULT_COLUMN_NO.equals(column)) {
+                            continue;
+                        }
+                        column = StringUtils.trimToEmpty(column);
+                        column = StringUtilForDb.dbFieldToJava_smartCheck(column);
+                        Object value = util.getValueAt(false, JTableUtil.getRealRowPos(rowIdx, queryResultTable), ii);
+                        String resultStr = "vo.set" + StringUtils.capitalize(column) + "(\"" + value + "\");";
+                        strLst.add(resultStr);
                     }
                     new SimpleTextDlg(StringUtils.join(strLst, "\r\n"), "", null).show();
                 }
