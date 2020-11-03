@@ -31,7 +31,7 @@ public class CaffeineCacheController {
     /**
      * http://localhost:8090/caffeine/getCustomer/123
      */
-    @RequestMapping("/getCustomer/{customerId}")
+    @RequestMapping(value = "/getCustomer/{customerId}")
     public String getCustomer(@PathVariable(value = "customerId") String customerId) {
         Long customId = Long.parseLong(customerId);
         Customer customer = customerService.getCustomer(customId);
