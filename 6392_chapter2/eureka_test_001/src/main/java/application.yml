@@ -1,6 +1,6 @@
 spring:
   application:
-    name: rest_test_001
+    name: mima-cloud-eureka
 
 
 server:
@@ -10,9 +10,15 @@ server:
     
  
 #eureka server   
-eureka:
-  instance:
+eureka:   #此处设置会改变eureka控制台的显示
+  datacenter: cloud #此处设置会改变eureka控制台的显示
+  environment: prod
+  dashboard: #控制台路径
+    path: /dashboard  #http://localhost:8761/dashboard   #是否启用控制台
+    enabled: true
+  instance:  #实例主机名
     hostname: localhost
+    leaseRenewalIntervalInSeconds : 30
   client:
     registerWithEureka: false
     fetchRegistry: false
@@ -21,3 +27,11 @@ eureka:
   server:
     waitTimeInMsWhenSyncEmpty: 0
     enableSelfPreservation: false
+    renewalPercentThreshold : 5
+    
+    
+
+security:
+  basic:
+    enabled: false    #关闭安全验证
+    
