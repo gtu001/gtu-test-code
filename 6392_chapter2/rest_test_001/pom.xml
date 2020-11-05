@@ -29,6 +29,13 @@
 			<artifactId>lib_test_001</artifactId>
 		</dependency>
 
+		<!-- 使用 test case ↓↓↓↓↓↓ -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+		</dependency>
+		<!-- 使用 test case 寫法 ↑↑↑↑↑↑ -->
+
 		<!-- 使用 eureka server 寫法 ↓↓↓↓↓↓ -->
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
@@ -61,12 +68,6 @@
 		</dependency>
 		<!-- 使用jetty 寫法 ↑↑↑↑↑↑ -->
 
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>3.8.1</version>
-			<scope>test</scope>
-		</dependency>
 	</dependencies>
 
 </project>

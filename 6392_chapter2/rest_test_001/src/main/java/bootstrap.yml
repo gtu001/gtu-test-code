@@ -1,0 +1,4 @@
+spring:
+  cloud:
+    config:
+      enabled: false #關掉 config server追蹤
