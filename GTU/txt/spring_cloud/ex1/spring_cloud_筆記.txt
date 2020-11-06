@@ -1,0 +1,384 @@
+﻿https://www.youtube.com/watch?v=aO3W-lYnw-o
+
+
+
+
+eureka-client  <-- for Service Discovery
+zipkin  sleuth <-- for  tracing log
+ribbon  <-- for API Gateway (load balance)
+zuul <-- for API Getway proxy type
+
+
+
+
+GreetingApp
+-----------------------------------
+
+@ConfigurationProperties()
+public class GreetingProperties{
+  String greeting;
+  Map<String,String> greetings;
+}
+對應 application.yml
+server : 
+  port : 9000
+greeting : Hello
+greetings :
+  EN : Hello
+  ES : Hola
+  DE : Hallo
+--->後面改成load線上檔案
+  app/spring-cloud-config/greeting.yml
+---> 設定改為
+spring:
+  application:
+    name: greeting
+---> 看設定 http://localhost:8888/greeting/default
+
+
+NameApp
+-----------------------------------
+@RestController
+public class NameController {
+  NameProperties nameProperties;
+  
+  public NameController(NameProperties nameProperties) { this.nameProperties = nameProperties;}
+  
+  @RequestMapping
+  public String getName(){
+    return nameProperties.getName();
+  }
+}
+
+對應 application.yml
+server.port : 7070
+name :Ryan
+--->後面改成load線上檔案
+  app/spring-cloud-config/name.yml
+---> 設定改為
+spring:
+  application:
+    name: name
+    
+    
+
+
+WebApp
+-----------------------------------
+@SpringBootApplication
+@EnableDiscoveryClient
+@EnableZuulProxy
+public class WebApplication {
+  public static void main(String[] args){SpringApplication.run(WebApplication.class, args);}
+  @Configuration
+  static class MyConfig {
+    @Bean
+    @LoadBalanced
+    public RestTemplate rest() { return new RestTemplateBuilder().build();}
+    
+    SamplerBean...here
+  }
+}
+對應 application.yml
+--->後面改成load線上檔案
+  app/spring-cloud-config/web.yml
+---> 設定改為
+spring:
+  application:
+    name: web
+
+
+@RestController
+public class WebController {
+  NameService nameService;
+  GreetingService greetingService;
+  
+  public WebController(NameServcie nameService, GreetingService greetingService){
+    this.xx = xx..etc;
+  }
+  
+  public String index(HttpServletRequest request){
+  String locale = RequestContextUtils.getLocaleResolver(request).resolveLocale(request).toLanguageTag();
+    String greeting = new StringBuilder().append(greetingService.getGreeting(lacale)).append(" ").append(nameService.getName()).toString();
+    Log.info("Greeting : " + greeting);
+    Log.info("Locale : " + locale);
+    return greeting; 
+  }
+}
+
+@Service
+public class GreetingService {
+  String URL = "http://localhost:9090";
+    --> 後面改成 "http://greeting";
+  RestTemplate rest;
+  public GreetingService(RestTemplate trest){this.rest = rest;}
+  public String getGreeting(){return rest.getForObject(URL, String.class);}
+}
+
+@Service
+@EnableFeignClients
+@EnableZuulProxy
+public class NameService {
+  //RestTemplate rest; -->說可以用 Feign 取代
+  //public NameService(RestTemplate trest){this.rest = rest;}
+  //public String getName(){return rest.getForObject(URL, String.class);}
+  -->換成下面這組
+  
+  NameFeignClient nameFeignClient;
+  public NameService(NameFeignClient nameFeignClient){this.nameFeignClient = nameFeignClient;}
+  public String getName(){ return nameFeignClient.getName();}
+  
+  
+  
+  @FeignClient("name")
+  static interface NameFeignClient {
+    @RequestMapping("/")
+    public String getName();
+  }
+} 
+
+
+
+app/config/configserver.yml
+可定義設定黨於git
+
+
+
+測試
+-------
+原本的
+--------------------------------------------------------------------------
+public class NameServiceTest {
+  @Test
+  public void getNameTest() throws Exception {
+    RestTemplate rest = mock(RestTemplate.class);
+    doReturn("Ryan").when(rest).getForObject("http://localhost:7070"), eq(String.class));
+    NameService nameServvice = new NameService(rest);
+    String name = nameService.getName();
+    assertEquals(name, "Ryan");
+  }
+  
+  --------------
+  public void getNameTest() throws Exception {
+    NameService.NameFeignClient nameFeignClient = mock(NameService.NameFeignClient.class);
+    doReturn("Ryan").when(nameFeignClient).getName();
+    NameService nameServvice = new NameService(nameFeignClient);
+    String name = nameService.getName();
+    assertEquals(name, "Ryan");
+  }
+}
+
+@RunWith(SpringRunner.class)
+@SpringBootTest(webEnvirmonent = SpringBootTest.WebEnvironment.RANDOM_PORT, properties={"spring.cloud.config.enabled:false})
+@AutoConfigureStubRunner(ids = {"com.example:name:+:stubs:0", "com.example:greeting:+:stubs:0"}, workOffLine = true}
+@DirtiesContext
+public class WebApplicationTests {
+  @Autowired
+  TestRestTemplate rest;
+  @MockBean
+  RestTemplate restTemplate;
+  @MockBean -->新加
+  NameService.NameFeignClient nameFeignClient;
+  
+  @Before
+  public void setup(){
+  //原本
+    doReturn("Ryan").when(restTemplate).getForObject(eq("http://localhost:7070"), eq(String.class));
+    -->改成˙ 
+    doReturn("Ryan").when(nameFeignClient).getName();
+    
+    doReturn("Hello").when(restTemplate).getForObject(eq("http://localhost:9090/en"), eq(String.class));
+    網址要改成 http://greeting/en
+  }
+  @Test
+  public void contextLoads(){
+    HttpHeaders headers = new HttpHeaders();
+    headers.add("Accept-Language", "en");
+    HttpEntity<String> entity = new HttpEntity<>("parameters", headers);
+    ResponseEntity<String> greeting = rest.exchange("/", HttpMethod.GET, entity, String.class);
+    assertEquals("Hello Ryan", greeting.getBody());
+  }
+}
+
+public class GreetingServiceTest {
+  GreetingService greetingService;
+  @Before
+  public void setup(){
+    RestTemplate rest = mock(RestTemplate.class);
+    doReturn("Hello").when(rest).getForObject(eq("http://greeting"), eq(String.class));
+    doReturn("Hello").when(rest).getForObject(eq("http://greeting/en"), eq(String.class));
+    doReturn("Hola").when(rest).getForObject(eq("http://greeting/es"), eq(String.class));
+    greetingService = new GreetingService(rest);
+  }
+  @After
+  public void teardown(){greetingService = null;}
+  @Test
+  public void getGreeting() throws Exception {
+    assertEquals("Hello", greetingService.getGreeting());
+  }
+  Test
+  public void getGreeting() throws Exception {
+    assertEquals("Hello", greetingService.getGreeting("en"));
+    assertEquals("Hola", greetingService.getGreeting("es"));
+  }
+}
+
+
+@RunWith(SpringRunner.class)
+@SpringBootTest(webEnvirenment = SpringBootTest.WebEnvirenment.RANDOM_PORT, properties = {"spring.cloud.config.enabled:false"})
+@TestPropertySource(locations = {"classpath:test.properties"})
+public class GreetingApplicationTests {
+	@Autowired
+	TestRestTemplate rest;
+	@Test
+	public void contextLoads(){
+    String deGreeting = this.rest.getForObject("/de", String.class);
+    String enGreeting = this.rest.getForObject("/en", String.class);
+    String esGreeting = this.rest.getForObject("/es", String.class);
+    String desfultGreeting = this.rest.getForObject("/", String.class);
+    assertEquals("Hallo", deGreeting);
+	}
+}
+
+public class GreetingBase {
+  @Before
+  public void setup(){
+    GreetingProperties greetingProperties = new GreetingProperties();
+    greetingProperties.setGreeting("Hello");
+    Map<String,String> greetings = new HashMap<String,String>();
+    greetings.put("EN", "Hello");
+    greetings.put("ES", "Hola");
+    greetings.put("DE", "Hallo");
+    greetingProperteis.setGreetings(greetings);
+    RestAssuredMockMvc.standaloneSetup(new GreetingController(greetingProperties));
+  }   
+}
+
+greeting/src/test/resources/contracts.greeting/shoudReturnDefault.groovy
+內容
+Contract.make {
+  request {
+    method  'GET'
+    url  '/'
+    headers{
+    }
+  }
+  response {
+    status 200
+    body("Hello")
+    headers {
+      contentType(textPlain())
+    }
+  }
+}
+
+
+
+
+<dependencyManagement>
+  <dependencies>
+    <dependency>
+      <groupId>org.springframework.cloud
+      <artifactId>spring-cloud-dependencies
+      <version>${spring-cloud.version}
+      <type>pom
+      <scope>import
+      
+<properties>
+  <spring-cloud.version>Edgware.RELEASE
+
+dependency
+ GroupId
+  org.springframework.cloud
+ ArtifactId
+  spring-cloud-starter-netflix-eureka-client
+  spring-cloud-starter-zipkin  V V V
+  spring-cloud-starter-sleuth  V V V
+  spring-cloud-config-client   V V V
+  spring-cloud-starter-netflix-eureka-client  <-- for Service Discovery  V V V -->@EnableDiscoveryClient Ps: register to eureka
+  spring-cloud-starter-netflix-ribbon <--webApp
+  spring-cloud-starter-feign <--webApp
+  spring-cloud-starter-netflix-zuul <--webApp  <-- API Gateway
+ 
+ GroupId
+   org.springframework.book
+ ArtifactId
+   spring-boot-starter-web  V V 
+ 
+ 
+ 
+
+
+
+一共有三個AppMain -> base boot
+GreetingApp   
+NameApp
+WebApp
+
+
+
+
+每個都加
+@EnableDiscoveryClient -> auto register to eureka
+AppMain
+
+@Bean --> for sleuth zipkin , tracing log
+public Sampler getSampler(){
+  return new AlwaysSampler();
+} 
+
+application.yml
+-------------------
+spring:
+  application:
+    name: greeting --> 讓 server 去找 設定 greeting.yml
+    
+
+$ spring cloud eureka configserver zipkin 
+
+
+
+
+
+
+Eureka : http://localhost:8761
+-----------------------------------
+--> Instances currently registered with Eureka
+底下應該有兩個 
+  cCONFIGSERVER , ZIPKIN, 
+    (後續開啟 GREETING, NAME)
+  
+    看設定 http://localhost:8888/gretting/default
+    
+    
+Zipkin : http://localhost:9411/zipkin
+-----------------------------------
+    
+    
+
+
+
+GreetingApp
+  <Configserver> 
+  會有log  -> Fetching config from server at : http://localhost:8888
+              Located evironment : name=greeting, profiles={}
+
+
+NameApp 
+  <Eureka>
+  會有log -> Registering application name with eureka with status UP
+  
+  
+  
+測試是否正常
+localhost:8080/greeting
+localhost:8080/greeting/de
+localhost:8080/greeting/es
+localhost:8080/name
+
+
+
+
+
+55:56
+https://www.youtube.com/watch?v=aO3W-lYnw-o

@@ -1,6 +1,6 @@
 spring:
   application:
-    name: mima-cloud-eureka
+    name: eureka-test-001
 
 
 server:
@@ -18,7 +18,7 @@ eureka:   #此处设置会改变eureka控制台的显示
     enabled: true
   instance:  #实例主机名
     hostname: localhost
-    leaseRenewalIntervalInSeconds : 30
+    leaseRenewalIntervalInSeconds : 3
   client:
     registerWithEureka: false
     fetchRegistry: false

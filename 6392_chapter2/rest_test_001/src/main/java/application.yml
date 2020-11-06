@@ -1,6 +1,6 @@
 spring:
   application:
-    name: rest_test_001
+    name: rest-test-001
 
 
 server:

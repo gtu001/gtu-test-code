@@ -5,11 +5,12 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<modelVersion>4.0.0</modelVersion>
 
+<!-- 
 	<parent>
 		<groupId>com.packtpub.mmj</groupId>
 		<artifactId>6392_chapter2</artifactId>
 		<version>1.0-SNAPSHOT</version>
-	</parent>
+	</parent> -->
 
 	<groupId>com.packtpub.mmj</groupId>
 	<artifactId>lib_test_001</artifactId>
@@ -22,6 +23,13 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.0.3.RELEASE</version>
+		<relativePath />
+	</parent>
+
 	<dependencies>
 
 		<dependency>
@@ -29,7 +37,7 @@
 			<artifactId>lombok</artifactId>
 			<optional>true</optional>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-devtools</artifactId>
