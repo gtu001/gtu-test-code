@@ -50,6 +50,7 @@ import gtu.swing.util.JFrameUtil;
 import gtu.swing.util.SwingActionUtil;
 import gtu.swing.util.SwingActionUtil.Action;
 import gtu.swing.util.SwingActionUtil.ActionAdapter;
+import com.jgoodies.forms.layout.FormSpecs;
 
 public class DMMVRPlayerHotKeyUI extends JFrame {
 
@@ -112,7 +113,7 @@ public class DMMVRPlayerHotKeyUI extends JFrame {
         swingUtil = SwingActionUtil.newInstance(this);
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setBounds(100, 100, 450, 300);
+        setBounds(100, 100, 450, 333);
         contentPane = new JPanel();
         contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
         contentPane.setLayout(new BorderLayout(0, 0));
@@ -124,9 +125,10 @@ public class DMMVRPlayerHotKeyUI extends JFrame {
 
         JPanel panel = new JPanel();
         tabbedPane.addTab("New tab", null, panel, null);
-        panel.setLayout(new FormLayout(new ColumnSpec[] { FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow"), },
-                new RowSpec[] { FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
-                        FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, }));
+        panel.setLayout(new FormLayout(new ColumnSpec[] { FormSpecs.RELATED_GAP_COLSPEC, FormSpecs.DEFAULT_COLSPEC, FormSpecs.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow"), },
+                new RowSpec[] { FormSpecs.RELATED_GAP_ROWSPEC, FormSpecs.DEFAULT_ROWSPEC, FormSpecs.RELATED_GAP_ROWSPEC, FormSpecs.DEFAULT_ROWSPEC, FormSpecs.RELATED_GAP_ROWSPEC,
+                        FormSpecs.DEFAULT_ROWSPEC, FormSpecs.RELATED_GAP_ROWSPEC, FormSpecs.DEFAULT_ROWSPEC, FormSpecs.RELATED_GAP_ROWSPEC, FormSpecs.DEFAULT_ROWSPEC, FormSpecs.RELATED_GAP_ROWSPEC,
+                        FormSpecs.DEFAULT_ROWSPEC, }));
 
         lblNewLabel = new JLabel("<<(ctl+left)");
         panel.add(lblNewLabel, "2, 2");
@@ -218,6 +220,24 @@ public class DMMVRPlayerHotKeyUI extends JFrame {
         panel_4.add(playText);
         panel_4.add(playBtn);
 
+        lblContinuec = new JLabel("continue(c)");
+        panel.add(lblContinuec, "2, 12");
+
+        panel_8 = new JPanel();
+        panel.add(panel_8, "4, 12, fill, fill");
+
+        continueText = new JTextField();
+        continueText.setColumns(10);
+        panel_8.add(continueText);
+
+        continueBtn = new JButton("set");
+        continueBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                swingUtil.invokeAction("continueBtn.click", e);
+            }
+        });
+        panel_8.add(continueBtn);
+
         JPanel panel_1 = new JPanel();
         tabbedPane.addTab("New tab", null, panel_1, null);
 
@@ -293,6 +313,12 @@ public class DMMVRPlayerHotKeyUI extends JFrame {
                 locatePosition(playText);
             }
         });
+        swingUtil.addActionHex("continueBtn.click", new Action() {
+            @Override
+            public void action(EventObject evt) throws Exception {
+                locatePosition(continueText);
+            }
+        });
     }
 
     private void locatePosition(final JTextField text) {
@@ -329,6 +355,8 @@ public class DMMVRPlayerHotKeyUI extends JFrame {
             pair = getPosition(next2Text);
         } else if ("play/pause".equals(input)) {
             pair = getPosition(playText);
+        } else if ("continue".equals(input)) {
+            pair = getPosition(continueText);
         }
         if (pair == null) {
             return;
@@ -348,6 +376,10 @@ public class DMMVRPlayerHotKeyUI extends JFrame {
     }
 
     private GlobalKeyListenerExampleForEnglishUI keyUtil;
+    private JLabel lblContinuec;
+    private JPanel panel_8;
+    private JTextField continueText;
+    private JButton continueBtn;
 
     private class GlobalKeyListenerExampleForEnglishUI extends NativeKeyAdapter {
         public void close() {
@@ -373,6 +405,8 @@ public class DMMVRPlayerHotKeyUI extends JFrame {
                 pressDMMVRPlayerBtn(">");
             } else if (e.getKeyCode() == NativeKeyEvent.VC_SPACE) {
                 pressDMMVRPlayerBtn("play/pause");
+            } else if (e.getKeyCode() == NativeKeyEvent.VC_C) {
+                pressDMMVRPlayerBtn("continue");
             }
         }
 

@@ -8,28 +8,6 @@ server:
   compression:
     enabled: true
     
- 
-#eureka server   
-eureka:   #此处设置会改变eureka控制台的显示
-  datacenter: cloud #此处设置会改变eureka控制台的显示
-  environment: prod
-  dashboard: #控制台路径
-    path: /dashboard  #http://localhost:8761/dashboard   #是否启用控制台
-    enabled: true
-  instance:  #实例主机名
-    hostname: localhost
-    leaseRenewalIntervalInSeconds : 3
-  client:
-    registerWithEureka: false
-    fetchRegistry: false
-    serviceUrl:
-      defaultZone: ${vcap.services.${PREFIX:}eureka.credentials.uri:http://user:password@localhost:8761}/eureka/   
-  server:
-    waitTimeInMsWhenSyncEmpty: 0
-    enableSelfPreservation: false
-    renewalPercentThreshold : 5
-    
-    
 
 security:
   basic:

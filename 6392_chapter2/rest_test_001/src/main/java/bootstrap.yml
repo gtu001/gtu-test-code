@@ -2,3 +2,16 @@ spring:
   cloud:
     config:
       enabled: false #關掉 config server追蹤
+      
+      
+      
+#eureka client
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+    healthcheck:
+      enabled: true
+      
+      
+      

@@ -8,22 +8,3 @@ server:
     enabled: true
 
 
-zuul:
-  ignoredServices: "*"
-  routes:
-    rest_test_001:
-      path: /rest_test_001/**  
-      serviceId: rest-test-001
-      stripPrefix: true
-      
-      
-      
-#eureka server   
-eureka:
-  instance:
-    leaseRenewalIntervalInSeconds : 3
-  metadataMap: #在eureka server註冊 第二個以上 instance 要用 metadataMap:instanceId
-    instanceId: ${vcap.application.instance_id:${spring.application.name}:${spring.application.instance_id:${random.value}}} 
-  serviceUrl:
-    defaultZone: http://localhost:8761/eureka/
-  fetchRegistry: false 
