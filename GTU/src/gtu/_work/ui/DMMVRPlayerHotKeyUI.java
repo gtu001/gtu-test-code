@@ -1,6 +1,5 @@
 package gtu._work.ui;
 
-import java.awt.AWTException;
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
@@ -35,6 +34,10 @@ import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.mouse.NativeMouseAdapter;
 import org.jnativehook.mouse.NativeMouseEvent;
 
+import com.jgoodies.forms.layout.ColumnSpec;
+import com.jgoodies.forms.layout.FormLayout;
+import com.jgoodies.forms.layout.RowSpec;
+
 import com.jgoodies.forms.factories.FormFactory;
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormLayout;
@@ -50,6 +53,7 @@ import gtu.swing.util.JFrameUtil;
 import gtu.swing.util.SwingActionUtil;
 import gtu.swing.util.SwingActionUtil.Action;
 import gtu.swing.util.SwingActionUtil.ActionAdapter;
+import javax.swing.JToggleButton;
 import com.jgoodies.forms.layout.FormSpecs;
 
 public class DMMVRPlayerHotKeyUI extends JFrame {
@@ -113,7 +117,7 @@ public class DMMVRPlayerHotKeyUI extends JFrame {
         swingUtil = SwingActionUtil.newInstance(this);
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setBounds(100, 100, 450, 333);
+        setBounds(100, 100, 490, 382);
         contentPane = new JPanel();
         contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
         contentPane.setLayout(new BorderLayout(0, 0));
@@ -125,16 +129,32 @@ public class DMMVRPlayerHotKeyUI extends JFrame {
 
         JPanel panel = new JPanel();
         tabbedPane.addTab("New tab", null, panel, null);
-        panel.setLayout(new FormLayout(new ColumnSpec[] { FormSpecs.RELATED_GAP_COLSPEC, FormSpecs.DEFAULT_COLSPEC, FormSpecs.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow"), },
-                new RowSpec[] { FormSpecs.RELATED_GAP_ROWSPEC, FormSpecs.DEFAULT_ROWSPEC, FormSpecs.RELATED_GAP_ROWSPEC, FormSpecs.DEFAULT_ROWSPEC, FormSpecs.RELATED_GAP_ROWSPEC,
-                        FormSpecs.DEFAULT_ROWSPEC, FormSpecs.RELATED_GAP_ROWSPEC, FormSpecs.DEFAULT_ROWSPEC, FormSpecs.RELATED_GAP_ROWSPEC, FormSpecs.DEFAULT_ROWSPEC, FormSpecs.RELATED_GAP_ROWSPEC,
-                        FormSpecs.DEFAULT_ROWSPEC, }));
+        panel.setLayout(new FormLayout(new ColumnSpec[] { FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow"), },
+                new RowSpec[] { FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
+                        FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
+                        FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
+                        FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, }));
+
+        lblEnable = new JLabel("ENABLE");
+        panel.add(lblEnable, "2, 2");
+
+        panel_9 = new JPanel();
+        panel.add(panel_9, "4, 2, fill, fill");
+
+        enableToggleBtn = new JToggleButton("啟用");
+        enableToggleBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String label = enableToggleBtn.isSelected() ? "啟用" : "取消";
+                enableToggleBtn.setText(label);
+            }
+        });
+        panel_9.add(enableToggleBtn);
 
         lblNewLabel = new JLabel("<<(ctl+left)");
-        panel.add(lblNewLabel, "2, 2");
+        panel.add(lblNewLabel, "2, 4");
 
         panel_3 = new JPanel();
-        panel.add(panel_3, "4, 2, fill, fill");
+        panel.add(panel_3, "4, 4, fill, fill");
 
         previous2Btn = new JButton("set");
         previous2Btn.addActionListener(new ActionListener() {
@@ -149,10 +169,10 @@ public class DMMVRPlayerHotKeyUI extends JFrame {
         panel_3.add(previous2Btn);
 
         lblNewLabel_1 = new JLabel("<(left)");
-        panel.add(lblNewLabel_1, "2, 4");
+        panel.add(lblNewLabel_1, "2, 6");
 
         panel_7 = new JPanel();
-        panel.add(panel_7, "4, 4, fill, fill");
+        panel.add(panel_7, "4, 6, fill, fill");
 
         previous1Btn = new JButton("set");
         previous1Btn.addActionListener(new ActionListener() {
@@ -167,10 +187,10 @@ public class DMMVRPlayerHotKeyUI extends JFrame {
         panel_7.add(previous1Btn);
 
         lblNewLabel_2 = new JLabel(">(right)");
-        panel.add(lblNewLabel_2, "2, 6");
+        panel.add(lblNewLabel_2, "2, 8");
 
         panel_6 = new JPanel();
-        panel.add(panel_6, "4, 6, fill, fill");
+        panel.add(panel_6, "4, 8, fill, fill");
 
         next1Btn = new JButton("set");
         next1Btn.addActionListener(new ActionListener() {
@@ -185,10 +205,10 @@ public class DMMVRPlayerHotKeyUI extends JFrame {
         panel_6.add(next1Btn);
 
         lblNewLabel_3 = new JLabel(">>(ctl+right)");
-        panel.add(lblNewLabel_3, "2, 8");
+        panel.add(lblNewLabel_3, "2, 10");
 
         panel_5 = new JPanel();
-        panel.add(panel_5, "4, 8, fill, fill");
+        panel.add(panel_5, "4, 10, fill, fill");
 
         next2Btn = new JButton("set");
         next2Btn.addActionListener(new ActionListener() {
@@ -203,10 +223,10 @@ public class DMMVRPlayerHotKeyUI extends JFrame {
         panel_5.add(next2Btn);
 
         lblNewLabel_4 = new JLabel("pause/play(space)");
-        panel.add(lblNewLabel_4, "2, 10");
+        panel.add(lblNewLabel_4, "2, 12");
 
         panel_4 = new JPanel();
-        panel.add(panel_4, "4, 10, fill, fill");
+        panel.add(panel_4, "4, 12, fill, fill");
 
         playBtn = new JButton("set");
         playBtn.addActionListener(new ActionListener() {
@@ -221,10 +241,10 @@ public class DMMVRPlayerHotKeyUI extends JFrame {
         panel_4.add(playBtn);
 
         lblContinuec = new JLabel("continue(c)");
-        panel.add(lblContinuec, "2, 12");
+        panel.add(lblContinuec, "2, 14");
 
         panel_8 = new JPanel();
-        panel.add(panel_8, "4, 12, fill, fill");
+        panel.add(panel_8, "4, 14, fill, fill");
 
         continueText = new JTextField();
         continueText.setColumns(10);
@@ -380,6 +400,9 @@ public class DMMVRPlayerHotKeyUI extends JFrame {
     private JPanel panel_8;
     private JTextField continueText;
     private JButton continueBtn;
+    private JLabel lblEnable;
+    private JPanel panel_9;
+    private JToggleButton enableToggleBtn;
 
     private class GlobalKeyListenerExampleForEnglishUI extends NativeKeyAdapter {
         public void close() {
@@ -391,6 +414,11 @@ public class DMMVRPlayerHotKeyUI extends JFrame {
         }
 
         public void nativeKeyReleased(NativeKeyEvent e) {
+            if (!enableToggleBtn.isSelected()) {
+                System.out.println("未啟用 enableToggleBtn");
+                return;
+            }
+
             System.out.println("Key Released: " + NativeKeyEvent.getKeyText(e.getKeyCode()));
             // 模式check
             if ((e.getModifiers() & NativeInputEvent.CTRL_MASK) != 0 && //
