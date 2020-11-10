@@ -83,6 +83,50 @@ public class S2T_And_T2S_EventHandler {
         }
     };
 
+    final Transformer toChangeCase = new Transformer() {
+        public Object transform(final Object _input) {
+            String text = input.getText();
+            boolean isUpperCase = (Boolean) _input;
+            try {
+                if (isUpperCase) {
+                    if (StringUtils.isNotBlank(input.getSelectedText())) {
+                        String before = StringUtils.substring(text, 0, input.getSelectionStart());
+                        String middle = input.getSelectedText();
+                        middle = middle.toUpperCase();
+                        String after = StringUtils.substring(text, input.getSelectionEnd());
+                        return before + middle + after;
+                    } else {
+                        return text.toUpperCase();
+                    }
+                } else {
+                    if (StringUtils.isNotBlank(input.getSelectedText())) {
+                        String before = StringUtils.substring(text, 0, input.getSelectionStart());
+                        String middle = input.getSelectedText();
+                        middle = middle.toLowerCase();
+                        String after = StringUtils.substring(text, input.getSelectionEnd());
+                        return before + middle + after;
+                    } else {
+                        return text.toLowerCase();
+                    }
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+            return text;
+        }
+    };
+
+    public JMenuItem getMenuItem3(final boolean isUpperCase) {
+        JMenuItem item = new JMenuItem(isUpperCase ? "轉大寫" : "轉小寫");
+        item.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                input.setText((String) toChangeCase.transform(isUpperCase));
+            }
+        });
+        return item;
+    }
+
     public JMenuItem getMenuItem(final boolean isS2t) {
         JMenuItem item = new JMenuItem(isS2t ? "簡轉繁" : "繁轉簡");
         item.addActionListener(new ActionListener() {
@@ -124,6 +168,17 @@ public class S2T_And_T2S_EventHandler {
                                     @Override
                                     public void actionPerformed(ActionEvent e) {
                                         input.setText((String) trans.transform(true));
+                                    }
+                                }).addJMenuItem("轉大寫", new ActionListener() {
+                                    @Override
+                                    public void actionPerformed(ActionEvent e) {
+                                        input.setText((String) toChangeCase.transform(true));
+                                    }
+                                }).addJMenuItem("轉小寫", new ActionListener() {
+
+                                    @Override
+                                    public void actionPerformed(ActionEvent e) {
+                                        input.setText((String) toChangeCase.transform(false));
                                     }
                                 }).addJMenuItem("Encode", new ActionListener() {
                                     @Override

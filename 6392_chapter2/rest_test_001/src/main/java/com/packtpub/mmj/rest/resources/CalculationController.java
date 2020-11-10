@@ -5,6 +5,8 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -19,16 +21,21 @@ import com.packtpub.mmj.lib.model.Calculation;
 @RestController
 @RequestMapping("calculation")
 public class CalculationController {
+
+    private static Logger logger = LoggerFactory.getLogger(CalculationController.class);
+
     private static final String PATTERN = "^-?+\\d+\\.?+\\d*$";
 
     /**
      * http://localhost:8080/calculation/power?base=33&exponent=2
+     * 
      * @param b
      * @param e
      * @return
      */
     @RequestMapping("/power")
     public Calculation pow(@RequestParam(value = "base") String b, @RequestParam(value = "exponent") String e) {
+        logger.info("# power --start");
         List<String> input = new ArrayList();
         input.add(b);
         input.add(e);
@@ -51,6 +58,7 @@ public class CalculationController {
      */
     @RequestMapping(value = "/sqrt/{value:.+}", method = GET)
     public Calculation sqrt(@PathVariable(value = "value") String aValue) {
+        logger.info("# sqrt --start");
         List<String> input = new ArrayList();
         input.add(aValue);
         List<String> output = new ArrayList();

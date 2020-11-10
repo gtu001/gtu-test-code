@@ -1,4 +1,4 @@
-package com.packtpub.mmj.eureka.service;
+package com.packtpub.mmj.eureka;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
