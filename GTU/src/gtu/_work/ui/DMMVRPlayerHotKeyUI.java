@@ -21,6 +21,7 @@ import javax.swing.JMenu;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
+import javax.swing.JToggleButton;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeListener;
 
@@ -33,10 +34,6 @@ import org.jnativehook.keyboard.NativeKeyAdapter;
 import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.mouse.NativeMouseAdapter;
 import org.jnativehook.mouse.NativeMouseEvent;
-
-import com.jgoodies.forms.layout.ColumnSpec;
-import com.jgoodies.forms.layout.FormLayout;
-import com.jgoodies.forms.layout.RowSpec;
 
 import com.jgoodies.forms.factories.FormFactory;
 import com.jgoodies.forms.layout.ColumnSpec;
@@ -53,8 +50,6 @@ import gtu.swing.util.JFrameUtil;
 import gtu.swing.util.SwingActionUtil;
 import gtu.swing.util.SwingActionUtil.Action;
 import gtu.swing.util.SwingActionUtil.ActionAdapter;
-import javax.swing.JToggleButton;
-import com.jgoodies.forms.layout.FormSpecs;
 
 public class DMMVRPlayerHotKeyUI extends JFrame {
 
@@ -85,6 +80,35 @@ public class DMMVRPlayerHotKeyUI extends JFrame {
     private JTextField next1Text;
     private JTextField next2Text;
     private JTextField playText;
+    private GlobalKeyListenerExampleForEnglishUI keyUtil;
+    private JLabel lblContinuec;
+    private JPanel panel_8;
+    private JTextField continueText;
+    private JButton continueBtn;
+    private JLabel lblEnable;
+    private JPanel panel_9;
+    private JToggleButton enableToggleBtn;
+    private JLabel lblNewLabel_5;
+    private JPanel panel_10;
+    private JLabel label_1;
+    private JLabel lblNewLabel_6;
+    private JLabel lblNewLabel_7;
+    private JLabel lblNewLabel_8;
+    private JTextField _1text;
+    private JButton _1Btn;
+    private JPanel panel_11;
+    private JTextField _2text;
+    private JButton _2Btn;
+    private JPanel panel_12;
+    private JTextField _3text;
+    private JButton _3Btn;
+    private JPanel panel_13;
+    private JTextField _4text;
+    private JButton _4Btn;
+    private JPanel panel_14;
+    private JTextField _5text;
+    private JButton _5Btn;
+
     private static AtomicReference<ActionListener> START_LISTENER = new AtomicReference<ActionListener>();
     private PropertiesUtilBean config = new PropertiesUtilBean(DMMVRPlayerHotKeyUI.class);
 
@@ -260,6 +284,101 @@ public class DMMVRPlayerHotKeyUI extends JFrame {
 
         JPanel panel_1 = new JPanel();
         tabbedPane.addTab("New tab", null, panel_1, null);
+        panel_1.setLayout(new FormLayout(
+                new ColumnSpec[] { FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC,
+                        ColumnSpec.decode("default:grow"), },
+                new RowSpec[] { FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
+                        FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, }));
+
+        lblNewLabel_5 = new JLabel("1");
+        panel_1.add(lblNewLabel_5, "2, 2");
+
+        panel_10 = new JPanel();
+        panel_1.add(panel_10, "6, 2, fill, fill");
+
+        _1text = new JTextField();
+        panel_10.add(_1text);
+        _1text.setColumns(10);
+
+        _1Btn = new JButton("set");
+        _1Btn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                swingUtil.invokeAction("_1Btn.click", e);
+            }
+        });
+        panel_10.add(_1Btn);
+
+        label_1 = new JLabel("2");
+        panel_1.add(label_1, "2, 4");
+
+        panel_11 = new JPanel();
+        panel_1.add(panel_11, "6, 4, fill, fill");
+
+        _2text = new JTextField();
+        _2text.setColumns(10);
+        panel_11.add(_2text);
+
+        _2Btn = new JButton("set");
+        _2Btn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                swingUtil.invokeAction("_2Btn.click", e);
+            }
+        });
+        panel_11.add(_2Btn);
+
+        lblNewLabel_6 = new JLabel("3");
+        panel_1.add(lblNewLabel_6, "2, 6");
+
+        panel_12 = new JPanel();
+        panel_1.add(panel_12, "6, 6, fill, fill");
+
+        _3text = new JTextField();
+        _3text.setColumns(10);
+        panel_12.add(_3text);
+
+        _3Btn = new JButton("set");
+        _3Btn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                swingUtil.invokeAction("_3Btn.click", e);
+            }
+        });
+        panel_12.add(_3Btn);
+
+        lblNewLabel_7 = new JLabel("4");
+        panel_1.add(lblNewLabel_7, "2, 8");
+
+        panel_13 = new JPanel();
+        panel_1.add(panel_13, "6, 8, fill, fill");
+
+        _4text = new JTextField();
+        _4text.setColumns(10);
+        panel_13.add(_4text);
+
+        _4Btn = new JButton("set");
+        _4Btn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                swingUtil.invokeAction("_4Btn.click", e);
+            }
+        });
+        panel_13.add(_4Btn);
+
+        lblNewLabel_8 = new JLabel("5");
+        panel_1.add(lblNewLabel_8, "2, 10");
+
+        panel_14 = new JPanel();
+        panel_1.add(panel_14, "6, 10, fill, fill");
+
+        _5text = new JTextField();
+        _5text.setColumns(10);
+        panel_14.add(_5text);
+
+        _5Btn = new JButton("set");
+        _5Btn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                swingUtil.invokeAction("_5Btn.click", e);
+            }
+        });
+        panel_14.add(_5Btn);
 
         panel_2 = new JPanel();
         tabbedPane.addTab("其他設定", null, panel_2, null);
@@ -339,6 +458,36 @@ public class DMMVRPlayerHotKeyUI extends JFrame {
                 locatePosition(continueText);
             }
         });
+        swingUtil.addActionHex("_1Btn.click", new Action() {
+            @Override
+            public void action(EventObject evt) throws Exception {
+                locatePosition(_1text);
+            }
+        });
+        swingUtil.addActionHex("_2Btn.click", new Action() {
+            @Override
+            public void action(EventObject evt) throws Exception {
+                locatePosition(_2text);
+            }
+        });
+        swingUtil.addActionHex("_3Btn.click", new Action() {
+            @Override
+            public void action(EventObject evt) throws Exception {
+                locatePosition(_3text);
+            }
+        });
+        swingUtil.addActionHex("_4Btn.click", new Action() {
+            @Override
+            public void action(EventObject evt) throws Exception {
+                locatePosition(_4text);
+            }
+        });
+        swingUtil.addActionHex("_5Btn.click", new Action() {
+            @Override
+            public void action(EventObject evt) throws Exception {
+                locatePosition(_5text);
+            }
+        });
     }
 
     private void locatePosition(final JTextField text) {
@@ -354,11 +503,15 @@ public class DMMVRPlayerHotKeyUI extends JFrame {
     }
 
     private Pair<Integer, Integer> getPosition(JTextField text) {
-        String strVal = StringUtils.trimToEmpty(text.getText());
-        Pattern ptn = Pattern.compile("(\\d+)x(\\d+)");
-        Matcher mth = ptn.matcher(strVal);
-        if (mth.find()) {
-            return Pair.of(Integer.parseInt(mth.group(1)), Integer.parseInt(mth.group(2)));
+        try {
+            String strVal = StringUtils.trimToEmpty(text.getText());
+            Pattern ptn = Pattern.compile("(\\d+)x(\\d+)");
+            Matcher mth = ptn.matcher(strVal);
+            if (mth.find()) {
+                return Pair.of(Integer.parseInt(mth.group(1)), Integer.parseInt(mth.group(2)));
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
         return null;
     }
@@ -377,7 +530,18 @@ public class DMMVRPlayerHotKeyUI extends JFrame {
             pair = getPosition(playText);
         } else if ("continue".equals(input)) {
             pair = getPosition(continueText);
+        } else if ("1".equals(input)) {
+            pair = getPosition(_1text);
+        } else if ("2".equals(input)) {
+            pair = getPosition(_2text);
+        } else if ("3".equals(input)) {
+            pair = getPosition(_3text);
+        } else if ("4".equals(input)) {
+            pair = getPosition(_4text);
+        } else if ("5".equals(input)) {
+            pair = getPosition(_5text);
         }
+
         if (pair == null) {
             return;
         }
@@ -394,15 +558,6 @@ public class DMMVRPlayerHotKeyUI extends JFrame {
             e.printStackTrace();
         }
     }
-
-    private GlobalKeyListenerExampleForEnglishUI keyUtil;
-    private JLabel lblContinuec;
-    private JPanel panel_8;
-    private JTextField continueText;
-    private JButton continueBtn;
-    private JLabel lblEnable;
-    private JPanel panel_9;
-    private JToggleButton enableToggleBtn;
 
     private class GlobalKeyListenerExampleForEnglishUI extends NativeKeyAdapter {
         public void close() {
@@ -435,6 +590,16 @@ public class DMMVRPlayerHotKeyUI extends JFrame {
                 pressDMMVRPlayerBtn("play/pause");
             } else if (e.getKeyCode() == NativeKeyEvent.VC_C) {
                 pressDMMVRPlayerBtn("continue");
+            } else if (e.getKeyCode() == NativeKeyEvent.VC_1) {
+                pressDMMVRPlayerBtn("1");
+            } else if (e.getKeyCode() == NativeKeyEvent.VC_2) {
+                pressDMMVRPlayerBtn("2");
+            } else if (e.getKeyCode() == NativeKeyEvent.VC_3) {
+                pressDMMVRPlayerBtn("3");
+            } else if (e.getKeyCode() == NativeKeyEvent.VC_4) {
+                pressDMMVRPlayerBtn("4");
+            } else if (e.getKeyCode() == NativeKeyEvent.VC_5) {
+                pressDMMVRPlayerBtn("5");
             }
         }
 
