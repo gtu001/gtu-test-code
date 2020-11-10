@@ -12,9 +12,9 @@
 	</parent>
 
 	<groupId>com.packtpub.mmj</groupId>
-	<artifactId>zuul_test_001</artifactId>
+	<artifactId>feign_test_001</artifactId>
 	<version>1.0-SNAPSHOT</version>
-	<name>zuul_test_001</name>
+	<name>feign_test_001</name>
 	<url>http://maven.apache.org</url>
 
 	<properties>
@@ -28,25 +28,12 @@
 			<artifactId>lib_test_001</artifactId>
 		</dependency>
 
-		<!-- 使用 zuul 寫法 ↓↓↓↓↓↓ -->
+		<!-- 使用 feign 寫法 ↓↓↓↓↓↓ -->
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-netflix-zuul</artifactId>
+			<artifactId>spring-cloud-starter-openfeign</artifactId>
 		</dependency>
-		<!-- 使用 zuul 寫法 ↑↑↑↑↑↑ -->
-
-		<!-- 使用 eureka server 寫法 ↓↓↓↓↓↓ -->
-		<!-- 
-		<dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-config</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-netflix-eureka-server</artifactId>
-		</dependency>
-		 -->
-		<!-- 使用 eureka server 寫法 ↑↑↑↑↑↑ -->
+		<!-- 使用 feign 寫法 ↑↑↑↑↑↑ -->
 
 		<!-- 使用 eureka client 寫法 ↓↓↓↓↓↓ -->
 		<dependency>

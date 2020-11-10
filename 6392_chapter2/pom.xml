@@ -13,6 +13,7 @@
 		<module>caffeine_cache_001</module>
 		<module>eureka_test_001</module>
     <module>zuul_test_001</module>
+    <module>feign_test_001</module>
   </modules>
 
 	<properties>

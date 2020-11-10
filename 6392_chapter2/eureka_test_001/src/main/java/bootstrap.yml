@@ -5,20 +5,20 @@ spring:
       
  
 #eureka server   
-eureka:   #此处设置会改变eureka控制台的显示
-  datacenter: cloud #此处设置会改变eureka控制台的显示
+eureka:      #此处设置会改变eureka控制台的显示
+  datacenter: cloud   #此处设置会改变eureka控制台的显示
   environment: prod
-  dashboard: #控制台路径
+  dashboard:   #控制台路径
     path: /dashboard  #http://localhost:8761/dashboard   #是否启用控制台
     enabled: true
   instance:  #实例主机名
     hostname: localhost
     leaseRenewalIntervalInSeconds : 3
   client:
-    registerWithEureka: false
-    fetchRegistry: false
-    serviceUrl:
-      defaultZone: ${vcap.services.${PREFIX:}eureka.credentials.uri:http://user:password@localhost:8761}/eureka/   
+    registerWithEureka: false   #是否將自己註冊到 Eureka中,本身無須註冊
+    fetchRegistry: false    #是否已Eureka中惠取註冊訊息
+    serviceUrl:   #EurekaClient 與 EurekaServer服務端交互的地址
+      defaultZone: http://127.0.0.1:${server.port}/eureka/   
   server:
     waitTimeInMsWhenSyncEmpty: 0
     enableSelfPreservation: false
