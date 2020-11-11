@@ -4,7 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.EventQueue;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
@@ -1186,6 +1185,26 @@ public class FastDBQueryUI extends JFrame {
                         @Override
                         public void actionPerformed(ActionEvent e) {
                             ClipboardUtil.getInstance().setContents(name);
+                        }
+                    }).addJMenuItem("修改欄位 : " + name, new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            try {
+                                String newName = JCommonUtil._jOptionPane_showInputDialog("輸入column名稱", name);
+                                boolean fixOk = false;
+                                if (queryList != null) {
+                                    List<String> titles = queryList.getLeft();
+                                    if (StringUtils.equals(titles.get(col), name)) {
+                                        titles.set(col, newName);
+                                        fixOk = true;
+                                    }
+                                }
+                                if (fixOk) {
+                                    JTableUtil.newInstance(queryResultTable).setColumTitle(col, newName);
+                                }
+                            } catch (Exception ex) {
+                                JCommonUtil.handleException(ex);
+                            }
                         }
                     }).addJMenuItem("加入標籤 : " + name, new ActionListener() {
                         @Override
@@ -4240,6 +4259,237 @@ public class FastDBQueryUI extends JFrame {
         return -1;
     }
 
+    private void excelImportAllSheetsIntoOneModel(File xlsfile) {
+        final ExcelUtil_Xls97 exlUtl = ExcelUtil_Xls97.getInstance();
+        final HSSFWorkbook wk = exlUtl.readExcel(xlsfile);
+
+        final JProgressBarHelper prog = JProgressBarHelper.newInstance(this, "import excel");
+        prog.max(wk.getNumberOfSheets());
+        prog.limitMoveBound(false);
+        prog.modal(false);
+        prog.closeListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                prog.setExitFlag(true);
+            }
+        });
+        prog.build();
+        prog.show();
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                List<String> titles2 = new ArrayList<String>();
+                List<Object[]> rowLst = new ArrayList<Object[]>();
+
+                for (int kk = 0; kk < wk.getNumberOfSheets(); kk++) {
+                    HSSFSheet sheet = wk.getSheetAt(kk);
+                    for (int ii = 0; ii <= 0; ii++) {
+                        Row row = sheet.getRow(ii);
+                        for (int jj = 0; jj < row.getLastCellNum(); jj++) {
+                            String value = ExcelUtil_Xls97.getInstance().readCell(row.getCell(jj));
+                            if (!titles2.contains(value)) {
+                                titles2.add(value);
+                            }
+                        }
+                    }
+                }
+
+                DefaultTableModel model = (DefaultTableModel) queryResultTable.getModel();
+                model = JTableUtil.createModel(true, titles2.toArray());
+                queryResultTable.setModel(model);
+
+                for (int kk = 0; kk < wk.getNumberOfSheets(); kk++) {
+                    HSSFSheet sheet = wk.getSheetAt(kk);
+
+                    Map<String, Integer> titleMap = new LinkedHashMap<String, Integer>();
+                    for (String shName : titles2) {
+                        titleMap.put(shName, null);
+                    }
+
+                    for (int ii = 0; ii <= 0; ii++) {
+                        Row row = sheet.getRow(ii);
+                        for (int jj = 0; jj < row.getLastCellNum(); jj++) {
+                            String value = ExcelUtil_Xls97.getInstance().readCell(row.getCell(jj));
+                            if (titles2.contains(value)) {
+                                titleMap.put(value, titles2.indexOf(value));
+                            }
+                        }
+                    }
+
+                    for (int ii = 1; ii <= sheet.getLastRowNum(); ii++) {
+                        Row row = sheet.getRow(ii);
+                        if (row == null) {
+                            continue;
+                        }
+
+                        List<Object> rows = new ArrayList<Object>();
+
+                        for (String title : titleMap.keySet()) {
+                            if (titleMap.get(title) == null) {
+                                rows.add("");
+                            } else {
+                                String value = ExcelUtil_Xls97.getInstance().readCell(row.getCell(titleMap.get(title)));
+                                rows.add(value);
+                            }
+                        }
+
+                        model.addRow(rows.toArray());
+                        rowLst.add(rows.toArray());
+
+                        if (prog.isExitFlag()) {
+                            return;
+                        }
+                    }
+
+                    prog.addOne();
+                    if (prog.isExitFlag()) {
+                        return;
+                    }
+                }
+
+                Class<?>[] clzs = new Class[titles2.size()];
+                Arrays.fill(clzs, String.class);
+                List<Class<?>> clzLst = Arrays.asList(clzs);
+                queryList = Triple.of(titles2, clzLst, rowLst);
+                
+                queryResultCountLabel.setText(String.valueOf(queryList.getRight().size()));
+                
+                prog.dismissByMax();
+            }
+        }).start();
+    }
+
+    private void excelImportSingleSheet(File xlsfile) {
+        final ExcelUtil_Xls97 exlUtl = ExcelUtil_Xls97.getInstance();
+        // 選擇sheet
+        final HSSFWorkbook wk = exlUtl.readExcel(xlsfile);
+        List<String> shLst = new ArrayList<String>();
+        for (int ii = 0; ii < wk.getNumberOfSheets(); ii++) {
+            HSSFSheet sh = wk.getSheetAt(ii);
+            shLst.add(sh.getSheetName());
+        }
+        importExcelSheetName = (String) JCommonUtil._JOptionPane_showInputDialog(//
+                "請選擇sheet,共[" + shLst.size() + "]個", "選擇sheet", shLst.toArray(), shLst.get(0));
+        if (StringUtils.isBlank(importExcelSheetName)) {
+            JCommonUtil._jOptionPane_showMessageDialog_info("sheetname 錯誤!");
+            return;
+        }
+
+        final HSSFSheet sheet = wk.getSheet(importExcelSheetName);
+
+        final JProgressBarHelper prog = JProgressBarHelper.newInstance(this, "import excel");
+        prog.max(sheet.getLastRowNum());
+        prog.limitMoveBound(false);
+        prog.modal(false);
+        prog.closeListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                prog.setExitFlag(true);
+            }
+        });
+        prog.build();
+        prog.show();
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                DefaultTableModel model = (DefaultTableModel) queryResultTable.getModel();
+
+                List<String> titles2 = new ArrayList<String>();
+                List<Object[]> rowLst = new ArrayList<Object[]>();
+
+                for (int ii = 0; ii <= 0; ii++) {
+                    Row row = sheet.getRow(ii);
+                    List<Object> titles = new ArrayList<Object>();
+                    for (int jj = 0; jj < row.getLastCellNum(); jj++) {
+                        String value = ExcelUtil_Xls97.getInstance().readCell(row.getCell(jj));
+                        titles.add(value);
+                        titles2.add(value);
+                    }
+                }
+
+                if (!radio_import_excel_isAppend.isSelected()) {
+                    model = JTableUtil.createModel(true, titles2.toArray());
+                    queryResultTable.setModel(model);
+                    JTableUtil.newInstance(queryResultTable).setRowHeightByFontSize();
+
+                    for (int ii = 1; ii <= sheet.getLastRowNum(); ii++) {
+                        Row row = sheet.getRow(ii);
+                        if (row == null) {
+                            continue;
+                        }
+                        List<Object> rows = new ArrayList<Object>();
+                        for (int jj = 0; jj < row.getLastCellNum(); jj++) {
+                            String value = ExcelUtil_Xls97.getInstance().readCell(row.getCell(jj));
+                            rows.add(value);
+                        }
+                        for (int fixSize = titles2.size() - rows.size(); fixSize > 0; fixSize--) {
+                            rows.add("");
+                        }
+                        model.addRow(rows.toArray());
+                        rowLst.add(rows.toArray());
+                        prog.addOne();
+
+                        if (prog.isExitFlag()) {
+                            return;
+                        }
+                    }
+
+                    Class<?>[] clzs = new Class[titles2.size()];
+                    Arrays.fill(clzs, String.class);
+                    List<Class<?>> clzLst = Arrays.asList(clzs);
+                    queryList = Triple.of(titles2, clzLst, rowLst);
+                    queryResultCountLabel.setText(String.valueOf(queryList.getRight().size()));
+
+                } else {
+                    List<Object> titles = JTableUtil.newInstance(queryResultTable).getColumnTitleArray();
+                    Map<Integer, Integer> titlesMap = new TreeMap<Integer, Integer>();
+                    A: for (int jj = 0; jj < titles2.size(); jj++) {
+                        for (int ii = 0; ii < titles.size(); ii++) {
+                            if (StringUtils.equalsIgnoreCase(String.valueOf(titles.get(ii)), titles2.get(jj))) {
+                                titlesMap.put(ii, jj);
+                                continue A;
+                            }
+                        }
+                    }
+
+                    boolean isButtonStart = false;
+                    if (!titles.isEmpty() && StringUtils.equals(QUERY_RESULT_COLUMN_NO, String.valueOf(titles.get(0)))) {
+                        isButtonStart = true;
+                    }
+
+                    for (int ii = 1; ii <= sheet.getLastRowNum(); ii++) {
+                        Row row = sheet.getRow(ii);
+                        if (row == null) {
+                            continue;
+                        }
+                        List<Object> rows = new ArrayList<Object>();
+                        if (isButtonStart) {
+                            rows.add(createSelectionBtn("*" + ii));
+                        }
+                        for (int jj : titlesMap.values()) {
+                            String value = ExcelUtil_Xls97.getInstance().readCell(row.getCell(jj));
+                            rows.add(value);
+                        }
+                        model.addRow(rows.toArray());
+                        rowLst.add(rows.toArray());
+                        prog.addOne();
+
+                        if (prog.isExitFlag()) {
+                            return;
+                        }
+                    }
+
+                    queryList.getRight().addAll(rowLst);
+                    queryResultCountLabel.setText(String.valueOf(queryList.getRight().size()));
+                }
+
+                prog.dismiss();
+            }
+        }).start();
+    }
+
     private void excelExportBtnAction() {
         try {
             final ExcelUtil_Xls97 exlUtl = ExcelUtil_Xls97.getInstance();
@@ -4252,127 +4502,22 @@ public class FastDBQueryUI extends JFrame {
                     return;
                 }
 
-                // 選擇sheet
-                HSSFWorkbook wk = exlUtl.readExcel(xlsfile);
-                List<String> shLst = new ArrayList<String>();
-                for (int ii = 0; ii < wk.getNumberOfSheets(); ii++) {
-                    HSSFSheet sh = wk.getSheetAt(ii);
-                    shLst.add(sh.getSheetName());
-                }
-                importExcelSheetName = (String) JCommonUtil._JOptionPane_showInputDialog(//
-                        "請選擇sheet,共[" + shLst.size() + "]個", "選擇sheet", shLst.toArray(), shLst.get(0));
-                if (StringUtils.isBlank(importExcelSheetName)) {
-                    JCommonUtil._jOptionPane_showMessageDialog_info("sheetname 錯誤!");
+                List<String> choices = new ArrayList<String>();
+                choices.add("單一sheet");
+                choices.add("所有sheet匯入在一起");
+                String importStyle = (String) JCommonUtil._JOptionPane_showInputDialog(//
+                        "請選擇匯入方式?", "單一或全部", choices.toArray(), choices.get(0));
+                if (StringUtils.isBlank(importStyle)) {
+                    JCommonUtil._jOptionPane_showMessageDialog_info("匯入選擇錯誤!");
                     return;
                 }
 
-                final HSSFSheet sheet = wk.getSheet(importExcelSheetName);
+                if (choices.get(0).equalsIgnoreCase(importStyle)) {
+                    excelImportSingleSheet(xlsfile);
+                } else if (choices.get(1).equalsIgnoreCase(importStyle)) {
+                    excelImportAllSheetsIntoOneModel(xlsfile);
+                }
 
-                final JProgressBarHelper prog = JProgressBarHelper.newInstance(this, "import excel");
-                prog.max(sheet.getLastRowNum());
-                prog.limitMoveBound(false);
-                prog.modal(false);
-                prog.closeListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent arg0) {
-                        prog.setExitFlag(true);
-                    }
-                });
-                prog.build();
-                prog.show();
-
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        DefaultTableModel model = (DefaultTableModel) queryResultTable.getModel();
-
-                        List<String> titles2 = new ArrayList<String>();
-                        List<Object[]> rowLst = new ArrayList<Object[]>();
-
-                        for (int ii = 0; ii <= 0; ii++) {
-                            Row row = sheet.getRow(ii);
-                            List<Object> titles = new ArrayList<Object>();
-                            for (int jj = 0; jj < row.getLastCellNum(); jj++) {
-                                String value = ExcelUtil_Xls97.getInstance().readCell(row.getCell(jj));
-                                titles.add(value);
-                                titles2.add(value);
-                            }
-                        }
-
-                        if (!radio_import_excel_isAppend.isSelected()) {
-                            model = JTableUtil.createModel(true, titles2.toArray());
-                            queryResultTable.setModel(model);
-                            JTableUtil.newInstance(queryResultTable).setRowHeightByFontSize();
-
-                            for (int ii = 1; ii <= sheet.getLastRowNum(); ii++) {
-                                Row row = sheet.getRow(ii);
-                                if (row == null) {
-                                    continue;
-                                }
-                                List<Object> rows = new ArrayList<Object>();
-                                for (int jj = 0; jj < row.getLastCellNum(); jj++) {
-                                    String value = ExcelUtil_Xls97.getInstance().readCell(row.getCell(jj));
-                                    rows.add(value);
-                                }
-                                model.addRow(rows.toArray());
-                                rowLst.add(rows.toArray());
-                                prog.addOne();
-
-                                if (prog.isExitFlag()) {
-                                    return;
-                                }
-                            }
-
-                            Class<?>[] clzs = new Class[titles2.size()];
-                            Arrays.fill(clzs, String.class);
-                            List<Class<?>> clzLst = Arrays.asList(clzs);
-                            queryList = Triple.of(titles2, clzLst, rowLst);
-
-                        } else {
-                            List<Object> titles = JTableUtil.newInstance(queryResultTable).getColumnTitleArray();
-                            Map<Integer, Integer> titlesMap = new TreeMap<Integer, Integer>();
-                            A: for (int jj = 0; jj < titles2.size(); jj++) {
-                                for (int ii = 0; ii < titles.size(); ii++) {
-                                    if (StringUtils.equalsIgnoreCase(String.valueOf(titles.get(ii)), titles2.get(jj))) {
-                                        titlesMap.put(ii, jj);
-                                        continue A;
-                                    }
-                                }
-                            }
-
-                            boolean isButtonStart = false;
-                            if (!titles.isEmpty() && StringUtils.equals(QUERY_RESULT_COLUMN_NO, String.valueOf(titles.get(0)))) {
-                                isButtonStart = true;
-                            }
-
-                            for (int ii = 1; ii <= sheet.getLastRowNum(); ii++) {
-                                Row row = sheet.getRow(ii);
-                                if (row == null) {
-                                    continue;
-                                }
-                                List<Object> rows = new ArrayList<Object>();
-                                if (isButtonStart) {
-                                    rows.add(createSelectionBtn("*" + ii));
-                                }
-                                for (int jj : titlesMap.values()) {
-                                    String value = ExcelUtil_Xls97.getInstance().readCell(row.getCell(jj));
-                                    rows.add(value);
-                                }
-                                model.addRow(rows.toArray());
-                                rowLst.add(rows.toArray());
-                                prog.addOne();
-
-                                if (prog.isExitFlag()) {
-                                    return;
-                                }
-                            }
-
-                            queryList.getRight().addAll(rowLst);
-                        }
-
-                        prog.dismiss();
-                    }
-                }).start();
             } else if (radio_import_clipboard == selBtn) {
                 new ImportFromClipboard().parseMain();
             } else if (radio_export_excel == selBtn) {

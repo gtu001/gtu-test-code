@@ -1689,6 +1689,18 @@ public class JTableUtil {
         return null;
     }
 
+    public boolean setColumTitle(int colIdx, Object titleObj) {
+        TableColumnModel titleModel = table.getTableHeader().getColumnModel();
+        for (int ii = 0; ii < titleModel.getColumnCount(); ii++) {
+            TableColumn colX = titleModel.getColumn(ii);
+            if (ii == colIdx) {
+                colX.setHeaderValue(titleObj);
+                return true;
+            }
+        }
+        return false;
+    }
+
     public List<Object> getColumnTitleArray() {
         List<Object> titles = new ArrayList<Object>();
         TableColumnModel titleModel = table.getTableHeader().getColumnModel();
@@ -1698,7 +1710,7 @@ public class JTableUtil {
         }
         return titles;
     }
-    
+
     public List<String> getColumnTitleStringArray() {
         return getColumnTitleStringArray(null);
     }
