@@ -1,10 +1,10 @@
 spring:
   application:
-    name: feign-test-001
+    name: hystrix-test-001
 
 
 server:
-  port: ${port:8899}
+  port: ${port:8890}
   compression:
     enabled: true
 
