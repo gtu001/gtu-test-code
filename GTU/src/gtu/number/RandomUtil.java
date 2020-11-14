@@ -35,6 +35,11 @@ public class RandomUtil {
         return lst2;
     }
 
+    public static <T> T pickOne(List<T> lst) {
+        int index = RandomUtil.rangeInteger(0, lst.size() - 1);
+        return lst.get(index);
+    }
+
     public static <T> T random(T... ts) {
         List<T> list = new ArrayList<T>();
         for (T x : ts) {

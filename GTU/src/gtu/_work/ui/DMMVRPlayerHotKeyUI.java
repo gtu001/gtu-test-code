@@ -1,6 +1,7 @@
 package gtu._work.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Desktop;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.MouseInfo;
@@ -9,14 +10,23 @@ import java.awt.Robot;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.File;
+import java.util.ArrayList;
 import java.util.EventObject;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
@@ -42,11 +52,15 @@ import com.jgoodies.forms.layout.RowSpec;
 
 import gtu._work.ui.JMenuBarUtil.JMenuAppender;
 import gtu.keyboard_mouse.JnativehookKeyboardMouseHelper;
+import gtu.number.RandomUtil;
 import gtu.properties.PropertiesUtilBean;
+import gtu.runtime.RuntimeBatPromptModeUtil;
 import gtu.swing.util.HideInSystemTrayHelper;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JFrameRGBColorPanel;
 import gtu.swing.util.JFrameUtil;
+import gtu.swing.util.JListUtil;
+import gtu.swing.util.JMouseEventUtil;
 import gtu.swing.util.SwingActionUtil;
 import gtu.swing.util.SwingActionUtil.Action;
 import gtu.swing.util.SwingActionUtil.ActionAdapter;
@@ -111,6 +125,18 @@ public class DMMVRPlayerHotKeyUI extends JFrame {
 
     private static AtomicReference<ActionListener> START_LISTENER = new AtomicReference<ActionListener>();
     private PropertiesUtilBean config = new PropertiesUtilBean(DMMVRPlayerHotKeyUI.class);
+    private JPanel panel_15;
+    private JPanel panel_16;
+    private JPanel panel_17;
+    private JPanel panel_18;
+    private JPanel panel_19;
+    private JList dmmList;
+    private JLabel lblNewLabel_9;
+    private JTextField dmmPlayerText;
+    private JButton dmmPlayerSetBtn;
+    private AtomicReference<DMMFile> currentFile = new AtomicReference<DMMFile>();
+    private JButton dmmLstResetBtn;
+    private JButton replayBtn;
 
     /**
      * Launch the application.
@@ -380,10 +406,80 @@ public class DMMVRPlayerHotKeyUI extends JFrame {
         });
         panel_14.add(_5Btn);
 
+        panel_15 = new JPanel();
+        tabbedPane.addTab("New tab", null, panel_15, null);
+        panel_15.setLayout(new BorderLayout(0, 0));
+
+        panel_16 = new JPanel();
+        panel_15.add(panel_16, BorderLayout.NORTH);
+
+        lblNewLabel_9 = new JLabel("DMMPlayer");
+        panel_16.add(lblNewLabel_9);
+
+        dmmPlayerText = new JTextField();
+        panel_16.add(dmmPlayerText);
+        dmmPlayerText.setColumns(10);
+
+        dmmPlayerSetBtn = new JButton("set");
+        dmmPlayerSetBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                swingUtil.invokeAction("dmmPlayerSetBtn.click", e);
+            }
+        });
+        panel_16.add(dmmPlayerSetBtn);
+
+        dmmLstResetBtn = new JButton("reset");
+        dmmLstResetBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                swingUtil.invokeAction("dmmLstResetBtn.click", e);
+            }
+        });
+        panel_16.add(dmmLstResetBtn);
+
+        replayBtn = new JButton("replay");
+        replayBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                swingUtil.invokeAction("replayBtn.click", e);
+            }
+        });
+        panel_16.add(replayBtn);
+
+        panel_17 = new JPanel();
+        panel_15.add(panel_17, BorderLayout.WEST);
+
+        panel_18 = new JPanel();
+        panel_15.add(panel_18, BorderLayout.EAST);
+
+        panel_19 = new JPanel();
+        panel_15.add(panel_19, BorderLayout.SOUTH);
+
+        dmmList = new JList();
+        dmmList.setModel(new DefaultListModel());
+        dmmList.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                swingUtil.invokeAction("dmmList.mouseClick", e);
+            }
+        });
+        dmmList.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                swingUtil.invokeAction("dmmList.keyPress", e);
+            }
+        });
+        panel_15.add(JCommonUtil.createScrollComponent(dmmList), BorderLayout.CENTER);
+
         panel_2 = new JPanel();
         tabbedPane.addTab("其他設定", null, panel_2, null);
         panel_2.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 
+        JCommonUtil.applyDropFiles(dmmList, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                List<File> files = (List<File>) e.getSource();
+                dmmListAppendDMMFiles(files);
+            }
+        });
         {
             // 掛載所有event
             applyAllEvents();
@@ -488,6 +584,136 @@ public class DMMVRPlayerHotKeyUI extends JFrame {
                 locatePosition(_5text);
             }
         });
+        swingUtil.addActionHex("dmmList.mouseClick", new Action() {
+            @Override
+            public void action(EventObject evt) throws Exception {
+                dmmListMouseClick(evt);
+            }
+        });
+        swingUtil.addActionHex("dmmList.keyPress", new Action() {
+            @Override
+            public void action(EventObject evt) throws Exception {
+                JListUtil.newInstance(dmmList).defaultJListKeyPressed(evt);
+            }
+        });
+        swingUtil.addActionHex("dmmPlayerSetBtn.click", new Action() {
+            @Override
+            public void action(EventObject evt) throws Exception {
+                config.reflectSetConfig(DMMVRPlayerHotKeyUI.this);
+                config.store();
+            }
+        });
+        swingUtil.addActionHex("dmmLstResetBtn.click", new Action() {
+            @Override
+            public void action(EventObject evt) throws Exception {
+                dmmList.setModel(new DefaultListModel());
+            }
+        });
+        swingUtil.addActionHex("replayBtn.click", new Action() {
+            @Override
+            public void action(EventObject evt) throws Exception {
+                replayBtnClick();
+            }
+        });
+    }
+
+    private void dmmListAppendDMMFiles(List<File> files) {
+        List<DMMFile> files2 = new ArrayList<DMMFile>();
+        for (File f : files) {
+            files2.add(new DMMFile(f));
+        }
+        DefaultListModel model = (DefaultListModel) dmmList.getModel();
+        for (DMMFile f2 : files2) {
+            boolean findOk = false;
+            A: for (int ii = 0; ii < model.getSize(); ii++) {
+                DMMFile f = (DMMFile) model.getElementAt(ii);
+                if (StringUtils.equals(f.path, f2.path)) {
+                    findOk = true;
+                    break A;
+                }
+            }
+            if (!findOk) {
+                model.addElement(f2);
+            }
+        }
+    }
+
+    private void randomDMMPlayerPlay() {
+        List<DMMFile> randomLst = new ArrayList<DMMFile>();
+        DefaultListModel model = (DefaultListModel) dmmList.getModel();
+        for (int ii = 0; ii < model.getSize(); ii++) {
+            DMMFile f = (DMMFile) model.getElementAt(ii);
+            if (!f.isPlayed) {
+                randomLst.add(f);
+            }
+        }
+        if (randomLst.isEmpty()) {
+            JCommonUtil._jOptionPane_showInputDialog("已撥放完所有內容!!");
+            return;
+        }
+        DMMFile file = RandomUtil.pickOne(randomLst);
+        file.isPlayed = true;
+        playFile(file);
+    }
+
+    private void dmmListMouseClick(EventObject evt) {
+        if (JMouseEventUtil.buttonLeftClick(2, evt)) {
+            DMMFile file = (DMMFile) dmmList.getSelectedValue();
+            playFile(file);
+        }
+    }
+
+    private void replayBtnClick() {
+        playFile(currentFile.get());
+    }
+
+    private void playFile(DMMFile file) {
+        if (file == null) {
+            return;
+        }
+        setTitle(file.name);
+        String player = dmmPlayerText.getText();
+        if (StringUtils.isBlank(player)) {
+            try {
+                Desktop.getDesktop().open(file.file);
+            } catch (Exception e) {
+                JCommonUtil.handleException(e);
+            }
+        } else {
+            try {
+                RuntimeBatPromptModeUtil inst = RuntimeBatPromptModeUtil.newInstance();
+                String command = String.format(" \"%s\" \"%s\" ", player, file.path);
+                inst.command(command);
+                inst.apply();
+            } catch (Exception e) {
+                JCommonUtil.handleException(e);
+            }
+        }
+    }
+
+    private void playNextDMMFile() {
+        DefaultListModel model = (DefaultListModel) dmmList.getModel();
+        for (int ii = 0; ii < model.getSize(); ii++) {
+            DMMFile f = (DMMFile) model.getElementAt(ii);
+            if (currentFile.get() == null) {
+                currentFile.set(f);
+                break;
+            }
+            if (StringUtils.equalsIgnoreCase(currentFile.get().path, f.path)) {
+                if (ii + 1 <= model.getSize() - 1) {
+                    DMMFile f2 = (DMMFile) model.getElementAt(ii + 1);
+                    currentFile.set(f2);
+                    break;
+                } else {
+                    DMMFile f2 = (DMMFile) model.getElementAt(0);
+                    currentFile.set(f2);
+                    break;
+                }
+            }
+        }
+        DMMFile file = currentFile.get();
+        file.isPlayed = true;
+        playFile(file);
     }
 
     private void locatePosition(final JTextField text) {
@@ -601,6 +827,12 @@ public class DMMVRPlayerHotKeyUI extends JFrame {
             } else if (e.getKeyCode() == NativeKeyEvent.VC_5) {
                 pressDMMVRPlayerBtn("5");
             }
+
+            else if (e.getKeyCode() == NativeKeyEvent.VC_R) {
+                randomDMMPlayerPlay();
+            } else if (e.getKeyCode() == NativeKeyEvent.VC_N) {
+                playNextDMMFile();
+            }
         }
 
         public void init() {
@@ -645,5 +877,27 @@ public class DMMVRPlayerHotKeyUI extends JFrame {
 
     public SwingActionUtil getSwingUtil() {
         return swingUtil;
+    }
+
+    private class DMMFile {
+        File file;
+        String name;
+        String path;
+        boolean isPlayed = false;
+
+        DMMFile(File file) {
+            this.file = file;
+            this.name = file.getName();
+            this.path = file.getAbsolutePath();
+        }
+
+        public String toString() {
+            String resultStr = //
+                    "<html><font color=red>" + //
+                            (isPlayed ? "已撥放" : "") + //
+                            "</font>" + name + //
+                            "</html>";//
+            return resultStr;
+        }
     }
 }
