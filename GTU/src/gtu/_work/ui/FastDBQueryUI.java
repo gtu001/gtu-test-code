@@ -10,6 +10,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -1782,21 +1783,37 @@ public class FastDBQueryUI extends JFrame {
 
         columnXlsDefTableQryText = new JTextField();
         panel_29.add(columnXlsDefTableQryText);
-        columnXlsDefTableQryText.setColumns(20);
+        columnXlsDefTableQryText.setColumns(15);
 
         label_2 = new JLabel("欄位");
         panel_29.add(label_2);
 
         columnXlsDefColumnQryText = new JTextField();
-        columnXlsDefColumnQryText.setColumns(20);
+        columnXlsDefColumnQryText.setColumns(15);
         panel_29.add(columnXlsDefColumnQryText);
 
         lblNewLabel_19 = new JLabel("其他");
         panel_29.add(lblNewLabel_19);
 
         columnXlsDefOtherQryText = new JTextField();
-        columnXlsDefOtherQryText.setColumns(20);
+        columnXlsDefOtherQryText.setColumns(15);
         panel_29.add(columnXlsDefOtherQryText);
+        
+        panel_30 = new JPanel();
+        panel_28.add(panel_30, BorderLayout.WEST);
+
+        panel_31 = new JPanel();
+        panel_28.add(panel_31, BorderLayout.SOUTH);
+
+        panel_32 = new JPanel();
+        panel_28.add(panel_32, BorderLayout.EAST);
+
+        lblNewLabel_23 = new JLabel("標色");
+        panel_29.add(lblNewLabel_23);
+
+        columnXlsDefLblColorQryText = new JTextField();
+        columnXlsDefLblColorQryText.setColumns(15);
+        panel_29.add(columnXlsDefLblColorQryText);
 
         for (final JTextField textField : new JTextField[] { columnXlsDefTableQryText, columnXlsDefColumnQryText, columnXlsDefOtherQryText }) {
             textField.getDocument().addDocumentListener(JCommonUtil.getDocumentListener(new HandleDocumentEvent() {
@@ -1821,22 +1838,28 @@ public class FastDBQueryUI extends JFrame {
             });
         }
 
-        panel_30 = new JPanel();
-        panel_28.add(panel_30, BorderLayout.WEST);
-
-        panel_31 = new JPanel();
-        panel_28.add(panel_31, BorderLayout.SOUTH);
-
-        panel_32 = new JPanel();
-        panel_28.add(panel_32, BorderLayout.EAST);
+        columnXlsDefLblColorQryText.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusLost(FocusEvent e) {
+                JTableUtil.newInstance(columnXlsDefTableColumnQryTable).findSearchTextMatchChangeColor(columnXlsDefLblColorQryText.getText(), Arrays.asList(0));
+            }
+        });
+        columnXlsDefLblColorQryText.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JTableUtil.newInstance(columnXlsDefTableColumnQryTable).findSearchTextMatchChangeColor(columnXlsDefLblColorQryText.getText(), Arrays.asList(0));
+            }
+        });
 
         columnXlsDefTableQryText.setToolTipText("分隔\"^\", 正則/.../");
         columnXlsDefColumnQryText.setToolTipText("分隔\"^\", 正則/.../");
         columnXlsDefOtherQryText.setToolTipText("分隔\"^\", 正則/.../");
+        columnXlsDefLblColorQryText.setToolTipText("分隔\"^\", 正則/.../");
 
         columnXlsDefTableQryText.addMouseListener(new S2T_And_T2S_EventHandler(columnXlsDefTableQryText).getEvent());
         columnXlsDefColumnQryText.addMouseListener(new S2T_And_T2S_EventHandler(columnXlsDefColumnQryText).getEvent());
         columnXlsDefOtherQryText.addMouseListener(new S2T_And_T2S_EventHandler(columnXlsDefOtherQryText).getEvent());
+        columnXlsDefLblColorQryText.addMouseListener(new S2T_And_T2S_EventHandler(columnXlsDefOtherQryText).getEvent());
 
         columnXlsDefShowChineseChk = new JCheckBox("顯示中文");
         panel_29.add(columnXlsDefShowChineseChk);
@@ -2114,6 +2137,8 @@ public class FastDBQueryUI extends JFrame {
             }
         });
 
+        // -----------------------------------------------------------------------------------------------
+        // -----------------------------------------------------------------------------------------------
         // -----------------------------------------------------------------------------------------------
         // -----------------------------------------------------------------------------------------------
         {
@@ -4352,9 +4377,9 @@ public class FastDBQueryUI extends JFrame {
                 Arrays.fill(clzs, String.class);
                 List<Class<?>> clzLst = Arrays.asList(clzs);
                 queryList = Triple.of(titles2, clzLst, rowLst);
-                
+
                 queryResultCountLabel.setText(String.valueOf(queryList.getRight().size()));
-                
+
                 prog.dismissByMax();
             }
         }).start();
@@ -7217,6 +7242,8 @@ public class FastDBQueryUI extends JFrame {
             }
         }
     };
+    private JTextField columnXlsDefLblColorQryText;
+    private JLabel lblNewLabel_23;
 
     // 設定預設欄位定義
     // 格式為 /*中文解釋 */
@@ -8300,6 +8327,10 @@ public class FastDBQueryUI extends JFrame {
         }
     }
 
+    // --------------------------------------------------------------------------------------------------------------------------
+    // --------------------------------------------------------------------------------------------------------------------------
+    // --------------------------------------------------------------------------------------------------------------------------
+    // --------------------------------------------------------------------------------------------------------------------------
     // --------------------------------------------------------------------------------------------------------------------------
     // --------------------------------------------------------------------------------------------------------------------------
     // --------------------------------------------------------------------------------------------------------------------------

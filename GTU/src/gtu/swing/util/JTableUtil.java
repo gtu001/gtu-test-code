@@ -36,6 +36,7 @@ import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Enumeration;
@@ -1827,31 +1828,6 @@ public class JTableUtil {
             }
         }
 
-        protected Pair<String, List<Pattern>> filterPattern(String filterText) {
-            Pattern ptn = Pattern.compile("\\/(.*?)\\/");
-            Matcher mth = ptn.matcher(filterText);
-            StringBuffer sb = new StringBuffer();
-            List<Pattern> lst = new ArrayList<Pattern>();
-            while (mth.find()) {
-                String temp = mth.group(1);
-                Pattern tmpPtn = null;
-                if (StringUtils.isNotBlank(temp)) {
-                    try {
-                        tmpPtn = Pattern.compile(temp, Pattern.CASE_INSENSITIVE);
-                    } catch (Exception ex) {
-                    }
-                }
-                if (tmpPtn != null) {
-                    lst.add(tmpPtn);
-                    mth.appendReplacement(sb, "");
-                } else {
-                    mth.appendReplacement(sb, mth.group(0));
-                }
-            }
-            mth.appendTail(sb);
-            return Pair.of(sb.toString(), lst);
-        }
-
         protected void __filterText(String filterText) {
             TableColumnModel columnModel = table.getTableHeader().getColumnModel();
 
@@ -1917,7 +1893,6 @@ public class JTableUtil {
             removeAll();
             __filterText(filterText);
         }
-
     }
 
     /**
@@ -2136,4 +2111,83 @@ public class JTableUtil {
             return super.stopCellEditing();
         }
     }
+
+    // ----------------------------------------------------------------------------------------------------------------------
+
+    private static Pair<String, List<Pattern>> filterPattern(String filterText) {
+        Pattern ptn = Pattern.compile("\\/(.*?)\\/");
+        Matcher mth = ptn.matcher(filterText);
+        StringBuffer sb = new StringBuffer();
+        List<Pattern> lst = new ArrayList<Pattern>();
+        while (mth.find()) {
+            String temp = mth.group(1);
+            Pattern tmpPtn = null;
+            if (StringUtils.isNotBlank(temp)) {
+                try {
+                    tmpPtn = Pattern.compile(temp, Pattern.CASE_INSENSITIVE);
+                } catch (Exception ex) {
+                }
+            }
+            if (tmpPtn != null) {
+                lst.add(tmpPtn);
+                mth.appendReplacement(sb, "");
+            } else {
+                mth.appendReplacement(sb, mth.group(0));
+            }
+        }
+        mth.appendTail(sb);
+        return Pair.of(sb.toString(), lst);
+    }
+
+    public void findSearchTextMatchChangeColor(String text11, List<Integer> ignoreColLst) {
+        try {
+            Map<Integer, List<Integer>> changeColorMap = new HashMap<Integer, List<Integer>>();
+            if (StringUtils.isBlank(text11)) {
+                JTableUtil.newInstance(table).setCellBackgroundColor(Color.green.brighter(), changeColorMap, ignoreColLst);
+                return;
+            }
+
+            Pair<String, List<Pattern>> mthPtn = filterPattern(text11);
+
+            String text1 = StringUtils.trimToEmpty(mthPtn.getLeft());
+            String text = text1.toLowerCase();
+            List<String> textLst = new ArrayList<String>();
+            for (String t : text1.split("\\^", -1)) {
+                t = StringUtils.trimToEmpty(t).toLowerCase();
+                if (StringUtils.isNotBlank(t)) {
+                    textLst.add(t);
+                }
+            }
+
+            JTableUtil util = JTableUtil.newInstance(table);
+            DefaultTableModel model = util.getModel();
+
+            for (int ii = 0; ii < model.getRowCount(); ii++) {
+                List<Integer> lst = new ArrayList<Integer>();
+                changeColorMap.put(ii, lst);
+                A: for (int jj = 0; jj < table.getColumnCount(); jj++) {
+                    Object val = util.getValueAt(true, ii, jj);
+                    if (val instanceof String) {
+                        String strVal = (String) val;
+                        for (String txt : textLst) {
+                            if (strVal.toLowerCase().contains(txt)) {
+                                lst.add(jj);
+                                continue A;
+                            }
+                        }
+                        for (Pattern pp : mthPtn.getRight()) {
+                            if (pp != null && pp.matcher(strVal).find()) {
+                                lst.add(jj);
+                                continue A;
+                            }
+                        }
+                    }
+                }
+            }
+            JTableUtil.newInstance(table).setCellBackgroundColor(Color.green.brighter(), changeColorMap, ignoreColLst);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+    // ----------------------------------------------------------------------------------------------------------------------
 }
