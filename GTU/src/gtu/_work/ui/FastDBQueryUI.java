@@ -2507,6 +2507,7 @@ public class FastDBQueryUI extends JFrame {
         sqlIdText.setText("");
         sqlTextArea.setText("");
         sqlIdCommentArea.setText("");
+        sqlIdCategoryComboBox_Auto.setSelectItemAndText("");
         this.sqlBean = null;
         setSqlListSelection(this.sqlBean);
         SqlIdConfigBean emptyBean = new SqlIdConfigBean();
@@ -8295,7 +8296,7 @@ public class FastDBQueryUI extends JFrame {
                 Collections.sort(sqlIdList, new Comparator<SqlIdConfigBean>() {
                     @Override
                     public int compare(SqlIdConfigBean o1, SqlIdConfigBean o2) {
-                        int compare1 = -1 * StringUtils.trimToEmpty(o1.queryTimes).toLowerCase().compareTo(StringUtils.trimToEmpty(o2.queryTimes).toLowerCase());
+                        int compare1 = -1 * toCompareInt(o1.queryTimes).compareTo(toCompareInt(o2.queryTimes));
                         return compare1;
                     }
                 });
@@ -8305,7 +8306,7 @@ public class FastDBQueryUI extends JFrame {
                 Collections.sort(sqlIdList, new Comparator<SqlIdConfigBean>() {
                     @Override
                     public int compare(SqlIdConfigBean o1, SqlIdConfigBean o2) {
-                        int compare1 = StringUtils.trimToEmpty(o1.queryTimes).toLowerCase().compareTo(StringUtils.trimToEmpty(o2.queryTimes).toLowerCase());
+                        int compare1 = toCompareInt(o1.queryTimes).compareTo(toCompareInt(o2.queryTimes));
                         return compare1;
                     }
                 });
@@ -8324,6 +8325,14 @@ public class FastDBQueryUI extends JFrame {
                     return compare2;
                 }
             });
+        }
+    }
+    
+    private static Integer toCompareInt(String strVal) {
+        try {
+            return Integer.parseInt(StringUtils.trimToEmpty(strVal));
+        }catch(Exception ex) {
+            return 0;
         }
     }
 
