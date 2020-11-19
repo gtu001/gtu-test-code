@@ -32,7 +32,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.ListModel;
-import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -59,8 +58,8 @@ import gtu.swing.util.JFrameRGBColorPanel;
 import gtu.swing.util.JFrameUtil;
 import gtu.swing.util.JListUtil;
 import gtu.swing.util.JOptionPaneUtil;
-import gtu.swing.util.SwingTabTemplateUI;
 import gtu.swing.util.JOptionPaneUtil.ComfirmDialogResult;
+import gtu.swing.util.SwingTabTemplateUI;
 
 /**
  * This code was edited or generated using CloudGarden's Jigloo SWT/Swing GUI
@@ -145,7 +144,6 @@ public class JarFinderUI extends javax.swing.JFrame {
                     {
                         jScrollPane1 = new JScrollPane();
                         jPanel1.add(jScrollPane1, BorderLayout.CENTER);
-                        jScrollPane1.setPreferredSize(new java.awt.Dimension(406, 255));
                         {
                             DefaultListModel jList1Model = new DefaultListModel();
                             try {
@@ -176,7 +174,17 @@ public class JarFinderUI extends javax.swing.JFrame {
                             });
                             jarFileDirs.addKeyListener(new KeyAdapter() {
                                 public void keyPressed(KeyEvent evt) {
-                                    JListUtil.newInstance(jarFileDirs).defaultJListKeyPressed(evt);
+                                    JListUtil.newInstance(jarFileDirs).defaultJListKeyPressed(evt, new ActionListener() {
+                                        @Override
+                                        public void actionPerformed(ActionEvent e) {
+                                            File delFile = (File) e.getSource();
+                                            boolean delConfirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("是否刪除:" + delFile, "刪除設定");
+                                            if (delConfirm) {
+                                                PropertiesUtil.removePropertyNS(delFile.getAbsolutePath(), CONFIG_FILE);
+                                                e.setSource(true);
+                                            }
+                                        }
+                                    });
                                 }
                             });
                         }
@@ -473,6 +481,8 @@ public class JarFinderUI extends javax.swing.JFrame {
         if (file != null) {
             DefaultListModel model = (DefaultListModel) jarFileDirs.getModel();
             model.addElement(file);
+
+            PropertiesUtil.setPropertyNS(file.getAbsolutePath(), "", CONFIG_FILE);
         }
     }
 

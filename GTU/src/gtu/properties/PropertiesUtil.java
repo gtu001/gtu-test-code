@@ -18,6 +18,7 @@ import java.util.Enumeration;
 import java.util.Properties;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.time.DateFormatUtils;
 
 import gtu.log.Log;
 import gtu.swing.util.JCommonUtil;
@@ -301,5 +302,27 @@ public class PropertiesUtil {
                 e.printStackTrace();
             }
         }
+    }
+    
+    //-------------------------------------------------------
+
+    public static void setPropertyNS(String key, String value, File file) {
+        Properties prop = new Properties();
+        PropertiesUtil.loadProperties(file, prop, true);
+        prop.setProperty(key, value);
+        PropertiesUtil.storeProperties(prop, file, "" + DateFormatUtils.format(System.currentTimeMillis(), "yyyy-MM-dd HHmmss"));
+    }
+    
+    public static void removePropertyNS(String key, File file) {
+        Properties prop = new Properties();
+        PropertiesUtil.loadProperties(file, prop, true);
+        prop.remove(key);
+        PropertiesUtil.storeProperties(prop, file, "" + DateFormatUtils.format(System.currentTimeMillis(), "yyyy-MM-dd HHmmss"));
+    }
+    
+    public static boolean containsPropertyNS(String key, String value, File file) {
+        Properties prop = new Properties();
+        PropertiesUtil.loadProperties(file, prop, true);
+        return prop.containsKey(key);
     }
 }

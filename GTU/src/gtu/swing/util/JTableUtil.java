@@ -1780,6 +1780,7 @@ public class JTableUtil {
         JTable table;
         String delimit;
         Object[] alwaysMatchColumns;
+        boolean doHiddenColumn = false;
 
         public ColumnSearchFilter(JTable table, String delimit, Object[] alwaysMatchColumns) {
             this.table = table;
@@ -1829,6 +1830,8 @@ public class JTableUtil {
         }
 
         protected void __filterText(String filterText) {
+            doHiddenColumn = false;
+
             TableColumnModel columnModel = table.getTableHeader().getColumnModel();
 
             // 解析 regex ptn
@@ -1880,6 +1883,8 @@ public class JTableUtil {
                     if (findOk && !addColumns.containsKey(headerColumn)) {
                         System.out.println("Add------------" + key);
                         addColumns.put(headerColumn, headerDef.getRight().get(ii));
+                    } else {
+                        doHiddenColumn = true;
                     }
                 }
             }
@@ -1887,6 +1892,10 @@ public class JTableUtil {
             for (TableColumn column : addColumns.values()) {
                 columnModel.addColumn(column);
             }
+        }
+
+        public boolean isDoHiddenColumn() {
+            return doHiddenColumn;
         }
 
         public void filterText(String filterText) {

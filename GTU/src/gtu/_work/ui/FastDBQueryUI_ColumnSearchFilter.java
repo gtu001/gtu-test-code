@@ -22,6 +22,8 @@ public class FastDBQueryUI_ColumnSearchFilter {
     // -----------------以下變數為rowFilter
     Triple<List<String>, List<Class<?>>, List<Object[]>> rowFilterResult = null;
     Map<Integer, List<Integer>> changeColorRowCellIdxMap = null;
+    
+    boolean doHiddenColumn= false;
 
     public FastDBQueryUI_ColumnSearchFilter(Triple<List<String>, List<Class<?>>, List<Object[]>> queryList, String delimit, Object[] alwaysMatchColumns) {
         this.delimit = (delimit == null || StringUtils.isBlank(delimit)) ? "," : delimit;
@@ -69,6 +71,8 @@ public class FastDBQueryUI_ColumnSearchFilter {
     }
 
     private void __filterText(String filterText) {
+        doHiddenColumn = false;
+        
         // 解析 regex ptn
         Pair<String, List<Pattern>> afterFilterProc = filterPattern(filterText);
 
@@ -118,6 +122,8 @@ public class FastDBQueryUI_ColumnSearchFilter {
                 if (findOk && !showColumns.containsKey(headerColumn)) {
                     System.out.println("Add------------" + key);
                     showColumns.put(headerColumn, ii);
+                } else {
+                    doHiddenColumn = true;
                 }
             }
         }
@@ -328,5 +334,9 @@ public class FastDBQueryUI_ColumnSearchFilter {
 
     public Pair<Triple<List<String>, List<Class<?>>, List<Object[]>>, Map<Integer, List<Integer>>> getResultFinal() {
         return Pair.of(rowFilterResult, changeColorRowCellIdxMap);
+    }
+
+    public boolean isDoHiddenColumn() {
+        return doHiddenColumn;
     }
 }

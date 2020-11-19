@@ -402,6 +402,7 @@ public class FastDBQueryUI extends JFrame {
     private FastDBQueryUI_ReserveSqlDlg mFastDBQueryUI_ReserveSqlDlg;
     private JComboBox sqlListSortCombobox;
     private JLabel lblNewLabel_22;
+    private AtomicReference<ColumnSearchFilter> columnFilterHolder = new AtomicReference<ColumnSearchFilter>();
 
     private final Predicate IGNORE_PREDICT = new Predicate() {
         @Override
@@ -1289,7 +1290,7 @@ public class FastDBQueryUI extends JFrame {
         distinctQueryBtn = new JButton("Distinct");
         distinctQueryBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                distinctQueryBtnAction();
+                distinctQueryBtnActionTotal();
             }
         });
 
@@ -1354,6 +1355,7 @@ public class FastDBQueryUI extends JFrame {
                     if (columnFilter == null || isResetQuery) {
                         columnFilter = new ColumnSearchFilter(queryResultTable, "^", new Object[] { QUERY_RESULT_COLUMN_NO });
                         isResetQuery = false;
+                        columnFilterHolder.set(columnFilter);
                     }
                     columnFilter.filterText(columnFilterText.getText());
                 } catch (Exception ex) {
@@ -1798,7 +1800,7 @@ public class FastDBQueryUI extends JFrame {
         columnXlsDefOtherQryText = new JTextField();
         columnXlsDefOtherQryText.setColumns(15);
         panel_29.add(columnXlsDefOtherQryText);
-        
+
         panel_30 = new JPanel();
         panel_28.add(panel_30, BorderLayout.WEST);
 
@@ -4825,42 +4827,92 @@ public class FastDBQueryUI extends JFrame {
         }
     }
 
-    protected void distinctQueryBtnAction() {
+    protected void distinctQueryBtnActionTotal() {
         try {
-            distinctHasClicked = true;
-
-            TreeMap<Integer, String> columnMapping = new TreeMap<Integer, String>();
-            JTableUtil util = JTableUtil.newInstance(queryResultTable);
-
-            for (int ii = 0; ii < queryResultTable.getColumnCount(); ii++) {
-                TableColumn column = queryResultTable.getTableHeader().getColumnModel().getColumn(ii);
-                int pos2 = util.getRealColumnPos(ii, queryResultTable);
-                // System.out.println(column.getHeaderValue() + " - " + ii + " -
-                // " + pos2);
-                columnMapping.put(pos2, (String) column.getHeaderValue());
+            if (columnFilterHolder.get() == null || !columnFilterHolder.get().isDoHiddenColumn()) {
+                distinctQueryBtnAction();
+            } else {
+                distinctQueryBtnActionAbbr();
             }
-            System.out.println(columnMapping);
-            List<Object[]> queryLst = new ArrayList<Object[]>();
-            for (int row = 0; row < util.getModel().getRowCount(); row++) {
-                TreeMap<Integer, Object> map = new TreeMap<Integer, Object>();
-                for (int col = 0; col < queryResultTable.getColumnCount(); col++) {
-                    int realCol = util.getRealColumnPos(col, queryResultTable);
-                    int realRow = util.getRealRowPos(row, queryResultTable);
-                    Object value = util.getModel().getValueAt(realRow, realCol);
-                    map.put(realCol, value);
-                }
-                Object[] arry = map.values().toArray();
-                if (isContainObjectArray_Index(queryLst, arry) == -1) {
-                    queryLst.add(arry);
-                }
-            }
-
-            List<String> matchColumnLst = new ArrayList<String>(columnMapping.values());
-            Triple<List<String>, List<Class<?>>, List<Object[]>> queryResultFinal = fixPairToTripleQueryResult(Pair.of(matchColumnLst, queryLst));
-            this.queryModeProcess(queryResultFinal, true, null, null);
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
         }
+    }
+
+    protected void distinctQueryBtnActionAbbr() {
+        distinctHasClicked = true;
+
+        JTableUtil util = JTableUtil.newInstance(queryResultTable);
+
+        List<String> containsLst = new ArrayList<String>();
+
+        List<String> columns = new ArrayList<String>();
+        List<Object[]> rows = new ArrayList<Object[]>();
+
+        boolean hiddenNoColumn = false;
+
+        for (int colPos = 0; colPos < queryResultTable.getColumnCount(); colPos++) {
+            TableColumn column = queryResultTable.getTableHeader().getColumnModel().getColumn(colPos);
+            String colStr = (String) column.getHeaderValue();
+            if (!StringUtils.equals(QUERY_RESULT_COLUMN_NO, colStr)) {
+                columns.add(colStr);
+                hiddenNoColumn = true;
+            }
+        }
+
+        for (int rowPos = 0; rowPos < queryResultTable.getRowCount(); rowPos++) {
+            List<Object> row = new ArrayList<Object>();
+            A: for (int colPos = 0; colPos < queryResultTable.getColumnCount(); colPos++) {
+                if (hiddenNoColumn && colPos == 0) {
+                    continue A;
+                }
+                Object data = util.getRealValueAt(rowPos, colPos);
+                row.add(data);
+            }
+
+            String rowStr = row.toString();
+            if (!containsLst.contains(rowStr)) {
+                containsLst.add(rowStr);
+                rows.add(row.toArray());
+            }
+        }
+
+        Triple<List<String>, List<Class<?>>, List<Object[]>> queryResultFinal = fixPairToTripleQueryResult(Pair.of(columns, rows));
+        this.queryModeProcess(queryResultFinal, true, null, null);
+    }
+
+    protected void distinctQueryBtnAction() {
+        distinctHasClicked = true;
+
+        TreeMap<Integer, String> columnMapping = new TreeMap<Integer, String>();
+        JTableUtil util = JTableUtil.newInstance(queryResultTable);
+
+        for (int ii = 0; ii < queryResultTable.getColumnCount(); ii++) {
+            TableColumn column = queryResultTable.getTableHeader().getColumnModel().getColumn(ii);
+            int pos2 = util.getRealColumnPos(ii, queryResultTable);
+            // System.out.println(column.getHeaderValue() + " - " + ii + " -
+            // " + pos2);
+            columnMapping.put(pos2, (String) column.getHeaderValue());
+        }
+        System.out.println(columnMapping);
+        List<Object[]> queryLst = new ArrayList<Object[]>();
+        for (int row = 0; row < util.getModel().getRowCount(); row++) {
+            TreeMap<Integer, Object> map = new TreeMap<Integer, Object>();
+            for (int col = 0; col < queryResultTable.getColumnCount(); col++) {
+                int realCol = util.getRealColumnPos(col, queryResultTable);
+                int realRow = util.getRealRowPos(row, queryResultTable);
+                Object value = util.getModel().getValueAt(realRow, realCol);
+                map.put(realCol, value);
+            }
+            Object[] arry = map.values().toArray();
+            if (isContainObjectArray_Index(queryLst, arry) == -1) {
+                queryLst.add(arry);
+            }
+        }
+
+        List<String> matchColumnLst = new ArrayList<String>(columnMapping.values());
+        Triple<List<String>, List<Class<?>>, List<Object[]>> queryResultFinal = fixPairToTripleQueryResult(Pair.of(matchColumnLst, queryLst));
+        this.queryModeProcess(queryResultFinal, true, null, null);
     }
 
     private int isContainObjectArray_Index(List<Object[]> allLst, Object[] arry) {
@@ -8327,11 +8379,11 @@ public class FastDBQueryUI extends JFrame {
             });
         }
     }
-    
+
     private static Integer toCompareInt(String strVal) {
         try {
             return Integer.parseInt(StringUtils.trimToEmpty(strVal));
-        }catch(Exception ex) {
+        } catch (Exception ex) {
             return 0;
         }
     }
