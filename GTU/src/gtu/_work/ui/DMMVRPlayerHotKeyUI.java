@@ -61,6 +61,7 @@ import gtu.swing.util.JFrameRGBColorPanel;
 import gtu.swing.util.JFrameUtil;
 import gtu.swing.util.JListUtil;
 import gtu.swing.util.JMouseEventUtil;
+import gtu.swing.util.JPopupMenuUtil;
 import gtu.swing.util.SwingActionUtil;
 import gtu.swing.util.SwingActionUtil.Action;
 import gtu.swing.util.SwingActionUtil.ActionAdapter;
@@ -137,6 +138,7 @@ public class DMMVRPlayerHotKeyUI extends JFrame {
     private AtomicReference<DMMFile> currentFile = new AtomicReference<DMMFile>();
     private JButton dmmLstResetBtn;
     private JButton replayBtn;
+    private JButton infoBtn;
 
     /**
      * Launch the application.
@@ -199,6 +201,14 @@ public class DMMVRPlayerHotKeyUI extends JFrame {
             }
         });
         panel_9.add(enableToggleBtn);
+
+        infoBtn = new JButton("info");
+        infoBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                swingUtil.invokeAction("infoBtn.click", e);
+            }
+        });
+        panel_9.add(infoBtn);
 
         lblNewLabel = new JLabel("<<(ctl+left)");
         panel.add(lblNewLabel, "2, 4");
@@ -615,6 +625,12 @@ public class DMMVRPlayerHotKeyUI extends JFrame {
                 replayBtnClick();
             }
         });
+        swingUtil.addActionHex("infoBtn.click", new Action() {
+            @Override
+            public void action(EventObject evt) throws Exception {
+                JCommonUtil._jOptionPane_showMessageDialog_info("R隨機\nN下一部\nT重播");
+            }
+        });
     }
 
     private void dmmListAppendDMMFiles(List<File> files) {
@@ -661,6 +677,31 @@ public class DMMVRPlayerHotKeyUI extends JFrame {
             DMMFile file = (DMMFile) dmmList.getSelectedValue();
             playFile(file);
         }
+        if (JMouseEventUtil.buttonRightClick(1, evt)) {
+            final DMMFile file = (DMMFile) dmmList.getSelectedValue();
+            JPopupMenuUtil.newInstance(dmmList)//
+                    .addJMenuItem("改名", new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            if (file.file.exists()) {
+                                String name = file.file.getName();
+                                String name1 = StringUtils.trimToEmpty(name).replaceAll("\\.wsdcf$", "");
+                                name1 = JCommonUtil._jOptionPane_showInputDialog("修改檔名", name1);
+                                String name2 = name1 + ".wsdcf";
+                                if (JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("確定是否改為:" + name2, "是否改名")) {
+                                    if (!StringUtils.equals(name, name2)) {
+                                        File newFile = new File(file.file.getParentFile(), name2);
+                                        boolean fixNameOk = file.file.renameTo(newFile);
+                                        JCommonUtil._jOptionPane_showMessageDialog_info("修改檔名" + (fixNameOk ? "成功" : "失敗"));
+                                        file.applyFile(newFile);
+                                        dmmList.repaint();
+                                    }
+                                }
+                            }
+                        }
+                    })//
+                    .applyEvent(evt).show();
+        }
     }
 
     private void replayBtnClick() {
@@ -669,6 +710,11 @@ public class DMMVRPlayerHotKeyUI extends JFrame {
 
     private void playFile(DMMFile file) {
         if (file == null) {
+            System.out.println("檔案為null");
+            return;
+        }
+        if (!file.file.exists()) {
+            System.out.println("檔案位置移動 : " + file.path);
             return;
         }
         setTitle(file.name);
@@ -832,6 +878,8 @@ public class DMMVRPlayerHotKeyUI extends JFrame {
                 randomDMMPlayerPlay();
             } else if (e.getKeyCode() == NativeKeyEvent.VC_N) {
                 playNextDMMFile();
+            } else if (e.getKeyCode() == NativeKeyEvent.VC_T) {
+                replayBtnClick();
             }
         }
 
@@ -885,10 +933,14 @@ public class DMMVRPlayerHotKeyUI extends JFrame {
         String path;
         boolean isPlayed = false;
 
-        DMMFile(File file) {
+        private void applyFile(File file) {
             this.file = file;
             this.name = file.getName();
             this.path = file.getAbsolutePath();
+        }
+
+        DMMFile(File file) {
+            applyFile(file);
         }
 
         public String toString() {
