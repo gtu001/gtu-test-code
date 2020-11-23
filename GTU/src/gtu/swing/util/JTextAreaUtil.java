@@ -504,10 +504,10 @@ public class JTextAreaUtil {
 
                     String beforeText = StringUtils.substring(textArea.getText(), 0, caretPosition.get());
                     String afterText = StringUtils.substring(textArea.getText(), caretPosition.get());
-                    if (!beforeText.endsWith("\n")) {
+                    if (!beforeText.endsWith("\n") || StringUtils.length(prefixLine) == 0) {
                         beforeText += "\n";
                     }
-                    if (afterText.startsWith("\n") && StringUtils.isNotBlank(afterText)) {
+                    if (afterText.startsWith("\n")) {
                         afterText = afterText.replaceFirst("\n", "");
                     }
 
