@@ -84,7 +84,7 @@
 			<packagename mode="small" name="forms-1.3.0.jar">com.jgoodies.forms.factories.FormFactory</packagename>
 			<packagename mode="small" name="commons-beanutils-1.7.0.jar">org.apache.commons.beanutils.ConvertUtils</packagename>
 			<packagename mode="pom" name="commons-collections4-4.1.jar">org.apache.commons.collections4</packagename>
-
+			<packagename mode="pom" name="">org.apache.tools.zip.ZipFile</packagename>
 
 		</jarfinder>
 
@@ -177,12 +177,12 @@
 
 	<target name="compiler" if="${enable}">
 		<echo># compiler ...</echo>
-		<javac executable="${jdk_javac}" fork="yes" compiler="javac1.6" source="1.6" target="1.6" includeantruntime="true" srcdir="${src_dir}" destdir="${build_dir}" deprecation="no" nowarn="true" encoding="UTF-8" debug="on"><!-- -->
+		<javac  fork="yes" compiler="javac1.6" source="1.6" target="1.6" includeantruntime="true" srcdir="${src_dir}" destdir="${build_dir}" deprecation="no" nowarn="true" encoding="UTF-8" debug="on"><!-- -->
 			<include name="**/${main_class}.java" /><!--executable="${jdk_javac}" fork="yes" -->
 			<classpath>
 				<path location="${build_dir}" />
 			</classpath>
-			<classpath refid="javafx_class_path" />
+			<!--<classpath refid="javafx_class_path" />-->
 		</javac>
 	</target>
 

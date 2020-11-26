@@ -34,6 +34,7 @@ import java.nio.channels.FileLock;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -52,6 +53,7 @@ import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.tuple.Pair;
 
 import gtu.date.DateUtil;
+import sun.security.action.GetPropertyAction;
 
 /**
  * @author Troy 2009/05/04
@@ -1645,6 +1647,20 @@ public class FileUtil {
 
     public void writeBOM(FileOutputStream writer) throws IOException {
         writer.write(new byte[] { (byte) 0xEF, (byte) 0xBB, (byte) 0xBF });
+    }
+
+    public static File createTempDir(String prefix, String suffix) {
+        File tmpdir = new File(AccessController.doPrivileged(new GetPropertyAction("java.io.tmpdir")));
+        if (prefix.length() < 3)
+            throw new IllegalArgumentException("Prefix string too short");
+        if (StringUtils.isBlank(suffix))
+            suffix = "_Dir";
+        String dirName = prefix + "_" + System.currentTimeMillis() + "_" + suffix;
+        File dir = new File(tmpdir, dirName);
+        if (!dir.mkdirs()) {
+            throw new RuntimeException("建立暫時目錄失敗 :" + dir);
+        }
+        return dir;
     }
 
     private static class FileDeleteHelper {

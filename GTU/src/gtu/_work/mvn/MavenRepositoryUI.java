@@ -1,24 +1,5 @@
 package gtu._work.mvn;
 
-import gtu._work.JarFinder;
-import gtu._work.mvn.LoadPomListDependency.DependencyKey;
-import gtu._work.mvn.LoadPomListDependency.Pom;
-import gtu.clipboard.ClipboardUtil;
-import gtu.collection.ListUtil;
-import gtu.date.DateFormatUtil;
-import gtu.file.FileUtil;
-import gtu.properties.PropertiesUtil;
-import gtu.runtime.ProcessWatcher;
-import gtu.swing.util.JCommonUtil;
-import gtu.swing.util.JCommonUtil.HandleDocumentEvent;
-import gtu.swing.util.JFileChooserUtil;
-import gtu.swing.util.JListUtil;
-import gtu.swing.util.JMouseEventUtil;
-import gtu.swing.util.JOptionPaneUtil;
-import gtu.swing.util.JPopupMenuUtil;
-import gtu.swing.util.JProgressBarHelper;
-import gtu.swing.util.JTableUtil;
-
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Desktop;
@@ -61,8 +42,6 @@ import javax.swing.ListModel;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.plaf.ProgressBarUI;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
@@ -73,6 +52,28 @@ import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
+
+import gtu._work.JarFinder;
+import gtu._work.mvn.LoadPomListDependency.DependencyKey;
+import gtu._work.mvn.LoadPomListDependency.Pom;
+import gtu.clipboard.ClipboardUtil;
+import gtu.collection.ListUtil;
+import gtu.date.DateFormatUtil;
+import gtu.file.FileUtil;
+import gtu.properties.PropertiesUtil;
+import gtu.runtime.ProcessWatcher;
+import gtu.serialization.ObjectSerailizeUtil;
+import gtu.serialization.ObjectSerailizeUtil.ReadObject;
+import gtu.serialization.ObjectSerailizeUtil.WriteObject;
+import gtu.swing.util.JCommonUtil;
+import gtu.swing.util.JCommonUtil.HandleDocumentEvent;
+import gtu.swing.util.JFileChooserUtil;
+import gtu.swing.util.JListUtil;
+import gtu.swing.util.JMouseEventUtil;
+import gtu.swing.util.JOptionPaneUtil;
+import gtu.swing.util.JPopupMenuUtil;
+import gtu.swing.util.JProgressBarHelper;
+import gtu.swing.util.JTableUtil;
 
 /**
  * This code was edited or generated using CloudGarden's Jigloo SWT/Swing GUI
@@ -117,6 +118,7 @@ public class MavenRepositoryUI extends javax.swing.JFrame {
     private JPanel jPanel2;
     private JButton saveCurrentDataBtn;
     private JButton loadConfigDataBtn;
+    private M2ConfigHolder mM2ConfigHolder;
 
     /**
      * Auto-generated main method to display this JFrame
@@ -379,9 +381,9 @@ public class MavenRepositoryUI extends javax.swing.JFrame {
                                 }
                                 try {
                                     ObjectInputStream reader = new ObjectInputStream(new FileInputStream(cfgFile));
-                                    pomFileList = (Set<PomFile>) reader.readObject();
-                                    pomFileJarList = (Set<PomFile>) reader.readObject();
-                                    pomFileMap = (Map<DependencyKey, PomFile>) reader.readObject();
+                                    pomFileList = (HashSet<PomFile>) reader.readObject();
+                                    pomFileJarList = (HashSet<PomFile>) reader.readObject();
+                                    pomFileMap = (HashMap<DependencyKey, PomFile>) reader.readObject();
                                     reader.close();
                                     resetUIStatus();
                                     JOptionPaneUtil.newInstance().iconInformationMessage().showMessageDialog("load completed!\n" + cfgFile, "SUCCESS");
@@ -558,9 +560,9 @@ public class MavenRepositoryUI extends javax.swing.JFrame {
         }
     }
 
-    static Set<PomFile> pomFileList;// 全部的pom不一定有jar
-    static Set<PomFile> pomFileJarList;// 有對應jar黨的pom
-    static Map<DependencyKey, PomFile> pomFileMap;
+    static HashSet<PomFile> pomFileList;// 全部的pom不一定有jar
+    static HashSet<PomFile> pomFileJarList;// 有對應jar黨的pom
+    static HashMap<DependencyKey, PomFile> pomFileMap;
 
     static JarFinder jarfinder;
     static File copyTo = FileUtil.DESKTOP_DIR;// single jar copy to
@@ -1025,6 +1027,8 @@ public class MavenRepositoryUI extends javax.swing.JFrame {
             return;
         }
 
+        mM2ConfigHolder = new M2ConfigHolder();
+
         final JProgressBarHelper jprogDlg = JProgressBarHelper.newInstance(this, "讀取m2");
         jprogDlg.indeterminate(true);
         jprogDlg.build();
@@ -1033,16 +1037,25 @@ public class MavenRepositoryUI extends javax.swing.JFrame {
             public void run() {
                 try {
                     long startTime = System.currentTimeMillis();
-                    setTitle("loading... " + repositoryDir);
 
-                    List<File> pomList = new ArrayList<File>();
-                    FileUtil.searchFileMatchs(repositoryDir, ".*\\.pom", pomList);
+                    boolean readSuccess = mM2ConfigHolder.readConfig();
 
-                    pomFileList = new HashSet<PomFile>();
-                    pomFileJarList = new HashSet<PomFile>();
-                    pomFileMap = new HashMap<DependencyKey, PomFile>();
+                    if (!readSuccess) {
+                        setTitle("loading... " + repositoryDir);
 
-                    loadPomList(pomList, jprogDlg);
+                        List<File> pomList = new ArrayList<File>();
+                        FileUtil.searchFileMatchs(repositoryDir, ".*\\.pom", pomList);
+
+                        pomFileList = new HashSet<PomFile>();
+                        pomFileJarList = new HashSet<PomFile>();
+                        pomFileMap = new HashMap<DependencyKey, PomFile>();
+
+                        loadPomList(pomList, jprogDlg);
+
+                        mM2ConfigHolder.writeConfig(pomFileList, pomFileJarList, pomFileMap);
+                    } else {
+                        setTitle("loaded from cache !");
+                    }
 
                     long endTime = System.currentTimeMillis() - startTime;
                     String message = "load completed! \ntime:" + endTime + ", poms:" + pomFileList.size() + ", jars:" + pomFileJarList.size();
@@ -1289,6 +1302,41 @@ public class MavenRepositoryUI extends javax.swing.JFrame {
                     return false;
             } else if (!pom.equals(other.pom))
                 return false;
+            return true;
+        }
+    }
+
+    private class M2ConfigHolder {
+        File m2CacheFile;
+
+        public M2ConfigHolder() {
+            m2CacheFile = new File(PropertiesUtil.getJarCurrentPath(MavenRepositoryUI.class), MavenRepositoryUI.class.getSimpleName() + "_M2_cache.cfg");
+            System.out.println("m2CacheFile : " + m2CacheFile);
+        }
+
+        private void writeConfig(HashSet<PomFile> pomFileList, HashSet<PomFile> pomFileJarList, HashMap<DependencyKey, PomFile> pomFileMap) {
+            ObjectSerailizeUtil.write(m2CacheFile, new WriteObject() {
+                @Override
+                public void write(ObjectOutputStream oos) throws Exception {
+                    oos.writeObject(pomFileList);
+                    oos.writeObject(pomFileJarList);
+                    oos.writeObject(pomFileMap);
+                }
+            });
+        }
+
+        private boolean readConfig() {
+            if (!m2CacheFile.exists()) {
+                return false;
+            }
+            ObjectSerailizeUtil.read(m2CacheFile, new ReadObject() {
+                @Override
+                public void read(ObjectInputStream oos) throws Exception {
+                    pomFileList = (HashSet<PomFile>) oos.readObject();
+                    pomFileJarList = (HashSet<PomFile>) oos.readObject();
+                    pomFileMap = (HashMap<DependencyKey, PomFile>) oos.readObject();
+                }
+            });
             return true;
         }
     }

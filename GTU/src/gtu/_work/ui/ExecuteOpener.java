@@ -1930,10 +1930,14 @@ public class ExecuteOpener extends javax.swing.JFrame {
                     }
 
                     public void actionPerformed(ActionEvent arg0) {
-                        File file = null;
-                        for (Object v : vals) {
-                            file = (File) v;
-                            addModelElement(file);
+                        try {
+                            File file = null;
+                            for (Object v : vals) {
+                                file = (File) v;
+                                addModelElement(file);
+                            }
+                        } catch (Exception ex) {
+                            JCommonUtil.handleException(ex);
                         }
                     }
                 });
@@ -1944,97 +1948,129 @@ public class ExecuteOpener extends javax.swing.JFrame {
             popupUtil//
                     .addJMenuItem("sort list", new ActionListener() {
                         public void actionPerformed(ActionEvent e) {
-                            DefaultListModel model = (DefaultListModel) scanList.getModel();
-                            Object[] arry = model.toArray();
-                            Arrays.sort(arry, new Comparator<Object>() {
-                                @Override
-                                public int compare(Object o1, Object o2) {
-                                    return ((ZFile) o1).getAbsolutePath().compareTo(((ZFile) o2).getAbsolutePath());
+                            try {
+                                DefaultListModel model = (DefaultListModel) scanList.getModel();
+                                Object[] arry = model.toArray();
+                                Arrays.sort(arry, new Comparator<Object>() {
+                                    @Override
+                                    public int compare(Object o1, Object o2) {
+                                        return ((ZFile) o1).getAbsolutePath().compareTo(((ZFile) o2).getAbsolutePath());
+                                    }
+                                });
+                                DefaultListModel model2 = new DefaultListModel();
+                                for (Object obj : arry) {
+                                    ZFile file = (ZFile) obj;
+                                    model2.addElement(file);
                                 }
-                            });
-                            DefaultListModel model2 = new DefaultListModel();
-                            for (Object obj : arry) {
-                                ZFile file = (ZFile) obj;
-                                model2.addElement(file);
+                                scanList.setModel(model2);
+                            } catch (Exception ex) {
+                                JCommonUtil.handleException(ex);
                             }
-                            scanList.setModel(model2);
                         }
                     }).addJMenuItem("keep exists", new ActionListener() {
                         public void actionPerformed(ActionEvent e) {
-                            DefaultListModel model = (DefaultListModel) scanList.getModel();
-                            DefaultListModel model2 = new DefaultListModel();
-                            for (Object obj : model.toArray()) {
-                                ZFile file = (ZFile) obj;
-                                if (file.exists()) {
-                                    model2.addElement(obj);
+                            try {
+                                DefaultListModel model = (DefaultListModel) scanList.getModel();
+                                DefaultListModel model2 = new DefaultListModel();
+                                for (Object obj : model.toArray()) {
+                                    ZFile file = (ZFile) obj;
+                                    if (file.exists()) {
+                                        model2.addElement(obj);
+                                    }
                                 }
+                                scanList.setModel(model2);
+                            } catch (Exception ex) {
+                                JCommonUtil.handleException(ex);
                             }
-                            scanList.setModel(model2);
                         }
                     }).addJMenuItem("remove duplicate", new ActionListener() {
                         public void actionPerformed(ActionEvent e) {
-                            DefaultListModel model = (DefaultListModel) scanList.getModel();
-                            DefaultListModel model2 = new DefaultListModel();
-                            Set<ZFile> set = new HashSet<ZFile>();
-                            for (Object obj : model.toArray()) {
-                                ZFile file = (ZFile) obj;
-                                set.add(file);
+                            try {
+                                DefaultListModel model = (DefaultListModel) scanList.getModel();
+                                DefaultListModel model2 = new DefaultListModel();
+                                Set<ZFile> set = new HashSet<ZFile>();
+                                for (Object obj : model.toArray()) {
+                                    ZFile file = (ZFile) obj;
+                                    set.add(file);
+                                }
+                                for (ZFile val : set) {
+                                    model2.addElement(val);
+                                }
+                                scanList.setModel(model2);
+                            } catch (Exception ex) {
+                                JCommonUtil.handleException(ex);
                             }
-                            for (ZFile val : set) {
-                                model2.addElement(val);
-                            }
-                            scanList.setModel(model2);
                         }
                     }).addJMenuItem("remove folder", new ActionListener() {
                         public void actionPerformed(ActionEvent e) {
-                            DefaultListModel model = (DefaultListModel) scanList.getModel();
-                            for (int ii = 0; ii < model.getSize(); ii++) {
-                                if (((ZFile) model.getElementAt(ii)).isDirectory()) {
-                                    model.removeElementAt(ii);
-                                    ii--;
+                            try {
+                                DefaultListModel model = (DefaultListModel) scanList.getModel();
+                                for (int ii = 0; ii < model.getSize(); ii++) {
+                                    if (((ZFile) model.getElementAt(ii)).isDirectory()) {
+                                        model.removeElementAt(ii);
+                                        ii--;
+                                    }
                                 }
+                            } catch (Exception ex) {
+                                JCommonUtil.handleException(ex);
                             }
                         }
                     }).addJMenuItem("remove empty folder", new ActionListener() {
                         public void actionPerformed(ActionEvent e) {
-                            DefaultListModel model = (DefaultListModel) scanList.getModel();
-                            File dir = null;
-                            for (int ii = 0; ii < model.getSize(); ii++) {
-                                dir = ((ZFile) model.getElementAt(ii));
-                                if (dir.isDirectory() && dir.list().length == 0) {
-                                    model.removeElementAt(ii);
-                                    ii--;
+                            try {
+                                DefaultListModel model = (DefaultListModel) scanList.getModel();
+                                File dir = null;
+                                for (int ii = 0; ii < model.getSize(); ii++) {
+                                    dir = ((ZFile) model.getElementAt(ii));
+                                    if (dir.isDirectory() && dir.list().length == 0) {
+                                        model.removeElementAt(ii);
+                                        ii--;
+                                    }
                                 }
+                            } catch (Exception ex) {
+                                JCommonUtil.handleException(ex);
                             }
                         }
                     }).addJMenuItem("delete selected", new ActionListener() {
                         public void actionPerformed(ActionEvent e) {
-                            List<ZFile> lst = JListUtil.getLeadSelectionArry(scanList);
-                            List<String> log = new ArrayList<String>();
-                            for (ZFile f : lst) {
-                                log.add(f.getName());
-                            }
-                            boolean deleteConfirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption(StringUtils.join(lst, "\r\n"), "刪除所選？");
-                            log.clear();
-                            if (deleteConfirm) {
+                            try {
+                                List<ZFile> lst = JListUtil.getLeadSelectionArry(scanList);
+                                List<String> log = new ArrayList<String>();
                                 for (ZFile f : lst) {
-                                    log.add(f.getName() + " " + f.delete());
+                                    log.add(f.getName());
                                 }
-                                JCommonUtil._jOptionPane_showMessageDialog_info(StringUtils.join(lst, "\r\n"), "刪除結果");
+                                boolean deleteConfirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption(StringUtils.join(lst, "\r\n"), "刪除所選？");
+                                log.clear();
+                                if (deleteConfirm) {
+                                    for (ZFile f : lst) {
+                                        log.add(f.getName() + " " + f.delete());
+                                    }
+                                    JCommonUtil._jOptionPane_showMessageDialog_info(StringUtils.join(lst, "\r\n"), "刪除結果");
+                                }
+                            } catch (Exception ex) {
+                                JCommonUtil.handleException(ex);
                             }
                         }
                     }).addJMenuItem("----------------", false).addJMenuItem("diff left : " + (diffLeft != null ? diffLeft.getName() : ""), true, new ActionListener() {
                         public void actionPerformed(ActionEvent arg0) {
-                            File value = ((ZFile) JListUtil.getLeadSelectionObject(scanList));
-                            if (value != null && value.isFile() && value.exists()) {
-                                diffLeft = value;
+                            try {
+                                File value = ((ZFile) JListUtil.getLeadSelectionObject(scanList));
+                                if (value != null && value.isFile() && value.exists()) {
+                                    diffLeft = value;
+                                }
+                            } catch (Exception ex) {
+                                JCommonUtil.handleException(ex);
                             }
                         }
                     }).addJMenuItem("diff right : " + (diffRight != null ? diffRight.getName() : ""), true, new ActionListener() {
                         public void actionPerformed(ActionEvent arg0) {
-                            File value = ((ZFile) JListUtil.getLeadSelectionObject(scanList));
-                            if (value != null && value.isFile() && value.exists()) {
-                                diffRight = value;
+                            try {
+                                File value = ((ZFile) JListUtil.getLeadSelectionObject(scanList));
+                                if (value != null && value.isFile() && value.exists()) {
+                                    diffRight = value;
+                                }
+                            } catch (Exception ex) {
+                                JCommonUtil.handleException(ex);
                             }
                         }
                     }).addJMenuItem((diffLeft != null && diffRight != null) ? "diff compare" : "", (diffLeft != null && diffRight != null), new ActionListener() {
@@ -2069,43 +2105,47 @@ public class ExecuteOpener extends javax.swing.JFrame {
                         }
 
                         public void actionPerformed(ActionEvent e) {
-                            File destDir = new File(FileUtil.DESKTOP_DIR, ExecuteOpener.class.getSimpleName() + "_CopyTo_" + DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMdd_HHmmss"));
-                            destDir.mkdirs();
-                            BufferedWriter writer = null;
                             try {
-                                writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(destDir, "CopyTo.log"))));
-                                int success = 0;
-                                int fail = 0;
-                                for (Object v : scanList.getSelectedValues()) {
-                                    File fromFile = ((ZFile) v);
-                                    File toFile = getToFile(destDir, fromFile.getName());
-                                    if (fromFile.exists()) {
-                                        boolean copyToSuccess = FileUtil.copyFile(fromFile, toFile);
-                                        writer.write(String.format("from:%s\tto:%s\t%s", fromFile, toFile, (copyToSuccess ? "Y" : "N")));
-                                        writer.newLine();
-                                        if (copyToSuccess) {
-                                            success++;
+                                File destDir = new File(FileUtil.DESKTOP_DIR, ExecuteOpener.class.getSimpleName() + "_CopyTo_" + DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMdd_HHmmss"));
+                                destDir.mkdirs();
+                                BufferedWriter writer = null;
+                                try {
+                                    writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(destDir, "CopyTo.log"))));
+                                    int success = 0;
+                                    int fail = 0;
+                                    for (Object v : scanList.getSelectedValues()) {
+                                        File fromFile = ((ZFile) v);
+                                        File toFile = getToFile(destDir, fromFile.getName());
+                                        if (fromFile.exists()) {
+                                            boolean copyToSuccess = FileUtil.copyFile(fromFile, toFile);
+                                            writer.write(String.format("from:%s\tto:%s\t%s", fromFile, toFile, (copyToSuccess ? "Y" : "N")));
+                                            writer.newLine();
+                                            if (copyToSuccess) {
+                                                success++;
+                                            } else {
+                                                fail++;
+                                            }
                                         } else {
+                                            writer.write(String.format("from:%s\tto:%s\t%s", fromFile, "NA", "N(來源不存在)"));
+                                            writer.newLine();
                                             fail++;
                                         }
-                                    } else {
-                                        writer.write(String.format("from:%s\tto:%s\t%s", fromFile, "NA", "N(來源不存在)"));
-                                        writer.newLine();
-                                        fail++;
+                                    }
+                                    JCommonUtil._jOptionPane_showMessageDialog_info("複製完成\n成功:" + success + "\n失敗:" + fail);
+                                } catch (Exception ex) {
+                                    JCommonUtil.handleException(ex);
+                                } finally {
+                                    try {
+                                        writer.flush();
+                                    } catch (IOException e1) {
+                                    }
+                                    try {
+                                        writer.close();
+                                    } catch (IOException e1) {
                                     }
                                 }
-                                JCommonUtil._jOptionPane_showMessageDialog_info("複製完成\n成功:" + success + "\n失敗:" + fail);
                             } catch (Exception ex) {
                                 JCommonUtil.handleException(ex);
-                            } finally {
-                                try {
-                                    writer.flush();
-                                } catch (IOException e1) {
-                                }
-                                try {
-                                    writer.close();
-                                } catch (IOException e1) {
-                                }
                             }
                         }
                     });
@@ -2113,36 +2153,43 @@ public class ExecuteOpener extends javax.swing.JFrame {
                     .addJMenuItem("zip selected", new ActionListener() {
 
                         public void actionPerformed(ActionEvent e) {
-                            Object[] files = (Object[]) scanList.getSelectedValues();
-                            List<File> fileLst = new ArrayList<File>();
-                            for (Object f : files) {
-                                fileLst.add((ZFile) f);
-                            }
-                            Pair<File, Map<String, File>> logFileInfo = RevertBackFileHelper.createLogFile(fileLst);
-                            if (logFileInfo != null && logFileInfo.getLeft().exists()) {
-                                List<Pair<File, String>> zipLst = new ArrayList<Pair<File, String>>();
-                                for (String name : logFileInfo.getRight().keySet()) {
-                                    zipLst.add(Pair.of(logFileInfo.getRight().get(name), name));
+                            try {
+                                Object[] files = (Object[]) scanList.getSelectedValues();
+                                List<File> fileLst = new ArrayList<File>();
+                                for (Object f : files) {
+                                    fileLst.add((ZFile) f);
                                 }
-                                zipLst.add(Pair.of(logFileInfo.getLeft(), ""));
+                                Pair<File, Map<String, File>> logFileInfo = RevertBackFileHelper.createLogFile(fileLst);
+                                if (logFileInfo != null && logFileInfo.getLeft().exists()) {
+                                    List<Pair<File, String>> zipLst = new ArrayList<Pair<File, String>>();
+                                    for (String name : logFileInfo.getRight().keySet()) {
+                                        zipLst.add(Pair.of(logFileInfo.getRight().get(name), name));
+                                    }
+                                    zipLst.add(Pair.of(logFileInfo.getLeft(), ""));
 
-                                SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
-                                File zipfile = new File(FileUtil.DESKTOP_DIR, "zip_" + sdf.format(new Date()) + ".zip");
-                                ZipUtils t = new ZipUtils();
-                                try {
-                                    t.zipMultiFile_Rename(zipLst, zipfile);
-                                    JOptionPaneUtil.newInstance().iconPlainMessage().showMessageDialog("zip selected : \n" + zipfile, "zip");
-                                } catch (Exception e1) {
-                                    JCommonUtil.handleException(e1);
+                                    SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+                                    File zipfile = new File(FileUtil.DESKTOP_DIR, "zip_" + sdf.format(new Date()) + ".zip");
+                                    ZipUtils t = new ZipUtils();
+                                    try {
+                                        t.zipMultiFile_Rename(zipLst, zipfile);
+                                        JOptionPaneUtil.newInstance().iconPlainMessage().showMessageDialog("zip selected : \n" + zipfile, "zip");
+                                    } catch (Exception e1) {
+                                        JCommonUtil.handleException(e1);
+                                    }
                                 }
+                            } catch (Exception ex) {
+                                JCommonUtil.handleException(ex);
                             }
-
                         }
                     });
             popupUtil//
                     .addJMenuItem("zip revert back", new ActionListener() {
                         public void actionPerformed(ActionEvent e) {
-                            RevertBackFileHelper.revertLogFile(StringUtils.trimToEmpty(config.getConfigProp().getProperty(TORTOISE_DIFF_FORMAT)));
+                            try {
+                                RevertBackFileHelper.revertLogFile(StringUtils.trimToEmpty(config.getConfigProp().getProperty(TORTOISE_DIFF_FORMAT)));
+                            } catch (Exception ex) {
+                                JCommonUtil.handleException(ex);
+                            }
                         }
                     });
             // SimpleCheckListDlg

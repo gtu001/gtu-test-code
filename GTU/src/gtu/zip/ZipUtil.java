@@ -23,6 +23,15 @@ import org.apache.tools.zip.ZipOutputStream;
  */
 public class ZipUtil {
 
+    private static final ZipUtil _INST = new ZipUtil();
+
+    public static ZipUtil getInstance() {
+        return _INST;
+    }
+
+    public ZipUtil() {
+    }
+
     public static void main(String[] args) throws IOException {
         ZipUtil test = new ZipUtil();
         // test.zip("c:\\url.txt", "c:\\test\\url.zip");
@@ -30,96 +39,112 @@ public class ZipUtil {
         System.out.println("done...");
     }
 
-    public void zip(String source, String dest) throws IOException {
-        OutputStream os = new FileOutputStream(dest);
-        BufferedOutputStream bos = new BufferedOutputStream(os);
-        ZipOutputStream zos = new ZipOutputStream(bos);
+    public void zip(String source, String dest)  {
+        try {
+            OutputStream os = new FileOutputStream(dest);
+            BufferedOutputStream bos = new BufferedOutputStream(os);
+            ZipOutputStream zos = new ZipOutputStream(bos);
 
-        // 支持中文，但有缺陷！?是硬??！
-        zos.setEncoding("GBK");
+            // 支持中文，但有缺陷！?是硬??！
+            zos.setEncoding("GBK");
 
-        File file = new File(source);
+            File file = new File(source);
 
-        String basePath = null;
-        if (file.isDirectory()) {
-            basePath = file.getPath();
-        } else {
-            basePath = file.getParent();
-        }
-
-        zipFile(file, basePath, zos);
-
-        zos.closeEntry();
-        zos.close();
-    }
-
-    public void unzip(String zipFile, String dest) throws IOException {
-        ZipFile zip = new ZipFile(zipFile);
-        Enumeration<ZipEntry> en = zip.getEntries();
-        ZipEntry entry = null;
-        byte[] buffer = new byte[1024];
-        int length = -1;
-        InputStream input = null;
-        BufferedOutputStream bos = null;
-        File file = null;
-
-        while (en.hasMoreElements()) {
-            entry = (ZipEntry) en.nextElement();
-            if (entry.isDirectory()) {
-                file = new File(dest, entry.getName());
-                if (!file.exists()) {
-                    file.mkdir();
-                }
-                continue;
-            }
-
-            input = zip.getInputStream(entry);
-            file = new File(dest, entry.getName());
-            if (!file.getParentFile().exists()) {
-                file.getParentFile().mkdirs();
-            }
-            bos = new BufferedOutputStream(new FileOutputStream(file));
-
-            while (true) {
-                length = input.read(buffer);
-                if (length == -1)
-                    break;
-                bos.write(buffer, 0, length);
-            }
-            bos.close();
-            input.close();
-        }
-        zip.close();
-    }
-
-    private void zipFile(File source, String basePath, ZipOutputStream zos) throws IOException {
-        File[] files = new File[0];
-
-        if (source.isDirectory()) {
-            files = source.listFiles();
-        } else {
-            files = new File[1];
-            files[0] = source;
-        }
-
-        String pathName;
-        byte[] buf = new byte[1024];
-        int length = 0;
-        for (File file : files) {
+            String basePath = null;
             if (file.isDirectory()) {
-                pathName = file.getPath().substring(basePath.length() + 1) + "/";
-                zos.putNextEntry(new ZipEntry(pathName));
-                zipFile(file, basePath, zos);
+                basePath = file.getPath();
             } else {
-                pathName = file.getPath().substring(basePath.length() + 1);
-                InputStream is = new FileInputStream(file);
-                BufferedInputStream bis = new BufferedInputStream(is);
-                zos.putNextEntry(new ZipEntry(pathName));
-                while ((length = bis.read(buf)) > 0) {
-                    zos.write(buf, 0, length);
-                }
-                is.close();
+                basePath = file.getParent();
             }
+
+            zipFile(file, basePath, zos);
+
+            zos.closeEntry();
+            zos.close();
+        } catch (Exception ex) {
+            throw new RuntimeException("zip ERR : " + ex.getMessage(), ex);
+        }
+    }
+
+    public void unzip(File zipFile, File destinationDir) {
+        unzip(zipFile.getAbsolutePath(), destinationDir.getAbsolutePath());
+    }
+
+    public void unzip(String zipFile, String dest) {
+        try {
+            ZipFile zip = new ZipFile(zipFile);
+            Enumeration<ZipEntry> en = zip.getEntries();
+            ZipEntry entry = null;
+            byte[] buffer = new byte[1024];
+            int length = -1;
+            InputStream input = null;
+            BufferedOutputStream bos = null;
+            File file = null;
+
+            while (en.hasMoreElements()) {
+                entry = (ZipEntry) en.nextElement();
+                if (entry.isDirectory()) {
+                    file = new File(dest, entry.getName());
+                    if (!file.exists()) {
+                        file.mkdir();
+                    }
+                    continue;
+                }
+
+                input = zip.getInputStream(entry);
+                file = new File(dest, entry.getName());
+                if (!file.getParentFile().exists()) {
+                    file.getParentFile().mkdirs();
+                }
+                bos = new BufferedOutputStream(new FileOutputStream(file));
+
+                while (true) {
+                    length = input.read(buffer);
+                    if (length == -1)
+                        break;
+                    bos.write(buffer, 0, length);
+                }
+                bos.close();
+                input.close();
+            }
+            zip.close();
+        } catch (Exception ex) {
+            throw new RuntimeException("unzip ERR : " + ex.getMessage(), ex);
+        }
+    }
+
+    private void zipFile(File source, String basePath, ZipOutputStream zos) {
+        try {
+            File[] files = new File[0];
+
+            if (source.isDirectory()) {
+                files = source.listFiles();
+            } else {
+                files = new File[1];
+                files[0] = source;
+            }
+
+            String pathName;
+            byte[] buf = new byte[1024];
+            int length = 0;
+            for (File file : files) {
+                if (file.isDirectory()) {
+                    pathName = file.getPath().substring(basePath.length() + 1) + "/";
+                    zos.putNextEntry(new ZipEntry(pathName));
+                    zipFile(file, basePath, zos);
+                } else {
+                    pathName = file.getPath().substring(basePath.length() + 1);
+                    InputStream is = new FileInputStream(file);
+                    BufferedInputStream bis = new BufferedInputStream(is);
+                    zos.putNextEntry(new ZipEntry(pathName));
+                    while ((length = bis.read(buf)) > 0) {
+                        zos.write(buf, 0, length);
+                    }
+                    is.close();
+                }
+            }
+        } catch (Exception ex) {
+            throw new RuntimeException("zipFile ERR : " + ex.getMessage(), ex);
         }
     }
 }

@@ -22,19 +22,17 @@ public class ZipUtils {
         File targetZip = new File("C:\\11111\\123.zip");
         File extractDir = new File("C:\\22222");
 
-        try {
-            // 壓縮
-            new ZipUtils().makeZip(srcFile, targetZip);
-            // 解壓縮
-            new ZipUtils().unzipFile(targetZip, extractDir);
-        } catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        // 壓縮
+        new ZipUtils().makeZip(srcFile, targetZip);
+        // 解壓縮
+        new ZipUtils().unzipFile(targetZip, extractDir);
         System.out.println("done...");
+    }
+
+    private static final ZipUtils _INST = new ZipUtils();
+
+    public static final ZipUtils getInstance() {
+        return _INST;
     }
 
     /**
@@ -51,7 +49,7 @@ public class ZipUtils {
             unZip(zipfile, extractDir.getAbsolutePath());
         } catch (Exception ex) {
             // TODO Auto-generated catch block
-            throw new RuntimeException(ex.getMessage(), ex);
+            throw new RuntimeException("unzipFile ERR : " + ex.getMessage(), ex);
             // return false;
         }
         return true;
@@ -64,9 +62,9 @@ public class ZipUtils {
      * @param subDirectory
      */
     private void createDirectory(String directory, String subDirectory) {
-        String dir[];
-        File fl = new File(directory);
         try {
+            String dir[];
+            File fl = new File(directory);
             if (subDirectory == "" && fl.exists() != true)
                 fl.mkdir();
             else if (subDirectory != "") {
@@ -79,7 +77,7 @@ public class ZipUtils {
                 }
             }
         } catch (Exception ex) {
-            System.out.println(ex.getMessage());
+            throw new RuntimeException("createDirectory ERR : " + ex.getMessage(), ex);
         }
     }
 
@@ -91,7 +89,7 @@ public class ZipUtils {
      * @throws Exception
      *             // * org.apache.tools.zip.
      */
-    private void unZip(File ZIPFile, String outputDirectory) throws Exception {
+    private void unZip(File ZIPFile, String outputDirectory) {
         try {
             ZipFile zipFile = new ZipFile(ZIPFile);
             java.util.Enumeration e = zipFile.entries();
@@ -133,7 +131,7 @@ public class ZipUtils {
                 }
             }
         } catch (Exception ex) {
-            throw new RuntimeException(ex.getMessage(), ex);
+            throw new RuntimeException("unZip ERR : " + ex.getMessage(), ex);
         }
     }
 
@@ -147,80 +145,92 @@ public class ZipUtils {
      * @throws IOException
      * @throws FileNotFoundException
      */
-    public void makeZip(File srcFile, File targetZip) throws IOException, FileNotFoundException {
-        ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(targetZip));
-        String dir = "";
-        recurseFiles(srcFile, zos, dir);
-        zos.close();
+    public void makeZip(File srcFile, File targetZip) {
+        try {
+            ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(targetZip));
+            String dir = "";
+            recurseFiles(srcFile, zos, dir);
+            zos.close();
+        } catch (Exception ex) {
+            throw new RuntimeException("makeZip ERR : " + ex.getMessage(), ex);
+        }
     }
 
-    public void zipMultiFile(List<File> fileLst, File destinationFile) throws IOException {
-        ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(destinationFile));
-        String dir = "";
-        for (File file : fileLst) {
-            if (file.isFile()) {
-                System.out.println("壓縮檔案:" + file.getName());
-                byte[] buf = new byte[1024];
-                int len;
-                dir = dir.substring(dir.indexOf(File.separator) + 1);
-                ZipEntry zipEntry = new ZipEntry(dir + file.getName());
-                FileInputStream fin = new FileInputStream(file);
-                BufferedInputStream in = new BufferedInputStream(fin);
-                zos.putNextEntry(zipEntry);
-                while ((len = in.read(buf)) >= 0) {
-                    zos.write(buf, 0, len);
-                }
-                in.close();
-                zos.closeEntry();
-            } else {
-                System.out.println("找到資料夾:" + file.getName());
-                dir += file.getName() + File.separator;
-                String[] fileNames = file.list();
-                if (fileNames != null) {
-                    for (int i = 0; i < fileNames.length; i++) {
-                        recurseFiles(new File(file, fileNames[i]), zos, dir);
+    public void zipMultiFile(List<File> fileLst, File destinationFile) {
+        try {
+            ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(destinationFile));
+            String dir = "";
+            for (File file : fileLst) {
+                if (file.isFile()) {
+                    System.out.println("壓縮檔案:" + file.getName());
+                    byte[] buf = new byte[1024];
+                    int len;
+                    dir = dir.substring(dir.indexOf(File.separator) + 1);
+                    ZipEntry zipEntry = new ZipEntry(dir + file.getName());
+                    FileInputStream fin = new FileInputStream(file);
+                    BufferedInputStream in = new BufferedInputStream(fin);
+                    zos.putNextEntry(zipEntry);
+                    while ((len = in.read(buf)) >= 0) {
+                        zos.write(buf, 0, len);
+                    }
+                    in.close();
+                    zos.closeEntry();
+                } else {
+                    System.out.println("找到資料夾:" + file.getName());
+                    dir += file.getName() + File.separator;
+                    String[] fileNames = file.list();
+                    if (fileNames != null) {
+                        for (int i = 0; i < fileNames.length; i++) {
+                            recurseFiles(new File(file, fileNames[i]), zos, dir);
+                        }
                     }
                 }
             }
+            zos.close();
+        } catch (Exception ex) {
+            throw new RuntimeException("zipMultiFile ERR : " + ex.getMessage(), ex);
         }
-        zos.close();
     }
 
-    public void zipMultiFile_Rename(List<Pair<File, String>> fileLst, File destinationFile) throws IOException {
-        ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(destinationFile));
-        String dir = "";
-        for (Pair<File, String> fileZ : fileLst) {
-            File file = fileZ.getLeft();
-            String rename = fileZ.getRight();
-            if (StringUtils.isBlank(rename)) {
-                rename = file.getName();
-            }
-            if (file.isFile()) {
-                System.out.println("壓縮檔案:" + file.getName());
-                byte[] buf = new byte[1024];
-                int len;
-                dir = dir.substring(dir.indexOf(File.separator) + 1);
-                ZipEntry zipEntry = new ZipEntry(dir + rename);
-                FileInputStream fin = new FileInputStream(file);
-                BufferedInputStream in = new BufferedInputStream(fin);
-                zos.putNextEntry(zipEntry);
-                while ((len = in.read(buf)) >= 0) {
-                    zos.write(buf, 0, len);
+    public void zipMultiFile_Rename(List<Pair<File, String>> fileLst, File destinationFile) {
+        try {
+            ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(destinationFile));
+            String dir = "";
+            for (Pair<File, String> fileZ : fileLst) {
+                File file = fileZ.getLeft();
+                String rename = fileZ.getRight();
+                if (StringUtils.isBlank(rename)) {
+                    rename = file.getName();
                 }
-                in.close();
-                zos.closeEntry();
-            } else {
-                System.out.println("找到資料夾:" + rename);
-                dir += rename + File.separator;
-                String[] fileNames = file.list();
-                if (fileNames != null) {
-                    for (int i = 0; i < fileNames.length; i++) {
-                        recurseFiles(new File(file, fileNames[i]), zos, dir);
+                if (file.isFile()) {
+                    System.out.println("壓縮檔案:" + file.getName());
+                    byte[] buf = new byte[1024];
+                    int len;
+                    dir = dir.substring(dir.indexOf(File.separator) + 1);
+                    ZipEntry zipEntry = new ZipEntry(dir + rename);
+                    FileInputStream fin = new FileInputStream(file);
+                    BufferedInputStream in = new BufferedInputStream(fin);
+                    zos.putNextEntry(zipEntry);
+                    while ((len = in.read(buf)) >= 0) {
+                        zos.write(buf, 0, len);
+                    }
+                    in.close();
+                    zos.closeEntry();
+                } else {
+                    System.out.println("找到資料夾:" + rename);
+                    dir += rename + File.separator;
+                    String[] fileNames = file.list();
+                    if (fileNames != null) {
+                        for (int i = 0; i < fileNames.length; i++) {
+                            recurseFiles(new File(file, fileNames[i]), zos, dir);
+                        }
                     }
                 }
             }
+            zos.close();
+        } catch (Exception ex) {
+            throw new RuntimeException("zipMultiFile_Rename ERR : " + ex.getMessage(), ex);
         }
-        zos.close();
     }
 
     /**
@@ -231,44 +241,48 @@ public class ZipUtils {
      * @throws IOException
      * @throws FileNotFoundException
      */
-    private void recurseFiles(File file, ZipOutputStream zos, String dir) throws IOException, FileNotFoundException {
-        // 目錄
-        if (file.isDirectory()) {
-            System.out.println("找到資料夾:" + file.getName());
-            dir += file.getName() + File.separator;
-            String[] fileNames = file.list();
-            if (fileNames != null) {
-                for (int i = 0; i < fileNames.length; i++) {
-                    recurseFiles(new File(file, fileNames[i]), zos, dir);
+    private void recurseFiles(File file, ZipOutputStream zos, String dir) {
+        try {
+            // 目錄
+            if (file.isDirectory()) {
+                System.out.println("找到資料夾:" + file.getName());
+                dir += file.getName() + File.separator;
+                String[] fileNames = file.list();
+                if (fileNames != null) {
+                    for (int i = 0; i < fileNames.length; i++) {
+                        recurseFiles(new File(file, fileNames[i]), zos, dir);
+                    }
                 }
             }
-        }
-        // Otherwise, a file so add it as an entry to the Zip file.
-        else {
-            System.out.println("壓縮檔案:" + file.getName());
+            // Otherwise, a file so add it as an entry to the Zip file.
+            else {
+                System.out.println("壓縮檔案:" + file.getName());
 
-            byte[] buf = new byte[1024];
-            int len;
+                byte[] buf = new byte[1024];
+                int len;
 
-            // Create a new Zip entry with the file's name.
-            dir = dir.substring(dir.indexOf(File.separator) + 1);
-            ZipEntry zipEntry = new ZipEntry(dir + file.getName());
-            // Create a buffered input stream out of the file
-            // we're trying to add into the Zip archive.
-            FileInputStream fin = new FileInputStream(file);
-            BufferedInputStream in = new BufferedInputStream(fin);
-            zos.putNextEntry(zipEntry);
-            // Read bytes from the file and write into the Zip archive.
+                // Create a new Zip entry with the file's name.
+                dir = dir.substring(dir.indexOf(File.separator) + 1);
+                ZipEntry zipEntry = new ZipEntry(dir + file.getName());
+                // Create a buffered input stream out of the file
+                // we're trying to add into the Zip archive.
+                FileInputStream fin = new FileInputStream(file);
+                BufferedInputStream in = new BufferedInputStream(fin);
+                zos.putNextEntry(zipEntry);
+                // Read bytes from the file and write into the Zip archive.
 
-            while ((len = in.read(buf)) >= 0) {
-                zos.write(buf, 0, len);
+                while ((len = in.read(buf)) >= 0) {
+                    zos.write(buf, 0, len);
+                }
+
+                // Close the input stream.
+                in.close();
+
+                // Close this entry in the Zip stream.
+                zos.closeEntry();
             }
-
-            // Close the input stream.
-            in.close();
-
-            // Close this entry in the Zip stream.
-            zos.closeEntry();
+        } catch (Exception ex) {
+            throw new RuntimeException("recurseFiles ERR : " + ex.getMessage(), ex);
         }
     }
 }

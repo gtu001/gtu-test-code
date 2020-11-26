@@ -31,6 +31,7 @@ import gtu.number.RandomUtil;
 import gtu.properties.PropertiesUtilBean;
 import gtu.runtime.DesktopUtil;
 import gtu.runtime.RuntimeBatPromptModeUtil;
+import gtu.zip.ZipUtil;
 import gtu.zip.ZipUtils;
 
 public class JFileExecuteUtil {
@@ -431,37 +432,47 @@ public class JFileExecuteUtil {
 
         public static boolean revertLogFile(String tortoiseGitExeFormat) {
             try {
-                final File choiceDir = JCommonUtil._jFileChooser_selectDirectoryOnly();
-                if (choiceDir == null || !choiceDir.exists()) {
+                final File fileOrDir = JCommonUtil._jFileChooser_selectFileAndDirectory();
+                if (fileOrDir == null || !fileOrDir.exists()) {
                     return false;
                 }
-                final List<File> lst2 = ListUtil.toList(choiceDir.listFiles());
-                final File logFile = CollectionUtils.find(lst2, new Predicate<File>() {
-                    @Override
-                    public boolean evaluate(File object) {
-                        return object.getName().matches("FileListLog\\w+\\.txt");
-                    }
-                });
-                final Map<String, File> logFiles = getLogFileList(logFile);
-                final List<String> mvLst = new ArrayList<String>();
-                for (final String name : logFiles.keySet()) {
-                    final File toFile = logFiles.get(name);
-                    final File fromZipFile = CollectionUtils.find(lst2, new Predicate<File>() {
-                        @Override
-                        public boolean evaluate(final File object) {
-                            return StringUtils.equals(object.getName(), name);
-                        }
-                    });
-                    boolean moveOk = fileMoveDiff(fromZipFile.getAbsolutePath(), toFile.getAbsolutePath(), tortoiseGitExeFormat);
-                    if (!moveOk) {
-                        mvLst.add(toFile.getName());
-                    }
+                if (fileOrDir.isDirectory()) {
+                    _inner_revertLogFile(tortoiseGitExeFormat, fileOrDir);
+                } else {
+                    File destZipDir = FileUtil.createTempDir("zip_revert_", null);
+                    ZipUtil.getInstance().unzip(fileOrDir, destZipDir);
+                    _inner_revertLogFile(tortoiseGitExeFormat, destZipDir);
                 }
-                JCommonUtil._jOptionPane_showMessageDialog_info(("搬運數：" + CollectionUtils.size(logFiles) + "\r\n以下為失敗：" + StringUtils.join(mvLst, "\r\n")));
-            } catch (Exception ex) {
+            } catch (Throwable ex) {
                 JCommonUtil.handleException(ex);
             }
             return true;
+        }
+
+        private static void _inner_revertLogFile(String tortoiseGitExeFormat, File choiceDir) {
+            final List<File> lst2 = ListUtil.toList(choiceDir.listFiles());
+            final File logFile = CollectionUtils.find(lst2, new Predicate<File>() {
+                @Override
+                public boolean evaluate(File object) {
+                    return object.getName().matches("FileListLog\\w+\\.txt");
+                }
+            });
+            final Map<String, File> logFiles = getLogFileList(logFile);
+            final List<String> mvLst = new ArrayList<String>();
+            for (final String name : logFiles.keySet()) {
+                final File toFile = logFiles.get(name);
+                final File fromZipFile = CollectionUtils.find(lst2, new Predicate<File>() {
+                    @Override
+                    public boolean evaluate(final File object) {
+                        return StringUtils.equals(object.getName(), name);
+                    }
+                });
+                boolean moveOk = fileMoveDiff(fromZipFile.getAbsolutePath(), toFile.getAbsolutePath(), tortoiseGitExeFormat);
+                if (!moveOk) {
+                    mvLst.add(toFile.getName());
+                }
+            }
+            JCommonUtil._jOptionPane_showMessageDialog_info(("搬運數：" + CollectionUtils.size(logFiles) + "\r\n以下為失敗：" + StringUtils.join(mvLst, "\r\n")));
         }
     }
 
