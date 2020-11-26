@@ -36,7 +36,20 @@
 	<typedef name="jarToExe" classname="gtu.ant.AntJarToExe" classpathref="my_test_classpath" />
 	<typedef name="notify" classname="gtu.ant.AntNotify" classpathref="my_test_classpath" />
 	<typedef name="obfuscator" classname="gtu.ant.AntObfuscator" classpathref="my_test_classpath" />
+	<typedef name="baseFolderChanger" classname="gtu.ant.AntBaseFolderChanger" classpathref="my_test_classpath" />
 
+	<macrodef name="set" >
+        <attribute name="name"/>
+        <attribute name="value"/>
+        <sequential>
+            <script language="javascript">
+                <![CDATA[
+                project.setProperty("@{name}", "@{value}");
+                ]]>
+            </script>
+        </sequential>
+    </macrodef>
+	
 	<!-- 參考的jar -->
 	<path id="class_path">
 		<fileset dir="${jar_repsitory}">
@@ -57,6 +70,16 @@
 		<echo># buildTest ..</echo>
 	</target>
 	-->
+
+	<target name="baseFolderChanger" if="${enable}">
+		<echo># baseFolderChanger = ${enable}</echo>
+		<baseFolderChanger>
+			<FolderPlaceholder name="build_dir_fix">${build_dir}</FolderPlaceholder>
+			<FolderPlaceholder name="jars_dir_fix">${jars_dir}</FolderPlaceholder>
+		</baseFolderChanger>
+		<set name="build_dir" value="${build_dir_fix}" />
+		<set name="jars_dir" value="${jars_dir_fix}" />
+	</target>
 
 	<target name="jarToExe" if="${enable}">
 		<echo># jarToExe = ${enable}</echo>
@@ -105,10 +128,17 @@
 	<path id="config">
 		<fileset dir="${src_dir}">
 			<exclude name="**/*.java" />
+			<exclude name="**/log4j.properties" />
+			<exclude name="**/logback.xml" />
+			<exclude name="**/velocity.properties" />
 		</fileset>
 	</path>
 
 	<target name="main">
+		<antcall target="baseFolderChanger">
+			<param name="enable" value="true" /><!--false -->
+		</antcall>
+
 		<antcall target="clean">
 			<!--清除-->
 			<param name="enable" value="true" /><!--false -->
