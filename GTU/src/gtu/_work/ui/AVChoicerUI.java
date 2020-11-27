@@ -48,6 +48,7 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
+import javax.swing.JToggleButton;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -56,6 +57,8 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
+import org.jnativehook.keyboard.NativeKeyEvent;
+import org.jnativehook.mouse.NativeMouseEvent;
 
 import com.jgoodies.forms.factories.FormFactory;
 import com.jgoodies.forms.layout.ColumnSpec;
@@ -67,6 +70,8 @@ import gtu.date.DateFormatUtil;
 import gtu.file.FileUtil;
 import gtu.file.OsInfoUtil;
 import gtu.jdk8.ex1.StreamUtil;
+import gtu.keyboard_mouse.JnativehookKeyboardMouseHelper;
+import gtu.keyboard_mouse.JnativehookKeyboardMouseHelper.MyNativeKeyAdapter;
 import gtu.number.NumberUtil;
 import gtu.properties.PropertiesGroupUtils_ByKey;
 import gtu.properties.PropertiesUtil;
@@ -141,6 +146,8 @@ public class AVChoicerUI extends JFrame {
     private JTextField historyBetweenConfigText;
     private JCheckBox ignoreHistoryConfigChk;
     private JButton renameBtn;
+    private JToggleButton keyboardTriggerBtn;
+    private JTabbedPane tabbedPane;
 
     private static AVChoicerUI mAVChoicerUI;
 
@@ -174,7 +181,21 @@ public class AVChoicerUI extends JFrame {
         contentPane.setLayout(new BorderLayout(0, 0));
         setContentPane(contentPane);
 
-        JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+        tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+        tabbedPane.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent e) {
+                System.out.println("changeTab : " + tabbedPane.getSelectedIndex());
+                try {
+                    if (tabbedPane.getSelectedIndex() == -1) {
+                        return;
+                    }
+                    tabbedPane.requestFocus();
+                } catch (Exception ex) {
+                    JCommonUtil.handleException(ex);
+                }
+            }
+        });
+
         contentPane.add(tabbedPane, BorderLayout.CENTER);
 
         JPanel panel = new JPanel();
@@ -287,6 +308,15 @@ public class AVChoicerUI extends JFrame {
 
         panel_7.add(renameBtn);
         panel_7.add(replayBtn);
+
+        keyboardTriggerBtn = new JToggleButton("Off");
+        keyboardTriggerBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                keyboardTriggerBtn.setText(keyboardTriggerBtn.isSelected() ? "On" : "Off");
+            }
+        });
+        panel_7.add(keyboardTriggerBtn);
 
         JPanel panel_8 = new JPanel();
         panel.add(panel_8, BorderLayout.WEST);
@@ -779,6 +809,8 @@ public class AVChoicerUI extends JFrame {
         initAvDirList();
         avExeConfigHandler = new AvExeConfigHandler();
         avExeConfigHandler.nextConfig();
+
+        initKeyboardAndMouseHandler();
 
         JCommonUtil.setJFrameCenter(this);
         JCommonUtil.setJFrameIcon(this, "resource/images/ico/pornHub.ico");
@@ -1310,6 +1342,8 @@ public class AVChoicerUI extends JFrame {
             }
         }
 
+        private AtomicReference<String> latestReplayForMplayerStatus = new AtomicReference<String>();
+
         private void replay_for_mplayer(String rotate) {
             playAvFile_for_VLC(historyConfigHandler.getPlayFile(new Callable<File>() {
                 @Override
@@ -1318,6 +1352,7 @@ public class AVChoicerUI extends JFrame {
                 }
             }), rotate);
             dirCheckList.repaint();
+            latestReplayForMplayerStatus.set(rotate);
         }
 
         private void replay() {
@@ -1328,6 +1363,15 @@ public class AVChoicerUI extends JFrame {
                 }
             }));
             dirCheckList.repaint();
+            latestReplayForMplayerStatus.set("");
+        }
+
+        private void replayDefault() {
+            if (StringUtils.isNoneBlank(latestReplayForMplayerStatus.get())) {
+                replay_for_mplayer(latestReplayForMplayerStatus.get());
+            } else {
+                replay();
+            }
         }
 
         private void rename() {
@@ -1409,7 +1453,7 @@ public class AVChoicerUI extends JFrame {
                 Pattern coverJpgPtn = Pattern.compile("([a-zA-Z]{2,5})[\\-\\_]?([0-9]{2,5})");
                 Matcher mth = coverJpgPtn.matcher(name);
                 if (!mth.find()) {
-//                    JCommonUtil._jOptionPane_showMessageDialog_error("無法匹配名子");
+                    // JCommonUtil._jOptionPane_showMessageDialog_error("無法匹配名子");
                     return Collections.EMPTY_LIST;
                 }
                 String cover1 = mth.group(1).toLowerCase();
@@ -1436,6 +1480,34 @@ public class AVChoicerUI extends JFrame {
                 JCommonUtil.handleException(e);
             }
             return Collections.EMPTY_LIST;
+        }
+
+        public void playNextFile() {
+            FileZ filez = null;
+            DefaultListModel model = (DefaultListModel) dirCheckList.getModel();
+            if (tempFile.get() == null) {
+                if (model.getSize() != 0) {
+                    filez = (FileZ) model.getElementAt(0);
+                }
+            } else {
+                File f1 = tempFile.get();
+                A: for (int ii = 0; ii < model.getSize(); ii++) {
+                    FileZ f = (FileZ) model.getElementAt(ii);
+                    if (f1.equals(f.file)) {
+                        if (ii + 1 <= model.getSize() - 1) {
+                            filez = (FileZ) model.getElementAt(ii + 1);
+                            break A;
+                        }
+                    }
+                }
+                if (filez == null && model.getSize() != 0) {
+                    filez = (FileZ) model.getElementAt(0);
+                }
+            }
+            if (filez != null) {
+                tempFile.set(filez.file);
+                replay();
+            }
         }
     }
 
@@ -1968,5 +2040,33 @@ public class AVChoicerUI extends JFrame {
 
     private void dirCheckListResetBtnAction() {
         resetCacheFileList();
+    }
+
+    // =======================================================================================================================
+
+    public void initKeyboardAndMouseHandler() {
+        JnativehookKeyboardMouseHelper.startNativeKeyboardAndMouse(new MyNativeKeyAdapter() {
+            @Override
+            public void nativeMouseReleased(NativeMouseEvent e) {
+            }
+
+            @Override
+            public void nativeKeyReleased(NativeKeyEvent e) {
+                if (!keyboardTriggerBtn.isSelected()) {
+                    System.out.println("未啟動 keyboardTriggerBtn !!!");
+                    return;
+                }
+
+                if (e.getKeyCode() == NativeKeyEvent.VC_R) {
+                    choiceAVBtnAction();
+                } else if (e.getKeyCode() == NativeKeyEvent.VC_N) {
+                    currentFileHandler.playNextFile();
+                } else if (e.getKeyCode() == NativeKeyEvent.VC_T) {
+                    currentFileHandler.replayDefault();
+                } else if (e.getKeyCode() == NativeKeyEvent.VC_DELETE) {
+                    currentFileHandler.deleteFile();
+                }
+            }
+        });
     }
 }

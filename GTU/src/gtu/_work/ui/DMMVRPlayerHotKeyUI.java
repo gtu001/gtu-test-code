@@ -140,6 +140,9 @@ public class DMMVRPlayerHotKeyUI extends JFrame {
     private JButton replayBtn;
     private JButton infoBtn;
 
+    private static final String SUBNAME = ".wsdcf";
+    private static final String SUBNAME1 = "wsdcf";
+
     /**
      * Launch the application.
      */
@@ -180,7 +183,7 @@ public class DMMVRPlayerHotKeyUI extends JFrame {
         contentPane.add(tabbedPane, BorderLayout.CENTER);
 
         JPanel panel = new JPanel();
-        tabbedPane.addTab("New tab", null, panel, null);
+        tabbedPane.addTab("快進退", null, panel, null);
         panel.setLayout(new FormLayout(new ColumnSpec[] { FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow"), },
                 new RowSpec[] { FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
                         FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
@@ -319,12 +322,13 @@ public class DMMVRPlayerHotKeyUI extends JFrame {
         panel_8.add(continueBtn);
 
         JPanel panel_1 = new JPanel();
-        tabbedPane.addTab("New tab", null, panel_1, null);
+        tabbedPane.addTab("百分比位置", null, panel_1, null);
         panel_1.setLayout(new FormLayout(
                 new ColumnSpec[] { FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC,
                         ColumnSpec.decode("default:grow"), },
                 new RowSpec[] { FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
-                        FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, }));
+                        FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
+                        FormFactory.DEFAULT_ROWSPEC, }));
 
         lblNewLabel_5 = new JLabel("1");
         panel_1.add(lblNewLabel_5, "2, 2");
@@ -417,7 +421,7 @@ public class DMMVRPlayerHotKeyUI extends JFrame {
         panel_14.add(_5Btn);
 
         panel_15 = new JPanel();
-        tabbedPane.addTab("New tab", null, panel_15, null);
+        tabbedPane.addTab("播放清單", null, panel_15, null);
         panel_15.setLayout(new BorderLayout(0, 0));
 
         panel_16 = new JPanel();
@@ -603,7 +607,19 @@ public class DMMVRPlayerHotKeyUI extends JFrame {
         swingUtil.addActionHex("dmmList.keyPress", new Action() {
             @Override
             public void action(EventObject evt) throws Exception {
-                JListUtil.newInstance(dmmList).defaultJListKeyPressed(evt);
+                JListUtil.newInstance(dmmList).defaultJListKeyPressed(evt, new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        DMMFile dmmFile = (DMMFile) e.getSource();
+                        if (dmmFile.file.exists()) {
+                            boolean delConfirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("是否刪除檔案 : " + dmmFile.name, "DEL");
+                            if (delConfirm) {
+                                boolean delConfirm2 = dmmFile.file.delete();
+                                JCommonUtil._jOptionPane_showInputDialog("刪除 " + (delConfirm2 ? "成功" : "失敗"));
+                            }
+                        }
+                    }
+                });
             }
         });
         swingUtil.addActionHex("dmmPlayerSetBtn.click", new Action() {
@@ -636,7 +652,9 @@ public class DMMVRPlayerHotKeyUI extends JFrame {
     private void dmmListAppendDMMFiles(List<File> files) {
         List<DMMFile> files2 = new ArrayList<DMMFile>();
         for (File f : files) {
-            files2.add(new DMMFile(f));
+            if (f.getName().toLowerCase().endsWith(SUBNAME)) {
+                files2.add(new DMMFile(f));
+            }
         }
         DefaultListModel model = (DefaultListModel) dmmList.getModel();
         for (DMMFile f2 : files2) {
@@ -685,9 +703,9 @@ public class DMMVRPlayerHotKeyUI extends JFrame {
                         public void actionPerformed(ActionEvent e) {
                             if (file.file.exists()) {
                                 String name = file.file.getName();
-                                String name1 = StringUtils.trimToEmpty(name).replaceAll("\\.wsdcf$", "");
+                                String name1 = StringUtils.trimToEmpty(name).replaceAll("\\." + SUBNAME1 + "$", "");
                                 name1 = JCommonUtil._jOptionPane_showInputDialog("修改檔名", name1);
-                                String name2 = name1 + ".wsdcf";
+                                String name2 = name1 + SUBNAME;
                                 if (JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("確定是否改為:" + name2, "是否改名")) {
                                     if (!StringUtils.equals(name, name2)) {
                                         File newFile = new File(file.file.getParentFile(), name2);
