@@ -85,7 +85,7 @@
 
 			<pomconfig mavenExe="${mavenExe}">${gtu_pom_file}</pomconfig>
 
-			<packagename mode="exact" name="commons-lang-2.6.jar">org.apache.commons.lang.StringUtils</packagename>
+			<packagename mode="pom" name="commons-lang-2.6.jar">org.apache.commons.lang.StringUtils</packagename>
 			<packagename mode="small" name="commons-collections-3.2.jar">org.apache.commons.collections.Transformer</packagename>
 			<packagename mode="exact" name="commons-lang3-3.4.jar">org.apache.commons.lang3.Validate</packagename>
 			<packagename mode="exact" name="commons-io-2.2.jar">org.apache.commons.io.IOUtils</packagename>
@@ -93,12 +93,10 @@
 			<packagename mode="small" name="forms-1.3.0.jar">com.jgoodies.forms.factories.FormFactory</packagename>
 			<packagename mode="small" name="commons-beanutils-1.7.0.jar">org.apache.commons.beanutils.ConvertUtils</packagename>
 			<packagename mode="small">org.apache.commons.beanutils.ConvertUtils</packagename>
-
 			<packagename mode="small">org.apache.commons.io.FileUtils</packagename>
-			
 			<packagename mode="small" name="jcc-bate-0.7.3.jar">taobe.tec.jcc.JChineseConvertor</packagename>
-
 			<packagename mode="small">com.sun.jna.platform.FileUtils</packagename>
+			<packagename mode="pom" name="jnativehook-2.1.0.jar">org.jnativehook.keyboard.NativeKeyListener</packagename>
 			
 
 		</jarfinder>

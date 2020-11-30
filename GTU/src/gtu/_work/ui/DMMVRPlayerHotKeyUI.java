@@ -33,6 +33,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.apache.commons.lang.StringUtils;
@@ -327,8 +328,8 @@ public class DMMVRPlayerHotKeyUI extends JFrame {
                 new ColumnSpec[] { FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC,
                         ColumnSpec.decode("default:grow"), },
                 new RowSpec[] { FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
-                        FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
-                        FormFactory.DEFAULT_ROWSPEC, }));
+                        FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC,
+                        FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, }));
 
         lblNewLabel_5 = new JLabel("1");
         panel_1.add(lblNewLabel_5, "2, 2");
@@ -530,6 +531,7 @@ public class DMMVRPlayerHotKeyUI extends JFrame {
             @Override
             public void action(EventObject evt) throws Exception {
                 System.out.println("tabbedPane : " + tabbedPane.getSelectedIndex());
+                tabbedPane.requestFocus();
             }
         });
         swingUtil.addActionHex("previous1Btn.click", new Action() {
@@ -607,19 +609,7 @@ public class DMMVRPlayerHotKeyUI extends JFrame {
         swingUtil.addActionHex("dmmList.keyPress", new Action() {
             @Override
             public void action(EventObject evt) throws Exception {
-                JListUtil.newInstance(dmmList).defaultJListKeyPressed(evt, new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        DMMFile dmmFile = (DMMFile) e.getSource();
-                        if (dmmFile.file.exists()) {
-                            boolean delConfirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("是否刪除檔案 : " + dmmFile.name, "DEL");
-                            if (delConfirm) {
-                                boolean delConfirm2 = dmmFile.file.delete();
-                                JCommonUtil._jOptionPane_showInputDialog("刪除 " + (delConfirm2 ? "成功" : "失敗"));
-                            }
-                        }
-                    }
-                });
+                JListUtil.newInstance(dmmList).defaultJListKeyPressed(evt);
             }
         });
         swingUtil.addActionHex("dmmPlayerSetBtn.click", new Action() {
@@ -714,6 +704,18 @@ public class DMMVRPlayerHotKeyUI extends JFrame {
                                         file.applyFile(newFile);
                                         dmmList.repaint();
                                     }
+                                }
+                            }
+                        }
+                    })//
+                    .addJMenuItem("刪除", new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            if (file.file.exists()) {
+                                boolean delConfirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("是否刪除檔案 : " + file.name, "DEL");
+                                if (delConfirm) {
+                                    boolean delConfirm2 = file.file.delete();
+                                    JCommonUtil._jOptionPane_showInputDialog("刪除 " + (delConfirm2 ? "成功" : "失敗"));
                                 }
                             }
                         }

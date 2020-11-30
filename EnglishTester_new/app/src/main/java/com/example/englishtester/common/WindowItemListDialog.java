@@ -7,6 +7,7 @@ import android.graphics.Rect;
 
 import com.example.englishtester.common.Log;
 
+import android.os.Build;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -187,12 +188,19 @@ public class WindowItemListDialog {
 
     public static LayoutParams getInitLayoutParams() {
         WindowManager.LayoutParams innerParams = new WindowManager.LayoutParams();
-        innerParams.type = LayoutParams.TYPE_PHONE;  //TYPE_PHONE
+        //innerParams.type = LayoutParams.TYPE_PHONE;  //TYPE_PHONE
         innerParams.format = PixelFormat.RGBA_8888;
         innerParams.flags = WindowManager.LayoutParams.FLAG_FULLSCREEN;
         innerParams.gravity = Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL;
         innerParams.width = WindowManager.LayoutParams.WRAP_CONTENT;
         innerParams.height = WindowManager.LayoutParams.WRAP_CONTENT;
+
+        //wmParams.type = LayoutParams.TYPE_PHONE; //LayoutParams.TYPE_PHONE;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            innerParams.type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
+        } else {
+            innerParams.type = WindowManager.LayoutParams.TYPE_PHONE;
+        }
         return innerParams;
     }
 

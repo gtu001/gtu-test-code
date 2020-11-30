@@ -16,6 +16,7 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Random;
 import java.util.TimeZone;
 
 import javax.xml.datatype.DatatypeConfigurationException;
@@ -38,7 +39,10 @@ import org.apache.commons.lang3.tuple.Pair;
 public class DateUtil {
 
     public static void main(String[] args) {
-        System.out.println(DateUtil.wasteTotalTime(49527345893L));
+        for (int ii = 0; ii < 50; ii++) {
+            long time = Math.abs(new Random().nextLong());
+            System.out.println(time + "\t" + DateUtil.wasteTotalTime(time));
+        }
     }
 
     // @Test
