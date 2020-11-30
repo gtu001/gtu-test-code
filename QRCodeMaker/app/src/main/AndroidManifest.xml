@@ -40,6 +40,10 @@
     <!--發送SMS-->
     <uses-permission android:name="android.permission.SEND_SMS" />
 
+    <!-- 服務前景作業 ↓↓↓↓↓↓↓↓↓↓ -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <!-- 服務前景作業 ↑↑↑↑↑↑↑↑↑↑ -->
+
     <application
         android:name="com.example.gtu001.qrcodemaker.MyApplication"
         android:allowBackup="true"

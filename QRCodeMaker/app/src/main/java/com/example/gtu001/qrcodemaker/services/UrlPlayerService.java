@@ -1,5 +1,6 @@
 package com.example.gtu001.qrcodemaker.services;
 
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Context;
@@ -71,6 +72,7 @@ public class UrlPlayerService extends Service {
 
     @Override
     public void onCreate() {
+        Log.i(TAG, "----------------------onCreate");
         super.onCreate();
 
         //-----------------------------------------------------------------
@@ -90,11 +92,13 @@ public class UrlPlayerService extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
+        Log.i(TAG, "----------------------onBind");
         return mBinderNew;
     }
 
     @Override
     public void onDestroy() {
+        Log.i(TAG, "----------------------onDestroy");
 
         this.stopPlay();
 
@@ -111,9 +115,26 @@ public class UrlPlayerService extends Service {
         super.onDestroy();
     }
 
+    public boolean onUnbind(Intent intent) {
+        Log.i(TAG, "----------------------onUnbind");
+        return super.onUnbind(intent);
+    }
+
+    public void onRebind(Intent intent) {
+        Log.i(TAG, "----------------------onRebind");
+        super.onRebind(intent);
+    }
+
+    public void onTaskRemoved(Intent rootIntent) {
+        Log.i(TAG, "----------------------onTaskRemoved");
+        super.onTaskRemoved(rootIntent);
+    }
+
+
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.i(TAG, "----------------------onStartCommand");
         return START_STICKY;
     }
 
