@@ -7179,8 +7179,9 @@ public class FastDBQueryUI extends JFrame {
     }
 
     private void createRecordWatcher(Triple<List<String>, List<Class<?>>, List<Object[]>> orignQueryResult, String sql, Object[] params, boolean b, int maxRowsLimit) {
+        // 停掉上階段
         if (mRecordWatcher.get() != null) {
-            mRecordWatcher.get().doStop(false);
+            mRecordWatcher.get().doStop(true);
         }
         String fileMiddleName = sqlIdText.getText();
         if (StringUtils.isBlank(fileMiddleName)) {
@@ -7213,6 +7214,11 @@ public class FastDBQueryUI extends JFrame {
                 return null;
             }
         }, columnsAndChinese, this.recordWatcherToggleAutoChk));
+        // 初始化狀態
+        if (mRecordWatcher.get() != null) {
+            mRecordWatcher.get().doStop(false);
+            recordWatcherToggleBtn.setText("監聽");
+        }
     }
 
     private void updateRecordWatcherChineseMap() {
