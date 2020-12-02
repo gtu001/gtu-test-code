@@ -21,9 +21,11 @@ import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -44,6 +46,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTable;
@@ -76,6 +79,7 @@ import gtu.string.StringUtilForDb;
 import gtu.swing.util.JButtonGroupUtil;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JCommonUtil.HandleDocumentEvent;
+import gtu.swing.util.SwingActionUtil.ActionAdapter;
 import gtu.swing.util.JFrameRGBColorPanel;
 import gtu.swing.util.JMouseEventUtil;
 import gtu.swing.util.JPopupMenuUtil;
@@ -1482,6 +1486,49 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                                     applyThisValueToAll(columnHolder.get(), valueHolder.get());
                                 }
                             });
+                            // 日期時間
+                            {
+                                JMenu menu1 = JMenuAppender.newInstance("日期時間")//
+                                        .addMenuItem("日期", new ActionListener() {
+                                            @Override
+                                            public void actionPerformed(ActionEvent e) {
+                                                String dateStrVal = DateFormatUtils.format(System.currentTimeMillis(), "yyyy-MM-dd");
+                                                rowTable.setValueAt(dateStrVal, rowPos.get(), ColumnOrderDef.value.ordinal());
+                                            }
+                                        })//
+                                        .addMenuItem("日期時間", new ActionListener() {
+                                            @Override
+                                            public void actionPerformed(ActionEvent e) {
+                                                String dateStrVal = DateFormatUtils.format(System.currentTimeMillis(), "yyyy-MM-dd HH:mm:ss");
+                                                rowTable.setValueAt(dateStrVal, rowPos.get(), ColumnOrderDef.value.ordinal());
+                                            }
+                                        })//
+                                        .addMenuItem("日期[台]", new ActionListener() {
+                                            @Override
+                                            public void actionPerformed(ActionEvent e) {
+                                                String str = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+                                                String dateStrVal = String.valueOf(Integer.parseInt(str.substring(0, 4)) - 1911) + str.substring(4);
+                                                rowTable.setValueAt(dateStrVal, rowPos.get(), ColumnOrderDef.value.ordinal());
+                                            }
+                                        })//
+                                        .addMenuItem("日期時間[台]", new ActionListener() {
+                                            @Override
+                                            public void actionPerformed(ActionEvent e) {
+                                                String str = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+                                                String dateStrVal = String.valueOf(Integer.parseInt(str.substring(0, 4)) - 1911) + str.substring(4);
+                                                rowTable.setValueAt(dateStrVal, rowPos.get(), ColumnOrderDef.value.ordinal());
+                                            }
+                                        })//
+                                        .addMenuItem("時間", new ActionListener() {
+                                            @Override
+                                            public void actionPerformed(ActionEvent e) {
+                                                String dateStrVal = DateFormatUtils.format(System.currentTimeMillis(), "HH:mm:ss");
+                                                rowTable.setValueAt(dateStrVal, rowPos.get(), ColumnOrderDef.value.ordinal());
+                                            }
+                                        })//
+                                        .getMenu();
+                                inst.addJMenuItem(menu1);
+                            }
                         }
                         inst.applyEvent(e).show();
                     }
