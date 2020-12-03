@@ -1,6 +1,7 @@
 package gtu._work.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Desktop;
 import java.awt.EventQueue;
 import java.awt.Font;
@@ -47,16 +48,19 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.table.DefaultTableModel;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
+import org.apache.commons.lang3.tuple.Pair;
 import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.mouse.NativeMouseEvent;
 
@@ -65,6 +69,7 @@ import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
 
+import gtu.clipboard.ClipboardUtil;
 import gtu.constant.PatternCollection;
 import gtu.date.DateFormatUtil;
 import gtu.file.FileUtil;
@@ -90,6 +95,8 @@ import gtu.swing.util.JMouseEventUtil;
 import gtu.swing.util.JPopupMenuUtil;
 import gtu.swing.util.JSwingCommonConfigUtil;
 import gtu.swing.util.JTabbedPaneUtil;
+import gtu.swing.util.JTableUtil;
+import gtu.swing.util.JTableUtil.TableColorDef;
 import taobe.tec.jcc.JChineseConvertor;
 
 public class AVChoicerUI extends JFrame {
@@ -150,6 +157,19 @@ public class AVChoicerUI extends JFrame {
     private JTabbedPane tabbedPane;
 
     private static AVChoicerUI mAVChoicerUI;
+
+    private JTable emptyDirList;
+    private DropFileChecker mDropFileChecker = null;
+    private JList readyMoveLst;
+    private JTextField readyMoveToDirText;
+    private JTextField readyMoveFromDirText;
+    private JButton readyMoveBtn;
+    private JTextField emptyDirTargetText;
+    private JButton emptyDirBtn;
+    private AtomicReference<File> emptyDirHolder = new AtomicReference<File>();
+
+    private static Pattern movPtn = Pattern.compile(PatternCollection.VIDEO_PATTERN, Pattern.CASE_INSENSITIVE);
+    private static Pattern jpgPtn = Pattern.compile(PatternCollection.PICTURE_PATTERN, Pattern.CASE_INSENSITIVE);
 
     /**
      * Launch the application.
@@ -670,6 +690,69 @@ public class AVChoicerUI extends JFrame {
         });
 
         panel_18.add(JCommonUtil.createScrollComponent(dirCheckList), BorderLayout.CENTER);
+
+        JPanel panel_28 = new JPanel();
+        tabbedPane.addTab("淨空BT資料夾", null, panel_28, null);
+        panel_28.setLayout(new BorderLayout(0, 0));
+
+        JPanel panel_29 = new JPanel();
+        panel_28.add(panel_29, BorderLayout.NORTH);
+
+        emptyDirBtn = new JButton("淨空搬出");
+        emptyDirBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                emptyDirBtnAction();
+            }
+        });
+
+        emptyDirTargetText = new JTextField();
+        JCommonUtil.jTextFieldSetFilePathMouseEvent(emptyDirTargetText, true, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                List<File> files = (List<File>) e.getSource();
+                if (files != null && !files.isEmpty() && files.get(0).isDirectory()) {
+                    config.reflectSetConfig(AVChoicerUI.this);
+                    config.store();
+                }
+            }
+        });
+        panel_29.add(emptyDirTargetText);
+        emptyDirTargetText.setColumns(10);
+        panel_29.add(emptyDirBtn);
+
+        JLabel lblNewLabel_6 = new JLabel("Drop Here");
+        JCommonUtil.applyDropFiles(lblNewLabel_6, new ActionListener() {// emptyDirList
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                List<File> lst = (List<File>) e.getSource();
+                if (lst != null && !lst.isEmpty()) {
+                    if (lst.size() == 1) {
+                        File file = lst.get(0);
+                        if (!file.isDirectory()) {
+                            JCommonUtil._jOptionPane_showMessageDialog_error("必須為目錄!");
+                            return;
+                        }
+                        emptyDirListCheckDir(file);
+                    }
+                }
+            }
+        });
+
+        panel_29.add(lblNewLabel_6);
+
+        JPanel panel_30 = new JPanel();
+        panel_28.add(panel_30, BorderLayout.WEST);
+
+        JPanel panel_31 = new JPanel();
+        panel_28.add(panel_31, BorderLayout.EAST);
+
+        JPanel panel_32 = new JPanel();
+        panel_28.add(panel_32, BorderLayout.SOUTH);
+
+        emptyDirList = new JTable();
+        initEmptyDirList();
+
+        panel_28.add(JCommonUtil.createScrollComponent(emptyDirList), BorderLayout.CENTER);
 
         JPanel panel_23 = new JPanel();
         tabbedPane.addTab("準備移動", null, panel_23, null);
@@ -1845,12 +1928,6 @@ public class AVChoicerUI extends JFrame {
         }
     }
 
-    private DropFileChecker mDropFileChecker = null;
-    private JList readyMoveLst;
-    private JTextField readyMoveToDirText;
-    private JTextField readyMoveFromDirText;
-    private JButton readyMoveBtn;
-
     private List<File> dirCheckTextActionPerformed(List<File> fileLst) {
         mDropFileChecker = new DropFileChecker(fileLst);
         return mDropFileChecker.forReturnLst;
@@ -1983,9 +2060,6 @@ public class AVChoicerUI extends JFrame {
         }
     }
 
-    private static Pattern movPtn = Pattern.compile(PatternCollection.VIDEO_PATTERN, Pattern.CASE_INSENSITIVE);
-    private static Pattern jpgPtn = Pattern.compile(PatternCollection.PICTURE_PATTERN, Pattern.CASE_INSENSITIVE);
-
     private static class FileZ {
         File file;
         String name;
@@ -2068,5 +2142,113 @@ public class AVChoicerUI extends JFrame {
                 }
             }
         });
+    }
+
+    // =========================================================================================================================
+    private void initEmptyDirList() {
+        DefaultTableModel model = JTableUtil.createModel(new int[] { 0 }, //
+                new Object[] { "keep", "name", "size", "file" }, //
+                new Class[] { Boolean.class, String.class, String.class, File.class }//
+        );//
+        emptyDirList.setModel(model);
+        JTableUtil.setColumnWidths_Percent(emptyDirList, new float[] { 5, 60, 30, 5 });
+        JTableUtil.newInstance(emptyDirList).setColumnColor_byCondition(1, new TableColorDef() {
+            @Override
+            public Pair<Color, Color> getTableColour(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                String fileName = (String) table.getValueAt(row, 1);
+                File file = (File) table.getValueAt(row, 3);
+                if (fileName.toLowerCase().matches(".*\\." + PatternCollection.VIDEO_AND_PICTURE_PATTERN)) {
+                    return Pair.of(java.awt.Color.GREEN, null);
+                } else if (file.length() >= FileUtil.getSizeLength(40, "mb")) {
+                    return Pair.of(java.awt.Color.GREEN, null);
+                }
+                return null;
+            }
+        });
+    }
+
+    private void emptyDirListCheckDir(File dir) {
+        emptyDirHolder.set(dir);
+        initEmptyDirList();
+        DefaultTableModel model = (DefaultTableModel) emptyDirList.getModel();
+        List<File> fileLst = new ArrayList<File>();
+        FileUtil.searchFilefind(dir, ".*", fileLst);
+        Collections.sort(fileLst, new Comparator<File>() {
+            @Override
+            public int compare(File o1, File o2) {
+                if (o1 == null || !o1.exists()) {
+                    return 1;
+                }
+                if (o2 == null || !o2.exists()) {
+                    return 1;
+                }
+                return Long.valueOf(o1.length()).compareTo(Long.valueOf(o2.length())) * -1;
+            }
+        });
+        for (int ii = 0; ii < fileLst.size(); ii++) {
+            File file = fileLst.get(ii);
+            model.addRow(new Object[] { false, file.getName(), FileUtil.getSizeDescription(file.length()), file });
+        }
+    }
+
+    private void emptyDirBtnAction() {
+        int checkCol = 0;
+        int fileCol = 3;
+        File moveToDir = new File(emptyDirTargetText.getText());
+        if (!moveToDir.exists() || !moveToDir.isDirectory()) {
+            JCommonUtil._jOptionPane_showMessageDialog_error("必須設定搬移目錄");
+            return;
+        }
+        if (emptyDirHolder.get() == null || !emptyDirHolder.get().exists() || !emptyDirHolder.get().isDirectory()) {
+            JCommonUtil._jOptionPane_showMessageDialog_error("必須設定淨空目錄");
+            return;
+        }
+        DefaultTableModel model = (DefaultTableModel) emptyDirList.getModel();
+        List<File> moveFiles = new ArrayList<File>();
+        List<String> moveLog = new ArrayList<String>();
+        JTableUtil util = JTableUtil.newInstance(emptyDirList);
+        for (int ii = 0; ii < model.getRowCount(); ii++) {
+            boolean isMoveOut = (Boolean) util.getValueAt(true, ii, checkCol);
+            if (isMoveOut) {
+                File moveFile = (File) util.getValueAt(true, ii, fileCol);
+                if (moveFile.exists()) {
+                    moveFiles.add(moveFile);
+                    moveLog.add(moveFile.getName());
+                }
+            }
+        }
+        boolean confirmMove = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("是否移出以下檔案?\n" + StringUtils.join(moveLog, "\r\n"), "移出檔案數 : " + moveFiles.size());
+        if (confirmMove) {
+            List<String> moveLog2 = new ArrayList<String>();
+            int failCount = 0;
+            for (File fromFile : moveFiles) {
+                long fileSize = fromFile.length();
+                File moveToFile = new File(moveToDir, fromFile.getName());
+                try {
+                    FileUtils.moveFile(fromFile, moveToFile);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    boolean moveResult = false;
+                    if (moveToFile.exists() && fileSize == moveToFile.length()) {
+                        moveResult = true;
+                    } else {
+                        failCount++;
+                    }
+                    moveLog2.add((moveResult ? moveToFile : fromFile) + "\t" + (moveResult ? "成功" : "失敗"));
+                }
+            }
+            JCommonUtil._jOptionPane_showMessageDialog_info("搬檔案結果\n " + StringUtils.join(moveLog2, "\r\n"));
+            if (failCount > 0) {
+                ClipboardUtil.getInstance().setContents(StringUtils.join(moveLog2, "\r\n"));
+            } else {
+                try {
+                    FileUtils.deleteDirectory(emptyDirHolder.get());
+                    emptyDirHolder.set(null);
+                } catch (Exception e) {
+                    JCommonUtil.handleException(e);
+                }
+            }
+        }
     }
 }

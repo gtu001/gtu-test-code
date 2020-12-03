@@ -5,6 +5,8 @@
  */
 package gtu.file;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -36,13 +38,13 @@ import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.security.AccessController;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.swing.JLabel;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -53,6 +55,8 @@ import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.tuple.Pair;
 
 import gtu.date.DateUtil;
+import gtu.swing.JFrameTest;
+import gtu.swing.util.JCommonUtil;
 import sun.security.action.GetPropertyAction;
 
 /**
@@ -61,35 +65,19 @@ import sun.security.action.GetPropertyAction;
  */
 public class FileUtil {
 
-    public static void mainXXX(String[] args) {
-        List<String> lst = new ArrayList<String>();
-        lst.add("267.44mb");
-        lst.add("1.81kb");
-        lst.add("234.97mb");
-        lst.add("31.09mb");
-        lst.add("23.76kb");
-        lst.add("36.66kb");
-        lst.add("3.61kb");
-        lst.add("8.82kb");
-        lst.add("192.71kb");
-        lst.add("16.17kb");
-        Collections.sort(lst, new Comparator<String>() {
+    public static void main(String[] args) {
+        JLabel lbl = new JLabel();
+        JCommonUtil.applyDropFiles(lbl, new ActionListener() {
             @Override
-            public int compare(String o1, String o2) {
-                return FileUtil.getSizeDescriptionCompare(o1, o2);
+            public void actionPerformed(ActionEvent e) {
+                List<File> files = (List<File>) e.getSource();
+                File file = files.get(0);
+                lbl.setText(FileUtil.getSizeDescription(file.length()) + "__" + file.length());
             }
         });
+        JFrameTest.simpleTestComponent(lbl);
 
-        for (String v : lst) {
-            System.out.println("\t>> " + v);
-        }
-        System.out.println(new File(FileUtil.DESKTOP_PATH).exists());
-    }
-
-    public static void main(String[] args) {
-        File f = FileUtil.getParentFolder(new File("D:\\gtu001_dropbox\\Dropbox\\Apps\\gtu001_test\\bak_20191009_164954\\exportFileXml.bin"));
-        System.out.println(f);
-        System.out.println(new File(FileUtil.DESKTOP_PATH).exists());
+        System.out.println(getSizeLength(8.93, "mb"));
     }
 
     private FileUtil() {
@@ -1287,6 +1275,25 @@ public class FileUtil {
             return filename.substring(0, pos);
         }
         return filename;
+    }
+
+    /**
+     * 取得檔案大小長度
+     * 
+     * @param size
+     * @param sizeType
+     * @return
+     */
+    public static long getSizeLength(double size, String sizeType) {
+        BigDecimal rtnSize = new BigDecimal(size);
+        String[] suffixS = new String[] { "kb", "mb", "gb", "tb" };
+        for (int ii = 0; ii < suffixS.length; ii++) {
+            rtnSize = rtnSize.multiply(new BigDecimal(1024));
+            if (StringUtils.equalsIgnoreCase(sizeType.toLowerCase(), suffixS[ii])) {
+                break;
+            }
+        }
+        return rtnSize.longValue();
     }
 
     /**

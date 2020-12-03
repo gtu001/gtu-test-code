@@ -33,7 +33,6 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.border.EmptyBorder;
-import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.apache.commons.lang.StringUtils;
@@ -55,6 +54,7 @@ import gtu._work.ui.JMenuBarUtil.JMenuAppender;
 import gtu.keyboard_mouse.JnativehookKeyboardMouseHelper;
 import gtu.number.RandomUtil;
 import gtu.properties.PropertiesUtilBean;
+import gtu.runtime.DesktopUtil;
 import gtu.runtime.RuntimeBatPromptModeUtil;
 import gtu.swing.util.HideInSystemTrayHelper;
 import gtu.swing.util.JCommonUtil;
@@ -143,6 +143,14 @@ public class DMMVRPlayerHotKeyUI extends JFrame {
 
     private static final String SUBNAME = ".wsdcf";
     private static final String SUBNAME1 = "wsdcf";
+    private JPanel panel_20;
+    private JPanel panel_21;
+    private JPanel panel_22;
+    private JPanel panel_23;
+    private JPanel panel_24;
+    private JList fixList;
+    private FixFileProcess mFixFileProcess;
+    private JButton fixFileApplyAllBtn;
 
     /**
      * Launch the application.
@@ -484,6 +492,46 @@ public class DMMVRPlayerHotKeyUI extends JFrame {
         });
         panel_15.add(JCommonUtil.createScrollComponent(dmmList), BorderLayout.CENTER);
 
+        panel_20 = new JPanel();
+        tabbedPane.addTab("修改組列", null, panel_20, null);
+        panel_20.setLayout(new BorderLayout(0, 0));
+
+        panel_21 = new JPanel();
+        panel_20.add(panel_21, BorderLayout.NORTH);
+
+        fixFileApplyAllBtn = new JButton("全部執行");
+        fixFileApplyAllBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                swingUtil.invokeAction("fixFileApplyAllBtn.click", e);
+            }
+        });
+        panel_21.add(fixFileApplyAllBtn);
+
+        panel_22 = new JPanel();
+        panel_20.add(panel_22, BorderLayout.WEST);
+
+        panel_23 = new JPanel();
+        panel_20.add(panel_23, BorderLayout.EAST);
+
+        panel_24 = new JPanel();
+        panel_20.add(panel_24, BorderLayout.SOUTH);
+
+        fixList = new JList();
+        fixList.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                swingUtil.invokeAction("fixList.click", e);
+            }
+        });
+        fixList.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                swingUtil.invokeAction("fixList.keyPress", e);
+            }
+        });
+        fixList.setModel(new DefaultListModel());
+        panel_20.add(JCommonUtil.createScrollComponent(fixList), BorderLayout.CENTER);
+
         panel_2 = new JPanel();
         tabbedPane.addTab("其他設定", null, panel_2, null);
         panel_2.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
@@ -496,6 +544,8 @@ public class DMMVRPlayerHotKeyUI extends JFrame {
             }
         });
         {
+            mFixFileProcess = new FixFileProcess();
+
             // 掛載所有event
             applyAllEvents();
 
@@ -637,6 +687,35 @@ public class DMMVRPlayerHotKeyUI extends JFrame {
                 JCommonUtil._jOptionPane_showMessageDialog_info("R隨機\nN下一部\nT重播");
             }
         });
+        swingUtil.addActionHex("fixList.keyPress", new Action() {
+            @Override
+            public void action(EventObject evt) throws Exception {
+                JListUtil.newInstance(fixList).defaultJListKeyPressed(evt);
+            }
+        });
+        swingUtil.addActionHex("fixList.click", new Action() {
+            @Override
+            public void action(EventObject evt) throws Exception {
+                if (JMouseEventUtil.buttonLeftClick(2, evt)) {
+                    FixFile file = (FixFile) fixList.getSelectedValue();
+                    if (file != null) {
+                        mFixFileProcess.processFixFile(file);
+                    }
+                }
+            }
+        });
+        swingUtil.addActionHex("fixFileApplyAllBtn.click", new Action() {
+            @Override
+            public void action(EventObject evt) throws Exception {
+                DefaultListModel model = (DefaultListModel) fixList.getModel();
+                for (int ii = 0; ii < model.getSize(); ii++) {
+                    FixFile file = (FixFile) model.getElementAt(ii);
+                    if (file != null) {
+                        mFixFileProcess.processFixFile(file);
+                    }
+                }
+            }
+        });
     }
 
     private void dmmListAppendDMMFiles(List<File> files) {
@@ -676,7 +755,6 @@ public class DMMVRPlayerHotKeyUI extends JFrame {
             return;
         }
         DMMFile file = RandomUtil.pickOne(randomLst);
-        file.isPlayed = true;
         playFile(file);
     }
 
@@ -698,11 +776,9 @@ public class DMMVRPlayerHotKeyUI extends JFrame {
                                 String name2 = name1 + SUBNAME;
                                 if (JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("確定是否改為:" + name2, "是否改名")) {
                                     if (!StringUtils.equals(name, name2)) {
-                                        File newFile = new File(file.file.getParentFile(), name2);
-                                        boolean fixNameOk = file.file.renameTo(newFile);
-                                        JCommonUtil._jOptionPane_showMessageDialog_info("修改檔名" + (fixNameOk ? "成功" : "失敗"));
-                                        file.applyFile(newFile);
-                                        dmmList.repaint();
+                                        FixFile newFile = new FixFile(file);
+                                        newFile.renameToName = name2;
+                                        mFixFileProcess.addQueueWork(newFile);
                                     }
                                 }
                             }
@@ -714,9 +790,18 @@ public class DMMVRPlayerHotKeyUI extends JFrame {
                             if (file.file.exists()) {
                                 boolean delConfirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("是否刪除檔案 : " + file.name, "DEL");
                                 if (delConfirm) {
-                                    boolean delConfirm2 = file.file.delete();
-                                    JCommonUtil._jOptionPane_showInputDialog("刪除 " + (delConfirm2 ? "成功" : "失敗"));
+                                    FixFile newFile = new FixFile(file);
+                                    newFile.delFile = true;
+                                    mFixFileProcess.addQueueWork(newFile);
                                 }
+                            }
+                        }
+                    })//
+                    .addJMenuItem("開啟目錄", new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            if (file.file.exists()) {
+                                DesktopUtil.browseFileDirectory(file.file);
                             }
                         }
                     })//
@@ -731,12 +816,15 @@ public class DMMVRPlayerHotKeyUI extends JFrame {
     private void playFile(DMMFile file) {
         if (file == null) {
             System.out.println("檔案為null");
+            setTitle("檔案為null");
             return;
         }
         if (!file.file.exists()) {
             System.out.println("檔案位置移動 : " + file.path);
+            setTitle("檔案位置移動 : " + file.path);
             return;
         }
+        file.isPlayed = true;
         setTitle(file.name);
         String player = dmmPlayerText.getText();
         if (StringUtils.isBlank(player)) {
@@ -755,6 +843,7 @@ public class DMMVRPlayerHotKeyUI extends JFrame {
                 JCommonUtil.handleException(e);
             }
         }
+        dmmList.repaint();
     }
 
     private void playNextDMMFile() {
@@ -778,7 +867,6 @@ public class DMMVRPlayerHotKeyUI extends JFrame {
             }
         }
         DMMFile file = currentFile.get();
-        file.isPlayed = true;
         playFile(file);
     }
 
@@ -947,11 +1035,95 @@ public class DMMVRPlayerHotKeyUI extends JFrame {
         return swingUtil;
     }
 
+    private class FixFileProcess {
+        private void addQueueWork(FixFile file) {
+            file.file.queueWork = true;
+            DefaultListModel model = (DefaultListModel) fixList.getModel();
+            for (int ii = 0; ii < model.getSize(); ii++) {
+                FixFile f1 = (FixFile) model.getElementAt(ii);
+                if (StringUtils.equals(f1.file.path, file.file.path)) {
+                    model.removeElementAt(ii);
+                    ii--;
+                }
+            }
+            model.addElement(file);
+            fixList.repaint();
+            dmmList.repaint();
+        }
+
+        private void processFixFile(FixFile file) {
+            if (file.workDone) {
+                return;
+            }
+            if (StringUtils.isNotBlank(file.renameToName)) {
+                doRename(file);
+            } else if (file.delFile) {
+                doDelFile(file);
+            }
+        }
+
+        private void doRename(FixFile file1) {
+            DMMFile file = file1.file;
+            File newFile = new File(file.file.getParentFile(), file1.renameToName);
+            boolean fixNameOk = file.file.renameTo(newFile);
+            JCommonUtil._jOptionPane_showMessageDialog_info("修改檔名:" + file1.renameToName + " ->" + (fixNameOk ? "成功" : "失敗"));
+            if (fixNameOk) {
+                file.applyFile(newFile);
+                file1.workDone = true;
+                dmmList.repaint();
+                fixList.repaint();
+            }
+        }
+
+        private void doDelFile(FixFile file1) {
+            DMMFile file = file1.file;
+            boolean delConfirm2 = file.file.delete();
+            JCommonUtil._jOptionPane_showInputDialog("刪除:  " + file.name + "->" + (delConfirm2 ? "成功" : "失敗"));
+            if (delConfirm2) {
+                DefaultListModel model = (DefaultListModel) dmmList.getModel();
+                model.removeElement(file);
+                file1.workDone = true;
+                dmmList.repaint();
+                fixList.repaint();
+            }
+        }
+    }
+
+    private class FixFile {
+        boolean delFile = false;
+        String renameToName = "";
+        DMMFile file;
+        boolean workDone = false;
+
+        private FixFile(DMMFile file) {
+            this.file = file;
+        }
+
+        public String toString() {
+            String repr = "";
+            if (delFile) {
+                repr = "刪除";
+            } else if (StringUtils.isNotBlank(renameToName)) {
+                repr = "改名";
+            }
+            if (workDone) {
+                repr += "已完成";
+            }
+            String resultStr = //
+                    "<html><font color=" + (!workDone ? "RED" : "GREEN") + ">" + //
+                            repr + //
+                            "</font>" + file.name + //
+                            "</html>";//
+            return resultStr;
+        }
+    }
+
     private class DMMFile {
         File file;
         String name;
         String path;
         boolean isPlayed = false;
+        boolean queueWork = false;
 
         private void applyFile(File file) {
             this.file = file;
@@ -964,9 +1136,16 @@ public class DMMVRPlayerHotKeyUI extends JFrame {
         }
 
         public String toString() {
+            String repr = "";
+            if (isPlayed) {
+                repr = "已撥放";
+            }
+            if (queueWork) {
+                repr = "佇列操作";
+            }
             String resultStr = //
                     "<html><font color=red>" + //
-                            (isPlayed ? "已撥放" : "") + //
+                            repr + //
                             "</font>" + name + //
                             "</html>";//
             return resultStr;
