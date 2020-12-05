@@ -66,7 +66,7 @@ import sun.security.action.GetPropertyAction;
 public class FileUtil {
 
     public static void main(String[] args) {
-        JLabel lbl = new JLabel();
+        final JLabel lbl = new JLabel();
         JCommonUtil.applyDropFiles(lbl, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

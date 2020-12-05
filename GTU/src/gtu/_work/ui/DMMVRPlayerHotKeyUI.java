@@ -826,6 +826,7 @@ public class DMMVRPlayerHotKeyUI extends JFrame {
         }
         file.isPlayed = true;
         setTitle(file.name);
+        currentFile.set(file);
         String player = dmmPlayerText.getText();
         if (StringUtils.isBlank(player)) {
             try {
