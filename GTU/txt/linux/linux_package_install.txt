@@ -9,3 +9,9 @@ apt-get install curl
 
 apt-get update
 apt-get install vim
+
+--------------------------------------------------------------------------
+
+反安裝
+
+ $ sudo  apt-get autoremove --purge  <pkg_name>

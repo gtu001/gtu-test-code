@@ -90,6 +90,7 @@ import gtu.swing.util.HideInSystemTrayHelper;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JFrameRGBColorPanel;
 import gtu.swing.util.JFrameUtil;
+import gtu.swing.util.JLabelUtil;
 import gtu.swing.util.JListUtil;
 import gtu.swing.util.JMouseEventUtil;
 import gtu.swing.util.JPopupMenuUtil;
@@ -195,7 +196,7 @@ public class AVChoicerUI extends JFrame {
      */
     public AVChoicerUI() {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setBounds(100, 100, 563, 433);
+        setBounds(100, 100, 633, 433);
         contentPane = new JPanel();
         contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
         contentPane.setLayout(new BorderLayout(0, 0));
@@ -721,19 +722,12 @@ public class AVChoicerUI extends JFrame {
         panel_29.add(emptyDirBtn);
 
         JLabel lblNewLabel_6 = new JLabel("Drop Here");
-        JCommonUtil.applyDropFiles(lblNewLabel_6, new ActionListener() {// emptyDirList
+        JLabelUtil.applyDropDirPath(lblNewLabel_6, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                List<File> lst = (List<File>) e.getSource();
-                if (lst != null && !lst.isEmpty()) {
-                    if (lst.size() == 1) {
-                        File file = lst.get(0);
-                        if (!file.isDirectory()) {
-                            JCommonUtil._jOptionPane_showMessageDialog_error("必須為目錄!");
-                            return;
-                        }
-                        emptyDirListCheckDir(file);
-                    }
+                File file = (File) e.getSource();
+                if (file != null && file.exists()) {
+                    emptyDirListCheckDir(file);
                 }
             }
         });
