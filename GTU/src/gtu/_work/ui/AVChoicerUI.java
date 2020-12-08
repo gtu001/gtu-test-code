@@ -835,6 +835,9 @@ public class AVChoicerUI extends JFrame {
                             openToFile = file.moveToFile;
                         }
                         DesktopUtil.browseFileDirectory(openToFile);
+                        if (file instanceof MoveFileBatch) {
+                            ((MoveFileBatch) file).showLog();
+                        }
                     }
                 }
             }
@@ -1977,6 +1980,17 @@ public class AVChoicerUI extends JFrame {
             public void run() {
                 for (int ii = 0; ii < model.getSize(); ii++) {
                     MoveFileZ file = (MoveFileZ) model.getElementAt(ii);
+
+                    if (file instanceof MoveFileBatch) {
+                        MoveFileBatch mFile = ((MoveFileBatch) file);
+                        boolean beforeMoveSuccesss = mFile.beforeMove();
+                        if (!beforeMoveSuccesss) {
+                            file.moveStateChs = "BeforeFail...";
+                            file.moveStateColor = "RED";
+                            continue;
+                        }
+                    }
+
                     file.moveStateChs = "移動中...";
                     file.moveStateColor = "BLUE";
                     File moveTo = new File(targetDir, file.file.getName());
@@ -2027,6 +2041,7 @@ public class AVChoicerUI extends JFrame {
     }
 
     private static class MoveFileZ extends FileZ {
+
         MoveFileZ(File file) {
             super(file);
         }
@@ -2185,6 +2200,67 @@ public class AVChoicerUI extends JFrame {
         }
     }
 
+    private class MoveFileBatch extends MoveFileZ {
+
+        List<File> moveFiles;
+        File moveToDir;
+        File emptyDirHolder;
+        boolean beforeMoveDone = false;
+        List<String> moveLog2 = new ArrayList<String>();
+
+        MoveFileBatch(List<File> moveFiles, File moveToDir, File emptyDirHolder) {
+            super(new File(moveToDir, emptyDirHolder.getName()));
+            this.moveToDir = new File(moveToDir, emptyDirHolder.getName());
+            this.moveFiles = moveFiles;
+            this.emptyDirHolder = emptyDirHolder;
+        }
+
+        private void showLog() {
+            JCommonUtil._jOptionPane_showMessageDialog_info("搬檔案結果\n " + StringUtils.join(moveLog2, "\r\n"));
+        }
+
+        private boolean beforeMove() {
+            if (beforeMoveDone) {
+                return true;
+            }
+            int failCount = 0;
+            for (File fromFile : moveFiles) {
+                long fileSize = fromFile.length();
+                File moveToFile = new File(moveToDir, fromFile.getName());
+                try {
+                    // FileUtils.moveFile(fromFile, moveToFile);//XXX 這個會喬很久!!
+                    if (moveToFile.exists()) {
+                        moveToFile.delete();
+                    }
+                    fromFile.renameTo(moveToFile);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    boolean moveResult = false;
+                    if (moveToFile.exists() && fileSize == moveToFile.length()) {
+                        moveResult = true;
+                    } else {
+                        failCount++;
+                    }
+                    moveLog2.add((moveResult ? moveToFile : fromFile) + "\t" + (moveResult ? "成功" : "失敗"));
+                }
+            }
+            if (failCount > 0) {
+                // ClipboardUtil.getInstance().setContents(StringUtils.join(moveLog2,
+                // "\r\n"));
+            } else {
+                try {
+                    FileUtils.deleteDirectory(emptyDirHolder);
+                    beforeMoveDone = true;
+                    return true;
+                } catch (Exception e) {
+                    JCommonUtil.handleException(e);
+                }
+            }
+            return false;
+        }
+    }
+
     private void emptyDirBtnAction() {
         int checkCol = 0;
         int fileCol = 3;
@@ -2213,36 +2289,9 @@ public class AVChoicerUI extends JFrame {
         }
         boolean confirmMove = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("是否移出以下檔案?\n" + StringUtils.join(moveLog, "\r\n"), "移出檔案數 : " + moveFiles.size());
         if (confirmMove) {
-            List<String> moveLog2 = new ArrayList<String>();
-            int failCount = 0;
-            for (File fromFile : moveFiles) {
-                long fileSize = fromFile.length();
-                File moveToFile = new File(moveToDir, fromFile.getName());
-                try {
-                    FileUtils.moveFile(fromFile, moveToFile);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                } finally {
-                    boolean moveResult = false;
-                    if (moveToFile.exists() && fileSize == moveToFile.length()) {
-                        moveResult = true;
-                    } else {
-                        failCount++;
-                    }
-                    moveLog2.add((moveResult ? moveToFile : fromFile) + "\t" + (moveResult ? "成功" : "失敗"));
-                }
-            }
-            JCommonUtil._jOptionPane_showMessageDialog_info("搬檔案結果\n " + StringUtils.join(moveLog2, "\r\n"));
-            if (failCount > 0) {
-                ClipboardUtil.getInstance().setContents(StringUtils.join(moveLog2, "\r\n"));
-            } else {
-                try {
-                    FileUtils.deleteDirectory(emptyDirHolder.get());
-                    emptyDirHolder.set(null);
-                } catch (Exception e) {
-                    JCommonUtil.handleException(e);
-                }
-            }
+            MoveFileBatch tMoveFileBatch = new MoveFileBatch(moveFiles, moveToDir, emptyDirHolder.get());
+            DefaultListModel model2 = (DefaultListModel) readyMoveLst.getModel();
+            model2.addElement(tMoveFileBatch);
         }
     }
 }
