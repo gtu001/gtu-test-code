@@ -30,6 +30,7 @@ import java.util.Map;
 
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
@@ -37,6 +38,7 @@ import javax.swing.KeyStroke;
 import gtu.file.FileUtil;
 import gtu.file.OsInfoUtil;
 import gtu.properties.PropertiesUtil;
+import gtu.swing.JFrameTest;
 
 public class JFrameUtil {
 
@@ -106,32 +108,50 @@ public class JFrameUtil {
         return false;
     }
 
+    public static void main(String[] args) {
+        System.out.println("-----1");
+        boolean forceOpen = lockInstance_delable(new File(FileUtil.DESKTOP_PATH, "lock_file.txt"));
+        System.out.println("-----2");
+        if (forceOpen) {
+            JFrameTest.simpleTestComponent(new JLabel());
+        }
+        System.out.println("done...");
+    }
+
     public static boolean lockInstance_delable(Class<?> clz) {
         return lockInstance_delable(new File(PropertiesUtil.getJarCurrentPath(clz), clz.getSimpleName() + "_lockfile.lock"));
     }
 
     public static boolean lockInstance_delable(final File lockFile) {
+        final Runnable addHook = new Runnable() {
+            @Override
+            public void run() {
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSSSS");
+                FileUtil.saveToFile(lockFile, sdf.format(new Date()), "utf8");
+                Runtime.getRuntime().addShutdownHook(new Thread() {
+                    public void run() {
+                        try {
+                            System.out.println("delete hook file : " + lockFile);
+                            lockFile.delete();
+                        } catch (Exception e) {
+                            System.out.println("Unable to remove lock file: " + lockFile);
+                            e.printStackTrace();
+                        }
+                    }
+                });
+            }
+        };
         if (lockFile.exists()) {
             System.out.println("Unable to create and/or lock file: " + lockFile);
             boolean forceOpen = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("已有存在的執行,是否要強制開啟?", "強制開啟");
             if (forceOpen) {
+                lockFile.delete();
+                addHook.run();
                 return true;
             }
             return false;
         }
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSSSS");
-        FileUtil.saveToFile(lockFile, sdf.format(new Date()), "utf8");
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            public void run() {
-                try {
-                    System.out.println("delete hook file : " + lockFile);
-                    lockFile.delete();
-                } catch (Exception e) {
-                    System.out.println("Unable to remove lock file: " + lockFile);
-                    e.printStackTrace();
-                }
-            }
-        });
+        addHook.run();
         return true;
     }
 

@@ -20,7 +20,7 @@ public class JFrameTest {
         JFrameTest.simpleTestComponent(textArea);
     }
 
-    public static void simpleTestComponent(JComponent comp) {
+    public static JFrame simpleTestComponent(JComponent comp) {
         JFrame jframe = new JFrame("測試元件");
         jframe.setSize(500, 300);// 寬 高
         jframe.setLocationRelativeTo(null);
@@ -28,5 +28,6 @@ public class JFrameTest {
         jframe.add(JCommonUtil.createScrollComponent(comp), BorderLayout.CENTER);
         jframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         jframe.setVisible(true);
+        return jframe;
     }
 }
