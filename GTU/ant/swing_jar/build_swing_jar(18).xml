@@ -106,6 +106,8 @@
 			<packagename mode="small">net.sf.image4j.codec.ico</packagename>
 			<packagename mode="small">com.jgoodies.forms.factories.FormFactory</packagename>
 			<packagename mode="small">org.apache.commons.beanutils.ConvertUtils</packagename>
+			<packagename mode="small">org.apache.commons.collections.CollectionUtils</packagename>
+
 		</jarfinder>
 
 		<!-- 特別指定要使用的jar檔 -->
