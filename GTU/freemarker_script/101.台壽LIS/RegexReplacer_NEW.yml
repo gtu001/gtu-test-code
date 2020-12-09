@@ -2,7 +2,9 @@
 - comboLst: [
     ]
   configKeyText: 起訖日
-  exampleArea: 起日 startDate 迄日 endDate
+  exampleArea: |2-
+
+        select * from sssss ffff = :ddddd and ffff = :rrrr
   fromVal: (.*?)\s+(.*?)\s+(.*?)\s+(.*)
   multiLine: false
   toVal: |2-
@@ -20,7 +22,7 @@
 - comboLst: [
     ]
   configKeyText: codeValue_下拉
-  exampleArea: 契變項目 EdorType edortype
+  exampleArea: 契變項目 lifeprovestate lifeprovestate
   fromVal: (.*?)\s+(.*?)\s+(.*)
   multiLine: false
   toVal: |2-
@@ -1404,7 +1406,7 @@
 - comboLst: [
     ]
   configKeyText: DB_Query
-  exampleArea: LCSurvivalCertificate
+  exampleArea: LCPol
   fromVal: (\w+)
   multiLine: false
   toVal: |2-

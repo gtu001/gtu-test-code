@@ -200,6 +200,47 @@ public class ${ct.getBlObj()['blClass']} implements BusinessService {
         tError.errorMessage(new I18nMessage(chMessage, messageCode));
         this.mErrors.addOneError(tError);
     }
+
+
+    private static class ErrorHandler {
+        private static String CLASS_NAME = PEdorCPDetailBL.class.getSimpleName();
+        private static StackTraceElement ERROR_STACK = new StackTraceElement("NA_Class", "NA_Method", "NA_File", -1);
+
+        private static StackTraceElement getCurrentStackTraceElement() {
+            int findIdx = -1;
+            String myClassName = CLASS_NAME + "$" + ErrorHandler.class.getSimpleName();
+            StackTraceElement[] ses = Thread.currentThread().getStackTrace();
+            for (int ii = 0; ii < ses.length; ii++) {
+                StackTraceElement s = ses[ii];
+                if (s.getClassName().endsWith(myClassName)) {
+                    findIdx = ii;
+                } else if (findIdx != -1) {
+                    return s;
+                }
+            }
+            return ERROR_STACK;
+        }
+
+        private static void errorMessage(Exception e, CErrors mErrors) {
+            StackTraceElement s = getCurrentStackTraceElement();
+            CError tError = new CError();
+            tError.moduleName = CLASS_NAME;
+            tError.functionName = s.getMethodName();
+            tError.errorMessage(new I18nMessage("数据处理错误！{0}", "xIDx155879959814434XidX", e.getMessage()));
+            mErrors.addOneError(tError);
+        }
+
+        private static void errorMessage(String chMessage, String messageCode, CErrors mErrors) {
+            StackTraceElement s = getCurrentStackTraceElement();
+            CError tError = new CError();
+            tError.moduleName = CLASS_NAME;
+            tError.functionName = s.getMethodName();
+            tError.errorMessage(new I18nMessage(chMessage, messageCode));
+            mErrors.addOneError(tError);
+        }
+    }
+
+
     
     private boolean dealData() {
         ${ct.getBlObj()['table']}Schema schema = m${ct.getBlObj()['table']}Schema;
@@ -385,6 +426,33 @@ public class ${ct.getBlObj()['blClass']} implements BusinessService {
             for (int c = 1; c <= tSSRS.getMaxCol(); c++) {
                 System.out.println(tSSRS.GetText(j + 1, c));
             }
+        }
+    }
+
+    private void queryCustom003() {
+        List<String[]> rowLst = new ArrayList<String[]>();
+        ExeSQL tExeSQL = new ExeSQL();
+        String sql = //
+                "                      select t.ACCEPTDATE, t.CONTNO, t.CONTTYPE \n" + //
+                        "                      from LCCont t                             \n" + //
+                        "                      where 1=1                                 \n" + //
+                        "                      and rownum < 3                            \n" + //
+                        ""; //
+        SQLwithBindVariables sqlbv1 = new SQLwithBindVariables();
+        sqlbv1.sql(sql);
+        sqlbv1.put("PrtSeq", mPrtSeq);
+        SSRS pSsrs = new SSRS();
+        pSsrs = tExeSQL.execSQL(sqlbv1);
+        for (int row = 0; row < pSsrs.getMaxRow(); row++) {
+            List<String> colLst = new ArrayList<String>();
+            for (int col = 0; col < pSsrs.getMaxCol(); col++) {
+                String column = pSsrs.GetText(row + 1, col + 1);
+                colLst.add(column);
+            }
+            rowLst.add(colLst.toArray(new String[0]));
+        }
+        for (int ii = 0; ii < rowLst.size(); ii++) {
+            System.out.println(Arrays.asList(rowLst.get(ii)));
         }
     }
 
