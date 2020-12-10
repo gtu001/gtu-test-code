@@ -84,6 +84,10 @@ class WebElementControl :
         return element.send_keys(text)
 
     @staticmethod
+    def getValue(element) :
+        return element.get_attribute("value")
+
+    @staticmethod
     def click(element) :
         return element.click()
 
