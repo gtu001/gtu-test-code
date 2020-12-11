@@ -12,6 +12,7 @@ def main(filePath):
     sheetSet = pandasUtil.loadExcel(filePath, "Sheet", headerRowIndices=[0])
     df = sheetSet["Sheet"]
 
+
     print(df.head())
 
     # pandasUtil.getColumns(df)
@@ -39,11 +40,11 @@ def main(filePath):
     
     df = pandasUtil.filterOutRowsByValue('消費明細', ['小計', '記名式悠遊卡卡號', '綠活卡累積減免下次年費金額起算日', '現已累積', '累積消費次數', '您的本期金額總計', '感謝您ｉｂｏｎ繳款已收到'], df)
 
-    df2 = df.groupby(['消費明細'])['台幣入帳金額'].agg("sum")
+    df = df.groupby(['消費明細'])['台幣入帳金額'].agg("sum")
+    
+    print(df)
 
-    print(df2)
-
-    pandasUtil.writeExcel(df2, fileUtil.getDesktopDir("firstBankTest001.xlsx"))
+    pandasUtil.writeExcel(df, fileUtil.getDesktopDir("firstBankTest001.xlsx"))
 
     print("done...")
 
