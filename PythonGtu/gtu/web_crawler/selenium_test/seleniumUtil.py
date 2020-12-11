@@ -11,6 +11,12 @@ from gtu.os import envUtil
 import inspect
 from gtu.string import stringUtil
 from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import Select
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import StaleElementReferenceException
+from selenium.common.exceptions import ElementClickInterceptedException
+
 
 '''
 from gtu.web_crawler.selenium_test import seleniumUtil
@@ -92,6 +98,18 @@ class WebElementControl :
         return element.click()
 
     @staticmethod
+    def clickUntil(driver, xpath=None, css=None) :
+        for i in range(20):
+            try:
+                if xpath is not None :
+                    WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.XPATH, xpath))).click()
+                else :
+                    WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.CSS_SELECTOR, css))).click()
+                break
+            except ElementClickInterceptedException as ex :
+                time.sleep(1)
+
+    @staticmethod
     def enter(webElement) :
         from selenium.webdriver.common import keys
         webElement.send_keys(keys.Keys.ENTER)
@@ -103,6 +121,33 @@ class WebElementControl :
     @staticmethod
     def getCurrentUrl(driver):
         return driver.current_url
+
+    @staticmethod
+    def setSelect(webElement, text=None, value=None, index=None):
+        if text is not None :
+            webElement.find_element_by_xpath(".//option[text()='"+ text +"']").click()
+        elif value is not None:
+            webElement.find_element_by_xpath(".//option[value()='"+ value +"']").click()
+        else :
+            findOk = False
+            options = webElement.find_elements_by_xpath(".//option")
+            for i,v in enumerate(options) :
+                if i == index:
+                    findOk = True
+                    print("setSelect(index) = ", i, ", value=", v.get_attribute("value"), ", text=", v.text)
+                    v.click()
+            if not findOk :
+                print("index 超出範圍 : ", str(index))
+
+    @staticmethod
+    def getOptionsLst(webElement) :
+        lst = list()
+        options = webElement.find_elements_by_xpath(".//option")
+        for i,v in enumerate(options) :
+            print(i, ", value=", v.get_attribute("value"), ", text=", v.text)
+            lst.append((v.get_attribute("value"), v.text))
+        return lst
+
 
     @staticmethod
     def until(driver, timeout=300, frequence=0.5, message='', waitUntilFunc=None) :
@@ -117,6 +162,36 @@ class WebElementControl :
             waitUntilFunc = waitUntilFuncDefault
         WebDriverWait(driver, timeout, frequence).until(waitUntilFunc, message)
 
+    @staticmethod
+    def waitPageElementByCss(css, text, driver) :
+        def waitUntilFunc(driver) :
+            chk1 = driver.find_elements_by_css_selector(css)
+            lenOk = len(chk1)
+            print("check_css_exists = " , lenOk)
+            if lenOk > 0 :
+                return True
+            return False        
+        WebElementControl.until(driver, timeout=300, frequence=0.5, message='', waitUntilFunc=waitUntilFunc) 
+        elements = driver.find_elements_by_css_selector(css)
+        if stringUtil.isBlank(text) and len(elements) > 0:
+            return elements[0]
+        text = text.lower()
+        for i,v in enumerate(elements) :
+            print(i,v.text)
+            if text in v.text.lower() :
+                return v
+        return None
+
+    @staticmethod
+    def waitPageElementByXpath(xpath, driver) :
+        def waitUntilFunc(driver) :
+            chk1 = driver.find_elements_by_xpath(xpath)
+            print("check_xpath_exists = " , len(chk1))
+            if len(chk1) > 0 :
+                return True
+            return False        
+        WebElementControl.until(driver, timeout=300, frequence=0.5, message='', waitUntilFunc=waitUntilFunc) 
+        return driver.find_elements_by_xpath(xpath)[0]
 
 
 class DownloadWatcher :

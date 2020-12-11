@@ -22,6 +22,10 @@ from abc import ABCMeta, abstractmethod
 
 from gtu.io import LogWriter
 from selenium.webdriver.support.ui import WebDriverWait
+from gtu.openpyxl_test import excelUtil
+from gtu.datetime import dateUtil
+from openpyxl import Workbook
+
 
 log = LogWriter.LogWriter()
 
@@ -78,25 +82,77 @@ class FirstBankHandler(Thread, metaclass=ABCMeta) :
         seleniumUtil.WebElementControl.click(loginBtn)
 
 
+    def waitSelectOptionsFull(self) :
+        def waitUntilFunc(driver) :
+            options = driver.find_elements_by_xpath("//select[contains(@id, 'selBillDate')]/option")
+            print("check_options_length = " , len(options))
+            if len(options) == 12 :
+                return True
+            return False        
+        seleniumUtil.WebElementControl.until(self.driver, timeout=300, frequence=0.5, message='', waitUntilFunc=waitUntilFunc)
+
+
+    def choiceMonthSelect(self) :
+        '''
+            選擇月份
+        '''
+        select = seleniumUtil.WebElementControl.waitPageElementByCss("select[id=selBillDate]", '', self.driver)
+        self.waitSelectOptionsFull()
+        options = seleniumUtil.WebElementControl.getOptionsLst(select)
+        for op in range(0, len(options)) :
+            seleniumUtil.WebElementControl.setSelect(select, index=op)
+
+        seleniumUtil.WebElementControl.setSelect(select, index=0)        
+        seleniumUtil.WebElementControl.clickUntil(self.driver, xpath="//button[text()='查詢']")
+
+        dateObj = dateUtil.taiwanDateToDateObj(options[0][1], delimit='/')
+        dateStr2 = dateUtil.formatDatetimeByJavaFormat(dateObj, 'yyyy/MM/dd')
+
+        # 等畫面出現正確日其
+        from selenium.webdriver.common.by import By
+        from selenium.webdriver.support import expected_conditions as EC
+        WebDriverWait(self.driver, 10).until(
+            EC.text_to_be_present_in_element(
+                (By.ID, 'tbQry1'), dateStr2))
+
 
     def showBillPage(self) :
-        Alink = self.findPageLink("li[class=cms-bg-menu]", '信用卡帳務服務')
+        Alink = seleniumUtil.WebElementControl.waitPageElementByCss("li[class=cms-bg-menu]", '信用卡帳務服務', self.driver)
         seleniumUtil.WebElementControl.click(Alink)
-        Blink = self.findPageLink("li > a > div", '帳單明細查詢╱列印繳款聯')
+        Blink = seleniumUtil.WebElementControl.waitPageElementByCss("li > a > div", '帳單明細查詢╱列印繳款聯', self.driver)
         seleniumUtil.WebElementControl.click(Blink)
-        Clink = self.findPageLink("li[class=active] > a", '台幣')
+        #選擇月份
+        self.choiceMonthSelect()
+
+        Clink = seleniumUtil.WebElementControl.waitPageElementByCss("li[class=active] > a", '台幣', self.driver)
+        
         pageContent = self.driver.page_source
         print("################# start ")
 
-        trs = self.driver.find_elements_by_xpath("//div[contains(@class,'cms-label')][text()='信用卡消費明細']/following-sibling::table//tbody//tr")
-        for i,tr in enumerate(trs) :
-            print(i, tr.text)
-            tds = tr.find_elements_by_xpath(".//td")
-            print("--------------")
-            for j,td in enumerate(tds) :
-                print(j, td.text)
+        for again in range(0,3) :
+            from selenium.common.exceptions import StaleElementReferenceException
+            try:
+                wb = Workbook()
+                ws = wb.active
+                ws.append(['','消費日','入帳日','消費明細','台幣入帳金額','外幣折算日及金額'])
+
+                trs = self.driver.find_elements_by_xpath("//div[contains(@class,'cms-label')][text()='信用卡消費明細']/following-sibling::table//tbody//tr")
+                for i,tr in enumerate(trs) :
+                    print(i, tr.text)
+                    tds = tr.find_elements_by_xpath(".//td")
+                    print("--------------")
+                    lst = list()
+                    for j,td in enumerate(tds) :
+                        print(j, td.text)
+                        lst.append(td.text)
+                    ws.append(lst)
+                    
+                wb.save(fileUtil.getDesktopDir("firstBankCreditCardCheck_" + dateUtil.currentDatetime_str() + ".xlsx"))
+                break
+            except StaleElementReferenceException as ex :
+                time.sleep(3)
         
-        
+
          
     def run(self) :
         # bs(self.driver.page_source, "html.parser")

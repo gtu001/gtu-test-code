@@ -104,6 +104,22 @@ def formatDatetimeByJavaFormat(datetimeObj, javaFormat):
     return datetimeObj.strftime(format)
 
 
+def taiwanDateToDateObj(taiwanDate, delimit=None) :
+    year = taiwanDate[0:3]
+    other = taiwanDate[3:]
+    month = ""
+    day = ""
+    if delimit is not None :
+        others = other.split(delimit)
+        month = others[1]
+        day = others[2]
+    elif len(other) == 4:
+        month = other[0:2]
+        day = others[2:]
+    year = int(year) + 1911
+    dateStr = str(year).zfill(4) + month.zfill(2) + day.zfill(2)
+    return datetime.datetime.strptime(dateStr, "%Y%m%d")
+
 
 if __name__ == '__main__' :
     dateObj = currentDate()

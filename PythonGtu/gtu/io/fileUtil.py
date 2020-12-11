@@ -27,6 +27,10 @@ from gtu.io import fileUtil
 '''
 
 
+def exists(path) :
+	return os.path.exists(path)
+
+
 def mkdirs(path):
 	'''建立多個目錄'''
 	os.makedirs(path, mode=0o777, exist_ok=True)
