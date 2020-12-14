@@ -30,8 +30,8 @@ public class InstagramVideoUrlHandler extends Porn91Downloader {
 
         System.out.println("START=====================================================================");
         System.out.println("=====================================================================");
-        // System.out.println(content);
-        FileUtil.saveToFile(new File(FileUtil.DESKTOP_DIR, "xxxxxxxxx.txt"), content, "utf8");
+        System.out.println(content);
+        FileUtil.saveToFile(new File(FileUtil.DESKTOP_DIR, "InstagramVideoUrlHandler_CONTENT.txt"), content, "utf8");
         System.out.println("=====================================================================");
         System.out.println("END=====================================================================");
 
@@ -49,6 +49,7 @@ public class InstagramVideoUrlHandler extends Porn91Downloader {
 
         if (StringUtils.isNotBlank(picUrl)) {
             SingleVideoUrlConfig su = new SingleVideoUrlConfig();
+            su.htmlUrl = url;
             su.orignUrl = picUrl;
             su.finalFileName = picName;
             VideoUrlConfig su2 = new VideoUrlConfig(su);

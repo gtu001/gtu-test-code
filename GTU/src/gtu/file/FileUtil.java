@@ -5,8 +5,6 @@
  */
 package gtu.file;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -44,8 +42,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.swing.JLabel;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
@@ -54,9 +50,8 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.tuple.Pair;
 
+import gtu.binary.StringUtil4FullChar;
 import gtu.date.DateUtil;
-import gtu.swing.JFrameTest;
-import gtu.swing.util.JCommonUtil;
 import sun.security.action.GetPropertyAction;
 
 /**
@@ -66,16 +61,25 @@ import sun.security.action.GetPropertyAction;
 public class FileUtil {
 
     public static void main(String[] args) {
-        final JLabel lbl = new JLabel();
-        JCommonUtil.applyDropFiles(lbl, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                List<File> files = (List<File>) e.getSource();
-                File file = files.get(0);
-                lbl.setText(FileUtil.getSizeDescription(file.length()) + "__" + file.length());
-            }
-        });
-        JFrameTest.simpleTestComponent(lbl);
+//        final JLabel lbl = new JLabel();
+//        JCommonUtil.applyDropFiles(lbl, new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//                List<File> files = (List<File>) e.getSource();
+//                File file = files.get(0);
+//                lbl.setText(FileUtil.getSizeDescription(file.length()) + "__" + file.length());
+//            }
+//        });
+//        JFrameTest.simpleTestComponent(lbl);
+        
+        String name = "-熊熊卓毓彤 (@beargenie) posted on Instagram- “大家端午佳節愉快❤️ 我是粽子的顏色🥰-@michelle_wu413 這次幫我染ㄧ個暖橘咖 顯白顯髮質好-@redcircle_office -頭髮長了 大家覺得我要剪短嗎？還是維持？” • Jun 25, 2020 at 10-58am UTC-_105420675_158377269137581_1579270419227492688_n.jpg";
+        
+        name = fixName(name);
+        
+        System.out.println("name == " + name);
+        System.out.println("name == " + StringUtil4FullChar.length(name));
+        
+        FileUtil.saveToFile(new File(FileUtil.DESKTOP_DIR, name), name, "UTF8");
 
         System.out.println(getSizeLength(8.93, "mb"));
     }
@@ -1760,6 +1764,20 @@ public class FileUtil {
             }
             return Files.isSymbolicLink(file.toPath());
         }
+    }
+
+    public static String fixName(String name) {
+        name = StringUtils.trimToEmpty(name);
+        name = escapeFilename(name, true);
+        String subName = "";
+        int fixSubNameLength = 0;
+        if (name.contains(".")) {
+            subName = name.substring(name.lastIndexOf(".") + 1);
+            fixSubNameLength = subName.length() + 1;
+        }
+        name = StringUtil4FullChar.substring(name, 0, 254 - fixSubNameLength);
+        String rtnVal = name + "." + subName;
+        return rtnVal;
     }
 
     public static class FileZ {

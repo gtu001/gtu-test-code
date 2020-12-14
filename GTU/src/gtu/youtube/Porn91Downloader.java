@@ -18,6 +18,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -54,6 +55,7 @@ import gtu.log.LogbackUtil;
 import gtu.log.line.SystemZ;
 import gtu.swing.util.JCommonUtil;
 import gtu.youtube.PornVideoUrlDetection.SingleVideoUrlConfig;
+import net.sf.json.JSONObject;
 
 public class Porn91Downloader {
 
@@ -162,7 +164,7 @@ public class Porn91Downloader {
         if (destDir == null) {
             destDir = FileUtil.DESKTOP_DIR;
         }
-        File saveVideoFile = new File(destDir, filename);
+        File saveVideoFile = new File(destDir, FileUtil.fixName(filename));
         downloadWithHttpClient(DEFAULT_USER_AGENT, v.url, saveVideoFile, percentScale);
     }
 
@@ -265,6 +267,23 @@ public class Porn91Downloader {
         return uri;
     }
 
+    private BasicCookieStore getCookieStringByJSON(String cookieStr) {
+        try {
+            JSONObject json = net.sf.json.JSONObject.fromObject(cookieStr);
+            BasicCookieStore cookstore = new BasicCookieStore();
+            for (Iterator it = json.keys(); it.hasNext();) {
+                String key = (String) it.next();
+                String value = json.getString(key);
+                cookstore.addCookie(new BasicClientCookie(key, value));
+                SystemZ.out.println("cookie : " + Arrays.toString(new String[] { key, value }));
+            }
+            return cookstore;
+        } catch (Exception ex) {
+            System.out.println("[getCookieStringByJSON] JSON parse err : " + ex.getMessage());
+            return null;
+        }
+    }
+
     /**
      * 多行Cookie key \t value
      */
@@ -334,7 +353,10 @@ public class Porn91Downloader {
 
             // 加入cookie
             if (StringUtils.isNotBlank(cookieContent)) {
-                cookieStore = getCookieString(cookieContent);
+                cookieStore = getCookieStringByJSON(cookieContent);
+                if (cookieStore == null) {
+                    cookieStore = getCookieString(cookieContent);
+                }
             }
 
             HttpContext localContext = new BasicHttpContext();

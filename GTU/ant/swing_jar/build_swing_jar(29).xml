@@ -109,12 +109,15 @@
 
 			<!-- http client -->
 			<packagename mode="exact" name="httpclient-4.5.2.jar">org.apache.http.client.HttpClient</packagename>
-			<packagename mode="pom">org/apache/http/util/Args</packagename>
-			<packagename mode="pom">org.apache.http.HttpEntity</packagename>
+			<packagename mode="small">org/apache/http/util/Args</packagename>
+			<packagename mode="small">org.apache.http.HttpEntity</packagename>
 			<packagename mode="exact" name="jcl-over-slf4j-1.7.6.jar">org/apache/commons/logging/LogFactory</packagename>
 			<packagename mode="exact" name="slf4j-api-1.7.5.jar">org.slf4j.Logger</packagename>
 			<packagename mode="exact" name="logback-classic-1.2.3.jar">ch.qos.logback.classic.Logger</packagename>
 			<packagename mode="exact" name="logback-core-1.2.3.jar">ch.qos.logback.core.joran.spi.JoranException</packagename>
+
+			<packagename mode="small" name="">net.sf.json.JSONObject</packagename>
+			
 
 		</jarfinder>
 
@@ -214,12 +217,12 @@
 
 	<target name="compiler" if="${enable}">
 		<echo># compiler ...</echo>
-		<javac fork="yes" compiler="javac1.6" source="1.6" target="1.6" includeantruntime="true" srcdir="${src_dir}" destdir="${build_dir}" deprecation="no" nowarn="true" encoding="UTF-8" debug="on"><!-- -->
+		<javac executable="${jdk_javac}" fork="yes" compiler="javac1.6" source="1.6" target="1.6" includeantruntime="true" srcdir="${src_dir}" destdir="${build_dir}" deprecation="no" nowarn="true" encoding="UTF-8" debug="on"><!-- -->
 			<include name="**/${main_class}.java" /><!--executable="${jdk_javac}" fork="yes" -->
 			<classpath>
 				<path location="${build_dir}" />
 			</classpath>
-			<!--<classpath refid="javafx_class_path" />-->
+			<classpath refid="javafx_class_path" />
 		</javac>
 	</target>
 

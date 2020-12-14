@@ -195,7 +195,7 @@ public class FacebookVideoDownloader extends JFrame {
                                                 }
                                             }
                                         }).show(2000);
-                            } catch (Exception ex) {
+                            } catch (Throwable ex) {
                                 sysutil.displayMessage("下載完成!!", DownloadGOGO.this.vo.getFileName(), MessageType.INFO);
                             }
                         }
@@ -780,7 +780,9 @@ public class FacebookVideoDownloader extends JFrame {
 
         boolean findOk1 = false;
         boolean findOk2 = false;
-        File willingDownloadFile = new File(targetDirectory, vo.getFileName());
+
+        String realName = FileUtil.fixName(vo.getFileName());
+        File willingDownloadFile = new File(targetDirectory, realName);
         if (!forceDownload) {
             for (int ii = 0; ii < downloadPool.downloadLst.size(); ii++) {
                 VideoUrlConfigZ vo2 = downloadPool.downloadLst.get(ii);

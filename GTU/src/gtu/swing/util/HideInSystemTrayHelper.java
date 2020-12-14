@@ -375,18 +375,21 @@ public class HideInSystemTrayHelper {
             mappingType = NotificationType.INFORMATION;
             break;
         }
-
-        TrayNotificationHelper.newInstance()//
-                .title(caption)//
-                .message(text)//
-                .notificationType(mappingType)//
-                .rectangleFill(TrayNotificationHelper.RandomColorFill.getInstance().get())//
-                .animationType(AnimationType.FADE)//
-                .onPanelClickCallback(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                    }
-                }).show(1500);
+        try {
+            TrayNotificationHelper.newInstance()//
+                    .title(caption)//
+                    .message(text)//
+                    .notificationType(mappingType)//
+                    .rectangleFill(TrayNotificationHelper.RandomColorFill.getInstance().get())//
+                    .animationType(AnimationType.FADE)//
+                    .onPanelClickCallback(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                        }
+                    }).show(1500);
+        } catch (Throwable ex) {
+            ex.printStackTrace();
+        }
     }
 
     public TrayIcon getTrayIcon() {
