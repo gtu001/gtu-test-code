@@ -61,6 +61,7 @@ import gtu.swing.util.JMouseEventUtil;
 import gtu.swing.util.JPopupMenuUtil;
 import gtu.swing.util.JTableUtil;
 import gtu.youtube.DownloadProgressHandler;
+import gtu.youtube.InstagramVideoUrlHandler;
 import gtu.youtube.JavaYoutubeVideoUrlHandler;
 import gtu.youtube.Porn91Downloader;
 import gtu.youtube.Porn91Downloader.VideoUrlConfig;
@@ -657,10 +658,16 @@ public class FacebookVideoDownloader extends JFrame {
 
                     String youtubeId = JavaYoutubeVideoUrlHandler.getYoutubeID(url);
                     System.out.println("youtubeId == " + youtubeId);
+
+                    InstagramVideoUrlHandler igHandler = new InstagramVideoUrlHandler(url, cookieContent, headerContent);
+
                     if (StringUtils.isNotBlank(youtubeId)) {
                         JavaYoutubeVideoUrlHandler youtube = new JavaYoutubeVideoUrlHandler(youtubeId, "", JavaYoutubeVideoUrlHandler.DEFAULT_USER_AGENT);
                         youtube.execute();
                         list = youtube.getVideoFor91Lst();
+                    } else if (igHandler.isIgPage()) {
+                        igHandler.execute();
+                        list = igHandler.getVideoFor91Lst();
                     } else {
                         list = downloader.processVideoLst(url, cookieContent, headerContent);
                         list.addAll(downloader.processVideoLst("\"" + url + "\""));

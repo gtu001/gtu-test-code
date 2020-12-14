@@ -154,6 +154,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
     private JTextField titleText;
     private JTextField urlText;
     private JLabel modifyTimeLabel;
+    private IconProcessThread mIconProcessThread = new IconProcessThread();
 
     private PropertiesUtilBean configSelf = null;
     {
@@ -1138,29 +1139,16 @@ public class BrowserHistoryHandlerUI extends JFrame {
         Icon(3) {
             @Override
             Object get(UrlConfig d, BrowserHistoryHandlerUI _this) {
-                int width = _this.urlTable.getRowHeight();
-                try {
-                    String newUrl = fixWindowUrl(d.url);
-                    if (!StringUtils.equals(newUrl, d.url)) {
-                        return _this.mImageIconConst.getPigIcon();
-                    } else {
-                        File f = DesktopUtil.getFile(newUrl);
-                        if (f.exists()) {
-                            Image image = null;
-                            if (OsInfoUtil.isWindows()) {
-                                Icon icon = ImageUtil.getInstance().getIconFromExe(f);
-                                image = ImageUtil.getInstance().iconToImage(icon);
-                                Image image2 = ImageUtil.getInstance().getScaledImage(image, width, width);
-                                return ImageUtil.getInstance().imageToIcon(image2);
-                            } else {
-                                return _this.mImageIconConst.getPigIcon();
-                            }
-                        }
-                    }
-                    return _this.mImageIconConst.getTransparentIcon();
-                } catch (Exception ex) {
-                    return _this.mImageIconConst.getTransparentIcon();
+                boolean needStart = false;
+                if (_this.mIconProcessThread == null || _this.mIconProcessThread.getState() == Thread.State.TERMINATED) {
+                    _this.mIconProcessThread = _this.new IconProcessThread();
+                    needStart = true;
                 }
+                _this.mIconProcessThread.processUrlConfigLst.add(d);
+                if (needStart) {
+                    _this.mIconProcessThread.start();
+                }
+                return null;
             }
         }, //
         title(35) {
@@ -1250,6 +1238,41 @@ public class BrowserHistoryHandlerUI extends JFrame {
         }
 
         abstract Object get(UrlConfig d, BrowserHistoryHandlerUI _this);
+    }
+
+    private class IconProcessThread extends Thread {
+
+        int width = 0;
+        List<UrlConfig> processUrlConfigLst = new ArrayList<UrlConfig>();
+
+        private IconProcessThread() {
+            width = BrowserHistoryHandlerUI.this.urlTable.getRowHeight();
+        }
+
+        private Icon getIcon(UrlConfig d) {
+            try {
+                String newUrl = fixWindowUrl(d.url);
+                if (!StringUtils.equals(newUrl, d.url)) {
+                    return BrowserHistoryHandlerUI.this.mImageIconConst.getPigIcon();
+                } else {
+                    File f = DesktopUtil.getFile(newUrl);
+                    if (f.exists()) {
+                        Image image = null;
+                        if (OsInfoUtil.isWindows()) {
+                            Icon icon = ImageUtil.getInstance().getIconFromExe(f);
+                            image = ImageUtil.getInstance().iconToImage(icon);
+                            Image image2 = ImageUtil.getInstance().getScaledImage(image, width, width);
+                            return ImageUtil.getInstance().imageToIcon(image2);
+                        } else {
+                            return BrowserHistoryHandlerUI.this.mImageIconConst.getPigIcon();
+                        }
+                    }
+                }
+                return BrowserHistoryHandlerUI.this.mImageIconConst.getTransparentIcon();
+            } catch (Exception ex) {
+                return BrowserHistoryHandlerUI.this.mImageIconConst.getTransparentIcon();
+            }
+        }
     }
 
     private void clickUrlDoLogAction(UrlConfig d) {

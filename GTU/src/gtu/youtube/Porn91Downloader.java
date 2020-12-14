@@ -467,7 +467,7 @@ public class Porn91Downloader {
         }
     }
 
-    private String getTitleForFileName(String content) {
+    public String getTitleForFileName(String content) {
         String title = "";
         try {
             SystemZ.out.println("-----------------------------------------------------------------------");
