@@ -51,13 +51,17 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
+import javax.swing.JTree;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang.builder.ToStringStyle;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.tuple.Pair;
@@ -69,7 +73,6 @@ import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
 
-import gtu.clipboard.ClipboardUtil;
 import gtu.constant.PatternCollection;
 import gtu.date.DateFormatUtil;
 import gtu.file.FileUtil;
@@ -98,6 +101,7 @@ import gtu.swing.util.JSwingCommonConfigUtil;
 import gtu.swing.util.JTabbedPaneUtil;
 import gtu.swing.util.JTableUtil;
 import gtu.swing.util.JTableUtil.TableColorDef;
+import gtu.swing.util.JTreeUtil;
 import taobe.tec.jcc.JChineseConvertor;
 
 public class AVChoicerUI extends JFrame {
@@ -171,6 +175,8 @@ public class AVChoicerUI extends JFrame {
 
     private static Pattern movPtn = Pattern.compile(PatternCollection.VIDEO_PATTERN, Pattern.CASE_INSENSITIVE);
     private static Pattern jpgPtn = Pattern.compile(PatternCollection.PICTURE_PATTERN, Pattern.CASE_INSENSITIVE);
+    private JTree emptyDirTree;
+    private JLabel dropHereLbl;
 
     /**
      * Launch the application.
@@ -721,8 +727,8 @@ public class AVChoicerUI extends JFrame {
         emptyDirTargetText.setColumns(10);
         panel_29.add(emptyDirBtn);
 
-        JLabel lblNewLabel_6 = new JLabel("Drop Here");
-        JLabelUtil.applyDropDirPath(lblNewLabel_6, new ActionListener() {
+        dropHereLbl = new JLabel("Drop Here");
+        JLabelUtil.applyDropDirPath(dropHereLbl, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 File file = (File) e.getSource();
@@ -732,10 +738,35 @@ public class AVChoicerUI extends JFrame {
             }
         });
 
-        panel_29.add(lblNewLabel_6);
+        panel_29.add(dropHereLbl);
 
         JPanel panel_30 = new JPanel();
         panel_28.add(panel_30, BorderLayout.WEST);
+
+        emptyDirTree = new JTree();
+        panel_30.add(JCommonUtil.createScrollComponent(emptyDirTree));
+        JCommonUtil.applyDropFiles(emptyDirTree, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                List<File> files = (List<File>) e.getSource();
+                File dir = (File) files.get(0);
+                JTreeUtil.newInstance(emptyDirTree).fileSystem(dir);
+            }
+        });
+        emptyDirTree.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                DefaultMutableTreeNode node = JTreeUtil.newInstance(emptyDirTree).getSelectItem();
+                if (node.getParent() == null) {
+                    return;
+                }
+                JTreeUtil.JFile jfile = (JTreeUtil.JFile) JTreeUtil.newInstance(emptyDirTree).getSelectItemUserObject();
+                File file = jfile.getFile();
+                if (file.isDirectory()) {
+                    emptyDirListCheckDir(file);
+                }
+            }
+        });
 
         JPanel panel_31 = new JPanel();
         panel_28.add(panel_31, BorderLayout.EAST);
@@ -834,9 +865,16 @@ public class AVChoicerUI extends JFrame {
                         if (file.moveToFile != null && file.moveToFile.exists()) {
                             openToFile = file.moveToFile;
                         }
-                        DesktopUtil.browseFileDirectory(openToFile);
                         if (file instanceof MoveFileBatch) {
                             ((MoveFileBatch) file).showLog();
+                            File fromDir = ((MoveFileBatch) file).emptyDirHolder;
+                            if (fromDir.exists()) {
+                                DesktopUtil.browseFileDirectory(fromDir);
+                            } else {
+                                DesktopUtil.browseFileDirectory(openToFile);
+                            }
+                        } else {
+                            DesktopUtil.browseFileDirectory(openToFile);
                         }
                     }
                 }
@@ -2177,6 +2215,7 @@ public class AVChoicerUI extends JFrame {
     }
 
     private void emptyDirListCheckDir(File dir) {
+        dropHereLbl.setText(dir.getName());
         emptyDirHolder.set(dir);
         initEmptyDirList();
         DefaultTableModel model = (DefaultTableModel) emptyDirList.getModel();
@@ -2226,6 +2265,9 @@ public class AVChoicerUI extends JFrame {
             int failCount = 0;
             for (File fromFile : moveFiles) {
                 long fileSize = fromFile.length();
+                if (!moveToDir.exists()) {
+                    moveToDir.mkdirs();
+                }
                 File moveToFile = new File(moveToDir, fromFile.getName());
                 try {
                     // FileUtils.moveFile(fromFile, moveToFile);//XXX 這個會喬很久!!

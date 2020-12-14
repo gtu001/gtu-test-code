@@ -35,13 +35,15 @@ def loadExcel(filePath, sheetName, headerRowIndices=[0], indexColIndices=[0], co
 
 
 def writeExcel(dataFrame, targetExcelPath):
-    excelWriter = pd.ExcelWriter(targetExcelPath)
-    dataFrame.to_excel(excelWriter, sheet_name='Sheet1', \
-             na_rep='', float_format=None, columns=None, \
-             header=True, index=True, index_label=None, \
-             startrow=0, startcol=0, engine=None, merge_cells=True, \
-             encoding=None, inf_rep='inf', verbose=True, freeze_panes=None)
-    print("write excel = ", fileUtil.exists(targetExcelPath))
+    with pd.ExcelWriter(targetExcelPath,
+                      date_format='YYYY-MM-DD',
+                      datetime_format='YYYY-MM-DD HH:MM:SS') as writer:
+        dataFrame.to_excel(writer, sheet_name='Sheet1', \
+                na_rep='', float_format=None, columns=None, \
+                header=True, index=True, index_label=None, \
+                startrow=0, startcol=0, engine=None, merge_cells=True, \
+                encoding=None, inf_rep='inf', verbose=True, freeze_panes=None)
+    print("write excel = ", targetExcelPath, fileUtil.exists(targetExcelPath))
 
 
 def getColumns(df) :

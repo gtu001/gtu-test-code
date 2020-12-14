@@ -76,6 +76,11 @@ public class JTreeUtil {
         return list.get(0);
     }
 
+    public Object getSelectItemUserObject() {
+        DefaultMutableTreeNode node = getSelectItem();
+        return node.getUserObject();
+    }
+
     public List<DefaultMutableTreeNode> getSelectItems() {
         TreeSelectionModel selectModel = tree.getSelectionModel();
         TreePath[] treePath = selectModel.getSelectionPaths();
