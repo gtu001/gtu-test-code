@@ -21,6 +21,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import javax.swing.Icon;
+
+import org.apache.commons.lang3.tuple.Pair;
+
 import gtu.reflect.ReflectUtil;
 
 /**
@@ -67,7 +71,7 @@ public class MapUtil {
             throw new RuntimeException(ex);
         }
     }
-    
+
     /**
      * 將bean對應到map的值裡去
      */
@@ -162,7 +166,7 @@ public class MapUtil {
             }
         }
     }
-    
+
     /**
      * 取得key對應value忽略大小寫
      */
@@ -270,5 +274,41 @@ public class MapUtil {
 
     public static Map createIngoreCaseMap() {
         return new TreeMap(String.CASE_INSENSITIVE_ORDER);
+    }
+
+    public static class SynchronizedMap {
+        Map map;
+
+        private SynchronizedMap(Map map) {
+            this.map = Collections.synchronizedMap(map);
+        }
+
+        public static SynchronizedMap create(Map map) {
+            return new SynchronizedMap(map);
+        }
+
+        public Set keySet() {
+            Set set = null;
+            synchronized (map) {
+                set = new HashSet(map.keySet());
+            }
+            return set;
+        }
+
+        public void put(Object key, Object value) {
+            map.put(key, value);
+        }
+
+        public void putAll(Map tmpMap) {
+            map.putAll(tmpMap);
+        }
+
+        public boolean containsKey(Object key) {
+            return map.containsKey(key);
+        }
+
+        public <T> T get(Object key) {
+            return (T) map.get(key);
+        }
     }
 }

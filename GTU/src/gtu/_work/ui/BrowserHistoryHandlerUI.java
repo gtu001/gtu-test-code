@@ -39,6 +39,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -109,6 +110,7 @@ import com.jgoodies.forms.layout.RowSpec;
 
 import gtu.clipboard.ClipboardUtil;
 import gtu.collection.ListUtil;
+import gtu.collection.MapUtil.SynchronizedMap;
 import gtu.constant.PatternCollection;
 import gtu.distribition.NormalDistributionFilter;
 import gtu.file.FileUtil;
@@ -216,6 +218,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
     private JTextPane logWatcherTextArea;
     private JButton logWatcherBtn;
     private JTextField logWatcherPeriodText;
+    private static SynchronizedMap ICON_HOLDER_MAP = SynchronizedMap.create(new HashMap<String, Pair<Boolean, Icon>>());
 
     /**
      * Launch the application.
@@ -1139,16 +1142,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
         Icon(3) {
             @Override
             Object get(UrlConfig d, BrowserHistoryHandlerUI _this) {
-                boolean needStart = false;
-                if (_this.mIconProcessThread == null || _this.mIconProcessThread.getState() == Thread.State.TERMINATED) {
-                    _this.mIconProcessThread = _this.new IconProcessThread();
-                    needStart = true;
-                }
-                _this.mIconProcessThread.processUrlConfigLst.add(d);
-                if (needStart) {
-                    _this.mIconProcessThread.start();
-                }
-                return null;
+                return d.getIcon();
             }
         }, //
         title(35) {
@@ -1243,16 +1237,75 @@ public class BrowserHistoryHandlerUI extends JFrame {
     private class IconProcessThread extends Thread {
 
         int width = 0;
-        List<UrlConfig> processUrlConfigLst = new ArrayList<UrlConfig>();
 
-        private IconProcessThread() {
-            width = BrowserHistoryHandlerUI.this.urlTable.getRowHeight();
+
+        private void append(String url) {
+            if (ICON_HOLDER_MAP.containsKey(url)) {
+                return;
+            }
+            ICON_HOLDER_MAP.put(url, null);
         }
 
-        private Icon getIcon(UrlConfig d) {
+        private IconProcessThread() {
+            if (urlTable != null) {
+                width = urlTable.getRowHeight();
+            } else {
+                width = 20;
+            }
+        }
+
+        int latestRecordIconCount = -1;
+
+        private int getDoneCount() {
+            int findOk = 0;
+            Set<String> keys = new HashSet<String>(ICON_HOLDER_MAP.keySet());
+            for (String url : keys) {
+                if (ICON_HOLDER_MAP.get(url) != null) {
+                    findOk++;
+                }
+            }
+            System.out.println("## IconProcessThread [icon map :" + findOk + "/" + keys.size() + "] !!");
+            return findOk;
+        }
+
+        public void run() {
+            for (;;) {
+                System.out.println("## IconProcessThread restart....");
+                Set<String> keys = new HashSet<String>(ICON_HOLDER_MAP.keySet());
+                Map<String, Pair<Boolean, Icon>> tmpMap = new HashMap<String, Pair<Boolean, Icon>>();
+                for (String url : keys) {
+                    Pair<Boolean, Icon> pair = ICON_HOLDER_MAP.get(url);
+                    if (pair == null) {
+                        Icon icon = getIcon(url);
+                        boolean findOk = false;
+                        if (icon != null) {
+                            findOk = true;
+                        }
+                        tmpMap.put(url, Pair.of(findOk, icon));
+                    }
+                }
+                ICON_HOLDER_MAP.putAll(tmpMap);
+                // 刷新icon =======
+                int doneCount = getDoneCount();
+                if (doneCount == keys.size()) {
+                    if (latestRecordIconCount == doneCount) {
+                        break;
+                    }
+                    initLoading();
+                    latestRecordIconCount = doneCount;
+                }
+                // 刷新icon =======
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                }
+            }
+        }
+
+        private Icon getIcon(String url) {
             try {
-                String newUrl = fixWindowUrl(d.url);
-                if (!StringUtils.equals(newUrl, d.url)) {
+                String newUrl = fixWindowUrl(url);
+                if (!StringUtils.equals(newUrl, url)) {
                     return BrowserHistoryHandlerUI.this.mImageIconConst.getPigIcon();
                 } else {
                     File f = DesktopUtil.getFile(newUrl);
@@ -1390,6 +1443,17 @@ public class BrowserHistoryHandlerUI extends JFrame {
         initLoading(null);
     }
 
+    private void appendToIconThread(String url) {
+        if (mIconProcessThread == null || mIconProcessThread.getState() == Thread.State.TERMINATED) {
+            mIconProcessThread = new IconProcessThread();
+            mIconProcessThread.start();
+        }
+        if (mIconProcessThread != null && mIconProcessThread.getState() == Thread.State.NEW) {
+            mIconProcessThread.start();
+        }
+        mIconProcessThread.append(url);
+    }
+
     private void initLoading(final JProgressBarHelper progressBarHelper) {
         try {
             if (searchBool.get()) {
@@ -1449,6 +1513,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
                 AtomicReference<UrlConfig> dd = new AtomicReference<UrlConfig>();
                 try {
                     dd.set(UrlConfig.parseTo(url, title_tag_remark_time));
+                    appendToIconThread(url);
                 } catch (Exception ex) {
                     ex.printStackTrace();
                     continue;
@@ -2069,6 +2134,18 @@ public class BrowserHistoryHandlerUI extends JFrame {
                 String text = StringUtils.trimToEmpty(orignRemark);
                 return text.replaceAll(Pattern.quote(REP_STR), "^");
             }
+        }
+
+        public Icon getIcon() {
+            if (ICON_HOLDER_MAP != null) {
+                if (ICON_HOLDER_MAP.containsKey(url)) {
+                    Pair<Boolean, Icon> pair = ICON_HOLDER_MAP.get(url);
+                    if (pair != null) {
+                        return pair.getRight();
+                    }
+                }
+            }
+            return null;
         }
 
         public String toString() {
