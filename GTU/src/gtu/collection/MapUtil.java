@@ -21,10 +21,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import javax.swing.Icon;
-
-import org.apache.commons.lang3.tuple.Pair;
-
 import gtu.reflect.ReflectUtil;
 
 /**

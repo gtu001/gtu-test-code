@@ -2893,7 +2893,8 @@ public class FastDBQueryUI extends JFrame {
                 }
             }
         }
-        tableColumnDefText_Auto.applyComboxBoxList(tabLst);
+        tabLst.add(FastDBQueryUI_XlsColumnDefLoader.FIND_TABLE_NAME_NA_DEF);
+        tableColumnDefText_Auto.applyComboxBoxList(tabLst, FastDBQueryUI_XlsColumnDefLoader.FIND_TABLE_NAME_NA_DEF);
     }
 
     // 儲存參數設定
@@ -7535,7 +7536,11 @@ public class FastDBQueryUI extends JFrame {
             try {
                 if (init(reset)) {
                     String table = String.valueOf(tableColumnDefText.getSelectedItem());
-                    queryResultTable.setTitleTooltipTransformer(xlsLoader.getTableTitleTransformer(table));
+                    if (FastDBQueryUI_XlsColumnDefLoader.FIND_TABLE_NAME_NA_DEF.equals(table)) {
+                        queryResultTable.setTitleTooltipTransformer(xlsLoader.getTableTitleTransformer_NA());
+                    } else {
+                        queryResultTable.setTitleTooltipTransformer(xlsLoader.getTableTitleTransformer(table));
+                    }
                 }
             } catch (Exception ex) {
                 JCommonUtil.handleException(ex);
@@ -7546,6 +7551,9 @@ public class FastDBQueryUI extends JFrame {
             try {
                 if (init(false)) {
                     String table = String.valueOf(tableColumnDefText.getSelectedItem());
+                    if (FastDBQueryUI_XlsColumnDefLoader.FIND_TABLE_NAME_NA_DEF.equals(table)) {
+                        return xlsLoader.getDBColumnChinese_NA(column, true);
+                    }
                     return xlsLoader.getDBColumnChinese(column, true, table);
                 }
             } catch (Exception ex) {

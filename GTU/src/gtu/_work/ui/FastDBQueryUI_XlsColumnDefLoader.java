@@ -48,6 +48,8 @@ public class FastDBQueryUI_XlsColumnDefLoader {
     List<TableDef> tabLst = new ArrayList<TableDef>();
     private ActionListener loadingInfoListener;
 
+    public static final String FIND_TABLE_NAME_NA_DEF = "無差別";
+    
     public FastDBQueryUI_XlsColumnDefLoader(File customDir, List<XlsColumnDefClz> configLst) {
         this.customDir = customDir;
         if (configLst != null) {
@@ -125,6 +127,22 @@ public class FastDBQueryUI_XlsColumnDefLoader {
             }
         }
     }
+    
+    public String getDBColumnChinese_NA(final String column, boolean forTooltip) {
+        final List<TableDef> tbs = new ArrayList<TableDef>(tabLst);
+        for (TableDef tb : tbs) {
+            for (Map<Integer, String> map : tb.columnLst) {
+                if (!isColumnValid(columnDef, map)) {
+                    continue;
+                }
+                if (StringUtils.equalsIgnoreCase(StringUtils.trimToEmpty(map.get(columnDef.index)), StringUtils.trimToEmpty(column)) && //
+                        StringUtils.isNotBlank(map.get(chineseDef.index))) {
+                    return getTooltipFormat(map, forTooltip);
+                }
+            }
+        }
+        return forTooltip ? null : "";
+    }
 
     public String getDBColumnChinese(final String column, boolean forTooltip, final String tableName) {
         final List<TableDef> tbs = getTable(tableName);
@@ -180,6 +198,26 @@ public class FastDBQueryUI_XlsColumnDefLoader {
         return String.format("<html>%s</html>", chinese + pk + sb);
     }
 
+    public Transformer getTableTitleTransformer_NA() {
+        final List<TableDef> tbs = new ArrayList<TableDef>(tabLst);
+        return new Transformer() {
+            @Override
+            public Object transform(Object input) {
+                Pair<Integer, Object> p = (Pair<Integer, Object>) input;
+                String column = (String) p.getRight();
+                for (TableDef tb : tbs) {
+                    for (Map<Integer, String> map : tb.columnLst) {
+                        if (StringUtils.equalsIgnoreCase(StringUtils.trimToEmpty(map.get(columnDef.index)), StringUtils.trimToEmpty(column)) && //
+                        StringUtils.isNotBlank(map.get(chineseDef.index))) {
+                            return getTooltipFormat(map, true);
+                        }
+                    }
+                }
+                return null;
+            }
+        };
+    }
+    
     public Transformer getTableTitleTransformer(final String tableName) {
         final List<TableDef> tbs = getTable(tableName);
         if (tbs.isEmpty()) {
