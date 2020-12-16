@@ -6883,7 +6883,7 @@ public class FastDBQueryUI extends JFrame {
                 }
                 String chinese = mTableColumnDefTextHandler.getChinese(column, tableName);
                 if (StringUtils.isNotBlank(chinese)) {
-                    return "<html>" + column + "[<font color='BLUE'>" + chinese + "</font>]</html>";
+                    return "<html>" + column + "<font color='BLUE'>　" + chinese + "</font></html>";
                 }
             }
             return column;
@@ -7604,6 +7604,7 @@ public class FastDBQueryUI extends JFrame {
 
         public String getChinese(String column, String table) {
             try {
+                tableColumnDefText_Auto.setSelectItemAndText(table);
                 if (init(false)) {
                     if (FastDBQueryUI_XlsColumnDefLoader.FIND_TABLE_NAME_NA_DEF.equals(table)) {
                         return xlsLoader.getDBColumnChinese_NA(column, true);
