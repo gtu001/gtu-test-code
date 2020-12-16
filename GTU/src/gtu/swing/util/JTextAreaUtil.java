@@ -2,6 +2,9 @@ package gtu.swing.util;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -26,6 +29,8 @@ import javax.swing.JLabel;
 import javax.swing.JTextArea;
 import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.EventListenerList;
@@ -41,6 +46,7 @@ import javax.swing.text.StyledDocument;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.Triple;
 
 import gtu.log.Log;
 import gtu.log.PrintStreamAdapter;
@@ -629,5 +635,33 @@ public class JTextAreaUtil {
                 }
             }
         });
+    }
+
+    public static void applyCaretPositionStatus(final JTextArea editor, final ActionListener mListener) {
+        editor.addCaretListener(new CaretListener() {
+            public void caretUpdate(CaretEvent e) {
+                JTextArea editArea = (JTextArea) e.getSource();
+                int linenum = 1;
+                int columnnum = 1;
+                Rectangle rect = null;
+                try {
+                    int caretpos = editArea.getCaretPosition();
+                    linenum = editArea.getLineOfOffset(caretpos);
+                    columnnum = caretpos - editArea.getLineStartOffset(linenum);
+                    linenum += 1;
+                } catch (Exception ex) {
+                }
+                try {
+                    rect = editArea.getUI().modelToView(editArea, e.getDot());
+                } catch (BadLocationException e1) {
+                }
+                if (mListener != null) {
+                    mListener.actionPerformed(new ActionEvent(Triple.of(linenum, columnnum, rect), -1, "CretPosition"));
+                }
+            }
+        });
+    }
+    
+    public static void main(String[] args) {
     }
 }

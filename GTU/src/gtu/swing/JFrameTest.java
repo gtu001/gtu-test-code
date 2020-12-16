@@ -1,13 +1,19 @@
 package gtu.swing;
 
 import java.awt.BorderLayout;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JTextArea;
+import javax.swing.text.JTextComponent;
+
+import org.codehaus.plexus.util.StringUtils;
 
 import gtu.swing.util.JCommonUtil;
-import gtu.swing.util.JTextAreaUtil;
 
 public class JFrameTest {
 
@@ -15,7 +21,7 @@ public class JFrameTest {
         JFrameTest test = new JFrameTest();
         JTextArea textArea = new JTextArea();
 
-        JTextAreaUtil.applyEnterKeyFixPosition(textArea);
+        JCommonUtil.defaultToolTipDelay();
 
         JFrameTest.simpleTestComponent(textArea);
     }

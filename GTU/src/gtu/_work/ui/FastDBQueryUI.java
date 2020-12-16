@@ -15,6 +15,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -764,6 +765,32 @@ public class FastDBQueryUI extends JFrame {
                 sqlTextAreaPromptProcess("insertUpdate", event);
             }
         }));
+
+        sqlTextArea.addMouseMotionListener(new MouseMotionAdapter() {
+            private String getChinese(String column) {
+                if (mTableColumnDefTextHandler != null) {
+                    return mTableColumnDefTextHandler.getChinese(column);
+                }
+                return null;
+            }
+
+            private void showParagraph(int caretPos) {
+                String text = StringUtils.defaultString(sqlTextArea.getText());
+                Pattern ptn = Pattern.compile("\\w+", Pattern.DOTALL | Pattern.MULTILINE);
+                Matcher mth = ptn.matcher(text);
+                while (mth.find()) {
+                    if (mth.start() <= caretPos && mth.end() >= caretPos) {
+                        sqlTextArea.setToolTipText(getChinese(mth.group()));
+                    }
+                }
+            }
+
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                int caretPosition = sqlTextArea.viewToModel(e.getPoint());
+                showParagraph(caretPosition);
+            }
+        });
 
         // DefaultCaret caret = (DefaultCaret)sqlTextArea.getCaret();
         // caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
