@@ -1,17 +1,10 @@
 package gtu.swing;
 
 import java.awt.BorderLayout;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionAdapter;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JTextArea;
-import javax.swing.text.JTextComponent;
-
-import org.codehaus.plexus.util.StringUtils;
 
 import gtu.swing.util.JCommonUtil;
 

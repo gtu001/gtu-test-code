@@ -6869,21 +6869,34 @@ public class FastDBQueryUI extends JFrame {
                 if (tab != null) {
                     List<String> columnLst = getColumnLst(tab);
                     if (!columnLst.isEmpty()) {
-                        showPopup(columnLst);
+                        showPopup(columnLst, tableName);
                         break;
                     }
                 }
             }
         }
 
-        private void showPopup(List<String> columnLst) {
+        private String getColumAndChinese(String column, String tableName) {
+            if (mTableColumnDefTextHandler != null) {
+                if (StringUtils.isBlank(tableName)) {
+                    tableName = FastDBQueryUI_XlsColumnDefLoader.FIND_TABLE_NAME_NA_DEF;
+                }
+                String chinese = mTableColumnDefTextHandler.getChinese(column, tableName);
+                if (StringUtils.isNotBlank(chinese)) {
+                    return "<html>" + column + "[<font color='BLUE'>" + chinese + "</font>]</html>";
+                }
+            }
+            return column;
+        }
+
+        private void showPopup(List<String> columnLst, String tableName) {
             Rectangle rect = mSqlTextAreaJTextAreaSelectPositionHandler.getRect();
             util = JPopupMenuUtil.newInstance(sqlTextArea, true);
             util.applyEvent(rect);
             // util.getJPopupMenu().setFocusable(false);
             for (int ii = 0; ii < columnLst.size(); ii++) {
                 final String col = columnLst.get(ii);
-                util.addJMenuItem(col, new ActionListener() {
+                util.addJMenuItem(getColumAndChinese(col, tableName), new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         replaceColumn(col);
@@ -7578,6 +7591,20 @@ public class FastDBQueryUI extends JFrame {
             try {
                 if (init(false)) {
                     String table = String.valueOf(tableColumnDefText.getSelectedItem());
+                    if (FastDBQueryUI_XlsColumnDefLoader.FIND_TABLE_NAME_NA_DEF.equals(table)) {
+                        return xlsLoader.getDBColumnChinese_NA(column, true);
+                    }
+                    return xlsLoader.getDBColumnChinese(column, true, table);
+                }
+            } catch (Exception ex) {
+                JCommonUtil.handleException(ex);
+            }
+            return null;
+        }
+
+        public String getChinese(String column, String table) {
+            try {
+                if (init(false)) {
                     if (FastDBQueryUI_XlsColumnDefLoader.FIND_TABLE_NAME_NA_DEF.equals(table)) {
                         return xlsLoader.getDBColumnChinese_NA(column, true);
                     }
