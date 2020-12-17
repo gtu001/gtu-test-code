@@ -117,6 +117,8 @@ class FirstBankHandler(Thread, metaclass=ABCMeta) :
             seleniumUtil.WebElementControl.setSelect(select, index=op)
 
         FirstBankHandler.monthIndex += 1
+        if FirstBankHandler.monthIndex == 12 :
+            return None
         sheetName = options[FirstBankHandler.monthIndex][1]
 
         seleniumUtil.WebElementControl.setSelect(select, index=FirstBankHandler.monthIndex)        
@@ -144,6 +146,10 @@ class FirstBankHandler(Thread, metaclass=ABCMeta) :
         while True:
             #選擇月份
             sheetName = self.choiceMonthSelect()
+
+            if sheetName == None :
+                print("------All Done !!")
+                break
 
             Clink = seleniumUtil.WebElementControl.waitPageElementByCss("li[class=active] > a", '台幣', self.driver)
             
