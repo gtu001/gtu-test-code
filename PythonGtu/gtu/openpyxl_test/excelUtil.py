@@ -11,6 +11,9 @@ from openpyxl.styles import Font, Color
 from openpyxl import load_workbook
 from openpyxl import Workbook
 import os
+from gtu.io import fileUtil
+from gtu.string import stringUtil
+import re
 
 
 '''
@@ -149,9 +152,11 @@ def getCellDefine(cell):
 
 
 class WorkbookHolder :
-    def __init__(self, path=None) :
-        self.path = path
+    def __init__(self, pathName=None, name=None) :
+        self.path = pathName
         self.wb = None
+        if pathName == None and stringUtil.isNotBlank(name) :
+            self.path = fileUtil.getDesktopDir(name)
     def loadWorkbook(self, path=None, create=False) :
         if path == None:
             path = self.path
@@ -177,12 +182,17 @@ class WorkbookHolder :
 
 
 def createSheet(sheetName, wb) :
-    sheetName = sheetName.replace('/', '／')
+    sheetName = re.sub(r"[\\\/\[\]\?\*]", "_", sheetName)
+    print("create sheet = ", sheetName)
     return wb.create_sheet(sheetName)
 
 
     
 if __name__ == '__main__' :
-    for i in range(1, 2000) :
-        print(cellEnglishToPos_toStr(i))
+    excel = WorkbookHolder(name="test001.xlsx")
+    excel.loadWorkbook(create=True)
+    wb = excel.getWorkbook()
+    ws = createSheet("哈哈", wb)
+    ws.append([333,444,555])
+    excel.saveWorkbook()
     print("done...")

@@ -1,0 +1,336 @@
+<html>
+    <head>
+        <script text="text/javascript">
+            function search() {
+                var value = document.querySelector(".search").value.toLowerCase();
+                var aArry = document.querySelectorAll("li");
+                for(var ii = 0 ; ii < aArry.length ; ii ++){
+                    aArry[ii].style.display = 'block';
+                }
+                for(var ii = 0 ; ii < aArry.length ; ii ++){
+                    var id = aArry[ii].getAttribute("id").replace(/^li\_/, '').toLowerCase();
+                    if(id.indexOf(value) == -1) {
+                        aArry[ii].style.display = 'none';
+                    }
+                }
+                var aArry = document.querySelectorAll("div");
+                for(var ii = 0 ; ii < aArry.length ; ii ++){
+                    aArry[ii].style.display = 'block';
+                }
+                for(var ii = 0 ; ii < aArry.length ; ii ++){
+                    if(aArry[ii].getAttribute('id') && aArry[ii].getAttribute('id').toLowerCase().indexOf(value) == -1) {
+                        aArry[ii].style.display = 'none';
+                    }
+                }
+            }
+            function gotoTop() {
+                window.scrollTo(0, 0);//document.body.scrollHeight
+            }
+            document.addEventListener("DOMContentLoaded", function(){
+                var aa = document.querySelectorAll("a");
+                for(var ii = 0 ; ii < aa.length ; ii ++){
+                    if(aa[ii].getAttribute("href")) {
+                        aa[ii].addEventListener("click", function() {
+                            var href = this.getAttribute("href").replace(/^\#/, "");
+                            document.querySelector("#" + href).scrollIntoView(true);
+                        });
+                    }
+                }
+            });
+        </script>
+    </head>
+    <body><input type='text' class='search' onblur='javascript:search();' /><br/><br/><ul><li id='li_NoAlertPresentException'><a href='#NoAlertPresentException'><span  style='font-family: Consolas'>NoAlertPresentException</span></a></li>
+<li id='li_NoSuchElementException'><a href='#NoSuchElementException'><span  style='font-family: Consolas'>NoSuchElementException</span></a></li>
+<li id='li_NoSuchFrameException'><a href='#NoSuchFrameException'><span  style='font-family: Consolas'>NoSuchFrameException</span></a></li>
+<li id='li_StaleElementReferenceException'><a href='#StaleElementReferenceException'><span  style='font-family: Consolas'>StaleElementReferenceException</span></a></li>
+<li id='li_WebDriverException'><a href='#WebDriverException'><span  style='font-family: Consolas'>WebDriverException</span></a></li>
+<li id='li_WebElement'><a href='#WebElement'><span  style='font-family: Consolas'>WebElement</span></a></li>
+<li id='li___builtins__'><a href='#__builtins__'><span  style='font-family: Consolas'>__builtins__</span></a></li>
+<li id='li___cached__'><a href='#__cached__'><span  style='font-family: Consolas'>__cached__</span></a></li>
+<li id='li___doc__'><a href='#__doc__'><span  style='font-family: Consolas'>__doc__</span></a></li>
+<li id='li___file__'><a href='#__file__'><span  style='font-family: Consolas'>__file__</span></a></li>
+<li id='li___loader__'><a href='#__loader__'><span  style='font-family: Consolas'>__loader__</span></a></li>
+<li id='li___name__'><a href='#__name__'><span  style='font-family: Consolas'>__name__</span></a></li>
+<li id='li___package__'><a href='#__package__'><span  style='font-family: Consolas'>__package__</span></a></li>
+<li id='li___spec__'><a href='#__spec__'><span  style='font-family: Consolas'>__spec__</span></a></li>
+<li id='li__element_if_visible'><a href='#_element_if_visible'><span  style='font-family: Consolas'>_element_if_visible</span></a></li>
+<li id='li__find_element'><a href='#_find_element'><span  style='font-family: Consolas'>_find_element</span></a></li>
+<li id='li__find_elements'><a href='#_find_elements'><span  style='font-family: Consolas'>_find_elements</span></a></li>
+<li id='li_alert_is_present'><a href='#alert_is_present'><span  style='font-family: Consolas'>alert_is_present</span></a></li>
+<li id='li_element_located_selection_state_to_be'><a href='#element_located_selection_state_to_be'><span  style='font-family: Consolas'>element_located_selection_state_to_be</span></a></li>
+<li id='li_element_located_to_be_selected'><a href='#element_located_to_be_selected'><span  style='font-family: Consolas'>element_located_to_be_selected</span></a></li>
+<li id='li_element_selection_state_to_be'><a href='#element_selection_state_to_be'><span  style='font-family: Consolas'>element_selection_state_to_be</span></a></li>
+<li id='li_element_to_be_clickable'><a href='#element_to_be_clickable'><span  style='font-family: Consolas'>element_to_be_clickable</span></a></li>
+<li id='li_element_to_be_selected'><a href='#element_to_be_selected'><span  style='font-family: Consolas'>element_to_be_selected</span></a></li>
+<li id='li_frame_to_be_available_and_switch_to_it'><a href='#frame_to_be_available_and_switch_to_it'><span  style='font-family: Consolas'>frame_to_be_available_and_switch_to_it</span></a></li>
+<li id='li_invisibility_of_element'><a href='#invisibility_of_element'><span  style='font-family: Consolas'>invisibility_of_element</span></a></li>
+<li id='li_invisibility_of_element_located'><a href='#invisibility_of_element_located'><span  style='font-family: Consolas'>invisibility_of_element_located</span></a></li>
+<li id='li_new_window_is_opened'><a href='#new_window_is_opened'><span  style='font-family: Consolas'>new_window_is_opened</span></a></li>
+<li id='li_number_of_windows_to_be'><a href='#number_of_windows_to_be'><span  style='font-family: Consolas'>number_of_windows_to_be</span></a></li>
+<li id='li_presence_of_all_elements_located'><a href='#presence_of_all_elements_located'><span  style='font-family: Consolas'>presence_of_all_elements_located</span></a></li>
+<li id='li_presence_of_element_located'><a href='#presence_of_element_located'><span  style='font-family: Consolas'>presence_of_element_located</span></a></li>
+<li id='li_staleness_of'><a href='#staleness_of'><span  style='font-family: Consolas'>staleness_of</span></a></li>
+<li id='li_text_to_be_present_in_element'><a href='#text_to_be_present_in_element'><span  style='font-family: Consolas'>text_to_be_present_in_element</span></a></li>
+<li id='li_text_to_be_present_in_element_value'><a href='#text_to_be_present_in_element_value'><span  style='font-family: Consolas'>text_to_be_present_in_element_value</span></a></li>
+<li id='li_title_contains'><a href='#title_contains'><span  style='font-family: Consolas'>title_contains</span></a></li>
+<li id='li_title_is'><a href='#title_is'><span  style='font-family: Consolas'>title_is</span></a></li>
+<li id='li_url_changes'><a href='#url_changes'><span  style='font-family: Consolas'>url_changes</span></a></li>
+<li id='li_url_contains'><a href='#url_contains'><span  style='font-family: Consolas'>url_contains</span></a></li>
+<li id='li_url_matches'><a href='#url_matches'><span  style='font-family: Consolas'>url_matches</span></a></li>
+<li id='li_url_to_be'><a href='#url_to_be'><span  style='font-family: Consolas'>url_to_be</span></a></li>
+<li id='li_visibility_of'><a href='#visibility_of'><span  style='font-family: Consolas'>visibility_of</span></a></li>
+<li id='li_visibility_of_all_elements_located'><a href='#visibility_of_all_elements_located'><span  style='font-family: Consolas'>visibility_of_all_elements_located</span></a></li>
+<li id='li_visibility_of_any_elements_located'><a href='#visibility_of_any_elements_located'><span  style='font-family: Consolas'>visibility_of_any_elements_located</span></a></li>
+<li id='li_visibility_of_element_located'><a href='#visibility_of_element_located'><span  style='font-family: Consolas'>visibility_of_element_located</span></a></li>
+</ul>
+<br/><br/>
+<div id="NoAlertPresentException" style='font-family: Consolas'><a id='NoAlertPresentException'><font style='font-size:18px;' color='red'><div  style='font-family: Consolas'>NoAlertPresentException&nbsp;&nbsp;&nbsp;<a style='border-width:1px;border-style:dashed;border-color:#FFAC55;' onclick='javascript:gotoTop();'>Top</a></div></font></a><br/>Thrown&nbsp;when&nbsp;switching&nbsp;to&nbsp;no&nbsp;presented&nbsp;alert.<br/>
+<br/>
+This&nbsp;can&nbsp;be&nbsp;caused&nbsp;by&nbsp;calling&nbsp;an&nbsp;operation&nbsp;on&nbsp;the&nbsp;Alert()&nbsp;class&nbsp;when&nbsp;an&nbsp;alert&nbsp;is<br/>
+not&nbsp;yet&nbsp;on&nbsp;the&nbsp;screen.<br/><br/><br/>
+
+</div><div id="NoSuchElementException" style='font-family: Consolas'><a id='NoSuchElementException'><font style='font-size:18px;' color='red'><div  style='font-family: Consolas'>NoSuchElementException&nbsp;&nbsp;&nbsp;<a style='border-width:1px;border-style:dashed;border-color:#FFAC55;' onclick='javascript:gotoTop();'>Top</a></div></font></a><br/>Thrown&nbsp;when&nbsp;element&nbsp;could&nbsp;not&nbsp;be&nbsp;found.<br/>
+<br/>
+If&nbsp;you&nbsp;encounter&nbsp;this&nbsp;exception,&nbsp;you&nbsp;may&nbsp;want&nbsp;to&nbsp;check&nbsp;the&nbsp;following:<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;Check&nbsp;your&nbsp;selector&nbsp;used&nbsp;in&nbsp;your&nbsp;find_by...<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;Element&nbsp;may&nbsp;not&nbsp;yet&nbsp;be&nbsp;on&nbsp;the&nbsp;screen&nbsp;at&nbsp;the&nbsp;time&nbsp;of&nbsp;the&nbsp;find&nbsp;operation,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(webpage&nbsp;is&nbsp;still&nbsp;loading)&nbsp;see&nbsp;selenium.webdriver.support.wait.WebDriverWait()<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for&nbsp;how&nbsp;to&nbsp;write&nbsp;a&nbsp;wait&nbsp;wrapper&nbsp;to&nbsp;wait&nbsp;for&nbsp;an&nbsp;element&nbsp;to&nbsp;appear.<br/><br/><br/>
+
+</div><div id="NoSuchFrameException" style='font-family: Consolas'><a id='NoSuchFrameException'><font style='font-size:18px;' color='red'><div  style='font-family: Consolas'>NoSuchFrameException&nbsp;&nbsp;&nbsp;<a style='border-width:1px;border-style:dashed;border-color:#FFAC55;' onclick='javascript:gotoTop();'>Top</a></div></font></a><br/>Thrown&nbsp;when&nbsp;frame&nbsp;target&nbsp;to&nbsp;be&nbsp;switched&nbsp;doesn't&nbsp;exist.<br/><br/><br/>
+
+</div><div id="StaleElementReferenceException" style='font-family: Consolas'><a id='StaleElementReferenceException'><font style='font-size:18px;' color='red'><div  style='font-family: Consolas'>StaleElementReferenceException&nbsp;&nbsp;&nbsp;<a style='border-width:1px;border-style:dashed;border-color:#FFAC55;' onclick='javascript:gotoTop();'>Top</a></div></font></a><br/>Thrown&nbsp;when&nbsp;a&nbsp;reference&nbsp;to&nbsp;an&nbsp;element&nbsp;is&nbsp;now&nbsp;"stale".<br/>
+<br/>
+Stale&nbsp;means&nbsp;the&nbsp;element&nbsp;no&nbsp;longer&nbsp;appears&nbsp;on&nbsp;the&nbsp;DOM&nbsp;of&nbsp;the&nbsp;page.<br/>
+<br/>
+<br/>
+Possible&nbsp;causes&nbsp;of&nbsp;StaleElementReferenceException&nbsp;include,&nbsp;but&nbsp;not&nbsp;limited&nbsp;to:<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;You&nbsp;are&nbsp;no&nbsp;longer&nbsp;on&nbsp;the&nbsp;same&nbsp;page,&nbsp;or&nbsp;the&nbsp;page&nbsp;may&nbsp;have&nbsp;refreshed&nbsp;since&nbsp;the&nbsp;element<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;was&nbsp;located.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;The&nbsp;element&nbsp;may&nbsp;have&nbsp;been&nbsp;removed&nbsp;and&nbsp;re-added&nbsp;to&nbsp;the&nbsp;screen,&nbsp;since&nbsp;it&nbsp;was&nbsp;located.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Such&nbsp;as&nbsp;an&nbsp;element&nbsp;being&nbsp;relocated.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This&nbsp;can&nbsp;happen&nbsp;typically&nbsp;with&nbsp;a&nbsp;javascript&nbsp;framework&nbsp;when&nbsp;values&nbsp;are&nbsp;updated&nbsp;and&nbsp;the<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;node&nbsp;is&nbsp;rebuilt.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;Element&nbsp;may&nbsp;have&nbsp;been&nbsp;inside&nbsp;an&nbsp;iframe&nbsp;or&nbsp;another&nbsp;context&nbsp;which&nbsp;was&nbsp;refreshed.<br/><br/><br/>
+
+</div><div id="WebDriverException" style='font-family: Consolas'><a id='WebDriverException'><font style='font-size:18px;' color='red'><div  style='font-family: Consolas'>WebDriverException&nbsp;&nbsp;&nbsp;<a style='border-width:1px;border-style:dashed;border-color:#FFAC55;' onclick='javascript:gotoTop();'>Top</a></div></font></a><br/>Base&nbsp;webdriver&nbsp;exception.<br/><br/><br/>
+
+</div><div id="WebElement" style='font-family: Consolas'><a id='WebElement'><font style='font-size:18px;' color='red'><div  style='font-family: Consolas'>WebElement&nbsp;&nbsp;&nbsp;<a style='border-width:1px;border-style:dashed;border-color:#FFAC55;' onclick='javascript:gotoTop();'>Top</a></div></font></a><br/>Represents&nbsp;a&nbsp;DOM&nbsp;element.<br/>
+<br/>
+Generally,&nbsp;all&nbsp;interesting&nbsp;operations&nbsp;that&nbsp;interact&nbsp;with&nbsp;a&nbsp;document&nbsp;will&nbsp;be<br/>
+performed&nbsp;through&nbsp;this&nbsp;interface.<br/>
+<br/>
+All&nbsp;method&nbsp;calls&nbsp;will&nbsp;do&nbsp;a&nbsp;freshness&nbsp;check&nbsp;to&nbsp;ensure&nbsp;that&nbsp;the&nbsp;element<br/>
+reference&nbsp;is&nbsp;still&nbsp;valid.&nbsp;&nbsp;This&nbsp;essentially&nbsp;determines&nbsp;whether&nbsp;or&nbsp;not&nbsp;the<br/>
+element&nbsp;is&nbsp;still&nbsp;attached&nbsp;to&nbsp;the&nbsp;DOM.&nbsp;&nbsp;If&nbsp;this&nbsp;test&nbsp;fails,&nbsp;then&nbsp;an<br/>
+``StaleElementReferenceException``&nbsp;is&nbsp;thrown,&nbsp;and&nbsp;all&nbsp;future&nbsp;calls&nbsp;to&nbsp;this<br/>
+instance&nbsp;will&nbsp;fail.<br/><br/><br/>
+
+</div><div id="__builtins__" style='font-family: Consolas'><a id='__builtins__'><font style='font-size:18px;' color='red'><div  style='font-family: Consolas'>__builtins__&nbsp;&nbsp;&nbsp;<a style='border-width:1px;border-style:dashed;border-color:#FFAC55;' onclick='javascript:gotoTop();'>Top</a></div></font></a><br/>dict()&nbsp;->&nbsp;new&nbsp;empty&nbsp;dictionary<br/>
+dict(mapping)&nbsp;->&nbsp;new&nbsp;dictionary&nbsp;initialized&nbsp;from&nbsp;a&nbsp;mapping&nbsp;object's<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(key,&nbsp;value)&nbsp;pairs<br/>
+dict(iterable)&nbsp;->&nbsp;new&nbsp;dictionary&nbsp;initialized&nbsp;as&nbsp;if&nbsp;via:<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;d&nbsp;=&nbsp;{}<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;for&nbsp;k,&nbsp;v&nbsp;in&nbsp;iterable:<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;d[k]&nbsp;=&nbsp;v<br/>
+dict(**kwargs)&nbsp;->&nbsp;new&nbsp;dictionary&nbsp;initialized&nbsp;with&nbsp;the&nbsp;name=value&nbsp;pairs<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;in&nbsp;the&nbsp;keyword&nbsp;argument&nbsp;list.&nbsp;&nbsp;For&nbsp;example:&nbsp;&nbsp;dict(one=1,&nbsp;two=2)<br/><br/><br/>
+
+</div><div id="__cached__" style='font-family: Consolas'><a id='__cached__'><font style='font-size:18px;' color='red'><div  style='font-family: Consolas'>__cached__&nbsp;&nbsp;&nbsp;<a style='border-width:1px;border-style:dashed;border-color:#FFAC55;' onclick='javascript:gotoTop();'>Top</a></div></font></a><br/>str(object='')&nbsp;->&nbsp;str<br/>
+str(bytes_or_buffer[,&nbsp;encoding[,&nbsp;errors]])&nbsp;->&nbsp;str<br/>
+<br/>
+Create&nbsp;a&nbsp;new&nbsp;string&nbsp;object&nbsp;from&nbsp;the&nbsp;given&nbsp;object.&nbsp;If&nbsp;encoding&nbsp;or<br/>
+errors&nbsp;is&nbsp;specified,&nbsp;then&nbsp;the&nbsp;object&nbsp;must&nbsp;expose&nbsp;a&nbsp;data&nbsp;buffer<br/>
+that&nbsp;will&nbsp;be&nbsp;decoded&nbsp;using&nbsp;the&nbsp;given&nbsp;encoding&nbsp;and&nbsp;error&nbsp;handler.<br/>
+Otherwise,&nbsp;returns&nbsp;the&nbsp;result&nbsp;of&nbsp;object.__str__()&nbsp;(if&nbsp;defined)<br/>
+or&nbsp;repr(object).<br/>
+encoding&nbsp;defaults&nbsp;to&nbsp;sys.getdefaultencoding().<br/>
+errors&nbsp;defaults&nbsp;to&nbsp;'strict'.<br/><br/><br/>
+
+</div><div id="__doc__" style='font-family: Consolas'><a id='__doc__'><font style='font-size:18px;' color='red'><div  style='font-family: Consolas'>__doc__&nbsp;&nbsp;&nbsp;<a style='border-width:1px;border-style:dashed;border-color:#FFAC55;' onclick='javascript:gotoTop();'>Top</a></div></font></a><br/>NA<br/><br/><br/>
+
+</div><div id="__file__" style='font-family: Consolas'><a id='__file__'><font style='font-size:18px;' color='red'><div  style='font-family: Consolas'>__file__&nbsp;&nbsp;&nbsp;<a style='border-width:1px;border-style:dashed;border-color:#FFAC55;' onclick='javascript:gotoTop();'>Top</a></div></font></a><br/>str(object='')&nbsp;->&nbsp;str<br/>
+str(bytes_or_buffer[,&nbsp;encoding[,&nbsp;errors]])&nbsp;->&nbsp;str<br/>
+<br/>
+Create&nbsp;a&nbsp;new&nbsp;string&nbsp;object&nbsp;from&nbsp;the&nbsp;given&nbsp;object.&nbsp;If&nbsp;encoding&nbsp;or<br/>
+errors&nbsp;is&nbsp;specified,&nbsp;then&nbsp;the&nbsp;object&nbsp;must&nbsp;expose&nbsp;a&nbsp;data&nbsp;buffer<br/>
+that&nbsp;will&nbsp;be&nbsp;decoded&nbsp;using&nbsp;the&nbsp;given&nbsp;encoding&nbsp;and&nbsp;error&nbsp;handler.<br/>
+Otherwise,&nbsp;returns&nbsp;the&nbsp;result&nbsp;of&nbsp;object.__str__()&nbsp;(if&nbsp;defined)<br/>
+or&nbsp;repr(object).<br/>
+encoding&nbsp;defaults&nbsp;to&nbsp;sys.getdefaultencoding().<br/>
+errors&nbsp;defaults&nbsp;to&nbsp;'strict'.<br/><br/><br/>
+
+</div><div id="__loader__" style='font-family: Consolas'><a id='__loader__'><font style='font-size:18px;' color='red'><div  style='font-family: Consolas'>__loader__&nbsp;&nbsp;&nbsp;<a style='border-width:1px;border-style:dashed;border-color:#FFAC55;' onclick='javascript:gotoTop();'>Top</a></div></font></a><br/>Concrete&nbsp;implementation&nbsp;of&nbsp;SourceLoader&nbsp;using&nbsp;the&nbsp;file&nbsp;system.<br/><br/><br/>
+
+</div><div id="__name__" style='font-family: Consolas'><a id='__name__'><font style='font-size:18px;' color='red'><div  style='font-family: Consolas'>__name__&nbsp;&nbsp;&nbsp;<a style='border-width:1px;border-style:dashed;border-color:#FFAC55;' onclick='javascript:gotoTop();'>Top</a></div></font></a><br/>str(object='')&nbsp;->&nbsp;str<br/>
+str(bytes_or_buffer[,&nbsp;encoding[,&nbsp;errors]])&nbsp;->&nbsp;str<br/>
+<br/>
+Create&nbsp;a&nbsp;new&nbsp;string&nbsp;object&nbsp;from&nbsp;the&nbsp;given&nbsp;object.&nbsp;If&nbsp;encoding&nbsp;or<br/>
+errors&nbsp;is&nbsp;specified,&nbsp;then&nbsp;the&nbsp;object&nbsp;must&nbsp;expose&nbsp;a&nbsp;data&nbsp;buffer<br/>
+that&nbsp;will&nbsp;be&nbsp;decoded&nbsp;using&nbsp;the&nbsp;given&nbsp;encoding&nbsp;and&nbsp;error&nbsp;handler.<br/>
+Otherwise,&nbsp;returns&nbsp;the&nbsp;result&nbsp;of&nbsp;object.__str__()&nbsp;(if&nbsp;defined)<br/>
+or&nbsp;repr(object).<br/>
+encoding&nbsp;defaults&nbsp;to&nbsp;sys.getdefaultencoding().<br/>
+errors&nbsp;defaults&nbsp;to&nbsp;'strict'.<br/><br/><br/>
+
+</div><div id="__package__" style='font-family: Consolas'><a id='__package__'><font style='font-size:18px;' color='red'><div  style='font-family: Consolas'>__package__&nbsp;&nbsp;&nbsp;<a style='border-width:1px;border-style:dashed;border-color:#FFAC55;' onclick='javascript:gotoTop();'>Top</a></div></font></a><br/>str(object='')&nbsp;->&nbsp;str<br/>
+str(bytes_or_buffer[,&nbsp;encoding[,&nbsp;errors]])&nbsp;->&nbsp;str<br/>
+<br/>
+Create&nbsp;a&nbsp;new&nbsp;string&nbsp;object&nbsp;from&nbsp;the&nbsp;given&nbsp;object.&nbsp;If&nbsp;encoding&nbsp;or<br/>
+errors&nbsp;is&nbsp;specified,&nbsp;then&nbsp;the&nbsp;object&nbsp;must&nbsp;expose&nbsp;a&nbsp;data&nbsp;buffer<br/>
+that&nbsp;will&nbsp;be&nbsp;decoded&nbsp;using&nbsp;the&nbsp;given&nbsp;encoding&nbsp;and&nbsp;error&nbsp;handler.<br/>
+Otherwise,&nbsp;returns&nbsp;the&nbsp;result&nbsp;of&nbsp;object.__str__()&nbsp;(if&nbsp;defined)<br/>
+or&nbsp;repr(object).<br/>
+encoding&nbsp;defaults&nbsp;to&nbsp;sys.getdefaultencoding().<br/>
+errors&nbsp;defaults&nbsp;to&nbsp;'strict'.<br/><br/><br/>
+
+</div><div id="__spec__" style='font-family: Consolas'><a id='__spec__'><font style='font-size:18px;' color='red'><div  style='font-family: Consolas'>__spec__&nbsp;&nbsp;&nbsp;<a style='border-width:1px;border-style:dashed;border-color:#FFAC55;' onclick='javascript:gotoTop();'>Top</a></div></font></a><br/>The&nbsp;specification&nbsp;for&nbsp;a&nbsp;module,&nbsp;used&nbsp;for&nbsp;loading.<br/>
+<br/>
+A&nbsp;module's&nbsp;spec&nbsp;is&nbsp;the&nbsp;source&nbsp;for&nbsp;information&nbsp;about&nbsp;the&nbsp;module.&nbsp;&nbsp;For<br/>
+data&nbsp;associated&nbsp;with&nbsp;the&nbsp;module,&nbsp;including&nbsp;source,&nbsp;use&nbsp;the&nbsp;spec's<br/>
+loader.<br/>
+<br/>
+`name`&nbsp;is&nbsp;the&nbsp;absolute&nbsp;name&nbsp;of&nbsp;the&nbsp;module.&nbsp;&nbsp;`loader`&nbsp;is&nbsp;the&nbsp;loader<br/>
+to&nbsp;use&nbsp;when&nbsp;loading&nbsp;the&nbsp;module.&nbsp;&nbsp;`parent`&nbsp;is&nbsp;the&nbsp;name&nbsp;of&nbsp;the<br/>
+package&nbsp;the&nbsp;module&nbsp;is&nbsp;in.&nbsp;&nbsp;The&nbsp;parent&nbsp;is&nbsp;derived&nbsp;from&nbsp;the&nbsp;name.<br/>
+<br/>
+`is_package`&nbsp;determines&nbsp;if&nbsp;the&nbsp;module&nbsp;is&nbsp;considered&nbsp;a&nbsp;package&nbsp;or<br/>
+not.&nbsp;&nbsp;On&nbsp;modules&nbsp;this&nbsp;is&nbsp;reflected&nbsp;by&nbsp;the&nbsp;`__path__`&nbsp;attribute.<br/>
+<br/>
+`origin`&nbsp;is&nbsp;the&nbsp;specific&nbsp;location&nbsp;used&nbsp;by&nbsp;the&nbsp;loader&nbsp;from&nbsp;which&nbsp;to<br/>
+load&nbsp;the&nbsp;module,&nbsp;if&nbsp;that&nbsp;information&nbsp;is&nbsp;available.&nbsp;&nbsp;When&nbsp;filename&nbsp;is<br/>
+set,&nbsp;origin&nbsp;will&nbsp;match.<br/>
+<br/>
+`has_location`&nbsp;indicates&nbsp;that&nbsp;a&nbsp;spec's&nbsp;"origin"&nbsp;reflects&nbsp;a&nbsp;location.<br/>
+When&nbsp;this&nbsp;is&nbsp;True,&nbsp;`__file__`&nbsp;attribute&nbsp;of&nbsp;the&nbsp;module&nbsp;is&nbsp;set.<br/>
+<br/>
+`cached`&nbsp;is&nbsp;the&nbsp;location&nbsp;of&nbsp;the&nbsp;cached&nbsp;bytecode&nbsp;file,&nbsp;if&nbsp;any.&nbsp;&nbsp;It<br/>
+corresponds&nbsp;to&nbsp;the&nbsp;`__cached__`&nbsp;attribute.<br/>
+<br/>
+`submodule_search_locations`&nbsp;is&nbsp;the&nbsp;sequence&nbsp;of&nbsp;path&nbsp;entries&nbsp;to<br/>
+search&nbsp;when&nbsp;importing&nbsp;submodules.&nbsp;&nbsp;If&nbsp;set,&nbsp;is_package&nbsp;should&nbsp;be<br/>
+True--and&nbsp;False&nbsp;otherwise.<br/>
+<br/>
+Packages&nbsp;are&nbsp;simply&nbsp;modules&nbsp;that&nbsp;(may)&nbsp;have&nbsp;submodules.&nbsp;&nbsp;If&nbsp;a&nbsp;spec<br/>
+has&nbsp;a&nbsp;non-None&nbsp;value&nbsp;in&nbsp;`submodule_search_locations`,&nbsp;the&nbsp;import<br/>
+system&nbsp;will&nbsp;consider&nbsp;modules&nbsp;loaded&nbsp;from&nbsp;the&nbsp;spec&nbsp;as&nbsp;packages.<br/>
+<br/>
+Only&nbsp;finders&nbsp;(see&nbsp;importlib.abc.MetaPathFinder&nbsp;and<br/>
+importlib.abc.PathEntryFinder)&nbsp;should&nbsp;modify&nbsp;ModuleSpec&nbsp;instances.<br/><br/><br/>
+
+</div><div id="_element_if_visible" style='font-family: Consolas'><a id='_element_if_visible'><font style='font-size:18px;' color='red'><div  style='font-family: Consolas'>_element_if_visible&nbsp;&nbsp;&nbsp;<a style='border-width:1px;border-style:dashed;border-color:#FFAC55;' onclick='javascript:gotoTop();'>Top</a></div></font></a><br/>NA<br/><br/><br/>
+
+</div><div id="_find_element" style='font-family: Consolas'><a id='_find_element'><font style='font-size:18px;' color='red'><div  style='font-family: Consolas'>_find_element&nbsp;&nbsp;&nbsp;<a style='border-width:1px;border-style:dashed;border-color:#FFAC55;' onclick='javascript:gotoTop();'>Top</a></div></font></a><br/>Looks&nbsp;up&nbsp;an&nbsp;element.&nbsp;Logs&nbsp;and&nbsp;re-raises&nbsp;``WebDriverException``<br/>
+if&nbsp;thrown.<br/><br/><br/>
+
+</div><div id="_find_elements" style='font-family: Consolas'><a id='_find_elements'><font style='font-size:18px;' color='red'><div  style='font-family: Consolas'>_find_elements&nbsp;&nbsp;&nbsp;<a style='border-width:1px;border-style:dashed;border-color:#FFAC55;' onclick='javascript:gotoTop();'>Top</a></div></font></a><br/>NA<br/><br/><br/>
+
+</div><div id="alert_is_present" style='font-family: Consolas'><a id='alert_is_present'><font style='font-size:18px;' color='red'><div  style='font-family: Consolas'>alert_is_present&nbsp;&nbsp;&nbsp;<a style='border-width:1px;border-style:dashed;border-color:#FFAC55;' onclick='javascript:gotoTop();'>Top</a></div></font></a><br/>Expect&nbsp;an&nbsp;alert&nbsp;to&nbsp;be&nbsp;present.<br/><br/><br/>
+
+</div><div id="element_located_selection_state_to_be" style='font-family: Consolas'><a id='element_located_selection_state_to_be'><font style='font-size:18px;' color='red'><div  style='font-family: Consolas'>element_located_selection_state_to_be&nbsp;&nbsp;&nbsp;<a style='border-width:1px;border-style:dashed;border-color:#FFAC55;' onclick='javascript:gotoTop();'>Top</a></div></font></a><br/>An&nbsp;expectation&nbsp;to&nbsp;locate&nbsp;an&nbsp;element&nbsp;and&nbsp;check&nbsp;if&nbsp;the&nbsp;selection&nbsp;state<br/>
+specified&nbsp;is&nbsp;in&nbsp;that&nbsp;state.<br/>
+locator&nbsp;is&nbsp;a&nbsp;tuple&nbsp;of&nbsp;(by,&nbsp;path)<br/>
+is_selected&nbsp;is&nbsp;a&nbsp;boolean<br/><br/><br/>
+
+</div><div id="element_located_to_be_selected" style='font-family: Consolas'><a id='element_located_to_be_selected'><font style='font-size:18px;' color='red'><div  style='font-family: Consolas'>element_located_to_be_selected&nbsp;&nbsp;&nbsp;<a style='border-width:1px;border-style:dashed;border-color:#FFAC55;' onclick='javascript:gotoTop();'>Top</a></div></font></a><br/>An&nbsp;expectation&nbsp;for&nbsp;the&nbsp;element&nbsp;to&nbsp;be&nbsp;located&nbsp;is&nbsp;selected.<br/>
+locator&nbsp;is&nbsp;a&nbsp;tuple&nbsp;of&nbsp;(by,&nbsp;path)<br/><br/><br/>
+
+</div><div id="element_selection_state_to_be" style='font-family: Consolas'><a id='element_selection_state_to_be'><font style='font-size:18px;' color='red'><div  style='font-family: Consolas'>element_selection_state_to_be&nbsp;&nbsp;&nbsp;<a style='border-width:1px;border-style:dashed;border-color:#FFAC55;' onclick='javascript:gotoTop();'>Top</a></div></font></a><br/>An&nbsp;expectation&nbsp;for&nbsp;checking&nbsp;if&nbsp;the&nbsp;given&nbsp;element&nbsp;is&nbsp;selected.<br/>
+element&nbsp;is&nbsp;WebElement&nbsp;object<br/>
+is_selected&nbsp;is&nbsp;a&nbsp;Boolean."<br/><br/><br/>
+
+</div><div id="element_to_be_clickable" style='font-family: Consolas'><a id='element_to_be_clickable'><font style='font-size:18px;' color='red'><div  style='font-family: Consolas'>element_to_be_clickable&nbsp;&nbsp;&nbsp;<a style='border-width:1px;border-style:dashed;border-color:#FFAC55;' onclick='javascript:gotoTop();'>Top</a></div></font></a><br/>An&nbsp;Expectation&nbsp;for&nbsp;checking&nbsp;an&nbsp;element&nbsp;is&nbsp;visible&nbsp;and&nbsp;enabled&nbsp;such&nbsp;that<br/>
+you&nbsp;can&nbsp;click&nbsp;it.<br/><br/><br/>
+
+</div><div id="element_to_be_selected" style='font-family: Consolas'><a id='element_to_be_selected'><font style='font-size:18px;' color='red'><div  style='font-family: Consolas'>element_to_be_selected&nbsp;&nbsp;&nbsp;<a style='border-width:1px;border-style:dashed;border-color:#FFAC55;' onclick='javascript:gotoTop();'>Top</a></div></font></a><br/>An&nbsp;expectation&nbsp;for&nbsp;checking&nbsp;the&nbsp;selection&nbsp;is&nbsp;selected.<br/>
+element&nbsp;is&nbsp;WebElement&nbsp;object<br/><br/><br/>
+
+</div><div id="frame_to_be_available_and_switch_to_it" style='font-family: Consolas'><a id='frame_to_be_available_and_switch_to_it'><font style='font-size:18px;' color='red'><div  style='font-family: Consolas'>frame_to_be_available_and_switch_to_it&nbsp;&nbsp;&nbsp;<a style='border-width:1px;border-style:dashed;border-color:#FFAC55;' onclick='javascript:gotoTop();'>Top</a></div></font></a><br/>An&nbsp;expectation&nbsp;for&nbsp;checking&nbsp;whether&nbsp;the&nbsp;given&nbsp;frame&nbsp;is&nbsp;available&nbsp;to<br/>
+switch&nbsp;to.&nbsp;&nbsp;If&nbsp;the&nbsp;frame&nbsp;is&nbsp;available&nbsp;it&nbsp;switches&nbsp;the&nbsp;given&nbsp;driver&nbsp;to&nbsp;the<br/>
+specified&nbsp;frame.<br/><br/><br/>
+
+</div><div id="invisibility_of_element" style='font-family: Consolas'><a id='invisibility_of_element'><font style='font-size:18px;' color='red'><div  style='font-family: Consolas'>invisibility_of_element&nbsp;&nbsp;&nbsp;<a style='border-width:1px;border-style:dashed;border-color:#FFAC55;' onclick='javascript:gotoTop();'>Top</a></div></font></a><br/>An&nbsp;Expectation&nbsp;for&nbsp;checking&nbsp;that&nbsp;an&nbsp;element&nbsp;is&nbsp;either&nbsp;invisible&nbsp;or&nbsp;not<br/>
+present&nbsp;on&nbsp;the&nbsp;DOM.<br/>
+<br/>
+element&nbsp;is&nbsp;either&nbsp;a&nbsp;locator&nbsp;(text)&nbsp;or&nbsp;an&nbsp;WebElement<br/><br/><br/>
+
+</div><div id="invisibility_of_element_located" style='font-family: Consolas'><a id='invisibility_of_element_located'><font style='font-size:18px;' color='red'><div  style='font-family: Consolas'>invisibility_of_element_located&nbsp;&nbsp;&nbsp;<a style='border-width:1px;border-style:dashed;border-color:#FFAC55;' onclick='javascript:gotoTop();'>Top</a></div></font></a><br/>An&nbsp;Expectation&nbsp;for&nbsp;checking&nbsp;that&nbsp;an&nbsp;element&nbsp;is&nbsp;either&nbsp;invisible&nbsp;or&nbsp;not<br/>
+present&nbsp;on&nbsp;the&nbsp;DOM.<br/>
+<br/>
+locator&nbsp;used&nbsp;to&nbsp;find&nbsp;the&nbsp;element<br/><br/><br/>
+
+</div><div id="new_window_is_opened" style='font-family: Consolas'><a id='new_window_is_opened'><font style='font-size:18px;' color='red'><div  style='font-family: Consolas'>new_window_is_opened&nbsp;&nbsp;&nbsp;<a style='border-width:1px;border-style:dashed;border-color:#FFAC55;' onclick='javascript:gotoTop();'>Top</a></div></font></a><br/>An&nbsp;expectation&nbsp;that&nbsp;a&nbsp;new&nbsp;window&nbsp;will&nbsp;be&nbsp;opened&nbsp;and&nbsp;have&nbsp;the&nbsp;number&nbsp;of<br/>
+windows&nbsp;handles&nbsp;increase<br/><br/><br/>
+
+</div><div id="number_of_windows_to_be" style='font-family: Consolas'><a id='number_of_windows_to_be'><font style='font-size:18px;' color='red'><div  style='font-family: Consolas'>number_of_windows_to_be&nbsp;&nbsp;&nbsp;<a style='border-width:1px;border-style:dashed;border-color:#FFAC55;' onclick='javascript:gotoTop();'>Top</a></div></font></a><br/>An&nbsp;expectation&nbsp;for&nbsp;the&nbsp;number&nbsp;of&nbsp;windows&nbsp;to&nbsp;be&nbsp;a&nbsp;certain&nbsp;value.<br/><br/><br/>
+
+</div><div id="presence_of_all_elements_located" style='font-family: Consolas'><a id='presence_of_all_elements_located'><font style='font-size:18px;' color='red'><div  style='font-family: Consolas'>presence_of_all_elements_located&nbsp;&nbsp;&nbsp;<a style='border-width:1px;border-style:dashed;border-color:#FFAC55;' onclick='javascript:gotoTop();'>Top</a></div></font></a><br/>An&nbsp;expectation&nbsp;for&nbsp;checking&nbsp;that&nbsp;there&nbsp;is&nbsp;at&nbsp;least&nbsp;one&nbsp;element&nbsp;present<br/>
+on&nbsp;a&nbsp;web&nbsp;page.<br/>
+locator&nbsp;is&nbsp;used&nbsp;to&nbsp;find&nbsp;the&nbsp;element<br/>
+returns&nbsp;the&nbsp;list&nbsp;of&nbsp;WebElements&nbsp;once&nbsp;they&nbsp;are&nbsp;located<br/><br/><br/>
+
+</div><div id="presence_of_element_located" style='font-family: Consolas'><a id='presence_of_element_located'><font style='font-size:18px;' color='red'><div  style='font-family: Consolas'>presence_of_element_located&nbsp;&nbsp;&nbsp;<a style='border-width:1px;border-style:dashed;border-color:#FFAC55;' onclick='javascript:gotoTop();'>Top</a></div></font></a><br/>An&nbsp;expectation&nbsp;for&nbsp;checking&nbsp;that&nbsp;an&nbsp;element&nbsp;is&nbsp;present&nbsp;on&nbsp;the&nbsp;DOM<br/>
+of&nbsp;a&nbsp;page.&nbsp;This&nbsp;does&nbsp;not&nbsp;necessarily&nbsp;mean&nbsp;that&nbsp;the&nbsp;element&nbsp;is&nbsp;visible.<br/>
+locator&nbsp;-&nbsp;used&nbsp;to&nbsp;find&nbsp;the&nbsp;element<br/>
+returns&nbsp;the&nbsp;WebElement&nbsp;once&nbsp;it&nbsp;is&nbsp;located<br/><br/><br/>
+
+</div><div id="staleness_of" style='font-family: Consolas'><a id='staleness_of'><font style='font-size:18px;' color='red'><div  style='font-family: Consolas'>staleness_of&nbsp;&nbsp;&nbsp;<a style='border-width:1px;border-style:dashed;border-color:#FFAC55;' onclick='javascript:gotoTop();'>Top</a></div></font></a><br/>Wait&nbsp;until&nbsp;an&nbsp;element&nbsp;is&nbsp;no&nbsp;longer&nbsp;attached&nbsp;to&nbsp;the&nbsp;DOM.<br/>
+element&nbsp;is&nbsp;the&nbsp;element&nbsp;to&nbsp;wait&nbsp;for.<br/>
+returns&nbsp;False&nbsp;if&nbsp;the&nbsp;element&nbsp;is&nbsp;still&nbsp;attached&nbsp;to&nbsp;the&nbsp;DOM,&nbsp;true&nbsp;otherwise.<br/><br/><br/>
+
+</div><div id="text_to_be_present_in_element" style='font-family: Consolas'><a id='text_to_be_present_in_element'><font style='font-size:18px;' color='red'><div  style='font-family: Consolas'>text_to_be_present_in_element&nbsp;&nbsp;&nbsp;<a style='border-width:1px;border-style:dashed;border-color:#FFAC55;' onclick='javascript:gotoTop();'>Top</a></div></font></a><br/>An&nbsp;expectation&nbsp;for&nbsp;checking&nbsp;if&nbsp;the&nbsp;given&nbsp;text&nbsp;is&nbsp;present&nbsp;in&nbsp;the<br/>
+specified&nbsp;element.<br/>
+locator,&nbsp;text<br/><br/><br/>
+
+</div><div id="text_to_be_present_in_element_value" style='font-family: Consolas'><a id='text_to_be_present_in_element_value'><font style='font-size:18px;' color='red'><div  style='font-family: Consolas'>text_to_be_present_in_element_value&nbsp;&nbsp;&nbsp;<a style='border-width:1px;border-style:dashed;border-color:#FFAC55;' onclick='javascript:gotoTop();'>Top</a></div></font></a><br/>An&nbsp;expectation&nbsp;for&nbsp;checking&nbsp;if&nbsp;the&nbsp;given&nbsp;text&nbsp;is&nbsp;present&nbsp;in&nbsp;the&nbsp;element's<br/>
+locator,&nbsp;text<br/><br/><br/>
+
+</div><div id="title_contains" style='font-family: Consolas'><a id='title_contains'><font style='font-size:18px;' color='red'><div  style='font-family: Consolas'>title_contains&nbsp;&nbsp;&nbsp;<a style='border-width:1px;border-style:dashed;border-color:#FFAC55;' onclick='javascript:gotoTop();'>Top</a></div></font></a><br/>An&nbsp;expectation&nbsp;for&nbsp;checking&nbsp;that&nbsp;the&nbsp;title&nbsp;contains&nbsp;a&nbsp;case-sensitive<br/>
+substring.&nbsp;title&nbsp;is&nbsp;the&nbsp;fragment&nbsp;of&nbsp;title&nbsp;expected<br/>
+returns&nbsp;True&nbsp;when&nbsp;the&nbsp;title&nbsp;matches,&nbsp;False&nbsp;otherwise<br/><br/><br/>
+
+</div><div id="title_is" style='font-family: Consolas'><a id='title_is'><font style='font-size:18px;' color='red'><div  style='font-family: Consolas'>title_is&nbsp;&nbsp;&nbsp;<a style='border-width:1px;border-style:dashed;border-color:#FFAC55;' onclick='javascript:gotoTop();'>Top</a></div></font></a><br/>An&nbsp;expectation&nbsp;for&nbsp;checking&nbsp;the&nbsp;title&nbsp;of&nbsp;a&nbsp;page.<br/>
+title&nbsp;is&nbsp;the&nbsp;expected&nbsp;title,&nbsp;which&nbsp;must&nbsp;be&nbsp;an&nbsp;exact&nbsp;match<br/>
+returns&nbsp;True&nbsp;if&nbsp;the&nbsp;title&nbsp;matches,&nbsp;false&nbsp;otherwise.<br/><br/><br/>
+
+</div><div id="url_changes" style='font-family: Consolas'><a id='url_changes'><font style='font-size:18px;' color='red'><div  style='font-family: Consolas'>url_changes&nbsp;&nbsp;&nbsp;<a style='border-width:1px;border-style:dashed;border-color:#FFAC55;' onclick='javascript:gotoTop();'>Top</a></div></font></a><br/>An&nbsp;expectation&nbsp;for&nbsp;checking&nbsp;the&nbsp;current&nbsp;url.<br/>
+url&nbsp;is&nbsp;the&nbsp;expected&nbsp;url,&nbsp;which&nbsp;must&nbsp;not&nbsp;be&nbsp;an&nbsp;exact&nbsp;match<br/>
+returns&nbsp;True&nbsp;if&nbsp;the&nbsp;url&nbsp;is&nbsp;different,&nbsp;false&nbsp;otherwise.<br/><br/><br/>
+
+</div><div id="url_contains" style='font-family: Consolas'><a id='url_contains'><font style='font-size:18px;' color='red'><div  style='font-family: Consolas'>url_contains&nbsp;&nbsp;&nbsp;<a style='border-width:1px;border-style:dashed;border-color:#FFAC55;' onclick='javascript:gotoTop();'>Top</a></div></font></a><br/>An&nbsp;expectation&nbsp;for&nbsp;checking&nbsp;that&nbsp;the&nbsp;current&nbsp;url&nbsp;contains&nbsp;a<br/>
+case-sensitive&nbsp;substring.<br/>
+url&nbsp;is&nbsp;the&nbsp;fragment&nbsp;of&nbsp;url&nbsp;expected,<br/>
+returns&nbsp;True&nbsp;when&nbsp;the&nbsp;url&nbsp;matches,&nbsp;False&nbsp;otherwise<br/><br/><br/>
+
+</div><div id="url_matches" style='font-family: Consolas'><a id='url_matches'><font style='font-size:18px;' color='red'><div  style='font-family: Consolas'>url_matches&nbsp;&nbsp;&nbsp;<a style='border-width:1px;border-style:dashed;border-color:#FFAC55;' onclick='javascript:gotoTop();'>Top</a></div></font></a><br/>An&nbsp;expectation&nbsp;for&nbsp;checking&nbsp;the&nbsp;current&nbsp;url.<br/>
+pattern&nbsp;is&nbsp;the&nbsp;expected&nbsp;pattern,&nbsp;which&nbsp;must&nbsp;be&nbsp;an&nbsp;exact&nbsp;match<br/>
+returns&nbsp;True&nbsp;if&nbsp;the&nbsp;url&nbsp;matches,&nbsp;false&nbsp;otherwise.<br/><br/><br/>
+
+</div><div id="url_to_be" style='font-family: Consolas'><a id='url_to_be'><font style='font-size:18px;' color='red'><div  style='font-family: Consolas'>url_to_be&nbsp;&nbsp;&nbsp;<a style='border-width:1px;border-style:dashed;border-color:#FFAC55;' onclick='javascript:gotoTop();'>Top</a></div></font></a><br/>An&nbsp;expectation&nbsp;for&nbsp;checking&nbsp;the&nbsp;current&nbsp;url.<br/>
+url&nbsp;is&nbsp;the&nbsp;expected&nbsp;url,&nbsp;which&nbsp;must&nbsp;be&nbsp;an&nbsp;exact&nbsp;match<br/>
+returns&nbsp;True&nbsp;if&nbsp;the&nbsp;url&nbsp;matches,&nbsp;false&nbsp;otherwise.<br/><br/><br/>
+
+</div><div id="visibility_of" style='font-family: Consolas'><a id='visibility_of'><font style='font-size:18px;' color='red'><div  style='font-family: Consolas'>visibility_of&nbsp;&nbsp;&nbsp;<a style='border-width:1px;border-style:dashed;border-color:#FFAC55;' onclick='javascript:gotoTop();'>Top</a></div></font></a><br/>An&nbsp;expectation&nbsp;for&nbsp;checking&nbsp;that&nbsp;an&nbsp;element,&nbsp;known&nbsp;to&nbsp;be&nbsp;present&nbsp;on&nbsp;the<br/>
+DOM&nbsp;of&nbsp;a&nbsp;page,&nbsp;is&nbsp;visible.&nbsp;Visibility&nbsp;means&nbsp;that&nbsp;the&nbsp;element&nbsp;is&nbsp;not&nbsp;only<br/>
+displayed&nbsp;but&nbsp;also&nbsp;has&nbsp;a&nbsp;height&nbsp;and&nbsp;width&nbsp;that&nbsp;is&nbsp;greater&nbsp;than&nbsp;0.<br/>
+element&nbsp;is&nbsp;the&nbsp;WebElement<br/>
+returns&nbsp;the&nbsp;(same)&nbsp;WebElement&nbsp;once&nbsp;it&nbsp;is&nbsp;visible<br/><br/><br/>
+
+</div><div id="visibility_of_all_elements_located" style='font-family: Consolas'><a id='visibility_of_all_elements_located'><font style='font-size:18px;' color='red'><div  style='font-family: Consolas'>visibility_of_all_elements_located&nbsp;&nbsp;&nbsp;<a style='border-width:1px;border-style:dashed;border-color:#FFAC55;' onclick='javascript:gotoTop();'>Top</a></div></font></a><br/>An&nbsp;expectation&nbsp;for&nbsp;checking&nbsp;that&nbsp;all&nbsp;elements&nbsp;are&nbsp;present&nbsp;on&nbsp;the&nbsp;DOM&nbsp;of&nbsp;a<br/>
+page&nbsp;and&nbsp;visible.&nbsp;Visibility&nbsp;means&nbsp;that&nbsp;the&nbsp;elements&nbsp;are&nbsp;not&nbsp;only&nbsp;displayed<br/>
+but&nbsp;also&nbsp;has&nbsp;a&nbsp;height&nbsp;and&nbsp;width&nbsp;that&nbsp;is&nbsp;greater&nbsp;than&nbsp;0.<br/>
+locator&nbsp;-&nbsp;used&nbsp;to&nbsp;find&nbsp;the&nbsp;elements<br/>
+returns&nbsp;the&nbsp;list&nbsp;of&nbsp;WebElements&nbsp;once&nbsp;they&nbsp;are&nbsp;located&nbsp;and&nbsp;visible<br/><br/><br/>
+
+</div><div id="visibility_of_any_elements_located" style='font-family: Consolas'><a id='visibility_of_any_elements_located'><font style='font-size:18px;' color='red'><div  style='font-family: Consolas'>visibility_of_any_elements_located&nbsp;&nbsp;&nbsp;<a style='border-width:1px;border-style:dashed;border-color:#FFAC55;' onclick='javascript:gotoTop();'>Top</a></div></font></a><br/>An&nbsp;expectation&nbsp;for&nbsp;checking&nbsp;that&nbsp;there&nbsp;is&nbsp;at&nbsp;least&nbsp;one&nbsp;element&nbsp;visible<br/>
+on&nbsp;a&nbsp;web&nbsp;page.<br/>
+locator&nbsp;is&nbsp;used&nbsp;to&nbsp;find&nbsp;the&nbsp;element<br/>
+returns&nbsp;the&nbsp;list&nbsp;of&nbsp;WebElements&nbsp;once&nbsp;they&nbsp;are&nbsp;located<br/><br/><br/>
+
+</div><div id="visibility_of_element_located" style='font-family: Consolas'><a id='visibility_of_element_located'><font style='font-size:18px;' color='red'><div  style='font-family: Consolas'>visibility_of_element_located&nbsp;&nbsp;&nbsp;<a style='border-width:1px;border-style:dashed;border-color:#FFAC55;' onclick='javascript:gotoTop();'>Top</a></div></font></a><br/>An&nbsp;expectation&nbsp;for&nbsp;checking&nbsp;that&nbsp;an&nbsp;element&nbsp;is&nbsp;present&nbsp;on&nbsp;the&nbsp;DOM&nbsp;of&nbsp;a<br/>
+page&nbsp;and&nbsp;visible.&nbsp;Visibility&nbsp;means&nbsp;that&nbsp;the&nbsp;element&nbsp;is&nbsp;not&nbsp;only&nbsp;displayed<br/>
+but&nbsp;also&nbsp;has&nbsp;a&nbsp;height&nbsp;and&nbsp;width&nbsp;that&nbsp;is&nbsp;greater&nbsp;than&nbsp;0.<br/>
+locator&nbsp;-&nbsp;used&nbsp;to&nbsp;find&nbsp;the&nbsp;element<br/>
+returns&nbsp;the&nbsp;WebElement&nbsp;once&nbsp;it&nbsp;is&nbsp;located&nbsp;and&nbsp;visible<br/><br/><br/>
+
+</div></body></html>

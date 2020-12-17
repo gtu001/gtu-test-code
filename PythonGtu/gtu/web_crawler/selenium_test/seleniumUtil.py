@@ -163,8 +163,8 @@ class WebElementControl :
         WebDriverWait(driver, timeout, frequence).until(waitUntilFunc, message)
 
     @staticmethod
-    def waitPageElementByCss(css, text, driver) : 
-        while True:
+    def waitPageElementByCss(css, text, driver, retryTime=10, retryWait=0.5) : 
+        for t in range(0, retryTime) :
             try :
                 def waitUntilFunc(driver) :
                     chk1 = driver.find_elements_by_css_selector(css)
@@ -184,12 +184,12 @@ class WebElementControl :
                         return v
                 return None
             except StaleElementReferenceException as ex :
+                time.sleep(retryWait)
                 print("[StaleElementReferenceException] try again ! ")
-                pass
         
     @staticmethod
-    def waitPageElementByXpath(xpath, driver) :
-        while True:
+    def waitPageElementByXpath(xpath, driver, retryTime=10, retryWait=0.5) :
+        for t in range(0, retryTime) :
             try :
                 def waitUntilFunc(driver) :
                     chk1 = driver.find_elements_by_xpath(xpath)
@@ -200,8 +200,8 @@ class WebElementControl :
                 WebElementControl.until(driver, timeout=300, frequence=0.5, message='', waitUntilFunc=waitUntilFunc) 
                 return driver.find_elements_by_xpath(xpath)[0]
             except StaleElementReferenceException as ex :
+                time.sleep(retryWait)
                 print("[StaleElementReferenceException] try again ! ")
-                pass
         
 
 

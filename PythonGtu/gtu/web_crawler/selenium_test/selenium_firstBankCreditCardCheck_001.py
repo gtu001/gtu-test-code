@@ -120,17 +120,19 @@ class FirstBankHandler(Thread, metaclass=ABCMeta) :
         if FirstBankHandler.monthIndex == 12 :
             return None
         sheetName = options[FirstBankHandler.monthIndex][1]
+        print("select date = ", sheetName)
 
         seleniumUtil.WebElementControl.setSelect(select, index=FirstBankHandler.monthIndex)        
         seleniumUtil.WebElementControl.clickUntil(self.driver, xpath="//button[text()='查詢']")
 
         dateObj = dateUtil.taiwanDateToDateObj(sheetName, delimit='/')
         dateStr2 = dateUtil.formatDatetimeByJavaFormat(dateObj, 'yyyy/MM/dd')
+        print("wait date = ", dateStr2)
 
         # 等畫面出現正確日其
         from selenium.webdriver.common.by import By
         from selenium.webdriver.support import expected_conditions as EC
-        WebDriverWait(self.driver, 10).until(
+        WebDriverWait(self.driver, 30).until(
             EC.text_to_be_present_in_element(
                 (By.ID, 'tbQry1'), dateStr2))
         return sheetName
@@ -158,7 +160,7 @@ class FirstBankHandler(Thread, metaclass=ABCMeta) :
 
             wb = self.getWorkbook()
 
-            for again in range(0,3) :
+            for again in range(0, 10) :
                 from selenium.common.exceptions import StaleElementReferenceException
                 try:
                     ws = excelUtil.createSheet(sheetName, wb)
@@ -214,4 +216,6 @@ def main() :
 
 if __name__ == '__main__' :
     main()
+
     # network("http://www.gamer.com.tw") # http://www.91porn.com/view_video.php?viewkey=a9a7ceb02bab655e0e6a
+

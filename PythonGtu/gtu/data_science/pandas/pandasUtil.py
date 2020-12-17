@@ -3,6 +3,10 @@ import pandas as pd
 from gtu.io import fileUtil
 from gtu.reflect import checkSelf
 import os
+from gtu.collection import orderedDictHelper
+from gtu.string import stringUtil
+from gtu.io import fileUtil
+
 
 '''
 from gtu.data_science.pandas import pandasUtil
@@ -21,38 +25,63 @@ class Converters :
         return self.map
 
 
-def loadExcel(filePath, sheetName, headerRowIndices=[0], indexColIndices=[0], converters=None):
-    sheet_name = [sheetName]
+def loadExcel(filePath, sheetName=None, headerRowIndices=[0], indexColIndices=[0], converters=None):
     names = None  # 若無column title 在此自訂
-    dataFrame = pd.read_excel(filePath, sheet_name=sheet_name, header=headerRowIndices, \
+    sheets = pd.read_excel(filePath, sheet_name=sheetName, header=headerRowIndices, \
                   skiprows=None, \
                   skip_footer=0, index_col=indexColIndices, names=names, \
                   usecols=None, parse_dates=False, date_parser=None, \
                   na_values=None, thousands=None, convert_float=True, \
                   converters=converters, dtype=None, true_values=None, \
                   false_values=None, engine=None, squeeze=False)
-    return dataFrame
+    return sheets
 
 
-def writeExcel(dataFrame, targetExcelPath):
-    with pd.ExcelWriter(targetExcelPath,
+def getSheetName(index, sheets) :
+    return orderedDictHelper.getKeyByIndex(index, sheets)
+
+def loadSheet(sheets, name=None, index=None) :
+    return orderedDictHelper.get(sheets, key=name, index=index)
+        
+def sheetsCount(sheets) :
+    return orderedDictHelper.size(sheets)
+
+def seriesToDataFrame(series) :
+    return series.to_frame()
+
+
+class WriteExcelHandler :
+    def __init__(self, targetExcelPath=None, name=None) :
+        if targetExcelPath is None and stringUtil.isNotBlank(name) :
+            targetExcelPath = fileUtil.getDesktopDir(name)
+        self.targetExcelPath = targetExcelPath
+        self.writer = pd.ExcelWriter(targetExcelPath,
                       date_format='YYYY-MM-DD',
-                      datetime_format='YYYY-MM-DD HH:MM:SS') as writer:
-        dataFrame.to_excel(writer, sheet_name='Sheet1', \
+                      datetime_format='YYYY-MM-DD HH:MM:SS')
+
+    def appendSheet(self, sheetName, dataFrame) :
+        dataFrame.to_excel(self.writer, sheet_name=sheetName, \
                 na_rep='', float_format=None, columns=None, \
                 header=True, index=True, index_label=None, \
                 startrow=0, startcol=0, engine=None, merge_cells=True, \
                 encoding=None, inf_rep='inf', verbose=True, freeze_panes=None)
-    print("write excel = ", targetExcelPath, fileUtil.exists(targetExcelPath))
+        self.adjustColumnsWidth(self.writer, sheetName, dataFrame)
+
+    def adjustColumnsWidth(self, writer, sheetName, dataFrame) :
+        worksheet = writer.sheets[sheetName]  # pull worksheet object
+        for idx, col in enumerate(dataFrame):  # loop through all columns
+            series = dataFrame[col]
+            max_len = max((
+                series.astype(str).map(len).max() * 10,  # len of largest item
+                len(str(series.name)) * 10  # len of column name/header
+                )) + 1  # adding a little extra space
+            worksheet.set_column(idx, idx, max_len)  # set column width
+
+    def save(self) :
+        self.writer.save()
 
 
-def getColumns(df) :
-    lst = list()
-    # print(df.head())
-    for i,v in enumerate(df.columns): 
-        print(i, v) 
-        lst.append(v)
-    return lst
+
 
 
 def currencyColumnTransform(column, df) :
@@ -82,3 +111,35 @@ def filterOutRowsByValue(column, notInLst, df, ignoreCase=False) :
     df[column] = df[column].apply(tryToRemoveMark)
     df = df[df[column] != removeMark]
     return df
+
+
+class DataFrameHandler :
+    def __init__(self, df=None) :
+        self.df = df
+
+    def createEmptyDataFrame(self, columns, indexes=None) :
+        df = pd.DataFrame()
+        for n in columns :
+            df[n] = np.nan
+        indexes2 = list()
+        if indexes is not None and len(indexes) > 0 :
+            indexes2.extend(indexes)
+            df.set_index(indexes2)
+        self.df = df
+        
+    def appendDataFrame(self, df2) :
+        df3 = df2.copy(deep=True)
+        df3.reset_index()
+        self.df = self.df.append(df3)
+
+    def getColumns(self) :
+        lst = list()
+        # print(df.head())
+        for i,v in enumerate(self.df.columns): 
+            print(i, v) 
+            lst.append(v)
+        return lst
+
+    def getDataFrame(self):
+        return self.df
+        

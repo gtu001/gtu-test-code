@@ -5,14 +5,10 @@ from gtu.reflect import checkSelf
 import os
 
 from gtu.data_science.pandas import pandasUtil
+from gtu.string import stringUtil
 
 
-def main(filePath):
-
-    sheetSet = pandasUtil.loadExcel(filePath, "Sheet", headerRowIndices=[0])
-    df = sheetSet["Sheet"]
-
-
+def dataFrameProcess(df) :
     print(df.head())
 
     # pandasUtil.getColumns(df)
@@ -42,16 +38,75 @@ def main(filePath):
 
     df = df.groupby(['消費明細'])['台幣入帳金額'].agg("sum")
     
-    print(df)
+    dd1 = pandasUtil.seriesToDataFrame(df)
 
-    pandasUtil.writeExcel(df, fileUtil.getDesktopDir("firstBankTest001.xlsx"))
+    for i,v in enumerate(dd1) :
+        print(i,v)
+
+    print(dd1)
+
+    return dd1
+
+
+
+def main(filePath):
+
+    sheetSet = pandasUtil.loadExcel(filePath, headerRowIndices=[0])
+
+    writer = pandasUtil.WriteExcelHandler(name="firstBankCreditCardCheck001.xlsx")
+
+    dfs = pandasUtil.DataFrameHandler()
+    dfs.createEmptyDataFrame(['消費明細', '台幣入帳金額'], [])
+
+
+    for i in range(0, pandasUtil.sheetsCount(sheetSet)) :
+        df = pandasUtil.loadSheet(sheetSet, index=i)
+
+        sheetName = pandasUtil.getSheetName(i, sheetSet)
+
+        dd1 = dataFrameProcess(df)
+
+        writer.appendSheet(sheetName, dd1)
+
+        dfs.appendDataFrame(dd1)
+
+
+    dfttt = dfs.getDataFrame()
+    
+    # ------------------------------ 最後加總 Groupby
+    # dfttt['消費明細'] = dfttt.groupby(['消費明細'])['台幣入帳金額'].agg("sum")
+    # ------------------------------ 最後加總 Groupby
+
+    writer.appendSheet("Total", dfttt)
+
+    writer.save()
 
     print("done...")
 
 
 if __name__ == '__main__' :
-    filePath = fileUtil.getDesktopDir("firstBankCreditCardCheck_20201211153309.xlsx")
+    filePath = fileUtil.getCurrentDir(__file__) + "firstBankCreditCardCheck_20201217133047.xlsx"
     main(filePath)
+
+    # dfs = pd.DataFrame()
+    # dfs['消費明細'] = np.nan
+    # dfs['台幣入帳金額'] = np.nan
+    # # dfs.set_index(['消費明細'])
+
+    # df1 = pd.DataFrame({"消費明細":['a','b'], "台幣入帳金額":[333,444]}, index=None)
+    # df2 = pd.DataFrame({"消費明細":['a','c'], "台幣入帳金額":[777,888]}, index=None)
+
+
+    # dfs = dfs.append(df1)
+    # dfs = dfs.append(df2)
+
+    # print(" ---------------- 0")
+    # print(dfs)
+
+    # print(dfs.groupby(['消費明細'])['台幣入帳金額'].agg("sum"))
+
+
+    print("done...")
 
 
 

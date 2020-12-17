@@ -769,7 +769,7 @@ public class FastDBQueryUI extends JFrame {
         sqlTextArea.addMouseMotionListener(new MouseMotionAdapter() {
             private String getChinese(String column) {
                 if (mTableColumnDefTextHandler != null) {
-                    return mTableColumnDefTextHandler.getChinese(column);
+                    return mTableColumnDefTextHandler.getChinese(column, null);
                 }
                 return null;
             }
@@ -7587,30 +7587,19 @@ public class FastDBQueryUI extends JFrame {
             }
         }
 
-        public String getChinese(String column) {
-            try {
-                if (init(false)) {
-                    String table = String.valueOf(tableColumnDefText.getSelectedItem());
-                    if (FastDBQueryUI_XlsColumnDefLoader.FIND_TABLE_NAME_NA_DEF.equals(table)) {
-                        return xlsLoader.getDBColumnChinese_NA(column, true);
-                    }
-                    return xlsLoader.getDBColumnChinese(column, true, table);
-                }
-            } catch (Exception ex) {
-                JCommonUtil.handleException(ex);
-            }
-            return null;
-        }
-
         public String getChinese(String column, String table) {
             try {
-                tableColumnDefText_Auto.setSelectItemAndText(table);
-                if (init(false)) {
-                    if (FastDBQueryUI_XlsColumnDefLoader.FIND_TABLE_NAME_NA_DEF.equals(table)) {
-                        return xlsLoader.getDBColumnChinese_NA(column, true);
-                    }
-                    return xlsLoader.getDBColumnChinese(column, true, table);
+                init2(false);
+                if (StringUtils.isBlank(table)) {
+                    table = String.valueOf(tableColumnDefText.getSelectedItem());
                 }
+                if (StringUtils.isBlank(table)) {
+                    table = FastDBQueryUI_XlsColumnDefLoader.FIND_TABLE_NAME_NA_DEF;
+                }
+                if (FastDBQueryUI_XlsColumnDefLoader.FIND_TABLE_NAME_NA_DEF.equals(table)) {
+                    return xlsLoader.getDBColumnChinese_NA(column, true);
+                }
+                return xlsLoader.getDBColumnChinese(column, true, table);
             } catch (Exception ex) {
                 JCommonUtil.handleException(ex);
             }

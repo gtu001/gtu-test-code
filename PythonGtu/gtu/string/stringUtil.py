@@ -64,11 +64,11 @@ def isNotBlank(chs):
     return not isBlank(chs) 
 
 
-def lpad(strVal, length, padChar):
+def leftPad(strVal, length, padChar):
     return strVal.rjust(length, padChar)
 
 
-def rpad(strVal, length, padChar):
+def rightPad(strVal, length, padChar):
     return strVal.ljust(length, padChar)
 
 
