@@ -1415,7 +1415,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                         int col = pair.getRight();
                         if (col == ColumnOrderDef.columnName.ordinal()) {
                             String column = (String) JTableUtil.newInstance(rowTable).getValueAt(false, row, ColumnOrderDef.columnName.ordinal());
-                            rowTable.setToolTipText(_parent.mTableColumnDefTextHandler.getChinese(column));
+                            rowTable.setToolTipText(_parent.mTableColumnDefTextHandler.getChinese(column, null));
                             return;
                         }
                     }

@@ -7590,6 +7590,9 @@ public class FastDBQueryUI extends JFrame {
         public String getChinese(String column, String table) {
             try {
                 init2(false);
+                if (xlsLoader == null) {
+                    return null;
+                }
                 if (StringUtils.isBlank(table)) {
                     table = String.valueOf(tableColumnDefText.getSelectedItem());
                 }
