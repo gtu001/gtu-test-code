@@ -25,6 +25,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from gtu.openpyxl_test import excelUtil
 from gtu.datetime import dateUtil
 from openpyxl import Workbook
+from gtu.openpyxl_test import excelUtil
 
 
 log = LogWriter.LogWriter()
@@ -32,6 +33,9 @@ log = LogWriter.LogWriter()
 
 class FirstBankHandler(Thread, metaclass=ABCMeta) :
     loginURL = "https://ccard.firstbank.com.tw/cmsweb/home/index"
+    workbookPath = fileUtil.getDesktopDir("firstBankCreditCardCheck_" + dateUtil.currentDatetime_str() + ".xlsx")
+    monthIndex = -1
+    Excel = None
 
     def __init__(self) :
         super().__init__()
@@ -44,6 +48,16 @@ class FirstBankHandler(Thread, metaclass=ABCMeta) :
             ""
             )
         # self.setName(newName)
+
+
+    def getWorkbook(self) :
+        FirstBankHandler.Excel = excelUtil.WorkbookHolder(FirstBankHandler.workbookPath)
+        FirstBankHandler.Excel.loadWorkbook(create=True)
+        return FirstBankHandler.Excel.getWorkbook()
+
+
+    def saveWorkbook(self) :
+        FirstBankHandler.Excel.saveWorkbook()
 
 
     def findButton(self, text) :
@@ -102,10 +116,13 @@ class FirstBankHandler(Thread, metaclass=ABCMeta) :
         for op in range(0, len(options)) :
             seleniumUtil.WebElementControl.setSelect(select, index=op)
 
-        seleniumUtil.WebElementControl.setSelect(select, index=0)        
+        FirstBankHandler.monthIndex += 1
+        sheetName = options[FirstBankHandler.monthIndex][1]
+
+        seleniumUtil.WebElementControl.setSelect(select, index=FirstBankHandler.monthIndex)        
         seleniumUtil.WebElementControl.clickUntil(self.driver, xpath="//button[text()='查詢']")
 
-        dateObj = dateUtil.taiwanDateToDateObj(options[0][1], delimit='/')
+        dateObj = dateUtil.taiwanDateToDateObj(sheetName, delimit='/')
         dateStr2 = dateUtil.formatDatetimeByJavaFormat(dateObj, 'yyyy/MM/dd')
 
         # 等畫面出現正確日其
@@ -114,6 +131,8 @@ class FirstBankHandler(Thread, metaclass=ABCMeta) :
         WebDriverWait(self.driver, 10).until(
             EC.text_to_be_present_in_element(
                 (By.ID, 'tbQry1'), dateStr2))
+        return sheetName
+
 
 
     def showBillPage(self) :
@@ -121,36 +140,39 @@ class FirstBankHandler(Thread, metaclass=ABCMeta) :
         seleniumUtil.WebElementControl.click(Alink)
         Blink = seleniumUtil.WebElementControl.waitPageElementByCss("li > a > div", '帳單明細查詢╱列印繳款聯', self.driver)
         seleniumUtil.WebElementControl.click(Blink)
-        #選擇月份
-        self.choiceMonthSelect()
 
-        Clink = seleniumUtil.WebElementControl.waitPageElementByCss("li[class=active] > a", '台幣', self.driver)
-        
-        pageContent = self.driver.page_source
-        print("################# start ")
+        while True:
+            #選擇月份
+            sheetName = self.choiceMonthSelect()
 
-        for again in range(0,3) :
-            from selenium.common.exceptions import StaleElementReferenceException
-            try:
-                wb = Workbook()
-                ws = wb.active
-                ws.append(['','消費日','入帳日','消費明細','台幣入帳金額','外幣折算日及金額'])
+            Clink = seleniumUtil.WebElementControl.waitPageElementByCss("li[class=active] > a", '台幣', self.driver)
+            
+            pageContent = self.driver.page_source
+            print("################# start ")
 
-                trs = self.driver.find_elements_by_xpath("//div[contains(@class,'cms-label')][text()='信用卡消費明細']/following-sibling::table//tbody//tr")
-                for i,tr in enumerate(trs) :
-                    print(i, tr.text)
-                    tds = tr.find_elements_by_xpath(".//td")
-                    print("--------------")
-                    lst = list()
-                    for j,td in enumerate(tds) :
-                        print(j, td.text)
-                        lst.append(td.text)
-                    ws.append(lst)
-                    
-                wb.save(fileUtil.getDesktopDir("firstBankCreditCardCheck_" + dateUtil.currentDatetime_str() + ".xlsx"))
-                break
-            except StaleElementReferenceException as ex :
-                time.sleep(3)
+            wb = self.getWorkbook()
+
+            for again in range(0,3) :
+                from selenium.common.exceptions import StaleElementReferenceException
+                try:
+                    ws = excelUtil.createSheet(sheetName, wb)
+                    ws.append(['','消費日','入帳日','消費明細','台幣入帳金額','外幣折算日及金額'])
+
+                    trs = self.driver.find_elements_by_xpath("//div[contains(@class,'cms-label')][text()='信用卡消費明細']/following-sibling::table//tbody//tr")
+                    for i,tr in enumerate(trs) :
+                        print(i, tr.text)
+                        tds = tr.find_elements_by_xpath(".//td")
+                        print("--------------")
+                        lst = list()
+                        for j,td in enumerate(tds) :
+                            print(j, td.text)
+                            lst.append(td.text)
+                        ws.append(lst)
+                        
+                    self.saveWorkbook()
+                    break
+                except StaleElementReferenceException as ex :
+                    time.sleep(3)
         
 
          

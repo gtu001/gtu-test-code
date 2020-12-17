@@ -1,6 +1,4 @@
-'''
-from gtu.openpyxl_test import excelUtil
-'''
+
 
 import math
 
@@ -10,6 +8,14 @@ import openpyxl
 from openpyxl.styles import PatternFill
 from openpyxl.styles.colors import Color
 from openpyxl.styles import Font, Color
+from openpyxl import load_workbook
+from openpyxl import Workbook
+import os
+
+
+'''
+from gtu.openpyxl_test import excelUtil
+'''
 
 
 def cellEnglishToPos_toInt(column, startByZero=False):
@@ -139,6 +145,41 @@ def getCellDefine(cell):
     if mth is not None :
         return mth["cellDef"]
     return None
+
+
+
+class WorkbookHolder :
+    def __init__(self, path=None) :
+        self.path = path
+        self.wb = None
+    def loadWorkbook(self, path=None, create=False) :
+        if path == None:
+            path = self.path
+        if not os.path.exists(path) and create :
+            self.wb = Workbook()
+        else :
+            self.wb = load_workbook(path)
+        return self.wb
+    def saveWorkbook(self, wb=None, path=None) :
+        if wb != None:
+            wb2 = wb
+        else:
+            wb2 = self.wb
+        if path != None:
+            path2 = path
+        else:
+            path2 = self.path
+        wb2.save(path2)
+        return wb
+    def getWorkbook(self) :
+        return self.wb
+
+
+
+def createSheet(sheetName, wb) :
+    sheetName = sheetName.replace('/', '／')
+    return wb.create_sheet(sheetName)
+
 
     
 if __name__ == '__main__' :

@@ -163,35 +163,46 @@ class WebElementControl :
         WebDriverWait(driver, timeout, frequence).until(waitUntilFunc, message)
 
     @staticmethod
-    def waitPageElementByCss(css, text, driver) :
-        def waitUntilFunc(driver) :
-            chk1 = driver.find_elements_by_css_selector(css)
-            lenOk = len(chk1)
-            print("check_css_exists = " , lenOk)
-            if lenOk > 0 :
-                return True
-            return False        
-        WebElementControl.until(driver, timeout=300, frequence=0.5, message='', waitUntilFunc=waitUntilFunc) 
-        elements = driver.find_elements_by_css_selector(css)
-        if stringUtil.isBlank(text) and len(elements) > 0:
-            return elements[0]
-        text = text.lower()
-        for i,v in enumerate(elements) :
-            print(i,v.text)
-            if text in v.text.lower() :
-                return v
-        return None
-
+    def waitPageElementByCss(css, text, driver) : 
+        while True:
+            try :
+                def waitUntilFunc(driver) :
+                    chk1 = driver.find_elements_by_css_selector(css)
+                    lenOk = len(chk1)
+                    print("check_css_exists = " , lenOk)
+                    if lenOk > 0 :
+                        return True
+                    return False        
+                WebElementControl.until(driver, timeout=300, frequence=0.5, message='', waitUntilFunc=waitUntilFunc) 
+                elements = driver.find_elements_by_css_selector(css)
+                if stringUtil.isBlank(text) and len(elements) > 0:
+                    return elements[0]
+                text = text.lower()
+                for i,v in enumerate(elements) :
+                    print(i,v.text)
+                    if text in v.text.lower() :
+                        return v
+                return None
+            except StaleElementReferenceException as ex :
+                print("[StaleElementReferenceException] try again ! ")
+                pass
+        
     @staticmethod
     def waitPageElementByXpath(xpath, driver) :
-        def waitUntilFunc(driver) :
-            chk1 = driver.find_elements_by_xpath(xpath)
-            print("check_xpath_exists = " , len(chk1))
-            if len(chk1) > 0 :
-                return True
-            return False        
-        WebElementControl.until(driver, timeout=300, frequence=0.5, message='', waitUntilFunc=waitUntilFunc) 
-        return driver.find_elements_by_xpath(xpath)[0]
+        while True:
+            try :
+                def waitUntilFunc(driver) :
+                    chk1 = driver.find_elements_by_xpath(xpath)
+                    print("check_xpath_exists = " , len(chk1))
+                    if len(chk1) > 0 :
+                        return True
+                    return False        
+                WebElementControl.until(driver, timeout=300, frequence=0.5, message='', waitUntilFunc=waitUntilFunc) 
+                return driver.find_elements_by_xpath(xpath)[0]
+            except StaleElementReferenceException as ex :
+                print("[StaleElementReferenceException] try again ! ")
+                pass
+        
 
 
 class DownloadWatcher :
