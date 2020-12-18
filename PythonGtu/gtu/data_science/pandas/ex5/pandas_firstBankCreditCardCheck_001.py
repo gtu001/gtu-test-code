@@ -58,6 +58,8 @@ def main(filePath):
     dfs = pandasUtil.DataFrameHandler()
     dfs.createEmptyDataFrame(['消費明細', '台幣入帳金額'], [])
 
+    widthsArry = [80, 30]
+
 
     for i in range(0, pandasUtil.sheetsCount(sheetSet)) :
         df = pandasUtil.loadSheet(sheetSet, index=i)
@@ -66,7 +68,7 @@ def main(filePath):
 
         dd1 = dataFrameProcess(df)
 
-        writer.appendSheet(sheetName, dd1)
+        writer.appendSheet(sheetName, dd1, widthsArry=widthsArry)
 
         dfs.appendDataFrame(dd1)
 
@@ -74,10 +76,10 @@ def main(filePath):
     dfttt = dfs.getDataFrame()
     
     # ------------------------------ 最後加總 Groupby
-    # dfttt['消費明細'] = dfttt.groupby(['消費明細'])['台幣入帳金額'].agg("sum")
+    dfttt = dfttt.groupby(['消費明細'])['台幣入帳金額'].agg("sum")
     # ------------------------------ 最後加總 Groupby
 
-    writer.appendSheet("Total", dfttt)
+    writer.appendSheet("Total", dfttt, widthsArry=widthsArry)
 
     writer.save()
 
@@ -91,11 +93,13 @@ if __name__ == '__main__' :
     # dfs = pd.DataFrame()
     # dfs['消費明細'] = np.nan
     # dfs['台幣入帳金額'] = np.nan
-    # # dfs.set_index(['消費明細'])
+    # dfs.set_index(['消費明細'])
 
     # df1 = pd.DataFrame({"消費明細":['a','b'], "台幣入帳金額":[333,444]}, index=None)
     # df2 = pd.DataFrame({"消費明細":['a','c'], "台幣入帳金額":[777,888]}, index=None)
 
+    # df3 = df1[:]
+    # print("-----", df3)
 
     # dfs = dfs.append(df1)
     # dfs = dfs.append(df2)
@@ -104,7 +108,6 @@ if __name__ == '__main__' :
     # print(dfs)
 
     # print(dfs.groupby(['消費明細'])['台幣入帳金額'].agg("sum"))
-
 
     print("done...")
 

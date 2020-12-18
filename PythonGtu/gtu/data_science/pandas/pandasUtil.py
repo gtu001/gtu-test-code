@@ -59,23 +59,19 @@ class WriteExcelHandler :
                       date_format='YYYY-MM-DD',
                       datetime_format='YYYY-MM-DD HH:MM:SS')
 
-    def appendSheet(self, sheetName, dataFrame) :
+    def appendSheet(self, sheetName, dataFrame, widthsArry=None) :
         dataFrame.to_excel(self.writer, sheet_name=sheetName, \
                 na_rep='', float_format=None, columns=None, \
                 header=True, index=True, index_label=None, \
                 startrow=0, startcol=0, engine=None, merge_cells=True, \
                 encoding=None, inf_rep='inf', verbose=True, freeze_panes=None)
-        self.adjustColumnsWidth(self.writer, sheetName, dataFrame)
+        if widthsArry is not None :
+            self.setSheetColumnsWidth(sheetName, widthsArry)
 
-    def adjustColumnsWidth(self, writer, sheetName, dataFrame) :
-        worksheet = writer.sheets[sheetName]  # pull worksheet object
-        for idx, col in enumerate(dataFrame):  # loop through all columns
-            series = dataFrame[col]
-            max_len = max((
-                series.astype(str).map(len).max() * 10,  # len of largest item
-                len(str(series.name)) * 10  # len of column name/header
-                )) + 1  # adding a little extra space
-            worksheet.set_column(idx, idx, max_len)  # set column width
+    def setSheetColumnsWidth(self, sheetName, widthsArry) :
+        worksheet = self.writer.sheets[sheetName]
+        for idx, length in enumerate(widthsArry):  
+            worksheet.set_column(idx, idx, length) 
 
     def save(self) :
         self.writer.save()
@@ -128,8 +124,11 @@ class DataFrameHandler :
         self.df = df
         
     def appendDataFrame(self, df2) :
+        '''
+            最好要有相同的column
+        '''
         df3 = df2.copy(deep=True)
-        df3.reset_index()
+        df3 = df3.reset_index()
         self.df = self.df.append(df3)
 
     def getColumns(self) :
