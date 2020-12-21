@@ -9,6 +9,7 @@ import java.net.Proxy;
 import java.net.URL;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -63,8 +64,12 @@ public class SimpleHttpsUtil {
             throw new RuntimeException(ex);
         }
     }
-
+    
     public String queryPage(String urls) {
+        return queryPage(urls, Collections.EMPTY_MAP);
+    }
+
+    public String queryPage(String urls, Map<String, String> map) {
         StringBuffer sb = new StringBuffer();
         try {
             Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("11.22.33.44", 8080));
@@ -78,7 +83,7 @@ public class SimpleHttpsUtil {
 
             url.setRequestProperty("User-agent", DEFAULT_USER_AGENT);
 
-            Map<String, String> map = new LinkedHashMap<String, String>();
+//            Map<String, String> map = new LinkedHashMap<String, String>();
 //            map.put("_ga", "GA1.2.439902964.1521730335");
 //            map.put("_gid", "GA1.2.95311867.1525080045");
 //            map.put("PHPSESSID", "khotctt1pfa7mgvfbutsgs2bui");

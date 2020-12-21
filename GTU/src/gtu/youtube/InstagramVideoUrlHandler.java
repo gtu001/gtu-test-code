@@ -1,16 +1,25 @@
 package gtu.youtube;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.StringReader;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
 
 import gtu.file.FileUtil;
+import gtu.log.line.SystemZ;
+import gtu.net.https.SimpleHttpsUtil;
 import gtu.youtube.PornVideoUrlDetection.SingleVideoUrlConfig;
+import net.sf.json.JSONObject;
 
 public class InstagramVideoUrlHandler extends Porn91Downloader {
 
@@ -25,8 +34,49 @@ public class InstagramVideoUrlHandler extends Porn91Downloader {
     private String cookieContent;
     private String headerContent;
 
+    private Map<String, String> getCookies(String cookieStr) {
+        Map<String, String> cooke = new LinkedHashMap<String, String>();
+        try {
+            JSONObject json = net.sf.json.JSONObject.fromObject(cookieStr);
+            for (Iterator it = json.keys(); it.hasNext();) {
+                String key = (String) it.next();
+                String value = json.getString(key);
+                SystemZ.out.println("cookie : " + Arrays.toString(new String[] { key, value }));
+                cooke.put(key, value);
+            }
+            return cooke;
+        } catch (Exception ex) {
+            System.out.println("[getCookieStringByJSON] JSON parse err : " + ex.getMessage());
+        }
+        BufferedReader reader = null;
+        try {
+            reader = new BufferedReader(new StringReader(cookieStr));
+            for (String line = null; (line = reader.readLine()) != null;) {
+                String[] arry = line.split("\t", -1);
+                if (arry != null && arry.length == 2) {
+                    arry[0] = StringUtils.trimToEmpty(arry[0]);
+                    arry[1] = StringUtils.trimToEmpty(arry[1]);
+                    cooke.put(arry[0], arry[1]);
+                    SystemZ.out.println("cookie : " + Arrays.toString(arry));
+                }
+            }
+            return cooke;
+        } catch (Exception ex) {
+            throw new RuntimeException(" Err : " + ex.getMessage(), ex);
+        } finally {
+            try {
+                reader.close();
+            } catch (Exception e) {
+            }
+        }
+    }
+
     public void execute() {
-        String content = super.getVideoInfo(URI.create(url), DEFAULT_USER_AGENT, cookieContent, headerContent);
+        // String content = super.getVideoInfo(URI.create(url),
+        // DEFAULT_USER_AGENT, cookieContent, headerContent);
+
+        Map<String, String> cookie = getCookies(cookieContent);
+        String content = SimpleHttpsUtil.newInstance().queryPage(url, cookie);
 
         System.out.println("START=====================================================================");
         System.out.println("=====================================================================");

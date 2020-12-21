@@ -121,7 +121,22 @@ def main() :
     #pass
 
     driver = seleniumUtil.getDriver()
-    driver.get("https://www.instagram.com/p/B4to46agwtx/")
+
+    driver.get("https://www.instagram.com/accounts/login/?next=%2F&source=logged_out_half_sheet")
+    username = seleniumUtil.WebElementControl.waitPageElementByCss("input[name=username]", "", driver)
+    password = seleniumUtil.WebElementControl.waitPageElementByCss("input[name=password]", "", driver)
+    seleniumUtil.WebElementControl.setValue(username, "gtu001@gmail.com")
+    seleniumUtil.WebElementControl.setValue(password, "123474736")
+    loginBtn = seleniumUtil.WebElementControl.waitPageElementByCss("button", "登入", driver)
+    seleniumUtil.WebElementControl.click(loginBtn)
+    for i in range(0,1) :
+        loginBtn2 = seleniumUtil.WebElementControl.waitPageElementByCss("button", "稍後再說", driver)
+        seleniumUtil.WebElementControl.click(loginBtn2)
+
+'''
+    driver.get("https://www.instagram.com/p/B7nbRGKBxiN/")
+
+    # https://www.instagram.com/siaoding_komachi/
     
     #fileUtil.saveToFile(fileUtil.getDesktopDir("xxxxxxx.htm"), driver.page_source, "UTF8")
 
@@ -140,7 +155,7 @@ def main() :
     for i,v in enumerate(picLst) :
         filepath = fileUtil.getDesktopDir(v.name)
         simple_request_handler_001.doDownload(v.picLink, filepath)
-
+'''
 
 
 
