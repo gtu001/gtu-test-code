@@ -276,7 +276,7 @@
 			<!-- xstream-1.3.jar -->
 			<groupId>com.thoughtworks.xstream</groupId>
 			<artifactId>xstream</artifactId>
-			<version>1.3</version>
+			<version>1.4.15</version>
 		</dependency>
 
 		<dependency>
