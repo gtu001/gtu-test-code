@@ -8,3 +8,9 @@ xpath_selenium_範例001.md
         print("--------------")
         for j,td in enumerate(tds) :
             print(j, td.text)
+
+
+
+    //input[@maxlength=2048]
+    //input[@maxlength]
+    //*[@maxlength]

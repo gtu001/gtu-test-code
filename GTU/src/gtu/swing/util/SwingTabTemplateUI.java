@@ -124,7 +124,8 @@ public class SwingTabTemplateUI {
                                 popupUtil.addJMenuItem("移除分頁", new ActionListener() {
                                     @Override
                                     public void actionPerformed(ActionEvent e) {
-                                        boolean confirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("確認移除 : " + tabbedPane.getTitleAt(idx), "移除分頁");
+                                        String message = "<html>移除分頁 : " + tabbedPane.getTitleAt(idx) + "</html>";
+                                        boolean confirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption(message, "是否移除分頁");
                                         if (confirm) {
                                             tabbedPane.remove(idx);
                                             jframeKeeperLst.remove(idx);

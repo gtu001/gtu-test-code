@@ -12,6 +12,8 @@ https://github.com/SeleniumHQ/selenium/blob/master/py/docs/source/index.rst
 	Edge: 	https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver/
 	Firefox: 	https://github.com/mozilla/geckodriver/releases
 	Safari: 	https://webkit.org/blog/6900/webdriver-support-in-safari-10/
+
+	全部在這 https://www.selenium.dev/documentation/en/getting_started_with_webdriver/browsers/
 	
 
 ------------------------------------------------------------------------------------------------

@@ -8197,6 +8197,12 @@ public class FastDBQueryUI extends JFrame {
 
                     queryList = Triple.of(titles, clzLst, rowLst);
                 } else {
+
+                    if (queryList.getRight() == null) {
+                        JCommonUtil._jOptionPane_showMessageDialog_error("附加模式必須先有查詢結果!");
+                        return;
+                    }
+
                     List<Object> titlesN = JTableUtil.newInstance(queryResultTable).getColumnTitleArray();
 
                     Map<Integer, Integer> titlesMap = new TreeMap<Integer, Integer>();

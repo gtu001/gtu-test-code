@@ -1414,5 +1414,7 @@ public class JCommonUtil {
     }
 
     public static void main(String[] args) {
+        JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("<html><font color='RED'>XXXXXXX</font></html>", "AAAAA");
+        System.out.println("done...");
     }
 }

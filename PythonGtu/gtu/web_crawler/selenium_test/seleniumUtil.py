@@ -65,6 +65,7 @@ def _getChromeConfig(config) :
 
 
 def getDriver(width=1280, height=720, config={}) :
+    # https://stackoverflow.max-everyday.com/2019/12/selenium-chrome-options/
     if envUtil.isWindows() :
         driverPath = r"D:/apps/selenium/chromedriver.exe"
     else :
