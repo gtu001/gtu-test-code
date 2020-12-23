@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.tomcat.jni.Time;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.ElementClickInterceptedException;
@@ -142,8 +141,15 @@ public class SeleniumUtil {
                         new WebDriverWait(driver, WAIT_IN_SECONDS).until(ExpectedConditions.elementToBeClickable(By.cssSelector(css))).click();
                     }
                 } catch (ElementClickInterceptedException ex) {
-                    Time.sleep(1000);
+                    _TimeSleep_(1000);
                 }
+            }
+        }
+
+        private static void _TimeSleep_(long time) {
+            try {
+                Thread.currentThread().sleep(time);
+            } catch (InterruptedException e) {
             }
         }
 
@@ -176,7 +182,7 @@ public class SeleniumUtil {
                     }
                 } catch (StaleElementReferenceException ex) {
                     System.out.print("[StaleElementReferenceException] try again ! ");
-                    Time.sleep(retryWait);
+                    _TimeSleep_(retryWait);
                 }
             }
             return null;
@@ -213,7 +219,7 @@ public class SeleniumUtil {
                     return rtnLst;
                 } catch (StaleElementReferenceException ex) {
                     System.out.print("[StaleElementReferenceException] try again ! ");
-                    Time.sleep(retryWait);
+                    _TimeSleep_(retryWait);
                 }
             }
             return null;
@@ -243,7 +249,7 @@ public class SeleniumUtil {
                     return driver.findElements(By.xpath(xpath)).get(0);
                 } catch (StaleElementReferenceException ex) {
                     System.out.print("[StaleElementReferenceException] try again ! ");
-                    Time.sleep(retryWait);
+                    _TimeSleep_(retryWait);
                 }
             }
             return null;
@@ -273,7 +279,7 @@ public class SeleniumUtil {
                     return driver.findElements(By.xpath(xpath));
                 } catch (StaleElementReferenceException ex) {
                     System.out.print("[StaleElementReferenceException] try again ! ");
-                    Time.sleep(retryWait);
+                    _TimeSleep_(retryWait);
                 }
             }
             return null;

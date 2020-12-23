@@ -116,12 +116,26 @@
 			<packagename mode="pom" name="commons-beanutils-1.8.0.jar">org/apache/commons/beanutils/DynaBean</packagename>
 			<packagename mode="exact" name="snakeyaml-1.21.jar">org.yaml.snakeyaml.DumperOptions</packagename>
 
-			<packagename mode="pom">net.sf.json.JSONObject</packagename>
-			<packagename mode="pom">net/sf/ezmorph/Morpher</packagename>
-			<packagename mode="pom">org/apache/commons/logging/LogFactory</packagename>
-			<packagename mode="pom">org/slf4j/LoggerFactory</packagename>
-			<packagename mode="pom">org/slf4j/impl/StaticLoggerBinder</packagename>
-			<packagename mode="pom">org/apache/commons/beanutils/DynaBean</packagename>
+			<packagename mode="small" name="json-lib-2.4-jdk15.jar">net.sf.json.JSONObject</packagename>
+			<packagename mode="small" name="ezmorph-1.0.4.jar">net/sf/ezmorph/Morpher</packagename>
+			<packagename mode="pom" name="commons-logging-1.1.1.jar">org/apache/commons/logging/LogFactory</packagename>
+			<packagename mode="pom" name="slf4j-api-1.7.28.jar">org/slf4j/LoggerFactory</packagename>
+			<packagename mode="pom" name="logback-classic-1.2.3.jar">org/slf4j/impl/StaticLoggerBinder</packagename>
+			<packagename mode="pom" name="commons-beanutils-1.8.0.jar">org/apache/commons/beanutils/DynaBean</packagename>
+
+			<packagename mode="pom" name="guava-30.0-jre.jar">com.google.common.base.Function</packagename>
+			<packagename mode="pom" name="okhttp-3.11.0.jar">okhttp3/ConnectionPool</packagename>
+			<packagename mode="pom" name="okio-1.14.0.jar">okio/BufferedSource</packagename>
+			<packagename mode="pom" name="commons-exec-1.3.jar">org/apache/commons/exec/Executor</packagename>
+			<packagename mode="pom" name="gson-2.8.5.jar">com/google/gson/JsonParseException</packagename>
+
+			<packagename mode="pom" name="selenium-api-3.9.1.jar" unjar="${build_dir}">org/openqa/selenium/WebDriver</packagename>
+
+			<packagename mode="pom" name="selenium-chrome-driver-3.141.59.jar" unjar="${build_dir}">org/openqa/selenium/chrome/ChromeOptions</packagename>
+			
+			<packagename mode="pom" name="selenium-remote-driver-3.9.1.jar" unjar="${build_dir}">org/openqa/selenium/remote/RemoteWebDriver</packagename>
+			
+			
 
 		</jarfinder>
 
@@ -221,13 +235,13 @@
 
 	<target name="compiler" if="${enable}">
 		<echo># compiler ...</echo>
-		<javac fork="yes" compiler="javac1.6" source="1.6" target="1.6" includeantruntime="true" srcdir="${src_dir}" destdir="${build_dir}" deprecation="no" nowarn="true" encoding="UTF-8" debug="on"><!-- -->
+		<javac executable="${jdk_javac}" fork="yes" compiler="javac1.8" source="1.8" target="1.8" includeantruntime="true" srcdir="${src_dir}" destdir="${build_dir}" deprecation="no" nowarn="true" encoding="UTF-8" debug="on"><!-- -->
 			<include name="**/${main_class}.java" /><!--executable="${jdk_javac}" fork="yes" -->
 			<classpath>
 				<path location="${build_dir}" />
 			</classpath>
 			<classpath refid="selenium_ref_jars" />
-			<!--<classpath refid="javafx_class_path" />-->
+			<classpath refid="javafx_class_path" />
 		</javac>
 	</target>
 

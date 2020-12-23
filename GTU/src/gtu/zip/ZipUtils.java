@@ -18,14 +18,14 @@ import org.apache.commons.lang3.tuple.Pair;
 public class ZipUtils {
 
     public static void main(String[] a) throws Exception {
-        File srcFile = new File("C:\\11111");
-        File targetZip = new File("C:\\11111\\123.zip");
-        File extractDir = new File("C:\\22222");
+        // File srcFile = new File("C:\\11111");
+        File targetZip = new File("/home/gtu001/.m2/repository/org/seleniumhq/selenium/selenium-chrome-driver/3.141.59/selenium-chrome-driver-3.141.59.jar");
+        File extractDir = new File("/home/gtu001/桌面/dddddddd/xxxxxxx");
 
-        // 壓縮
-        new ZipUtils().makeZip(srcFile, targetZip);
+        // // 壓縮
+        // new ZipUtils().makeZip(srcFile, targetZip);
         // 解壓縮
-        new ZipUtils().unzipFile(targetZip, extractDir);
+        new ZipUtils().unzipFile_SECURE(targetZip, extractDir);
         System.out.println("done...");
     }
 
@@ -283,6 +283,93 @@ public class ZipUtils {
             }
         } catch (Exception ex) {
             throw new RuntimeException("recurseFiles ERR : " + ex.getMessage(), ex);
+        }
+    }
+
+    /**
+     * 解壓縮
+     * 
+     * @param zipfile
+     *            zip檔位置
+     * @param extractDir
+     *            解壓縮資料夾
+     * @return
+     */
+    public boolean unzipFile_SECURE(File zipfile, File extractDir) {
+        try {
+            unZip_SECURE(zipfile, extractDir.getAbsolutePath());
+        } catch (Exception ex) {
+            // TODO Auto-generated catch block
+            throw new RuntimeException("unzipFile ERR : " + ex.getMessage(), ex);
+            // return false;
+        }
+        return true;
+    }
+
+    /**
+     * 解壓縮主程式 [若檔案已存在會自動覆蓋]
+     * 
+     * @param zipFileName
+     * @param outputDirectory
+     * @throws Exception
+     *             // * org.apache.tools.zip.
+     */
+    private void unZip_SECURE(File ZIPFile, String outputDirectory) {
+        File f = null;
+        try {
+            ZipFile zipFile = new ZipFile(ZIPFile);
+            java.util.Enumeration e = zipFile.entries();
+            ZipEntry zipEntry = null;
+            createDirectory(outputDirectory, "");
+            // if(!outputDirectory.exists()) outputDirectory.mkdirs();
+
+            while (e.hasMoreElements()) {
+                zipEntry = (ZipEntry) e.nextElement();
+                System.out.println("unziping " + zipEntry.getName());
+                if (zipEntry.isDirectory()) {
+                    String name = zipEntry.getName();
+                    name = name.substring(0, name.length() - 1);
+                    f = new File(outputDirectory + File.separator + name);
+                    f.mkdir();
+                    System.out.println("創建立目錄：" + outputDirectory + File.separator + name);
+                } else {
+                    String fileName = zipEntry.getName();
+                    fileName = fileName.replace('\\', '/');
+
+                    if (fileName.indexOf("/") != -1) {
+                        createDirectory(outputDirectory, fileName.substring(0, fileName.lastIndexOf("/")));
+                        fileName = fileName.substring(fileName.lastIndexOf("/") + 1, fileName.length());
+                    }
+
+                    f = new File(outputDirectory + File.separator + zipEntry.getName());
+
+                    try {
+                        f.createNewFile();
+                        InputStream in = zipFile.getInputStream(zipEntry);
+                        FileOutputStream out = new FileOutputStream(f);
+
+                        byte[] by = new byte[1024];
+                        int c;
+                        while ((c = in.read(by)) != -1) {
+                            out.write(by, 0, c);
+                        }
+                        out.close();
+                        in.close();
+                    } catch (java.io.FileNotFoundException ignoreError) {
+                        System.err.println(f + " : error : " + ignoreError.getMessage());
+                        if (!ignoreError.getMessage().contains("Is a directory")) {
+                            throw ignoreError;
+                        }
+                    } catch (java.io.IOException ignoreError) {
+                        System.err.println(f + " : error : " + ignoreError.getMessage());
+                        if (!ignoreError.getMessage().contains("Not a directory")) {
+                            throw ignoreError;
+                        }
+                    }
+                }
+            }
+        } catch (Exception ex) {
+            throw new RuntimeException("##unZip ERR : " + ex.getMessage() + " ---- " + f, ex);
         }
     }
 }

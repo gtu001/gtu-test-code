@@ -366,7 +366,9 @@ public class SeleniumTestUI extends JFrame {
             @Override
             public void action(EventObject evt) throws Exception {
                 String content = JCommonUtil.isBlankErrorMsg(scriptArea, "腳本必須輸入");
-                String driverPath = JCommonUtil.isBlankErrorMsg(webDriverText, "腳本必須輸入");
+                String driverPath = JCommonUtil.isBlankErrorMsg(webDriverText, "webDriver必須設定");
+                config.reflectSetConfig(SeleniumTestUI.this);
+                config.store();
                 SeleniumService mSeleniumService = new SeleniumService();
                 mSeleniumService.processContent(content, driverPath);
             }

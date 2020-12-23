@@ -24,6 +24,8 @@ import gtu._work.JarFinder;
 import gtu._work.JarFinder.IfMatch;
 import gtu.file.FileUtil;
 import gtu.maven.MavenDenpencyJarListLoader;
+import gtu.swing.util.JCommonUtil;
+import gtu.zip.ZipUtils;
 
 /**
  * 定義task的tag 可以在設定的目錄底下找jar<br/>
@@ -58,6 +60,9 @@ public class AntJarFinder extends Task {
     private List<File> allJarLst;
     // 定義輸出forDebug
     private List<String> _packagenamesDebugLst = new ArrayList<String>();
+
+    public static void main(String[] args) {
+    }
 
     @Override
     public void execute() throws BuildException {
@@ -163,18 +168,19 @@ public class AntJarFinder extends Task {
 
             final List<File> sameJarList = new ArrayList<File>();
             info("搜尋 :" + pk.text);
+
             finder.pattern(pk.text);
 
             // for exact jar files ↓↓↓↓↓↓↓
             if (StringUtils.isNotBlank(pk.name) && allJarLst != null) {
                 debug("直接比對檔名 : " + pk.name);
-                
+
                 File targetJarFile = new File(copyToDir, pk.name);
-                if(targetJarFile.exists()) {
+                if (targetJarFile.exists()) {
                     debug("檔案jar已存在於目的地跳過  : " + targetJarFile);
                     return;
                 }
-                
+
                 File findIndicateJar = null;
                 for (File file : allJarLst) {
                     if (StringUtils.equalsIgnoreCase(file.getName(), pk.name)) {
@@ -184,7 +190,14 @@ public class AntJarFinder extends Task {
                     }
                 }
                 if (findIndicateJar != null) {
-                    this.copyFile(findIndicateJar, copyToDir);
+                    if (StringUtils.isNotBlank(pk.unjar)) {
+                        // 直接解壓縮
+                        File buildDir = new File(StringUtils.trimToEmpty(helper.getParseAfterValue(pk.unjar)));
+                        info("[直接解壓縮]:" + buildDir);
+                        ZipUtils.getInstance().unzipFile_SECURE(findIndicateJar, buildDir);
+                    } else {
+                        this.copyFile(findIndicateJar, copyToDir);
+                    }
                     appendDebugPackageDef(pk, findIndicateJar);
                     return;
                 }
@@ -225,18 +238,47 @@ public class AntJarFinder extends Task {
             File jar = searchMode.apply(sameJarList, pk, this);
 
             if (jar == null) {
+                jar = choiceCandidateJars(pk.text, sameJarList);
+            }
+
+            if (jar == null) {
                 System.err.println("找不到符合jar檔 : " + pk.text);
                 throw new BuildException("找不到符合jar檔 : " + pk.text);
             }
 
-            // 複製jar
-            this.copyFile(jar, copyToDir);
+            if (StringUtils.isNotBlank(pk.unjar)) {
+                // 直接解壓縮
+                File buildDir = new File(StringUtils.trimToEmpty(helper.getParseAfterValue(pk.unjar)));
+                info("[直接解壓縮]:" + buildDir);
+                ZipUtils.getInstance().unzipFile_SECURE(jar, buildDir);
+            } else {
+                // 複製jar
+                this.copyFile(jar, copyToDir);
+            }
+
             appendDebugPackageDef(pk, jar);
             finder.clear();
         } catch (Exception ex) {
             System.err.println("執行失敗!!");
             throw new BuildException("執行失敗!!", ex);
         }
+    }
+
+    private File choiceCandidateJars(String classPath, List<File> jarLst) {
+        String splitChar = " ";
+        List<String> lst1 = new ArrayList<String>();
+        for (File f : jarLst) {
+            lst1.add(f.getAbsolutePath() + splitChar + FileUtil.getSizeDescription(f.length()) + splitChar + DateFormatUtils.format(f.lastModified(), "yyyy/MM/dd HH:mm:ss"));
+        }
+        String choiceJarStr = (String) JCommonUtil._JOptionPane_showInputDialog("找不到預設,選擇一個jar檔", classPath, lst1.toArray(new String[0]), null);
+        if (choiceJarStr != null) {
+            String jarPath = choiceJarStr.split(splitChar, -1)[0];
+            File choiceJar2 = new File(jarPath);
+            if (choiceJar2.exists()) {
+                return choiceJar2;
+            }
+        }
+        return null;
     }
 
     enum SearchMode {
@@ -327,9 +369,9 @@ public class AntJarFinder extends Task {
                 }
                 if (jarFile == null) {
                     System.err.println("找不到相同檔名 : " + pk.name);
-                    throw new BuildException("找不到相同檔名 : " + pk.name);
+                } else {
+                    _this.log("符合的Jar : " + jarFile.getAbsolutePath() + " => 大小 : " + _this.fileSize(jarFile));
                 }
-                _this.log("符合的Jar : " + jarFile.getAbsolutePath() + " => 大小 : " + _this.fileSize(jarFile));
                 return jarFile;
             }
 
@@ -358,9 +400,9 @@ public class AntJarFinder extends Task {
                 }
                 if (jarFile == null) {
                     System.err.println("找不到相同檔名 !!");
-                    throw new BuildException("找不到相同檔名!!");
+                } else {
+                    _this.log("符合的Jar : " + jarFile.getAbsolutePath() + " => 大小 : " + _this.fileSize(jarFile));
                 }
-                _this.log("符合的Jar : " + jarFile.getAbsolutePath() + " => 大小 : " + _this.fileSize(jarFile));
                 return jarFile;
             }
 
@@ -491,6 +533,7 @@ public class AntJarFinder extends Task {
         private String text;
         private String mode;
         private String name;
+        private String unjar;
 
         public void addText(String text) {
             this.text = text;
@@ -502,6 +545,10 @@ public class AntJarFinder extends Task {
 
         public void setMode(String mode) {
             this.mode = mode;
+        }
+
+        public void setUnjar(String unjar) {
+            this.unjar = unjar;
         }
 
         private AntJarFinder getOuterType() {
