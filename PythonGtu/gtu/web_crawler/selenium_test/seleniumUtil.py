@@ -187,6 +187,33 @@ class WebElementControl :
                 time.sleep(retryWait)
                 print("[StaleElementReferenceException] try again ! ")
         return None
+
+    @staticmethod
+    def waitPageElementByCsss(css, text, driver, retryTime=10, retryWait=0.5) : 
+        for t in range(0, retryTime) :
+            try :
+                def waitUntilFunc(driver) :
+                    chk1 = driver.find_elements_by_css_selector(css)
+                    lenOk = len(chk1)
+                    print("check_css_exists = " , lenOk)
+                    if lenOk > 0 :
+                        return True
+                    return False        
+                WebElementControl.until(driver, timeout=300, frequence=0.5, message='', waitUntilFunc=waitUntilFunc) 
+                elements = driver.find_elements_by_css_selector(css)
+                if stringUtil.isBlank(text) and len(elements) > 0:
+                    return elements[0]
+                text = text.lower()
+                lst = list()
+                for i,v in enumerate(elements) :
+                    print(i,v.text)
+                    if text in v.text.lower() :
+                        lst.append(v)
+                return lst
+            except StaleElementReferenceException as ex :
+                time.sleep(retryWait)
+                print("[StaleElementReferenceException] try again ! ")
+        return None
         
     @staticmethod
     def waitPageElementByXpath(xpath, driver, retryTime=10, retryWait=0.5) :
@@ -200,6 +227,23 @@ class WebElementControl :
                     return False        
                 WebElementControl.until(driver, timeout=300, frequence=0.5, message='', waitUntilFunc=waitUntilFunc) 
                 return driver.find_elements_by_xpath(xpath)[0]
+            except StaleElementReferenceException as ex :
+                time.sleep(retryWait)
+                print("[StaleElementReferenceException] try again ! ")
+		return None
+
+    @staticmethod
+    def waitPageElementByXpaths(xpath, driver, retryTime=10, retryWait=0.5) :
+        for t in range(0, retryTime) :
+            try :
+                def waitUntilFunc(driver) :
+                    chk1 = driver.find_elements_by_xpath(xpath)
+                    print("check_xpath_exists = " , len(chk1))
+                    if len(chk1) > 0 :
+                        return True
+                    return False        
+                WebElementControl.until(driver, timeout=300, frequence=0.5, message='', waitUntilFunc=waitUntilFunc) 
+                return driver.find_elements_by_xpath(xpath)
             except StaleElementReferenceException as ex :
                 time.sleep(retryWait)
                 print("[StaleElementReferenceException] try again ! ")

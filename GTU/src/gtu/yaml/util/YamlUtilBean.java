@@ -85,10 +85,13 @@ public class YamlUtilBean<T> {
         this.yamlLst.add(bean);
     }
 
-    public void remove(T bean) {
-        if (this.yamlLst.contains(bean)) {
+    public int remove(T bean) {
+        int removeCount = 0;
+        while (this.yamlLst.contains(bean)) {
             this.yamlLst.remove(bean);
+            removeCount++;
         }
+        return removeCount;
     }
 
     public void store() {

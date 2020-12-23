@@ -168,6 +168,13 @@ public class AntJarFinder extends Task {
             // for exact jar files ↓↓↓↓↓↓↓
             if (StringUtils.isNotBlank(pk.name) && allJarLst != null) {
                 debug("直接比對檔名 : " + pk.name);
+                
+                File targetJarFile = new File(copyToDir, pk.name);
+                if(targetJarFile.exists()) {
+                    debug("檔案jar已存在於目的地跳過  : " + targetJarFile);
+                    return;
+                }
+                
                 File findIndicateJar = null;
                 for (File file : allJarLst) {
                     if (StringUtils.equalsIgnoreCase(file.getName(), pk.name)) {

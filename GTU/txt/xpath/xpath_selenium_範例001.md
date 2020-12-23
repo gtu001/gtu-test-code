@@ -14,3 +14,6 @@ xpath_selenium_範例001.md
     //input[@maxlength=2048]
     //input[@maxlength]
     //*[@maxlength]
+
+
+    //*[contains(text(),'ABC')]

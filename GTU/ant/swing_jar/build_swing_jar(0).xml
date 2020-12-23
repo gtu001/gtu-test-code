@@ -288,7 +288,7 @@
 			</fileset>
 		</copy>
 
-		<unjar dest="${build_dir}">
+		<unjar dest="${build_dir}" overwrite="true">
 			<fileset dir="${jars_dir}">
 				<include name="**/*.jar" />
 			</fileset>

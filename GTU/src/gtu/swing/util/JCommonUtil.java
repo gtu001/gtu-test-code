@@ -892,6 +892,15 @@ public class JCommonUtil {
     }
 
     /**
+     * 未輸入值要顯示錯誤訊息 外層要包 try catch(){ JCommonUtil.handleException }
+     */
+    public static String isBlankErrorMsg(JTextComponent comp, String errMsg) {
+        String text = comp.getText();
+        Validate.isTrue(StringUtils.isNotBlank(text), errMsg);
+        return text;
+    }
+
+    /**
      * 顯示元件清單
      */
     public static void showJComponentInfo(JComponent component) {

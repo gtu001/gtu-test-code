@@ -3,9 +3,9 @@ package gtu.selenium;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.tomcat.jni.Time;
-import org.codehaus.plexus.util.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.ElementClickInterceptedException;
@@ -24,7 +24,7 @@ import gtu.file.OsInfoUtil;
 public class SeleniumUtil {
 
     private static final SeleniumUtil _INST = new SeleniumUtil();
-    
+
     private static final long WAIT_IN_SECONDS = 120L;
 
     public static SeleniumUtil getInstance() {
@@ -41,11 +41,16 @@ public class SeleniumUtil {
     }
 
     public WebDriver getDriver() {
-        String driverPath = "";
-        if (OsInfoUtil.isWindows()) {
-            driverPath = "D:/apps/selenium/chromedriver.exe";
-        } else {
-            driverPath = "/media/gtu001/OLD_D/apps/webdriver/chromedriver";
+        return getDriver("");
+    }
+
+    public WebDriver getDriver(String driverPath) {
+        if (StringUtils.isBlank(driverPath)) {
+            if (OsInfoUtil.isWindows()) {
+                driverPath = "D:/apps/selenium/chromedriver.exe";
+            } else {
+                driverPath = "/media/gtu001/OLD_D/apps/webdriver/chromedriver";
+            }
         }
         System.setProperty("webdriver.chrome.driver", driverPath);// chrome
         System.setProperty("webdriver.gecko.driver", driverPath);// firefox
@@ -177,6 +182,43 @@ public class SeleniumUtil {
             return null;
         }
 
+        public static List<WebElement> waitPageElementByCsss(final String css, final String text, final WebDriver driver) {
+            final int retryTime = 10;
+            final long retryWait = 500;
+            return waitPageElementByCsss(css, text, driver, retryTime, retryWait);
+        }
+
+        public static List<WebElement> waitPageElementByCsss(final String css, final String text, final WebDriver driver, final int retryTime, final long retryWait) {
+            for (int t = 0; t < retryTime; t++) {
+                try {
+                    new WebDriverWait(driver, WAIT_IN_SECONDS).until(//
+                            new java.util.function.Function<WebDriver, Boolean>() {
+                                @Override
+                                public Boolean apply(WebDriver t) {
+                                    List<WebElement> elems = driver.findElements(By.cssSelector(css));
+                                    System.out.println("check_css_exists = " + elems.size());
+                                    if (elems.isEmpty()) {
+                                        return false;
+                                    }
+                                    return true;
+                                }
+                            });
+                    List<WebElement> elems = driver.findElements(By.cssSelector(css));
+                    List<WebElement> rtnLst = new ArrayList<WebElement>();
+                    for (WebElement e : elems) {
+                        if (StringUtils.defaultString(e.getText()).contains(text)) {
+                            rtnLst.add(e);
+                        }
+                    }
+                    return rtnLst;
+                } catch (StaleElementReferenceException ex) {
+                    System.out.print("[StaleElementReferenceException] try again ! ");
+                    Time.sleep(retryWait);
+                }
+            }
+            return null;
+        }
+
         public static WebElement waitPageElementByXpath(final String xpath, final WebDriver driver) {
             final int retryTime = 10;
             final long retryWait = 500;
@@ -199,6 +241,36 @@ public class SeleniumUtil {
                                 }
                             });
                     return driver.findElements(By.xpath(xpath)).get(0);
+                } catch (StaleElementReferenceException ex) {
+                    System.out.print("[StaleElementReferenceException] try again ! ");
+                    Time.sleep(retryWait);
+                }
+            }
+            return null;
+        }
+
+        public static List<WebElement> waitPageElementByXpaths(final String xpath, final WebDriver driver) {
+            final int retryTime = 10;
+            final long retryWait = 500;
+            return waitPageElementByXpaths(xpath, driver, retryTime, retryWait);
+        }
+
+        public static List<WebElement> waitPageElementByXpaths(final String xpath, final WebDriver driver, final int retryTime, final long retryWait) {
+            for (int t = 0; t < retryTime; t++) {
+                try {
+                    new WebDriverWait(driver, WAIT_IN_SECONDS).until(//
+                            new java.util.function.Function<WebDriver, Boolean>() {
+                                @Override
+                                public Boolean apply(WebDriver t) {
+                                    List<WebElement> elems = driver.findElements(By.xpath(xpath));
+                                    System.out.println("check_xpath_exists = " + elems.size());
+                                    if (elems.isEmpty()) {
+                                        return false;
+                                    }
+                                    return true;
+                                }
+                            });
+                    return driver.findElements(By.xpath(xpath));
                 } catch (StaleElementReferenceException ex) {
                     System.out.print("[StaleElementReferenceException] try again ! ");
                     Time.sleep(retryWait);
