@@ -130,10 +130,9 @@
 			<packagename mode="pom" name="gson-2.8.5.jar">com/google/gson/JsonParseException</packagename>
 
 			<packagename mode="pom" name="selenium-api-3.9.1.jar" unjar="${build_dir}">org/openqa/selenium/WebDriver</packagename>
-
 			<packagename mode="pom" name="selenium-chrome-driver-3.141.59.jar" unjar="${build_dir}">org/openqa/selenium/chrome/ChromeOptions</packagename>
-			
 			<packagename mode="pom" name="selenium-remote-driver-3.9.1.jar" unjar="${build_dir}">org/openqa/selenium/remote/RemoteWebDriver</packagename>
+			<packagename mode="pom" name="" unjar="${build_dir}">org/openqa/selenium/support/ui/WebDriverWait</packagename>
 			
 			
 
@@ -235,13 +234,13 @@
 
 	<target name="compiler" if="${enable}">
 		<echo># compiler ...</echo>
-		<javac executable="${jdk_javac}" fork="yes" compiler="javac1.8" source="1.8" target="1.8" includeantruntime="true" srcdir="${src_dir}" destdir="${build_dir}" deprecation="no" nowarn="true" encoding="UTF-8" debug="on"><!-- -->
+		<javac fork="yes" compiler="javac1.8" source="1.8" target="1.8" includeantruntime="true" srcdir="${src_dir}" destdir="${build_dir}" deprecation="no" nowarn="true" encoding="UTF-8" debug="on"><!-- -->
 			<include name="**/${main_class}.java" /><!--executable="${jdk_javac}" fork="yes" -->
 			<classpath>
 				<path location="${build_dir}" />
 			</classpath>
 			<classpath refid="selenium_ref_jars" />
-			<classpath refid="javafx_class_path" />
+			<!-- <classpath refid="javafx_class_path" /> -->
 		</javac>
 	</target>
 

@@ -19,13 +19,13 @@ public class ZipUtils {
 
     public static void main(String[] a) throws Exception {
         // File srcFile = new File("C:\\11111");
-        File targetZip = new File("/home/gtu001/.m2/repository/org/seleniumhq/selenium/selenium-chrome-driver/3.141.59/selenium-chrome-driver-3.141.59.jar");
-        File extractDir = new File("/home/gtu001/桌面/dddddddd/xxxxxxx");
 
-        // // 壓縮
-        // new ZipUtils().makeZip(srcFile, targetZip);
-        // 解壓縮
-        new ZipUtils().unzipFile_SECURE(targetZip, extractDir);
+        File targetZip = new File("C:\\Users\\wistronits\\.m2\\repository\\org\\seleniumhq\\selenium\\selenium-api\\3.9.1\\selenium-api-3.9.1.jar");
+        File extractDir = new File("C:\\Users\\wistronits\\Desktop\\TEST_UNZIP");
+
+        for (File f : new File("C:\\Users\\wistronits\\Desktop\\新增資料夾 (2)").listFiles()) {
+            new ZipUtils().unzipFile_SECURE(f, extractDir);
+        }
         System.out.println("done...");
     }
 
@@ -357,12 +357,14 @@ public class ZipUtils {
                         in.close();
                     } catch (java.io.FileNotFoundException ignoreError) {
                         System.err.println(f + " : error : " + ignoreError.getMessage());
-                        if (!ignoreError.getMessage().contains("Is a directory")) {
+                        // 含有該字串不丟錯誤
+                        if (__checkNeedThrowException(ignoreError, new String[] { "Is a directory", "存取被拒" })) {
                             throw ignoreError;
                         }
                     } catch (java.io.IOException ignoreError) {
                         System.err.println(f + " : error : " + ignoreError.getMessage());
-                        if (!ignoreError.getMessage().contains("Not a directory")) {
+                        // 含有該字串不丟錯誤
+                        if (__checkNeedThrowException(ignoreError, new String[] { "Not a directory", "系統找不到指定的路徑。" })) {
                             throw ignoreError;
                         }
                     }
@@ -371,5 +373,16 @@ public class ZipUtils {
         } catch (Exception ex) {
             throw new RuntimeException("##unZip ERR : " + ex.getMessage() + " ---- " + f, ex);
         }
+    }
+
+    private boolean __checkNeedThrowException(Throwable ignoreError, String[] notThrowStringArray) {
+        boolean findOk = false;
+        for (String notIn : notThrowStringArray) {
+            if (ignoreError.getMessage().contains(notIn)) {
+                findOk = true;
+                break;
+            }
+        }
+        return !findOk;
     }
 }

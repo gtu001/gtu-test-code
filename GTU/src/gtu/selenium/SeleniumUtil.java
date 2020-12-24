@@ -111,7 +111,7 @@ public class SeleniumUtil {
             }
         }
 
-        public List<Pair<String, String>> getOptionsLst(WebElement element) {
+        public static List<Pair<String, String>> getOptionsLst(WebElement element) {
             List<Pair<String, String>> lst = new ArrayList<Pair<String, String>>();
             List<WebElement> options = element.findElements(By.xpath(".//option"));
             for (int i = 0; i < options.size(); i++) {

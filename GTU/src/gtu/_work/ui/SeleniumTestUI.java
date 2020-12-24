@@ -17,6 +17,8 @@ import java.util.EventObject;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -134,10 +136,10 @@ public class SeleniumTestUI extends JFrame {
 
         panel_6 = new JPanel();
         panel.add(panel_6, BorderLayout.SOUTH);
-        
+
         lblDriver = new JLabel("driver位置");
         panel_6.add(lblDriver);
-        
+
         webDriverText = new JTextField();
         JCommonUtil.jTextFieldSetFilePathMouseEvent(webDriverText, false);
         panel_6.add(webDriverText);
@@ -218,7 +220,7 @@ public class SeleniumTestUI extends JFrame {
         panel_2.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 
         {
-            
+
             config.reflectInit(this);
             mMyConfig = new MyConfig();
 
@@ -363,14 +365,40 @@ public class SeleniumTestUI extends JFrame {
             }
         });
         swingUtil.addActionHex("executeBtn.click", new Action() {
+            Thread runnable;
+
+            private void start(String content, String driverPath) {
+                final SeleniumService mSeleniumService = new SeleniumService();
+                runnable = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        executeBtn.setEnabled(false);
+                        mSeleniumService.processContent(content, driverPath);
+                        new Timer().schedule(new TimerTask() {
+                            @Override
+                            public void run() {
+                                executeBtn.setEnabled(true);
+                            }
+                        }, 3000);
+                    }
+                });
+                runnable.start();
+            }
+
             @Override
             public void action(EventObject evt) throws Exception {
                 String content = JCommonUtil.isBlankErrorMsg(scriptArea, "腳本必須輸入");
                 String driverPath = JCommonUtil.isBlankErrorMsg(webDriverText, "webDriver必須設定");
                 config.reflectSetConfig(SeleniumTestUI.this);
                 config.store();
-                SeleniumService mSeleniumService = new SeleniumService();
-                mSeleniumService.processContent(content, driverPath);
+                if (runnable == null || runnable.getState() == Thread.State.TERMINATED) {
+                    this.start(content, driverPath);
+                } else if (runnable != null && runnable.getState() != Thread.State.NEW) {
+                    boolean confirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("執行中, 是否開新的?", "start new one");
+                    if (confirm) {
+                        this.start(content, driverPath);
+                    }
+                }
             }
         });
         swingUtil.addActionHex("scriptList.click", new Action() {
@@ -553,6 +581,72 @@ public class SeleniumTestUI extends JFrame {
                 }
             }
         }, //
+        CLEAR(Pattern.compile("(\\w+)\\.clear\\(\\)")) {
+            @Override
+            void apply001(Matcher mth, int lineNumber, SeleniumService self) {
+                String var = mth.group(1);
+                if (self.elementMap.containsKey(var)) {
+                    System.out.println("點擊 : " + var);
+                    WebElement element = (WebElement) self.elementMap.get(var);
+                    element.clear();
+                } else {
+                    System.out.println("行:" + lineNumber + ", 找不到元素:" + var);
+                }
+            }
+        }, //
+        ENTER(Pattern.compile("(\\w+)\\.enter\\(\\)")) {
+            @Override
+            void apply001(Matcher mth, int lineNumber, SeleniumService self) {
+                String var = mth.group(1);
+                if (self.elementMap.containsKey(var)) {
+                    System.out.println("點擊 : " + var);
+                    WebElement element = (WebElement) self.elementMap.get(var);
+                    SeleniumUtil.WebElementControl.enter(element);
+                } else {
+                    System.out.println("行:" + lineNumber + ", 找不到元素:" + var);
+                }
+            }
+        }, //
+        SELECT_ONE(Pattern.compile("(\\w+)\\.select\\((value|text|index)\\=(.*)\\)")) {
+            @Override
+            void apply001(Matcher mth, int lineNumber, SeleniumService self) {
+                String var = mth.group(1);
+                String type = mth.group(2);
+                String val = mth.group(3);
+                if (self.elementMap.containsKey(var)) {
+                    System.out.println("下拉 : " + var);
+                    WebElement element = (WebElement) self.elementMap.get(var);
+                    String text = "";
+                    String value = "";
+                    Integer index = null;
+                    if ("value".equalsIgnoreCase(type)) {
+                        value = val;
+                    } else if ("text".equalsIgnoreCase(type)) {
+                        text = val;
+                    } else if ("index".equalsIgnoreCase(type)) {
+                        index = Integer.parseInt(val);
+                    }
+                    SeleniumUtil.WebElementControl.setSelect(element, text, value, index);
+                } else {
+                    System.out.println("行:" + lineNumber + ", 找不到元素:" + var);
+                }
+            }
+        }, //
+        SHOW_SELECT(Pattern.compile("show(?:Select|Option|Options)\\((\\w+)\\)")) {
+            @Override
+            void apply001(Matcher mth, int lineNumber, SeleniumService self) {
+                String var = mth.group(1);
+                if (self.elementMap.containsKey(var)) {
+                    System.out.println("下拉 : " + var);
+                    WebElement element = (WebElement) self.elementMap.get(var);
+                    System.out.println("###############");
+                    SeleniumUtil.WebElementControl.getOptionsLst(element);
+                    System.out.println("###############");
+                } else {
+                    System.out.println("行:" + lineNumber + ", 找不到元素:" + var);
+                }
+            }
+        }, //
         EQ_GET(Pattern.compile("(\\w+)\\s*\\=\\s*(\\w+)\\.(?:eq|get)\\((\\d+)\\)")) {
             @Override
             void apply001(Matcher mth, int lineNumber, SeleniumService self) {
@@ -612,6 +706,18 @@ public class SeleniumTestUI extends JFrame {
                         WebElement element = (WebElement) fetchVal;
                         this.process(var1, var2, express, element, self);
                     }
+                }
+            }
+        }, //
+        SLEEP(Pattern.compile("(?:wait|sleep)\\(([\\.\\d]+)\\)")) {
+            @Override
+            void apply001(Matcher mth, int lineNumber, SeleniumService self) {
+                double sleeptime = Math.abs(Double.parseDouble(mth.group(1)));
+                System.out.println("休息秒數 :" + sleeptime);
+                long sleeptime2 = (long) (sleeptime * 1000);
+                try {
+                    Thread.currentThread().sleep(sleeptime2);
+                } catch (Exception e) {
                 }
             }
         }, //
