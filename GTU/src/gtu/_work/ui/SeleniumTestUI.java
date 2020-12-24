@@ -34,6 +34,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
+import javax.swing.JToggleButton;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeListener;
 
@@ -56,6 +57,7 @@ import gtu.swing.util.JFrameUtil;
 import gtu.swing.util.JListUtil;
 import gtu.swing.util.JMouseEventUtil;
 import gtu.swing.util.JTextAreaUtil;
+import gtu.swing.util.JToggleButtonUtil;
 import gtu.swing.util.SwingActionUtil;
 import gtu.swing.util.SwingActionUtil.Action;
 import gtu.swing.util.SwingActionUtil.ActionAdapter;
@@ -86,6 +88,7 @@ public class SeleniumTestUI extends JFrame {
     private JButton executeBtn;
     private JLabel lblNewLabel;
     private JLabel lineNumberLbl;
+    private JToggleButton pauseBtn;
     private MyConfig mMyConfig;
     private PropertiesUtilBean config = new PropertiesUtilBean(SeleniumTestUI.class);
     private JLabel lblDriver;
@@ -184,6 +187,9 @@ public class SeleniumTestUI extends JFrame {
 
         lineNumberLbl = new JLabel("");
         panel_7.add(lineNumberLbl);
+        
+        pauseBtn = JToggleButtonUtil.createSimpleButton("pause", "continue", false, null);
+        panel_7.add(pauseBtn);
 
         lblNewLabel = new JLabel("腳本名稱");
         panel_7.add(lblNewLabel);
@@ -385,6 +391,16 @@ public class SeleniumTestUI extends JFrame {
                     @Override
                     void setCurrentLineNumber(int lineNumber) {
                         lineNumberLbl.setText("" + lineNumber);
+                    }
+
+                    @Override
+                    List<String> getContent() {
+                        return StringUtil_.readContentToList(scriptArea.getText(), true, false, false);
+                    }
+
+                    @Override
+                    boolean isPause() {
+                        return pauseBtn.isSelected();
                     }
                 };
                 runnable = new Thread(new Runnable() {
@@ -814,6 +830,10 @@ public class SeleniumTestUI extends JFrame {
     private abstract class SeleniumService {
         abstract void setCurrentLineNumber(int lineNumber);
 
+        abstract List<String> getContent();
+
+        abstract boolean isPause();
+
         SimpleDateFormat SDF = new SimpleDateFormat("yyyy/MM/dd");
         SimpleDateFormat TW_SDF = new SimpleDateFormat("/MM/dd");
         WebDriver driver;
@@ -823,10 +843,22 @@ public class SeleniumTestUI extends JFrame {
 
         private void processContent(String text, String driverPath) {
             driver = SeleniumUtil.getInstance().getDriver(driverPath);
-            List<String> contentLst = StringUtil_.readContentToList(text, true, false, false);
-            for (int ii = 0; ii < contentLst.size(); ii++) {
+            int ii = 0;
+            for (;;) {
+                List<String> contentLst = getContent();
+                if (ii > contentLst.size() - 1) {
+                    break;
+                }
+                while (isPause()) {
+                    try {
+                        Thread.currentThread().sleep(500);
+                    } catch (InterruptedException e1) {
+                    }
+                }
                 String line = contentLst.get(ii);
-                setCurrentLineNumber(ii + 1);
+                int lineNumber = ii + 1;
+                ii++;
+                setCurrentLineNumber(lineNumber);
                 if (StringUtils.isBlank(line)) {
                     continue;
                 }
@@ -836,7 +868,7 @@ public class SeleniumTestUI extends JFrame {
                 for (PatternEnum e : PatternEnum.values()) {
                     Matcher mth = e.ptn.matcher(line);
                     if (mth.matches()) {
-                        e.apply002(mth, ii + 1, this);
+                        e.apply002(mth, lineNumber, this);
                     }
                 }
                 if (stop) {
