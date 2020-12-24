@@ -36,11 +36,13 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeListener;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateFormatUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import gtu._work.ui.JMenuBarUtil.JMenuAppender;
+import gtu.file.FileUtil;
 import gtu.properties.PropertiesUtil;
 import gtu.properties.PropertiesUtilBean;
 import gtu.selenium.SeleniumUtil;
@@ -710,6 +712,8 @@ public class SeleniumTestUI extends JFrame {
                         WebElement element = (WebElement) fetchVal;
                         this.process(var1, var2, express, element, self);
                     }
+                } else {
+                    System.out.println("找不到元素 : " + var2 + "\t" + express);
                 }
             }
         }, //
@@ -740,6 +744,37 @@ public class SeleniumTestUI extends JFrame {
                     }
                 }
                 System.out.println("################");
+            }
+        }, //
+        PAGE_HTML(Pattern.compile("pageHtml\\(\\)")) {
+            @Override
+            void apply001(Matcher mth, int lineNumber, SeleniumService self) {
+                String htmlContent = self.driver.getPageSource();
+                File saveFile = new File(FileUtil.DESKTOP_DIR, SeleniumTestUI.class.getSimpleName() + "_" + DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMddHHmmss") + ".txt");
+                FileUtil.saveToFile(saveFile, htmlContent, "UTF8");
+                System.out.println("存檔 : " + saveFile);
+            }
+        }, //
+        HTML(Pattern.compile("(\\w+)\\.html\\(\\)")) {
+            @Override
+            void apply001(Matcher mth, int lineNumber, SeleniumService self) {
+                String var1 = mth.group(1);
+                if (self.elementMap.containsKey(var1)) {
+                    Object fetchVal = self.elementMap.get(var1);
+                    if (fetchVal instanceof List) {
+                        System.out.println("忽略List");
+                    } else if (fetchVal instanceof WebElement) {
+                        WebElement element = (WebElement) fetchVal;
+                        System.out.println("################");
+                        String html = SeleniumUtil.WebElementControl.getHtml(element);
+                        System.out.println();
+                        File saveFile = new File(FileUtil.DESKTOP_DIR, SeleniumTestUI.class.getSimpleName() + "_" + DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMddHHmmss") + ".txt");
+                        FileUtil.saveToFile(saveFile, html, "UTF8");
+                        System.out.println("################");
+                    }
+                } else {
+                    System.out.println("找不到元素 : " + var1);
+                }
             }
         }, //
         ;
@@ -777,6 +812,9 @@ public class SeleniumTestUI extends JFrame {
             for (int ii = 0; ii < contentLst.size(); ii++) {
                 String line = contentLst.get(ii);
                 if (StringUtils.isBlank(line)) {
+                    continue;
+                }
+                if (line.startsWith("//")) {
                     continue;
                 }
                 for (PatternEnum e : PatternEnum.values()) {
