@@ -366,9 +366,13 @@ public class SeleniumTestUI extends JFrame {
         });
         swingUtil.addActionHex("executeBtn.click", new Action() {
             Thread runnable;
+            SeleniumService mSeleniumService;
 
             private void start(String content, String driverPath) {
-                final SeleniumService mSeleniumService = new SeleniumService();
+                if (mSeleniumService != null) {
+                    mSeleniumService.stop = true;
+                }
+                mSeleniumService = new SeleniumService();
                 runnable = new Thread(new Runnable() {
                     @Override
                     public void run() {
@@ -765,6 +769,7 @@ public class SeleniumTestUI extends JFrame {
         WebDriver driver;
         Map<String, Object> elementMap = new HashMap<String, Object>();
         Map<String, String> valueMap = new HashMap<String, String>();
+        boolean stop = false;
 
         private void processContent(String text, String driverPath) {
             driver = SeleniumUtil.getInstance().getDriver(driverPath);
@@ -779,6 +784,9 @@ public class SeleniumTestUI extends JFrame {
                     if (mth.matches()) {
                         e.apply002(mth, ii + 1, this);
                     }
+                }
+                if (stop) {
+                    break;
                 }
             }
         }

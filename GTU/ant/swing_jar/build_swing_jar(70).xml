@@ -132,7 +132,7 @@
 			<packagename mode="pom" name="selenium-api-3.9.1.jar" unjar="${build_dir}">org/openqa/selenium/WebDriver</packagename>
 			<packagename mode="pom" name="selenium-chrome-driver-3.141.59.jar" unjar="${build_dir}">org/openqa/selenium/chrome/ChromeOptions</packagename>
 			<packagename mode="pom" name="selenium-remote-driver-3.9.1.jar" unjar="${build_dir}">org/openqa/selenium/remote/RemoteWebDriver</packagename>
-			<packagename mode="pom" name="" unjar="${build_dir}">org/openqa/selenium/support/ui/WebDriverWait</packagename>
+			<packagename mode="small" name="selenium-support-3.9.1.jar" unjar="${build_dir}">org/openqa/selenium/support/ui/WebDriverWait</packagename>
 			
 			
 

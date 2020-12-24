@@ -23,6 +23,7 @@ import org.apache.tools.ant.Task;
 import gtu._work.JarFinder;
 import gtu._work.JarFinder.IfMatch;
 import gtu.file.FileUtil;
+import gtu.file.OsInfoUtil;
 import gtu.maven.MavenDenpencyJarListLoader;
 import gtu.swing.util.JCommonUtil;
 import gtu.zip.ZipUtils;
@@ -238,7 +239,9 @@ public class AntJarFinder extends Task {
             File jar = searchMode.apply(sameJarList, pk, this);
 
             if (jar == null) {
-                jar = choiceCandidateJars(pk.text, sameJarList);
+                if (!OsInfoUtil.isWindows()) {
+                    jar = choiceCandidateJars(pk.text, sameJarList);
+                }
             }
 
             if (jar == null) {
