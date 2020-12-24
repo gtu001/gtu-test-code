@@ -8,6 +8,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.ElementClickInterceptedException;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.StaleElementReferenceException;
@@ -85,6 +86,12 @@ public class SeleniumUtil {
             return element.getAttribute("innerHTML");
         }
 
+        public static WebElement getParent(WebElement childElement, WebDriver driver) {
+            JavascriptExecutor executor = (JavascriptExecutor)driver;
+            WebElement parentElement = (WebElement)executor.executeScript("return arguments[0].parentNode;", childElement);
+            return parentElement;
+        }
+        
         public static String getCurrentUrl(WebDriver driver) {
             return driver.getCurrentUrl();
         }

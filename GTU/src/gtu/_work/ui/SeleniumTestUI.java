@@ -29,9 +29,11 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.JTextPane;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeListener;
 
@@ -57,6 +59,7 @@ import gtu.swing.util.JTextAreaUtil;
 import gtu.swing.util.SwingActionUtil;
 import gtu.swing.util.SwingActionUtil.Action;
 import gtu.swing.util.SwingActionUtil.ActionAdapter;
+import gtu.swing.util.TextLineNumber;
 import gtu.yaml.util.YamlUtilBean;
 
 public class SeleniumTestUI extends JFrame {
@@ -82,6 +85,7 @@ public class SeleniumTestUI extends JFrame {
     private JTextField scriptNameText;
     private JButton executeBtn;
     private JLabel lblNewLabel;
+    private JLabel lineNumberLbl;
     private MyConfig mMyConfig;
     private PropertiesUtilBean config = new PropertiesUtilBean(SeleniumTestUI.class);
     private JLabel lblDriver;
@@ -178,6 +182,9 @@ public class SeleniumTestUI extends JFrame {
         panel_7 = new JPanel();
         panel_1.add(panel_7, BorderLayout.NORTH);
 
+        lineNumberLbl = new JLabel("");
+        panel_7.add(lineNumberLbl);
+
         lblNewLabel = new JLabel("腳本名稱");
         panel_7.add(lblNewLabel);
 
@@ -215,7 +222,7 @@ public class SeleniumTestUI extends JFrame {
         JTextAreaUtil.applyEnterKeyFixPosition(scriptArea);
         JTextAreaUtil.applyTabKey(scriptArea);
 
-        panel_1.add(JCommonUtil.createScrollComponent(scriptArea), BorderLayout.CENTER);
+        panel_1.add(JTextAreaUtil.createLineNumberWrap(scriptArea), BorderLayout.CENTER);
 
         panel_2 = new JPanel();
         tabbedPane.addTab("其他設定", null, panel_2, null);
@@ -374,7 +381,12 @@ public class SeleniumTestUI extends JFrame {
                 if (mSeleniumService != null) {
                     mSeleniumService.stop = true;
                 }
-                mSeleniumService = new SeleniumService();
+                mSeleniumService = new SeleniumService() {
+                    @Override
+                    void setCurrentLineNumber(int lineNumber) {
+                        lineNumberLbl.setText("" + lineNumber);
+                    }
+                };
                 runnable = new Thread(new Runnable() {
                     @Override
                     public void run() {
@@ -472,7 +484,7 @@ public class SeleniumTestUI extends JFrame {
                     System.out.println("找不到元素 : " + word1 + "\t" + word2);
                     return;
                 }
-                System.out.println("宣告元素 : " + var + " 長" + desc);
+                System.out.println("宣告元素 : " + var + " -" + desc);
                 self.elementMap.put(var, elements);
             }
         }, //
@@ -746,7 +758,7 @@ public class SeleniumTestUI extends JFrame {
                 System.out.println("################");
             }
         }, //
-        PAGE_HTML(Pattern.compile("pageHtml\\(\\)")) {
+        SAVE_HTML(Pattern.compile("savehtml\\(\\)", Pattern.CASE_INSENSITIVE)) {
             @Override
             void apply001(Matcher mth, int lineNumber, SeleniumService self) {
                 String htmlContent = self.driver.getPageSource();
@@ -766,8 +778,9 @@ public class SeleniumTestUI extends JFrame {
                     } else if (fetchVal instanceof WebElement) {
                         WebElement element = (WebElement) fetchVal;
                         System.out.println("################");
-                        String html = SeleniumUtil.WebElementControl.getHtml(element);
-                        System.out.println();
+                        WebElement parent = SeleniumUtil.WebElementControl.getParent(element, self.driver);
+                        String html = SeleniumUtil.WebElementControl.getHtml(parent);
+                        System.out.println(html);
                         File saveFile = new File(FileUtil.DESKTOP_DIR, SeleniumTestUI.class.getSimpleName() + "_" + DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMddHHmmss") + ".txt");
                         FileUtil.saveToFile(saveFile, html, "UTF8");
                         System.out.println("################");
@@ -798,7 +811,9 @@ public class SeleniumTestUI extends JFrame {
         abstract void apply001(Matcher mth, int lineNumber, SeleniumService self) throws Exception;
     }
 
-    private class SeleniumService {
+    private abstract class SeleniumService {
+        abstract void setCurrentLineNumber(int lineNumber);
+
         SimpleDateFormat SDF = new SimpleDateFormat("yyyy/MM/dd");
         SimpleDateFormat TW_SDF = new SimpleDateFormat("/MM/dd");
         WebDriver driver;
@@ -811,6 +826,7 @@ public class SeleniumTestUI extends JFrame {
             List<String> contentLst = StringUtil_.readContentToList(text, true, false, false);
             for (int ii = 0; ii < contentLst.size(); ii++) {
                 String line = contentLst.get(ii);
+                setCurrentLineNumber(ii + 1);
                 if (StringUtils.isBlank(line)) {
                     continue;
                 }

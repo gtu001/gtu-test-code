@@ -26,6 +26,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.swing.JLabel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
@@ -53,6 +54,13 @@ import gtu.log.PrintStreamAdapter;
 import gtu.string.StringLineNumberHandler;
 
 public class JTextAreaUtil {
+
+    public static JScrollPane createLineNumberWrap(JTextComponent textPane) {
+        JScrollPane scrollPane = new JScrollPane(textPane);
+        TextLineNumber tln = new TextLineNumber(textPane);
+        scrollPane.setRowHeaderView(tln);
+        return scrollPane;
+    }
 
     /**
      * 建立自動換行, 只有垂直卷軸, warp行的textarea
@@ -661,7 +669,7 @@ public class JTextAreaUtil {
             }
         });
     }
-    
+
     public static void main(String[] args) {
     }
 }
