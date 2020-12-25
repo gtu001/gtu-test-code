@@ -106,7 +106,7 @@ public class YamlMapUtil {
                                 }
                             }
                         } catch (Exception e) {
-                            System.err.println("saveToFilePlain , field : " + d.getName() + " , ERR : " + e.getMessage());
+                            throw new RuntimeException("saveToFilePlain , field : " + d.getName() + " , ERR : " + e.getMessage(), e);
                         }
                     }
                 } catch (Exception e1) {
