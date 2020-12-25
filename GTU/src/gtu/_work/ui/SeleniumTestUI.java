@@ -187,7 +187,7 @@ public class SeleniumTestUI extends JFrame {
 
         lineNumberLbl = new JLabel("");
         panel_7.add(lineNumberLbl);
-        
+
         pauseBtn = JToggleButtonUtil.createSimpleButton("pause", "continue", false, null);
         panel_7.add(pauseBtn);
 
@@ -373,7 +373,7 @@ public class SeleniumTestUI extends JFrame {
                 String title = JCommonUtil.isBlankErrorMsg(scriptNameText, "標題必須輸入");
                 String content = JCommonUtil.isBlankErrorMsg(scriptArea, "腳本必須輸入");
 
-                mSeleniumScript.title = title;
+                mSeleniumScript.title = StringUtils.trimToEmpty(title);
                 mSeleniumScript.content = content;
 
                 mMyConfig.save(mSeleniumScript);
@@ -401,6 +401,20 @@ public class SeleniumTestUI extends JFrame {
                     @Override
                     boolean isPause() {
                         return pauseBtn.isSelected();
+                    }
+
+                    @Override
+                    void Goto(String title, SeleniumService self) {
+                        DefaultListModel model = (DefaultListModel) scriptList.getModel();
+                        for (int ii = 0; ii < model.getSize(); ii++) {
+                            SeleniumScript mSeleniumScript = (SeleniumScript) model.getElementAt(ii);
+                            if (StringUtils.equals(StringUtils.trimToEmpty(mSeleniumScript.title), StringUtils.trimToEmpty(title))) {
+                                scriptNameText.setText(mSeleniumScript.title);
+                                scriptArea.setText(mSeleniumScript.content);
+                                self.ii = 0;
+                                break;
+                            }
+                        }
                     }
                 };
                 runnable = new Thread(new Runnable() {
@@ -537,9 +551,10 @@ public class SeleniumTestUI extends JFrame {
                 String var = mth.group(1);
                 String value = mth.group(2);
                 if (self.elementMap.containsKey(var)) {
-                    System.out.println("設值 : " + var + " = " + value);
+                    String afterValue = PatternEnum.parseValue(value, self);
+                    System.out.println("設值 : " + var + " = " + afterValue);
                     WebElement element = (WebElement) self.elementMap.get(var);
-                    SeleniumUtil.WebElementControl.setValue(element, value);
+                    SeleniumUtil.WebElementControl.setValue(element, afterValue);
                 } else {
                     System.out.println("行:" + lineNumber + ", 找不到元素:" + var);
                 }
@@ -765,28 +780,38 @@ public class SeleniumTestUI extends JFrame {
                     Object fetchVal = self.elementMap.get(key);
                     if (fetchVal instanceof List) {
                         List<WebElement> elements = (List<WebElement>) fetchVal;
-                        System.out.println("\t" + key + "\tList-" + elements.size());
+                        System.out.println("\t" + key + "\tList----------start " + elements.size());
+                        for (int ii = 0; ii < elements.size(); ii++) {
+                            WebElement w = elements.get(ii);
+                            System.out.println("\t" + w.getTagName() + "[id=" + w.getAttribute("id") + ", name=" + w.getAttribute("name") + "]");
+                        }
+                        System.out.println("\t" + key + "\tList----------end   " + elements.size());
                     } else if (fetchVal instanceof WebElement) {
-                        WebElement element = (WebElement) fetchVal;
-                        System.out.println("\t" + key + "\tNode");
+                        WebElement w = (WebElement) fetchVal;
+                        System.out.println("\t" + key + "\tNode : " + w.getTagName() + "[id=" + w.getAttribute("id") + ", name=" + w.getAttribute("name") + "]");
                     }
                 }
                 System.out.println("################");
             }
         }, //
-        SAVE_HTML(Pattern.compile("savehtml\\(\\)", Pattern.CASE_INSENSITIVE)) {
+        SAVE_HTML(Pattern.compile("savehtml\\((\\w*)\\)", Pattern.CASE_INSENSITIVE)) {
             @Override
             void apply001(Matcher mth, int lineNumber, SeleniumService self) {
+                String var1 = mth.group(1);
                 String htmlContent = self.driver.getPageSource();
                 File saveFile = new File(FileUtil.DESKTOP_DIR, SeleniumTestUI.class.getSimpleName() + "_" + DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMddHHmmss") + ".txt");
+                if (StringUtils.isNotBlank(var1)) {
+                    saveFile = new File(FileUtil.DESKTOP_DIR, SeleniumTestUI.class.getSimpleName() + "_" + var1 + ".txt");
+                }
                 FileUtil.saveToFile(saveFile, htmlContent, "UTF8");
                 System.out.println("存檔 : " + saveFile);
             }
         }, //
-        HTML(Pattern.compile("(\\w+)\\.html\\(\\)")) {
+        HTML(Pattern.compile("(\\w+)\\.html\\((\\w*)\\)")) {
             @Override
             void apply001(Matcher mth, int lineNumber, SeleniumService self) {
                 String var1 = mth.group(1);
+                String var2 = mth.group(2);
                 if (self.elementMap.containsKey(var1)) {
                     Object fetchVal = self.elementMap.get(var1);
                     if (fetchVal instanceof List) {
@@ -798,11 +823,72 @@ public class SeleniumTestUI extends JFrame {
                         String html = SeleniumUtil.WebElementControl.getHtml(parent);
                         System.out.println(html);
                         File saveFile = new File(FileUtil.DESKTOP_DIR, SeleniumTestUI.class.getSimpleName() + "_" + DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMddHHmmss") + ".txt");
+                        if (StringUtils.isNotBlank(var2)) {
+                            saveFile = new File(FileUtil.DESKTOP_DIR, SeleniumTestUI.class.getSimpleName() + "_" + var2 + ".txt");
+                        }
                         FileUtil.saveToFile(saveFile, html, "UTF8");
                         System.out.println("################");
                     }
                 } else {
                     System.out.println("找不到元素 : " + var1);
+                }
+            }
+        }, //
+        SWITCH_TO(Pattern.compile("switchTo\\((.*)\\)")) {
+            @Override
+            void apply001(Matcher mth, int lineNumber, SeleniumService self) {
+                String var1 = mth.group(1);
+                String type = "";
+                String val = "";
+                if (var1.contains("=")) {
+                    String[] ary = var1.split("=", -1);
+                    type = StringUtils.trimToEmpty(ary[0]);
+                    val = StringUtils.trimToEmpty(ary[1]);
+                } else {
+                    type = StringUtils.trimToEmpty(var1);
+                }
+                if ("index".equalsIgnoreCase(type)) {
+                    int index = Integer.parseInt(val);
+                    System.out.println("switch to index = " + index);
+                    SeleniumUtil.WebElementControl.switchTo(self.driver, false, index, null, null);
+                } else if ("nameOrId".equalsIgnoreCase(type)) {
+                    System.out.println("switch to nameOrId = " + val);
+                    SeleniumUtil.WebElementControl.switchTo(self.driver, false, null, val, null);
+                } else if ("element".equalsIgnoreCase(type)) {
+                    System.out.println("switch to element = " + val);
+                    if (self.elementMap.containsKey(val)) {
+                        WebElement element = (WebElement) self.elementMap.get(val);
+                        SeleniumUtil.WebElementControl.switchTo(self.driver, false, null, null, element);
+                    }
+                } else {
+                    System.out.println("switch to default");
+                    SeleniumUtil.WebElementControl.switchTo(self.driver, true, null, null, null);
+                }
+            }
+        }, //
+        PRINT(Pattern.compile("print\\((.*)\\)")) {
+            @Override
+            void apply001(Matcher mth, int lineNumber, SeleniumService self) {
+                String var1 = mth.group(1);
+                System.out.println(var1);
+            }
+        }, //
+        PROMPT(Pattern.compile("(\\w+)\\s*\\=\\s*prompt\\(\\)")) {
+            @Override
+            void apply001(Matcher mth, int lineNumber, SeleniumService self) {
+                String var1 = mth.group(1);
+                String var2 = JCommonUtil._jOptionPane_showInputDialog("請輸入變數 :" + var1);
+                self.valueMap.put(var1, var2);
+                System.out.println("設定變數 : " + var1 + "\t" + var2);
+            }
+        }, //
+        GOTO(Pattern.compile("GOTO\\((\\w+)\\)")) {
+            @Override
+            void apply001(Matcher mth, int lineNumber, SeleniumService self) {
+                String var1 = mth.group(1);
+                if (StringUtils.isNotBlank(var1)) {
+                    System.out.println("Goto 前往 title :" + var1);
+                    self.Goto(var1, self);
                 }
             }
         }, //
@@ -812,6 +898,22 @@ public class SeleniumTestUI extends JFrame {
 
         PatternEnum(Pattern ptn) {
             this.ptn = ptn;
+        }
+
+        private static String parseValue(String value, SeleniumService self) {
+            Pattern ptn = Pattern.compile("\\$\\{(\\w+)\\}");
+            Matcher mth = ptn.matcher(value);
+            StringBuffer sb = new StringBuffer();
+            while (mth.find()) {
+                String value1 = mth.group();
+                String key = mth.group(1);
+                if (self.valueMap.containsKey(key)) {
+                    value1 = self.valueMap.get(key);
+                }
+                mth.appendReplacement(sb, value1);
+            }
+            mth.appendTail(sb);
+            return sb.toString();
         }
 
         public void apply002(Matcher mth, int lineNumber, SeleniumService self) {
@@ -832,7 +934,11 @@ public class SeleniumTestUI extends JFrame {
 
         abstract List<String> getContent();
 
+        abstract void Goto(String title, SeleniumService self);
+
         abstract boolean isPause();
+
+        int ii = 0;
 
         SimpleDateFormat SDF = new SimpleDateFormat("yyyy/MM/dd");
         SimpleDateFormat TW_SDF = new SimpleDateFormat("/MM/dd");
@@ -843,7 +949,7 @@ public class SeleniumTestUI extends JFrame {
 
         private void processContent(String text, String driverPath) {
             driver = SeleniumUtil.getInstance().getDriver(driverPath);
-            int ii = 0;
+            ii = 0;
             for (;;) {
                 List<String> contentLst = getContent();
                 if (ii > contentLst.size() - 1) {

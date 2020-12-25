@@ -86,12 +86,6 @@ public class SeleniumUtil {
             return element.getAttribute("innerHTML");
         }
 
-        public static WebElement getParent(WebElement childElement, WebDriver driver) {
-            JavascriptExecutor executor = (JavascriptExecutor)driver;
-            WebElement parentElement = (WebElement)executor.executeScript("return arguments[0].parentNode;", childElement);
-            return parentElement;
-        }
-        
         public static String getCurrentUrl(WebDriver driver) {
             return driver.getCurrentUrl();
         }
@@ -150,6 +144,24 @@ public class SeleniumUtil {
                 } catch (ElementClickInterceptedException ex) {
                     _TimeSleep_(1000);
                 }
+            }
+        }
+        
+        public static WebElement getParent(WebElement childElement, WebDriver driver) {
+            JavascriptExecutor executor = (JavascriptExecutor)driver;
+            WebElement parentElement = (WebElement)executor.executeScript("return arguments[0].parentNode;", childElement);
+            return parentElement;
+        }
+
+        public static void switchTo(WebDriver driver, boolean defaultContent, Integer index, String nameOrId, WebElement element) {
+            if (defaultContent) {
+                driver.switchTo().defaultContent();
+            } else if (index != null) {
+                driver.switchTo().frame(index);
+            } else if (nameOrId != null) {
+                driver.switchTo().frame(nameOrId);
+            } else if (element != null) {
+                driver.switchTo().frame(element);
             }
         }
 
