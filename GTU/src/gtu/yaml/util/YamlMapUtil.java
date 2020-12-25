@@ -106,7 +106,7 @@ public class YamlMapUtil {
                                 }
                             }
                         } catch (Exception e) {
-                            throw new RuntimeException("saveToFilePlain , field : " + d.getName() + " , ERR : " + e.getMessage(), e);
+                            System.err.println("saveToFilePlain , field : " + d.getName() + " , ERR : " + e.getMessage());
                         }
                     }
                 } catch (Exception e1) {
@@ -115,7 +115,7 @@ public class YamlMapUtil {
             }
         }
         new PlainSetter().go1(targetObj);
-        saveToFile(file, targetObj, append);
+        this.saveToFile(file, targetObj, append);
     }
 
     public <T> T loadFromFile(InputStream inputStream, Class<?> clz, Map<String, Class<?>> classMap) {
