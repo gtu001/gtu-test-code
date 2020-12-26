@@ -48,7 +48,6 @@ public class ImagesViewerUI extends JFrame {
     private HideInSystemTrayHelper hideInSystemTrayHelper;
     private JFrameRGBColorPanel jFrameRGBColorPanel;
     private SwingActionUtil swingUtil;
-    private String[] args;
     private JPanel panel_3;
     private JPanel panel_4;
     private JPanel panel_5;
@@ -67,7 +66,7 @@ public class ImagesViewerUI extends JFrame {
             public void run() {
                 try {
                     ImagesViewerUI frame = new ImagesViewerUI();
-                    frame.args = args;
+                    frame.applyArgs(args);
                     gtu.swing.util.JFrameUtil.setVisible(true, frame);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -121,16 +120,6 @@ public class ImagesViewerUI extends JFrame {
         {
             mShowImageHandler = new ShowImageHandler();
 
-            if (this.args != null && this.args.length != 0) {
-                for (String str : this.args) {
-                    File file = new File(str);
-                    if (file.exists()) {
-                        mShowImageHandler.apply(file);
-                        break;
-                    }
-                }
-            }
-
             // jframe resize
             this.addComponentListener(new ComponentAdapter() {
                 public void componentResized(ComponentEvent evt) {
@@ -161,6 +150,18 @@ public class ImagesViewerUI extends JFrame {
             this.applyAppMenu();
             JCommonUtil.defaultToolTipDelay();
             this.setTitle("You Set My World On Fire");
+        }
+    }
+
+    public void applyArgs(String[] args) {
+        if (args != null && args.length != 0) {
+            for (String str : args) {
+                File file = new File(str);
+                if (file.exists()) {
+                    mShowImageHandler.apply(file);
+                    break;
+                }
+            }
         }
     }
 
