@@ -328,7 +328,12 @@ public class ImagesViewerUI extends JFrame {
             if (this.file != null && this.file.exists()) {
                 boolean confirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("是否刪除圖片" + file.getName(), "刪除圖片");
                 if (confirm) {
-                    FileUtil.deleteFileToRecycleBin(file);
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            FileUtil.deleteFileToRecycleBin(file);
+                        }
+                    }).start();
                     this.next();
                 }
             }
