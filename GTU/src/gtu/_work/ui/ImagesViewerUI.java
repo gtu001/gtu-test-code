@@ -3,6 +3,7 @@ package gtu._work.ui;
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.awt.Image;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
@@ -33,11 +34,13 @@ import gtu.file.FileUtil;
 import gtu.image.ImageUtil;
 import gtu.keyboard_mouse.JnativehookKeyboardMouseHelper;
 import gtu.keyboard_mouse.JnativehookKeyboardMouseHelper.MyNativeKeyAdapter;
+import gtu.runtime.DesktopUtil;
 import gtu.swing.util.HideInSystemTrayHelper;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JFrameRGBColorPanel;
 import gtu.swing.util.JFrameUtil;
 import gtu.swing.util.JMouseEventUtil;
+import gtu.swing.util.JPopupMenuUtil;
 import gtu.swing.util.SwingActionUtil;
 import gtu.swing.util.SwingActionUtil.Action;
 import gtu.swing.util.SwingActionUtil.ActionAdapter;
@@ -179,6 +182,16 @@ public class ImagesViewerUI extends JFrame {
                 if (JMouseEventUtil.buttonLeftClick(2, evt)) {
                     applyFullScreen(null);
                 }
+                if (JMouseEventUtil.buttonRightClick(1, evt)) {
+                    JPopupMenuUtil.newInstance(ImageViewLbl).applyEvent(evt)//
+                            .addJMenuItem("開啟檔案位置", new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    mShowImageHandler.showFile();
+                                }
+                            })//
+                            .show();
+                }
             }
         });
 
@@ -200,6 +213,7 @@ public class ImagesViewerUI extends JFrame {
         private BufferedImage image;
         private File currentDir;
         private List<File> currentFilesLst;
+        int currentIndex = 0;
 
         ShowImageHandler() {
         }
@@ -210,10 +224,22 @@ public class ImagesViewerUI extends JFrame {
                 JCommonUtil._jOptionPane_showMessageDialog_error("檔案不存在:" + file.getName());
                 return;
             }
-            this.file = file;
-            this.image = ImageUtil.getInstance().getBufferedImage(file);
-            this.currentDir = this.file.getParentFile();
-            ImagesViewerUI.this.setTitle(this.file.getName());
+            if (file.isFile()) {
+                this.file = file;
+                this.currentDir = this.file.getParentFile();
+                this.currentFilesLst = null;
+                beforeCheck();
+            } else {
+                this.currentDir = file;
+                this.currentFilesLst = null;
+                beforeCheck();
+                if (currentFilesLst != null && !currentFilesLst.isEmpty()) {
+                    this.file = currentFilesLst.get(0);
+                }
+            }
+            this.image = ImageUtil.getInstance().getBufferedImage(this.file);
+            String message = "[" + (currentIndex + 1) + "/" + currentFilesLst.size() + "]";
+            ImagesViewerUI.this.setTitle(this.file.getName() + " " + message);
         }
 
         private void beforeCheck() {
@@ -231,6 +257,14 @@ public class ImagesViewerUI extends JFrame {
                             return o1.getName().compareTo(o2.getName());
                         }
                     });
+                    if (this.file != null && this.file.exists()) {
+                        for (int ii = 0; ii < currentFilesLst.size(); ii++) {
+                            if (this.file.equals(currentFilesLst.get(ii))) {
+                                currentIndex = ii;
+                                break;
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -243,6 +277,7 @@ public class ImagesViewerUI extends JFrame {
                     if (file.equals(currentFilesLst.get(ii))) {
                         if (ii + 1 <= currentFilesLst.size() - 1) {
                             findFile = currentFilesLst.get(ii + 1);
+                            currentIndex = ii + 1;
                             break;
                         }
                     }
@@ -263,6 +298,7 @@ public class ImagesViewerUI extends JFrame {
                     if (file.equals(currentFilesLst.get(ii))) {
                         if (ii - 1 >= 0) {
                             findFile = currentFilesLst.get(ii - 1);
+                            currentIndex = ii - 1;
                             break;
                         }
                     }
@@ -297,22 +333,28 @@ public class ImagesViewerUI extends JFrame {
                 }
             }
         }
+
+        private void showFile() {
+            DesktopUtil.browseFileDirectory(file);
+        }
     }
 
     private void initKeyBoard() {
-        JnativehookKeyboardMouseHelper.getInstance().startNativeKeyboardAndMouse(new MyNativeKeyAdapter() {
+        JnativehookKeyboardMouseHelper.startNativeKeyboardAndMouse(new MyNativeKeyAdapter() {
             @Override
             public void nativeMouseReleased(NativeMouseEvent e) {
             }
 
             @Override
             public void nativeKeyReleased(NativeKeyEvent e) {
-                if (NativeKeyEvent.VC_LEFT == e.getKeyCode()) {
-                    mShowImageHandler.previous();
-                } else if (NativeKeyEvent.VC_RIGHT == e.getKeyCode()) {
-                    mShowImageHandler.next();
-                } else if (NativeKeyEvent.VC_DELETE == e.getKeyCode()) {
-                    mShowImageHandler.deleteImage();
+                if (ImagesViewerUI.this.isVisible() && JCommonUtil.isVisibleOnScreen(ImagesViewerUI.this.ImageViewLbl)) {
+                    if (NativeKeyEvent.VC_LEFT == e.getKeyCode()) {
+                        mShowImageHandler.previous();
+                    } else if (NativeKeyEvent.VC_RIGHT == e.getKeyCode()) {
+                        mShowImageHandler.next();
+                    } else if (NativeKeyEvent.VC_DELETE == e.getKeyCode()) {
+                        mShowImageHandler.deleteImage();
+                    }
                 }
             }
         });

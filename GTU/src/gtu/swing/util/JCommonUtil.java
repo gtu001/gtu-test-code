@@ -1422,6 +1422,31 @@ public class JCommonUtil {
         }
     }
 
+    public static boolean isVisibleOnScreen(Container comp1) {
+        try {
+            Point point = comp1.getLocationOnScreen();
+            return true;
+        } catch (java.awt.IllegalComponentStateException ex) {
+            if (ex.getMessage().contains("component must be showing on the screen to determine its location")) {
+                return false;
+            }
+        }
+        return false;
+    }
+
+    @Deprecated
+    private static void findChildren(Container comp1, AtomicReference<Component> focusOwner) {
+        for (int ii = 0; ii < comp1.getComponentCount(); ii++) {
+            Component comp = (Component) comp1.getComponent(ii);
+            if (comp instanceof Container) {
+                Container comp2 = (Container) comp;
+                if (comp2.getComponentCount() >= 1) {
+                    findChildren(comp2, focusOwner);
+                }
+            }
+        }
+    }
+
     public static void main(String[] args) {
         JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("<html><font color='RED'>XXXXXXX</font></html>", "AAAAA");
         System.out.println("done...");

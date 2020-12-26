@@ -109,22 +109,36 @@ public class ImageUtil {
     }
 
     public BufferedImage getBufferedImage(String resourceUrl) {
+        InputStream in = null;
         try {
-            InputStream in = this.getClass().getClassLoader().getResourceAsStream(resourceUrl);
+            in = this.getClass().getClassLoader().getResourceAsStream(resourceUrl);
             BufferedImage bufferedImage = ImageIO.read(in);
             return bufferedImage;
         } catch (Exception ex) {
             throw new RuntimeException("getBufferedImage ERR : " + ex.getMessage(), ex);
+        } finally {
+            try {
+                in.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
     public BufferedImage getBufferedImage(File file) {
+        InputStream in = null;
         try {
-            InputStream in = new FileInputStream(file);
+            in = new FileInputStream(file);
             BufferedImage bufferedImage = ImageIO.read(in);
             return bufferedImage;
         } catch (Exception ex) {
             throw new RuntimeException("getBufferedImage ERR : " + ex.getMessage(), ex);
+        } finally {
+            try {
+                in.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
