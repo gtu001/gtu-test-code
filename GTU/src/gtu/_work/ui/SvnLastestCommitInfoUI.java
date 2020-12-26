@@ -166,7 +166,7 @@ public class SvnLastestCommitInfoUI extends javax.swing.JFrame {
                                                             for (File f : list) {
                                                                 try {
                                                                     FileUtil.copyFile(f, new File(copyToDir, f.getName()));
-                                                                } catch (IOException e) {
+                                                                } catch (Exception e) {
                                                                     e.printStackTrace();
                                                                     errCount++;
                                                                     errMsg.append(f + "\n");
@@ -209,7 +209,7 @@ public class SvnLastestCommitInfoUI extends javax.swing.JFrame {
                                                                     newFile = new File(copyToDir + "/" + f.getAbsolutePath().substring(cutLength), f.getName());
                                                                     newFile.getParentFile().mkdirs();
                                                                     FileUtil.copyFile(f, newFile);
-                                                                } catch (IOException e) {
+                                                                } catch (Exception e) {
                                                                     e.printStackTrace();
                                                                     errCount++;
                                                                     errMsg.append(f + "\n");

@@ -162,7 +162,7 @@ public class RuntimeBatPromptModeUtil {
                 encode = isWindows ? "BIG5" : "UTF8";
             }
             prefix = StringUtils.isBlank(prefix) ? "tmp_" : prefix;
-
+            
             if (isWindows) {
                 String fixCommand = __fixCommand(cmd.toString());
                 String chcpMapping = getBatChcpMapping(encode);

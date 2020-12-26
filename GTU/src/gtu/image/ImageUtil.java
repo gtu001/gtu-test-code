@@ -1,7 +1,5 @@
 package gtu.image;
 
-import java.awt.Component;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
@@ -11,6 +9,7 @@ import java.awt.RenderingHints;
 import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -119,6 +118,38 @@ public class ImageUtil {
         }
     }
 
+    public BufferedImage getBufferedImage(File file) {
+        try {
+            InputStream in = new FileInputStream(file);
+            BufferedImage bufferedImage = ImageIO.read(in);
+            return bufferedImage;
+        } catch (Exception ex) {
+            throw new RuntimeException("getBufferedImage ERR : " + ex.getMessage(), ex);
+        }
+    }
+
+    public Image resizeImage(BufferedImage img, int width, int height) {
+        Image dimg = img.getScaledInstance(width, height, Image.SCALE_SMOOTH);
+        return dimg;
+    }
+
+    /**
+     * 這是*.ICO 執行檔圖示 在用
+     * 
+     * @param image
+     * @return
+     */
+    public Image getIcoImage(BufferedImage image) {
+        try {
+            Image imgData = image.getScaledInstance(32, -1, Image.SCALE_SMOOTH);
+            BufferedImage bufferedImage = new BufferedImage(imgData.getWidth(null), imgData.getHeight(null), BufferedImage.TYPE_INT_RGB);
+            bufferedImage.getGraphics().drawImage(imgData, 0, 0, null);
+            return imgData;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public javafx.scene.image.WritableImage getImageForJavaFx(BufferedImage capture) {
         return javafx.embed.swing.SwingFXUtils.toFXImage(capture, null);
     }
@@ -129,7 +160,7 @@ public class ImageUtil {
         frame.getContentPane().add(new JLabel(new ImageIcon(bufferedImage)));
         frame.setLocationRelativeTo(null);
         frame.pack();
-         gtu.swing.util.JFrameUtil.setVisible(true,frame);
+        gtu.swing.util.JFrameUtil.setVisible(true, frame);
     }
 
     public void showImage(Icon icon) {
@@ -138,7 +169,7 @@ public class ImageUtil {
         frame.getContentPane().add(new JLabel(icon));
         frame.setLocationRelativeTo(null);
         frame.pack();
-         gtu.swing.util.JFrameUtil.setVisible(true,frame);
+        gtu.swing.util.JFrameUtil.setVisible(true, frame);
     }
 
     public Icon imageToIcon(Image image) {
