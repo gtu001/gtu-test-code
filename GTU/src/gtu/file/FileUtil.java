@@ -753,7 +753,7 @@ public class FileUtil {
             throw new IllegalArgumentException("Delete: deletion failed");
     }
 
-    public static void deleteFileToRecycleBin(File file) {
+    public static boolean deleteFileToRecycleBin(File file) {
         boolean delResult = false;
         try {
             if (OsInfoUtil.isWindows()) {
