@@ -5,6 +5,7 @@
  */
 package gtu.file;
 
+import java.awt.TrayIcon.MessageType;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -52,6 +53,9 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import gtu.binary.StringUtil4FullChar;
 import gtu.date.DateUtil;
+import gtu.recyclebin.RecycleBinTrashcanUtil;
+import gtu.recyclebin.RecycleBinUtil_forWin;
+import gtu.swing.util.JCommonUtil;
 import sun.security.action.GetPropertyAction;
 
 /**
@@ -61,24 +65,25 @@ import sun.security.action.GetPropertyAction;
 public class FileUtil {
 
     public static void main(String[] args) {
-//        final JLabel lbl = new JLabel();
-//        JCommonUtil.applyDropFiles(lbl, new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                List<File> files = (List<File>) e.getSource();
-//                File file = files.get(0);
-//                lbl.setText(FileUtil.getSizeDescription(file.length()) + "__" + file.length());
-//            }
-//        });
-//        JFrameTest.simpleTestComponent(lbl);
-        
+        // final JLabel lbl = new JLabel();
+        // JCommonUtil.applyDropFiles(lbl, new ActionListener() {
+        // @Override
+        // public void actionPerformed(ActionEvent e) {
+        // List<File> files = (List<File>) e.getSource();
+        // File file = files.get(0);
+        // lbl.setText(FileUtil.getSizeDescription(file.length()) + "__" +
+        // file.length());
+        // }
+        // });
+        // JFrameTest.simpleTestComponent(lbl);
+
         String name = "-熊熊卓毓彤 (@beargenie) posted on Instagram- “大家端午佳節愉快❤️ 我是粽子的顏色🥰-@michelle_wu413 這次幫我染ㄧ個暖橘咖 顯白顯髮質好-@redcircle_office -頭髮長了 大家覺得我要剪短嗎？還是維持？” • Jun 25, 2020 at 10-58am UTC-_105420675_158377269137581_1579270419227492688_n.jpg";
-        
+
         name = fixName(name);
-        
+
         System.out.println("name == " + name);
         System.out.println("name == " + StringUtil4FullChar.length(name));
-        
+
         FileUtil.saveToFile(new File(FileUtil.DESKTOP_DIR, name), name, "UTF8");
 
         System.out.println(getSizeLength(8.93, "mb"));
@@ -732,20 +737,42 @@ public class FileUtil {
      * @param fileName
      *            檔案路徑
      */
-    public static void deleteFile(String fileName) {
-        File f = new File(fileName);
+    public static void deleteFile(String filePath) {
+        File f = new File(filePath);
         if (!f.exists())
-            throw new IllegalArgumentException("Delete: no such file or directory: " + fileName);
+            throw new IllegalArgumentException("Delete: no such file or directory: " + filePath);
         if (!f.canWrite())
-            throw new IllegalArgumentException("Delete: write protected: " + fileName);
+            throw new IllegalArgumentException("Delete: write protected: " + filePath);
         if (f.isDirectory()) {
             String[] files = f.list();
             if (files.length > 0)
-                throw new IllegalArgumentException("Delete: directory not empty: " + fileName);
+                throw new IllegalArgumentException("Delete: directory not empty: " + filePath);
         }
         boolean success = f.delete();
         if (!success)
             throw new IllegalArgumentException("Delete: deletion failed");
+    }
+
+    public static void deleteFileToRecycleBin(File file) {
+        boolean delResult = false;
+        try {
+            if (OsInfoUtil.isWindows()) {
+                delResult = RecycleBinUtil_forWin.moveTo(file);
+            } else {
+                delResult = RecycleBinTrashcanUtil.moveToTrashCan(file);
+                if (!delResult) {
+                    try {
+                        FileUtils.forceDelete(file);
+                        delResult = file.exists();
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return delResult;
     }
 
     /**

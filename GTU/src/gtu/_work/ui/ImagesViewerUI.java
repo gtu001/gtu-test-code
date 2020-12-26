@@ -29,6 +29,7 @@ import org.jnativehook.mouse.NativeMouseEvent;
 
 import gtu._work.ui.JMenuBarUtil.JMenuAppender;
 import gtu.constant.PatternCollection;
+import gtu.file.FileUtil;
 import gtu.image.ImageUtil;
 import gtu.keyboard_mouse.JnativehookKeyboardMouseHelper;
 import gtu.keyboard_mouse.JnativehookKeyboardMouseHelper.MyNativeKeyAdapter;
@@ -205,6 +206,7 @@ public class ImagesViewerUI extends JFrame {
 
         public void apply(File file) {
             if (file == null || !file.exists()) {
+                ImageViewLbl.setIcon(null);
                 JCommonUtil._jOptionPane_showMessageDialog_error("檔案不存在:" + file.getName());
                 return;
             }
@@ -290,9 +292,9 @@ public class ImagesViewerUI extends JFrame {
             if (this.file != null && this.file.exists()) {
                 boolean confirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("是否刪除圖片" + file.getName(), "刪除圖片");
                 if (confirm) {
-                    file.delete();
+                    FileUtil.deleteFileToRecycleBin(file);
+                    this.next();
                 }
-                this.next();
             }
         }
     }
