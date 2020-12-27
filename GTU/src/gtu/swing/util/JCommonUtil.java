@@ -1353,7 +1353,7 @@ public class JCommonUtil {
             public synchronized void drop(DropTargetDropEvent evt) {
                 try {
                     evt.acceptDrop(DnDConstants.ACTION_COPY);
-                    List<File> droppedFiles = (List<File>) evt.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
+                    List<File> droppedFiles = new ArrayList<File>((List<File>) evt.getTransferable().getTransferData(DataFlavor.javaFileListFlavor));
                     if (listener != null) {
                         listener.actionPerformed(new ActionEvent(droppedFiles, -1, "files"));
                     }

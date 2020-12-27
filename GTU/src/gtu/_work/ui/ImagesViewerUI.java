@@ -1,9 +1,9 @@
 package gtu._work.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Image;
-import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
@@ -23,6 +23,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
 
 import org.jnativehook.keyboard.NativeKeyEvent;
@@ -39,8 +40,10 @@ import gtu.swing.util.HideInSystemTrayHelper;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JFrameRGBColorPanel;
 import gtu.swing.util.JFrameUtil;
+import gtu.swing.util.JLabelUtil;
 import gtu.swing.util.JMouseEventUtil;
 import gtu.swing.util.JPopupMenuUtil;
+import gtu.swing.util.JScrollPaneUtil;
 import gtu.swing.util.SwingActionUtil;
 import gtu.swing.util.SwingActionUtil.Action;
 import gtu.swing.util.SwingActionUtil.ActionAdapter;
@@ -57,6 +60,7 @@ public class ImagesViewerUI extends JFrame {
     private JPanel panel_5;
     private JPanel panel_6;
     private JLabel ImageViewLbl;
+    private JScrollPane mImageViewLblJScrollPane;
     private ShowImageHandler mShowImageHandler;
 
     /**
@@ -110,7 +114,9 @@ public class ImagesViewerUI extends JFrame {
         panel.add(panel_6, BorderLayout.SOUTH);
 
         ImageViewLbl = new JLabel("");
-        panel.add(ImageViewLbl, BorderLayout.CENTER);
+        JLabelUtil.alignCenter(ImageViewLbl);
+        mImageViewLblJScrollPane = JCommonUtil.createScrollComponent(ImageViewLbl);
+        panel.add(mImageViewLblJScrollPane, BorderLayout.CENTER);
 
         JPanel panel_1 = new JPanel();
 
@@ -127,6 +133,7 @@ public class ImagesViewerUI extends JFrame {
             // jframe resize
             this.addComponentListener(new ComponentAdapter() {
                 public void componentResized(ComponentEvent evt) {
+                    ImageViewLbl.setPreferredSize(JScrollPaneUtil.getVisibleSize(mImageViewLblJScrollPane));
                     mShowImageHandler.showImage();
                 }
             });
@@ -135,7 +142,11 @@ public class ImagesViewerUI extends JFrame {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     List<File> files = (List<File>) e.getSource();
-                    mShowImageHandler.apply(files.get(0));
+                    if (files.size() == 1) {
+                        mShowImageHandler.apply(files.get(0), null);
+                    } else {
+                        mShowImageHandler.apply(null, files);
+                    }
                     mShowImageHandler.showImage();
                 }
             });
@@ -159,12 +170,18 @@ public class ImagesViewerUI extends JFrame {
 
     public void applyArgs(String[] args) {
         if (args != null && args.length != 0) {
+            List<File> lst = new ArrayList<File>();
             for (String str : args) {
                 File file = new File(str);
+                lst.add(file);
+            }
+            if (lst.size() == 1) {
+                File file = lst.get(0);
                 if (file.exists()) {
-                    mShowImageHandler.apply(file);
-                    break;
+                    mShowImageHandler.apply(file, null);
                 }
+            } else {
+                mShowImageHandler.apply(null, lst);
             }
         }
     }
@@ -190,6 +207,36 @@ public class ImagesViewerUI extends JFrame {
                                     mShowImageHandler.showFile();
                                 }
                             })//
+                            .addJMenuItem("符合視窗高度", new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    mShowImageHandler.setMatchHeight(true);
+                                    mShowImageHandler.showImage();
+                                }
+                            })//
+                            .addJMenuItem("符合視窗寬度", new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    mShowImageHandler.setMatchHeight(false);
+                                    mShowImageHandler.showImage();
+                                }
+                            })//
+                            .addJMenuItem("依照檔名排序", new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    mShowImageHandler.setCurrentComparator(COMPARE_BY_NAME);
+                                    mShowImageHandler.apply(null, null);
+                                    mShowImageHandler.showImage();
+                                }
+                            })//
+                            .addJMenuItem("依照修改時間排序", new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    mShowImageHandler.setCurrentComparator(COMPARE_BY_CREATETIME);
+                                    mShowImageHandler.apply(null, null);
+                                    mShowImageHandler.showImage();
+                                }
+                            })//
                             .show();
                 }
             }
@@ -208,41 +255,96 @@ public class ImagesViewerUI extends JFrame {
         }
     }
 
+    private static final Comparator<File> COMPARE_BY_NAME = new Comparator<File>() {
+        @Override
+        public int compare(File o1, File o2) {
+            return o1.getName().compareTo(o2.getName());
+        }
+    };
+
+    private static final Comparator<File> COMPARE_BY_CREATETIME = new Comparator<File>() {
+        @Override
+        public int compare(File o1, File o2) {
+            return Long.valueOf(o1.lastModified()).compareTo(o2.lastModified());
+        }
+    };
+
     private class ShowImageHandler {
         private File file;
         private BufferedImage image;
         private File currentDir;
         private List<File> currentFilesLst;
         int currentIndex = 0;
+        boolean isMatchHeight = true;
+        Comparator<File> currentComparator;
 
         ShowImageHandler() {
         }
 
-        public void apply(File file) {
-            if (file == null || !file.exists()) {
-                ImageViewLbl.setIcon(null);
-                JCommonUtil._jOptionPane_showMessageDialog_error("檔案不存在:" + file.getName());
-                return;
-            }
-            if (file.isFile()) {
-                this.file = file;
-                this.currentDir = this.file.getParentFile();
-                this.currentFilesLst = null;
-                beforeCheck();
-            } else {
-                this.currentDir = file;
-                this.currentFilesLst = null;
-                beforeCheck();
-                if (currentFilesLst != null && !currentFilesLst.isEmpty()) {
-                    this.file = currentFilesLst.get(0);
-                }
-            }
-            this.image = ImageUtil.getInstance().getBufferedImage(this.file);
-            String message = "[" + (currentIndex + 1) + "/" + currentFilesLst.size() + "]";
-            ImagesViewerUI.this.setTitle(this.file.getName() + " " + message);
+        public void setMatchHeight(boolean isMatchHeight) {
+            this.isMatchHeight = isMatchHeight;
         }
 
-        private void beforeCheck() {
+        public void setCurrentComparator(Comparator<File> currentComparator) {
+            this.currentComparator = currentComparator;
+        }
+
+        public void apply(File file, List<File> currentFileLst1) {
+            try {
+                if (currentComparator == null) {
+                    currentComparator = COMPARE_BY_NAME;
+                }
+                if (file == null && (currentFileLst1 == null || currentFileLst1.isEmpty())) {
+                    if ((this.currentFilesLst != null && !this.currentFilesLst.isEmpty())) {
+                        currentFileLst1 = this.currentFilesLst;
+                    } else {
+                        JCommonUtil._jOptionPane_showMessageDialog_error("檔案不存在");
+                        return;
+                    }
+                }
+                if (file == null && currentFileLst1 != null && !currentFileLst1.isEmpty()) {
+                    for (File tmpFile : currentFileLst1) {
+                        if (tmpFile.isFile()) {
+                            file = tmpFile.getParentFile();
+                            break;
+                        }
+                    }
+                }
+                if (!file.exists()) {
+                    file = file.getParentFile();
+                }
+                if (file.isFile()) {
+                    this.file = file;
+                    this.currentDir = this.file.getParentFile();
+                    this.currentFilesLst = null;
+                    beforeCheck(currentFileLst1);
+                } else {
+                    this.currentDir = file;
+                    this.currentFilesLst = null;
+                    beforeCheck(currentFileLst1);
+                    if (currentFilesLst != null && !currentFilesLst.isEmpty()) {
+                        this.file = currentFilesLst.get(0);
+                        this.currentIndex = 0;
+                    }
+                }
+                this.image = ImageUtil.getInstance().getBufferedImage(this.file);
+                String message = "[" + (currentIndex + 1) + "/" + currentFilesLst.size() + "]";
+                ImagesViewerUI.this.setTitle(message + " " + this.file.getName());
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                if (ex.getMessage().contains("系統找不到指定的檔案")) {
+                    if (currentFilesLst != null && !currentFilesLst.isEmpty()) {
+                        currentFilesLst.remove(this.file);
+                        this.apply(null, currentFilesLst);
+                    }
+                }
+            }
+        }
+
+        private void beforeCheck(List<File> currentFileLst1) {
+            if (currentFileLst1 != null && !currentFileLst1.isEmpty()) {
+                this.currentFilesLst = currentFileLst1;
+            }
             if (currentFilesLst == null || currentFilesLst.isEmpty()) {
                 if (this.currentDir != null) {
                     currentFilesLst = new ArrayList<File>();
@@ -251,26 +353,21 @@ public class ImagesViewerUI extends JFrame {
                             currentFilesLst.add(f);
                         }
                     }
-                    Collections.sort(currentFilesLst, new Comparator<File>() {
-                        @Override
-                        public int compare(File o1, File o2) {
-                            return o1.getName().compareTo(o2.getName());
-                        }
-                    });
-                    if (this.file != null && this.file.exists()) {
-                        for (int ii = 0; ii < currentFilesLst.size(); ii++) {
-                            if (this.file.equals(currentFilesLst.get(ii))) {
-                                currentIndex = ii;
-                                break;
-                            }
-                        }
+                }
+            }
+            Collections.sort(currentFilesLst, currentComparator);
+            if (this.file != null && this.file.exists()) {
+                for (int ii = 0; ii < currentFilesLst.size(); ii++) {
+                    if (this.file.equals(currentFilesLst.get(ii))) {
+                        currentIndex = ii;
+                        break;
                     }
                 }
             }
         }
 
         private void next() {
-            beforeCheck();
+            beforeCheck(null);
             if (currentFilesLst != null && !currentFilesLst.isEmpty()) {
                 File findFile = null;
                 for (int ii = 0; ii < currentFilesLst.size(); ii++) {
@@ -285,13 +382,13 @@ public class ImagesViewerUI extends JFrame {
                 if (findFile == null) {
                     findFile = currentFilesLst.get(0);
                 }
-                apply(findFile);
+                apply(findFile, currentFilesLst);
                 showImage();
             }
         }
 
         private void previous() {
-            beforeCheck();
+            beforeCheck(null);
             if (currentFilesLst != null && !currentFilesLst.isEmpty()) {
                 File findFile = null;
                 for (int ii = 0; ii < currentFilesLst.size(); ii++) {
@@ -306,7 +403,7 @@ public class ImagesViewerUI extends JFrame {
                 if (findFile == null) {
                     findFile = currentFilesLst.get(currentFilesLst.size() - 1);
                 }
-                apply(findFile);
+                apply(findFile, currentFilesLst);
                 showImage();
             }
         }
@@ -316,7 +413,13 @@ public class ImagesViewerUI extends JFrame {
                 return;
             }
             try {
-                Image image2 = ImageUtil.getInstance().resizeImage(image, ImageViewLbl.getWidth(), ImageViewLbl.getHeight());
+                int matchLength = ImageViewLbl.getHeight();
+                if (!isMatchHeight) {
+                    matchLength = ImageViewLbl.getWidth();
+                }
+                Image image2 = ImageUtil.getInstance().resizeImageByIndicateWH(image, isMatchHeight, matchLength);
+                // Image image2 = ImageUtil.getInstance().resizeImage(image,
+                // ImageViewLbl.getWidth(), ImageViewLbl.getHeight());
                 Icon image3 = ImageUtil.getInstance().imageToIcon(image2);
                 ImageViewLbl.setIcon(image3);
             } catch (Exception e) {
@@ -325,16 +428,31 @@ public class ImagesViewerUI extends JFrame {
         }
 
         private void deleteImage() {
-            if (this.file != null && this.file.exists()) {
+            if (this.file == null) {
+                System.out.println("刪除檔案不存在 : " + this.file);
+            } else if (this.file != null && !this.file.exists()) {
+                System.out.println("刪除檔案不存在 : " + this.file);
+                currentFilesLst.remove(this.file);
+                this.apply(null, currentFilesLst);
+                this.showImage();
+            } else if (this.file != null) {
                 boolean confirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("是否刪除圖片" + file.getName(), "刪除圖片");
                 if (confirm) {
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            FileUtil.deleteFileToRecycleBin(file);
+                            try {
+                                FileUtil.deleteFileToRecycleBin(file);
+                            } catch (Exception ex) {
+                                JCommonUtil.handleException(ex);
+                            }
                         }
                     }).start();
-                    this.next();
+                    if (this.file != null) {
+                        currentFilesLst.remove(this.file);
+                    }
+                    this.apply(null, currentFilesLst);
+                    this.showImage();
                 }
             }
         }

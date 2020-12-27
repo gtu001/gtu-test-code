@@ -117,6 +117,11 @@ public class JLabelUtil {
         });
         return lblNewLabel_6;
     }
+    
+    public static void alignCenter(JLabel label) {
+        label.setHorizontalAlignment(JLabel.CENTER);
+        label.setVerticalAlignment(JLabel.CENTER);
+    }
 
     public static void main(String[] args) {
         String lblText = JLabelUtil.getText("XXXXXX", //

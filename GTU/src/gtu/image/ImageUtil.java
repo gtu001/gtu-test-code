@@ -7,6 +7,8 @@ import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.Toolkit;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
@@ -140,6 +142,32 @@ public class ImageUtil {
                 e.printStackTrace();
             }
         }
+    }
+
+    public BufferedImage resizeImageByIndicateWH(BufferedImage bimg, boolean isMatchHeight, int matchLength) {
+        int width = bimg.getWidth();
+        int height = bimg.getHeight();
+        if (matchLength <= 0) {
+            throw new RuntimeException("長度不可小於零:" + matchLength);
+        }
+        double rate = 1;
+        if (isMatchHeight) {
+            rate = ((double) matchLength) / ((double) height);
+        } else {
+            rate = ((double) matchLength) / ((double) width);
+        }
+        width = (int) (width * rate);
+        height = (int) (height * rate);
+        return resizeImage2(bimg, width, height);
+    }
+
+    public static BufferedImage resizeImage2(BufferedImage img, int newW, int newH) {
+        Image tmp = img.getScaledInstance(newW, newH, Image.SCALE_SMOOTH);
+        BufferedImage dimg = new BufferedImage(newW, newH, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2d = dimg.createGraphics();
+        g2d.drawImage(tmp, 0, 0, null);
+        g2d.dispose();
+        return dimg;
     }
 
     public Image resizeImage(BufferedImage img, int width, int height) {
