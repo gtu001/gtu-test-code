@@ -42,8 +42,8 @@ import gtu._work.etc.EnglishTester_Diectory.WordInfo;
 public class DropboxEnglishService {
 
     private static final String TAG = DropboxEnglishService.class.getSimpleName();
-    private final static String NEW_ENGLISH_WORD_FILE = "/english_prop/new_word.txt";
-    private final static String NEW_ENGLISH_PROP_FILE = "/english_prop/new_word_%s.properties";
+    private final static String NEW_ENGLISH_WORD_FILE = "/Apps/gtu001_test/english_prop/new_word.txt";
+    private final static String NEW_ENGLISH_PROP_FILE = "/Apps/gtu001_test/english_prop/new_word_%s.properties";
 
     Context context;
     EnglishwordInfoDAO englishwordInfoDAO;

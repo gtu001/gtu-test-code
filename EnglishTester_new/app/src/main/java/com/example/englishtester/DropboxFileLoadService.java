@@ -35,7 +35,7 @@ import java.util.concurrent.TimeUnit;
 public class DropboxFileLoadService implements IDropboxFileLoadService {
 
     private static final String TAG = DropboxFileLoadService.class.getSimpleName();
-    private final static String ENGLISH_TXT_FOLDER = "/english_txt";
+    private final static String ENGLISH_TXT_FOLDER = "/Apps/gtu001_test/english_txt";
 
     Context context;
     String accessToken;
