@@ -27,7 +27,10 @@ public class RecycleBinUtil_forWin {
                 System.out.println(resultStr);
                 return resultCode == 0;
             } catch (Exception e) {
-                Thread.currentThread().sleep(500);
+                try {
+                    Thread.currentThread().sleep(500);
+                } catch (InterruptedException e1) {
+                }
             }
         }
         return false;
