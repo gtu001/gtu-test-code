@@ -238,6 +238,7 @@ public class ImagesViewerUI extends JFrame {
                             .addJMenuItem("依照檔名排序[重新整理]", new ActionListener() {
                                 @Override
                                 public void actionPerformed(ActionEvent e) {
+                                    mShowImageHandler.currentFilesLst = null;
                                     mShowImageHandler.setCurrentComparator(COMPARE_BY_NAME);
                                     mShowImageHandler.apply(null, null);
                                     mShowImageHandler.showImage();
@@ -246,6 +247,7 @@ public class ImagesViewerUI extends JFrame {
                             .addJMenuItem("依照修改時間排序[重新整理]", new ActionListener() {
                                 @Override
                                 public void actionPerformed(ActionEvent e) {
+                                    mShowImageHandler.currentFilesLst = null;
                                     mShowImageHandler.setCurrentComparator(COMPARE_BY_CREATETIME);
                                     mShowImageHandler.apply(null, null);
                                     mShowImageHandler.showImage();
