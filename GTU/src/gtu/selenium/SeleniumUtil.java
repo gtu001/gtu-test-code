@@ -16,6 +16,8 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.interactions.Action;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -66,7 +68,25 @@ public class SeleniumUtil {
     public static class WebElementControl {
 
         public static void setValue(WebElement element, String value) {
-            element.sendKeys(value);
+            setValue(element, value, null);
+        }
+
+        public static void setValue(WebElement element, String value, WebDriver driver) {
+            for (int i = 0; i < 2; i++) {
+                try {
+                    element.sendKeys(value);
+                    break;
+                } catch (org.openqa.selenium.ElementNotInteractableException ex) {
+                    // element not interactable
+                    if (driver != null) {
+                        Actions builder = new Actions(driver);
+                        // builder.moveToElement(element);
+                        builder.sendKeys(value);
+                        Action selected = builder.build();
+                        selected.perform();
+                    }
+                }
+            }
         }
 
         public static String getValue(WebElement element) {
@@ -146,10 +166,10 @@ public class SeleniumUtil {
                 }
             }
         }
-        
+
         public static WebElement getParent(WebElement childElement, WebDriver driver) {
-            JavascriptExecutor executor = (JavascriptExecutor)driver;
-            WebElement parentElement = (WebElement)executor.executeScript("return arguments[0].parentNode;", childElement);
+            JavascriptExecutor executor = (JavascriptExecutor) driver;
+            WebElement parentElement = (WebElement) executor.executeScript("return arguments[0].parentNode;", childElement);
             return parentElement;
         }
 

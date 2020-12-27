@@ -570,7 +570,7 @@ public class SeleniumTestUI extends JFrame {
                 if (self.elementMap.containsKey(var)) {
                     System.out.println("設值 : " + var + " = " + value);
                     WebElement element = (WebElement) self.elementMap.get(var);
-                    SeleniumUtil.WebElementControl.setValue(element, value);
+                    SeleniumUtil.WebElementControl.setValue(element, value, self.driver);
                 } else {
                     System.out.println("行:" + lineNumber + ", 找不到元素:" + var);
                 }
@@ -643,6 +643,44 @@ public class SeleniumTestUI extends JFrame {
                     element.click();
                 } else {
                     System.out.println("行:" + lineNumber + ", 找不到元素:" + var);
+                }
+            }
+        }, //
+        CLICK_UNTIL(Pattern.compile("click\\((.+)\\)")) {
+            @Override
+            void apply001(Matcher mth, int lineNumber, SeleniumService self) {
+                String var = mth.group(1);
+                boolean clickSuccess = false;
+                if (var.contains(",")) {
+                    String[] arry = var.split(",", -1);
+                    String type = StringUtils.trimToEmpty(arry[0]);
+                    String express = StringUtils.trimToEmpty(arry[0]);
+                    if ("css".equalsIgnoreCase(type)) {
+                        SeleniumUtil.WebElementControl.clickUntil(self.driver, null, express);
+                        clickSuccess = true;
+                    } else if ("xpath".equalsIgnoreCase(type)) {
+                        SeleniumUtil.WebElementControl.clickUntil(self.driver, express, null);
+                        clickSuccess = true;
+                    }
+                }
+                if (!clickSuccess) {
+                    System.out.println("未能符合語法!");
+                }
+            }
+        }, //
+        PAUSE(Pattern.compile("pause\\((.*)\\)")) {
+            @Override
+            void apply001(Matcher mth, int lineNumber, SeleniumService self) {
+                String var = mth.group(1);
+                if (StringUtils.isBlank(var)) {
+                    var = "是否繼續?";
+                }
+                while (!JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption(var, "繼續執行:" + lineNumber)) {
+                    System.out.println("未按下繼續...");
+                    try {
+                        Thread.currentThread().sleep(1000);
+                    } catch (InterruptedException e) {
+                    }
                 }
             }
         }, //
