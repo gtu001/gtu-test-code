@@ -254,7 +254,7 @@ public class SeleniumTestUI extends JFrame {
             applyAllEvents();
 
             JCommonUtil.setJFrameCenter(this);
-            JCommonUtil.setJFrameIcon(this, "resource/images/ico/tk_aiengine.ico");
+            JCommonUtil.setJFrameIcon(this, "resource/images/ico/google.ico");
             hideInSystemTrayHelper = HideInSystemTrayHelper.newInstance();
             hideInSystemTrayHelper.apply(this);
             jFrameRGBColorPanel = new JFrameRGBColorPanel(this);
