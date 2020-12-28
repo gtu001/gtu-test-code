@@ -84,15 +84,19 @@ public class JavaFxMergeToSwing {
         protected abstract void appendToJFrame(Container frame, JFXPanel fxPanel);
 
         public void execute(Container jframe) {
-            final JFXPanel fxPanel = new JFXPanel();
-            this.appendToJFrame(jframe, fxPanel);
-            Platform.runLater(new Runnable() {
-                @Override
-                public void run() {
-                    Scene scene = JFXPanelToSwing.this.createScene(fxPanel);
-                    fxPanel.setScene(scene);
-                }
-            });
+            try {
+                final JFXPanel fxPanel = new JFXPanel();
+                this.appendToJFrame(jframe, fxPanel);
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        Scene scene = JFXPanelToSwing.this.createScene(fxPanel);
+                        fxPanel.setScene(scene);
+                    }
+                });
+            } catch (Throwable ex) {
+                ex.printStackTrace();
+            }
         }
     }
 
