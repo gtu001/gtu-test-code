@@ -10,6 +10,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 import gtu.javafx.mp4player.MediaControl;
 import gtu.swing.util.JCommonUtil;
@@ -28,15 +29,16 @@ public class JavaFxMergeToSwing {
 
     public static void main(String[] args) {
         // 範例一
-        // SwingUtilities.invokeLater(new Runnable() {
-        // @Override
-        // public void run() {
-        // JavaFxMergeToSwing.initAndShowGUI();
-        // }
-        // });
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                JavaFxMergeToSwing.initAndShowGUI();
+            }
+        });
+    }
 
+    private void ______test_moviePlayer() {
         final AtomicReference<Scene> scene1 = new AtomicReference<Scene>();
-
         JFrame jframe = new JFrame("測試元件");
         jframe.setSize(500, 300);// 寬 高
         jframe.setLocationRelativeTo(null);
@@ -72,31 +74,58 @@ public class JavaFxMergeToSwing {
 
             @Override
             public void appendToJFrame(Container frame, JFXPanel fxPanel) {
-                jframe.add(JCommonUtil.createScrollComponent(fxPanel), BorderLayout.CENTER);
+                jframe.add(fxPanel, BorderLayout.CENTER);
             }
         };
         mJFXPanelToSwing.execute(jframe);
     }
 
     public static abstract class JFXPanelToSwing {
+        Container container;
+        JFXPanel fxPanel;
+        Scene scene;
+
         protected abstract Scene createScene(JFXPanel fxPanel);
 
-        protected abstract void appendToJFrame(Container frame, JFXPanel fxPanel);
+        protected abstract void appendToJFrame(Container container, JFXPanel fxPanel);
 
         public void execute(Container jframe) {
+            this.container = jframe;
+            if (this.fxPanel == null) {
+                this.fxPanel = new JFXPanel();
+            }
             try {
-                final JFXPanel fxPanel = new JFXPanel();
                 this.appendToJFrame(jframe, fxPanel);
                 Platform.runLater(new Runnable() {
                     @Override
                     public void run() {
-                        Scene scene = JFXPanelToSwing.this.createScene(fxPanel);
+                        scene = JFXPanelToSwing.this.createScene(fxPanel);
                         fxPanel.setScene(scene);
                     }
                 });
             } catch (Throwable ex) {
                 ex.printStackTrace();
             }
+        }
+
+        public javafx.scene.Parent getRoot() {
+            return scene.getRoot();
+        }
+
+        public void setRoot(javafx.scene.Parent root) {
+            scene.setRoot(root);
+        }
+
+        public Scene getScene() {
+            return scene;
+        }
+
+        public Container getContainer() {
+            return container;
+        }
+
+        public JFXPanel getFxPanel() {
+            return fxPanel;
         }
     }
 

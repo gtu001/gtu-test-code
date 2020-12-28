@@ -3,6 +3,7 @@ package gtu.keyboard_mouse;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.apache.commons.lang.StringUtils;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
 import org.jnativehook.keyboard.NativeKeyAdapter;
@@ -48,6 +49,17 @@ public class JnativehookKeyboardMouseHelper {
         } catch (NativeHookException ex) {
             JCommonUtil.handleException(ex);
         }
+    }
+
+    /**
+     * 判斷Mask按鈕是否有按
+     */
+    public static boolean isMaskKeyPress(NativeKeyEvent e, String type) {
+        type = StringUtils.trimToEmpty(type);
+        boolean shiftChk = type.toLowerCase().contains("s") ? (e.getModifiers() & NativeKeyEvent.ALT_MASK) != 0 : true;
+        boolean altChk = type.toLowerCase().contains("a") ? (e.getModifiers() & NativeKeyEvent.ALT_MASK) != 0 : true;
+        boolean ctrlChk = type.toLowerCase().contains("c") ? (e.getModifiers() & NativeKeyEvent.CTRL_MASK) != 0 : true;
+        return shiftChk && ctrlChk && altChk;
     }
 
     public static void removeNativeKeyboardAndMouse() {

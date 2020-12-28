@@ -1,5 +1,7 @@
 package gtu.javafx.mp4player;
 
+import java.io.File;
+
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
@@ -15,6 +17,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
+import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaPlayer.Status;
 import javafx.scene.media.MediaView;
@@ -30,20 +33,22 @@ public class MediaControl extends BorderPane {
     boolean repeat;
     Slider timeSlider;
     Label playTime;
-
+    StackPane mvPane;
     Slider volumeSlider;
 
     public MediaControl(MediaPlayer mp) {
         this.mp = mp;
         setStyle("-fx-background-color: #bfc2c7;");
         mediaView = new MediaView(mp);
-        StackPane mvPane = new StackPane() {
+        mvPane = new StackPane() {
         };
 
         mvPane.getChildren().add(mediaView);
         mvPane.setStyle("-fx-background-color: black;");
+
         mediaView.fitWidthProperty().bind(mvPane.widthProperty());
         mediaView.fitHeightProperty().bind(mvPane.heightProperty());
+
         mediaView.setPreserveRatio(true);
         setCenter(mvPane);
 
@@ -174,6 +179,28 @@ public class MediaControl extends BorderPane {
         setBottom(mediaBar);
     }
 
+    public void forwardOrBackward(long addValue) {
+        Duration duration = mp.getCurrentTime();
+        Duration newDuration = Duration.millis(duration.toMillis() + addValue);
+        mp.seek(newDuration);
+    }
+
+    public void playPauseClicked() {
+        Status status = mp.getStatus();
+        if (status == Status.UNKNOWN || status == Status.HALTED) {
+            return;
+        }
+        if (status == Status.PAUSED || status == Status.READY || status == Status.STOPPED) {
+            if (atEndOfMedia) {
+                mp.seek(mp.getStartTime());
+                atEndOfMedia = false;
+            }
+            mp.play();
+        } else {
+            mp.pause();
+        }
+    }
+
     protected void updateValues() {
         if (playTime != null && timeSlider != null && volumeSlider != null) {
             Platform.runLater(new Runnable() {
@@ -222,5 +249,19 @@ public class MediaControl extends BorderPane {
                 return String.format("%02d:%02d", elapsedMinutes, elapsedSeconds);
             }
         }
+    }
+
+    public void stop() {
+        this.mp.stop();
+    }
+
+    public void dispose() {
+        this.mp.stop();
+        this.mp.setOnEndOfMedia(new Runnable() {
+            @Override
+            public void run() {
+                mp.dispose();
+            }
+        });
     }
 }
