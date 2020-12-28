@@ -1,6 +1,7 @@
 package gtu.javafx;
 
 import java.awt.BorderLayout;
+import java.awt.Container;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
@@ -63,27 +64,26 @@ public class JavaFxMergeToSwing {
 
         JFXPanelToSwing mJFXPanelToSwing = new JFXPanelToSwing() {
             @Override
-            Scene createScene(JFXPanel fxPanel) {
-                Scene scene = new Scene(new Pane(), Color.ALICEBLUE);
+            public Scene createScene(JFXPanel fxPanel) {
+                Scene scene = new Scene(new Pane(), javafx.scene.paint.Color.ALICEBLUE);
                 scene1.set(scene);
                 return scene;
             }
 
             @Override
-            void appendToJFrame(JFrame frame, JFXPanel fxPanel) {
+            public void appendToJFrame(Container frame, JFXPanel fxPanel) {
                 jframe.add(JCommonUtil.createScrollComponent(fxPanel), BorderLayout.CENTER);
             }
         };
-
         mJFXPanelToSwing.execute(jframe);
     }
 
     public static abstract class JFXPanelToSwing {
-        abstract Scene createScene(JFXPanel fxPanel);
+        protected abstract Scene createScene(JFXPanel fxPanel);
 
-        abstract void appendToJFrame(JFrame frame, JFXPanel fxPanel);
+        protected abstract void appendToJFrame(Container frame, JFXPanel fxPanel);
 
-        public void execute(JFrame jframe) {
+        public void execute(Container jframe) {
             final JFXPanel fxPanel = new JFXPanel();
             this.appendToJFrame(jframe, fxPanel);
             Platform.runLater(new Runnable() {

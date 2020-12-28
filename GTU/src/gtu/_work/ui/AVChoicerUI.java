@@ -2,6 +2,7 @@ package gtu._work.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Container;
 import java.awt.Desktop;
 import java.awt.EventQueue;
 import java.awt.Font;
@@ -60,8 +61,6 @@ import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.builder.ReflectionToStringBuilder;
-import org.apache.commons.lang.builder.ToStringStyle;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.tuple.Pair;
@@ -77,6 +76,8 @@ import gtu.constant.PatternCollection;
 import gtu.date.DateFormatUtil;
 import gtu.file.FileUtil;
 import gtu.file.OsInfoUtil;
+import gtu.javafx.JavaFxMergeToSwing.JFXPanelToSwing;
+import gtu.javafx.mp4player.MediaControl;
 import gtu.jdk8.ex1.StreamUtil;
 import gtu.keyboard_mouse.JnativehookKeyboardMouseHelper;
 import gtu.keyboard_mouse.JnativehookKeyboardMouseHelper.MyNativeKeyAdapter;
@@ -102,6 +103,11 @@ import gtu.swing.util.JTabbedPaneUtil;
 import gtu.swing.util.JTableUtil;
 import gtu.swing.util.JTableUtil.TableColorDef;
 import gtu.swing.util.JTreeUtil;
+import javafx.embed.swing.JFXPanel;
+import javafx.scene.Scene;
+import javafx.scene.layout.Pane;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import taobe.tec.jcc.JChineseConvertor;
 
 public class AVChoicerUI extends JFrame {
@@ -177,6 +183,7 @@ public class AVChoicerUI extends JFrame {
     private static Pattern jpgPtn = Pattern.compile(PatternCollection.PICTURE_PATTERN, Pattern.CASE_INSENSITIVE);
     private JTree emptyDirTree;
     private JLabel dropHereLbl;
+    private AtomicReference<Scene> jfxScene = new AtomicReference<Scene>();
 
     /**
      * Launch the application.
@@ -921,6 +928,28 @@ public class AVChoicerUI extends JFrame {
             }
         });
 
+        JPanel panel_33 = new JPanel();
+        tabbedPane.addTab("影片", null, panel_33, null);
+        panel_33.setLayout(new BorderLayout(0, 0));
+
+        {
+            JFXPanelToSwing mJFXPanelToSwing = new JFXPanelToSwing() {
+                @Override
+                public Scene createScene(JFXPanel fxPanel) {
+                    Scene scene = new Scene(new Pane(), javafx.scene.paint.Color.ALICEBLUE);
+                    jfxScene.set(scene);
+                    return scene;
+                }
+
+                @Override
+                public void appendToJFrame(Container frame, JFXPanel fxPanel) {
+                    frame.add(fxPanel, BorderLayout.CENTER);
+                }
+            };
+
+            mJFXPanelToSwing.execute(panel_33);
+        }
+
         // 000000000000000000000000000000000000000000000000000000000000000000000000000000000
 
         config.reflectInit(this);
@@ -942,6 +971,20 @@ public class AVChoicerUI extends JFrame {
         panel_16.add(jFrameRGBColorPanel.getToggleButton(false));
 
         System.out.println("file.encoding : " + System.getProperty("file.encoding"));
+    }
+
+    // 播放影片
+    public void executeAVMovieToPlayer(File movie) {
+        try {
+            System.out.println("[executeAVMovieToPlayer] ------------ start ");
+            Media pick = new Media(movie.toURI().toString());
+            MediaPlayer player = new MediaPlayer(pick);
+            MediaControl mMediaControl = new MediaControl(player);
+            jfxScene.get().setRoot(mMediaControl);
+            System.out.println("[executeAVMovieToPlayer] ------------ end ");
+        } catch (Exception ex) {
+            JCommonUtil.handleException(ex);
+        }
     }
 
     private void triggerIndicateFolderTextFoucsLost() {
@@ -1821,8 +1864,13 @@ public class AVChoicerUI extends JFrame {
     }
 
     private void playAvFile(File avFile) {
-        try {// -Dfile.encoding=UTF-8
-             // File exe = getMediaPlayerExe();
+        if (StringUtils.isBlank(avExeText.getText())) {
+            executeAVMovieToPlayer(avFile);
+            return;
+        }
+        try {
+            // -Dfile.encoding=UTF-8
+            // File exe = getMediaPlayerExe();
             File exe = new File(avExeText.getText());
             String commandFormat = avExeFormatText.getText();
             String encoding = avExeEncodeText.getText();
