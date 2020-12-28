@@ -43,6 +43,8 @@ public class DumpDataService {
 
     private static final String TAG = DumpDataService.class.getSimpleName();
 
+    public static final String DROPBOX_UPLOAD_FOLDER = "/Apps/gtu001_test/";
+
     ContextWrapper context;
     final EnglishwordInfoDAO dao;
     XStream xstream = new XStream(new DomDriver());
@@ -102,7 +104,7 @@ public class DumpDataService {
             String accessToken = DropboxApplicationActivity.getDropboxAccessToken(context);
             DbxClientV2 client = DropboxUtilV2.getClient(accessToken);
             String datestr = DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMdd_HHmmss");
-            String path = "/bak_" + datestr;
+            String path = DROPBOX_UPLOAD_FOLDER + "/bak_" + datestr;
             DropboxUtilV2.upload(path + File.separator + Constant.EXPORT_FILE_JAVA.getName(), new FileInputStream(Constant.EXPORT_FILE_JAVA), client);
             DropboxUtilV2.upload(path + File.separator + Constant.EXPORT_FILE_JSON.getName(), new FileInputStream(Constant.EXPORT_FILE_JSON), client);
             DropboxUtilV2.upload(path + File.separator + Constant.EXPORT_FILE_XML.getName(), new FileInputStream(Constant.EXPORT_FILE_XML), client);

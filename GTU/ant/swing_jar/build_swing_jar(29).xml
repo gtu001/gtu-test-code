@@ -106,6 +106,7 @@
 			<packagename mode="small" name="image4j-0.7.jar">net.sf.image4j.codec.ico</packagename>
 			<packagename mode="small" name="forms-1.3.0.jar">com.jgoodies.forms.factories.FormFactory</packagename>
 			<packagename mode="small" name="commons-beanutils-1.4.jar">org.apache.commons.beanutils.ConvertUtils</packagename>
+			<packagename mode="small" name="platform-3.4.0.jar">com.sun.jna.platform.FileUtils</packagename>
 
 			<!-- http client -->
 			<packagename mode="exact" name="httpclient-4.5.2.jar">org.apache.http.client.HttpClient</packagename>
@@ -123,7 +124,9 @@
 			<packagename mode="pom" name="log4j-slf4j-impl-2.10.0.jar">org/slf4j/impl/StaticLoggerBinder</packagename>
 			<packagename mode="pom" name="commons-beanutils-1.8.0.jar">org/apache/commons/beanutils/DynaBean</packagename>
 
-			<packagename mode="pom">org.apache.commons.collections.CollectionUtils</packagename>
+			<packagename mode="pom" name="commons-collections-3.2.1.jar">org.apache.commons.collections.CollectionUtils</packagename>
+			<packagename mode="pom" name="httpcore-4.4.10.jar">org.apache.http.message.TokenParser</packagename>
+
 
 		</jarfinder>
 

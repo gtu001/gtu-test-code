@@ -10,6 +10,10 @@ public class Base64JdkUtil {
         String result = decodeToString(
                 "YXt+Q1czD1kLERhVLwcYfyJVXAMwHi1cBT0PTRxvPhssSgMhDgIFGAVlAD8hN1g5BAFhNiYcehV5WDh0dzJhEVFyBURMaTRILDckOQ47HDMVPytRPTB+L2UUHSA5NCQ9KVpfBi86aj0RZB9BCi4jYD8uIlgnLFsgYjhkRhoDPFQwWyolPg4+OB1ZeTp/cFMe\",\"13053kE3QBZ/LjUFhg43TVljID75S+kna0dTCVHmH1MHmNaMgE0Ljf7o72iF9qTe26Tk/ZeqaaaNYPhkwQObpZ4W7QOFmqTjqj+Szi0QA0ZpDDHQqzcliF0N+p6syDimzhpUdIhNQkHM\",\"YXt+Q1czD1kLERhVLwcYfyJVXAMwHi1cBT0PTRxvPhssSgMhDgIFGAVlAD8hN1g5BAFhNiYcehV5WDh0dzJhEVFyBURMaTRILDckOQ47HDMVPytRPTB+L2UUHSA5NCQ9KVpfBi86aj0RZB9BCi4jYD8uIlgnLFsgYjhkRhoDPFQwWyolPg4+OB1ZeTp/cFMe");
         System.out.println(result);
+        
+        String str2 = encode("3y3nIS0p6KoAAAAAAAA4oZJtMc46F2hKE-yROCv9gnt3ZsZhSPjdbZC3zni6qAIU");
+        System.out.println(str2);
+        
         System.out.println("done...");
     }
 

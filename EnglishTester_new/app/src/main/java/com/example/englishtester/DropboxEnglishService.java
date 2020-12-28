@@ -98,7 +98,7 @@ public class DropboxEnglishService {
                     toastShow(msg);
                 } catch (Exception e) {
                     Log.e(TAG, e.getMessage(), e);
-                    toastShow("失敗新增新字!");
+                    toastShow("失敗新增新字! [executeAddDropboxWord] ERR : " + e.getMessage());
                 }
             }
         });
@@ -258,7 +258,7 @@ public class DropboxEnglishService {
             Log.v(TAG, "future done? " + future.isDone());
             Log.v(TAG, "result: " + result);
             return result;
-        } catch (Exception ex) {
+        } catch (Throwable ex) {
             Log.e(TAG, "getRunInThread ERROR", ex);
             return null;
         }

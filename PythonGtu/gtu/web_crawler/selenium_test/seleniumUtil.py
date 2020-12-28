@@ -230,7 +230,7 @@ class WebElementControl :
             except StaleElementReferenceException as ex :
                 time.sleep(retryWait)
                 print("[StaleElementReferenceException] try again ! ")
-		return None
+        return None
 
     @staticmethod
     def waitPageElementByXpaths(xpath, driver, retryTime=10, retryWait=0.5) :
@@ -247,7 +247,7 @@ class WebElementControl :
             except StaleElementReferenceException as ex :
                 time.sleep(retryWait)
                 print("[StaleElementReferenceException] try again ! ")
-		return None
+        return None
         
 
 

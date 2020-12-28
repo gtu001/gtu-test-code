@@ -12,7 +12,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -28,19 +27,16 @@ import com.example.englishtester.common.DialogSingleInput.DialogConfirmClickList
 import com.example.englishtester.common.FullPageMentionDialog;
 import com.example.englishtester.common.Log;
 import com.example.englishtester.common.TextToSpeechComponent;
+import com.example.englishtester.common.ToastUtil;
 
-import org.apache.commons.collections.MapUtils;
 import org.apache.commons.collections4.map.LRUMap;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.time.DateFormatUtils;
-import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -785,34 +781,40 @@ public class ShowWordListActivity extends Activity implements AdapterView.OnItem
 
             @Override
             public Object call() throws Exception {
-                List<String> lst = dropboxEnglishService.getDropboxWordLst();
-                Collections.reverse(lst);
+                try {
+                    List<String> lst = dropboxEnglishService.getDropboxWordLst();
+                    Collections.reverse(lst);
 
-                dto.wordsList = lst;
-                dto.wordsListCopy = lst;
-                sentanceMap = null;
+                    dto.wordsList = lst;
+                    dto.wordsListCopy = lst;
+                    sentanceMap = null;
 
-                Map<String, EnglishWord> englishMap = new HashMap<String, EnglishWord>();
-                for (String word : dto.wordsList) {
-                    EnglishWord word2 = englishwordInfoDAO.queryOneWord(word);
-                    if (word2 == null) {
-                        word2 = new EnglishWord();
-                        word2.englishId = word;
+                    Map<String, EnglishWord> englishMap = new HashMap<String, EnglishWord>();
+                    for (String word : dto.wordsList) {
+                        EnglishWord word2 = englishwordInfoDAO.queryOneWord(word);
+                        if (word2 == null) {
+                            word2 = new EnglishWord();
+                            word2.englishId = word;
+                        }
+                        englishMap.put(word, word2);
                     }
-                    englishMap.put(word, word2);
+
+                    dto.englishProp = englishMap;
+                } catch (Throwable ex) {
+                    Log.e(TAG, "[dropboxSearchHistory] ERR : " + ex.getMessage(), ex);
+                    ToastUtil.makeToast(getApplicationContext(), "[dropboxSearchHistory] ERR : " + ex.getMessage(), false);
+                } finally {
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            //取消dialog
+                            myDialog.cancel();
+                        }
+                    });
                 }
-
-                dto.englishProp = englishMap;
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        //取消dialog
-                        myDialog.cancel();
-                    }
-                });
                 return null;
             }
-        }, -1L);
+        }, 15 * 1000);
     }
 
     // ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓ 功能選單
