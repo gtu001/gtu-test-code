@@ -1,10 +1,10 @@
 package gtu.javafx.mp4player;
 
-import java.io.File;
-
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.DoubleProperty;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -17,7 +17,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
-import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaPlayer.Status;
 import javafx.scene.media.MediaView;
@@ -35,6 +34,7 @@ public class MediaControl extends BorderPane {
     Label playTime;
     StackPane mvPane;
     Slider volumeSlider;
+    boolean autoStart = false;
 
     public MediaControl(MediaPlayer mp) {
         this.mp = mp;
@@ -109,6 +109,10 @@ public class MediaControl extends BorderPane {
                 duration = mp.getMedia().getDuration();
                 System.out.println("Duration: " + duration);
                 updateValues();
+
+                if (autoStart) {
+                    playPauseClicked();
+                }
             }
         });
 
@@ -186,7 +190,9 @@ public class MediaControl extends BorderPane {
     }
 
     public void playPauseClicked() {
+        System.out.println("[playPauseClicked] start");
         Status status = mp.getStatus();
+        System.out.println("status = " + status);
         if (status == Status.UNKNOWN || status == Status.HALTED) {
             return;
         }
@@ -256,12 +262,53 @@ public class MediaControl extends BorderPane {
     }
 
     public void dispose() {
-        this.mp.stop();
-        this.mp.setOnEndOfMedia(new Runnable() {
-            @Override
-            public void run() {
-                mp.dispose();
-            }
-        });
+        try {
+            this.mp.stop();
+            this.mp.dispose();
+            System.gc();
+        } catch (Exception ex) {
+            System.err.println("[dispose] ERR : " + ex.getMessage());
+        }
+    }
+
+    public void setAutoStart(boolean autoStart) {
+        this.autoStart = autoStart;
+    }
+
+    public double getVolume() {
+        return mp.getVolume();
+    }
+
+    public void setVolume(double volume) {
+        mp.setVolume(volume);
+    }
+
+    public void addVolume(double addVal) {
+        double volume = mp.getVolume();
+        volume += addVal;
+        mp.setVolume(volume);
+    }
+
+    public double getPlayRate() {
+        return mp.getRate();
+    }
+
+    public void setPlayRate(double val) {
+        mp.setRate(val);
+    }
+
+    public void addPlayRate(double addVal) {
+        double rate = mp.getRate();
+        rate += addVal;
+        mp.setRate(rate);
+    }
+
+    public void resize() {
+        MediaView mv = mediaView;
+        DoubleProperty mvw = mv.fitWidthProperty();
+        DoubleProperty mvh = mv.fitHeightProperty();
+        mvw.bind(Bindings.selectDouble(mv.sceneProperty(), "width"));
+        mvh.bind(Bindings.selectDouble(mv.sceneProperty(), "height"));
+        mv.setPreserveRatio(true);
     }
 }

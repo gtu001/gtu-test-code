@@ -5,7 +5,8 @@
  */
 package gtu.file;
 
-import java.awt.TrayIcon.MessageType;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -40,6 +41,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -55,7 +57,6 @@ import gtu.binary.StringUtil4FullChar;
 import gtu.date.DateUtil;
 import gtu.recyclebin.RecycleBinTrashcanUtil;
 import gtu.recyclebin.RecycleBinUtil_forWin;
-import gtu.swing.util.JCommonUtil;
 import sun.security.action.GetPropertyAction;
 
 /**
@@ -753,17 +754,17 @@ public class FileUtil {
             throw new IllegalArgumentException("Delete: deletion failed");
     }
 
-    public static boolean deleteFileToRecycleBin(File file) {
-        boolean delResult = false;
+    public static boolean deleteFileToRecycleBin(final File file, final ActionListener mListener) {
+        final AtomicBoolean delResult = new AtomicBoolean();
         try {
             if (OsInfoUtil.isWindows()) {
-                delResult = RecycleBinUtil_forWin.moveTo(file);
+                delResult.set(RecycleBinUtil_forWin.moveTo(file));
             } else {
-                delResult = RecycleBinTrashcanUtil.moveToTrashCan(file);
-                if (!delResult) {
+                delResult.set(RecycleBinTrashcanUtil.moveToTrashCan(file));
+                if (!delResult.get()) {
                     try {
                         FileUtils.forceDelete(file);
-                        delResult = file.exists();
+                        delResult.set(file.exists());
                     } catch (Exception ex) {
                         ex.printStackTrace();
                     }
@@ -771,8 +772,20 @@ public class FileUtil {
             }
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            ActionListener mListener2 = mListener;
+            if (mListener2 == null) {
+                mListener2 = new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        boolean delResult = (boolean) e.getSource();
+                        System.out.println((delResult ? "刪除成功" : "刪除失敗") + " : " + e.getActionCommand());
+                    }
+                };
+            }
+            mListener2.actionPerformed(new ActionEvent(delResult.get(), -1, file.getAbsolutePath()));
         }
-        return delResult;
+        return delResult.get();
     }
 
     /**

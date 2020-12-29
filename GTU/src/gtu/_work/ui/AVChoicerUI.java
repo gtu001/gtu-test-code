@@ -211,7 +211,7 @@ public class AVChoicerUI extends JFrame {
      */
     public AVChoicerUI() {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setBounds(100, 100, 633, 433);
+        setBounds(100, 100, 700, 433);
         contentPane = new JPanel();
         contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
         contentPane.setLayout(new BorderLayout(0, 0));
@@ -951,6 +951,10 @@ public class AVChoicerUI extends JFrame {
             // resize
             this.addComponentListener(new java.awt.event.ComponentAdapter() {
                 public void componentResized(ComponentEvent e) {
+                    if (mJFXPanelToSwing.getRoot() != null && mJFXPanelToSwing.getRoot() instanceof MediaControl) {
+                        MediaControl mediaControl = ((MediaControl) mJFXPanelToSwing.getRoot());
+                        mediaControl.resize();
+                    }
                 }
             });
         }
@@ -982,15 +986,20 @@ public class AVChoicerUI extends JFrame {
     public void executeAVMovieToPlayer(File movie) {
         try {
             System.out.println("[executeAVMovieToPlayer] ------------ start ");
+            double volume = 1d;
             if (mJFXPanelToSwing.getRoot() != null && mJFXPanelToSwing.getRoot() instanceof MediaControl) {
-                ((MediaControl) mJFXPanelToSwing.getRoot()).dispose();
+                MediaControl mediaControl = ((MediaControl) mJFXPanelToSwing.getRoot());
+                volume = mediaControl.getVolume();
+                mediaControl.dispose();
             }
             String currentFile = movie.toURI().toString();
             System.out.println(currentFile);
             Media pick = new Media(currentFile);
             MediaPlayer player = new MediaPlayer(pick);
             MediaControl mMediaControl = new MediaControl(player);
-            mMediaControl.playPauseClicked();
+            mMediaControl.setAutoStart(true);
+            mMediaControl.setVolume(volume);
+            mMediaControl.setPlayRate(1d);
             mJFXPanelToSwing.setRoot(mMediaControl);
             JTabbedPaneUtil.newInst(tabbedPane).setSelectedIndexByTitle("影片");
             System.out.println("[executeAVMovieToPlayer] ------------ end ");
@@ -1451,6 +1460,10 @@ public class AVChoicerUI extends JFrame {
 
         private void deleteFile() {
             final File file = tempFile.get();
+            if (file == null) {
+                System.out.println("[deleteFile] 檔案為null");
+                return;
+            }
             if (!file.exists()) {
                 JCommonUtil._jOptionPane_showMessageDialog_error("檔案不存在!");
                 return;
@@ -1461,28 +1474,20 @@ public class AVChoicerUI extends JFrame {
                     @Override
                     public void run() {
                         try {
-                            boolean delResult = false;
-                            if (isWindows) {
-                                delResult = RecycleBinUtil_forWin.moveTo(file);
-                            } else {
-                                delResult = RecycleBinTrashcanUtil.moveToTrashCan(file);
-                                if (!delResult) {
-                                    try {
-                                        FileUtils.forceDelete(file);
-                                        delResult = file.exists();
-                                    } catch (Exception ex) {
-                                        ex.printStackTrace();
-                                    }
+                            FileUtil.deleteFileToRecycleBin(file, new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    boolean delResult = (boolean) e.getSource();
+                                    trayUtil.displayMessage(delResult ? "刪除成功!" : "刪除失敗", file.toString(), MessageType.INFO);
+                                    deleteAVFileLabel.setText(file.exists() ? "Done!" : "NotDone!");
+                                    setCountLabel();
+                                    // resetCacheFileList();
+                                    removeFromCacheLst(file);
+                                    dirCheckTextActionPerformed(null);
                                 }
-                            }
-                            trayUtil.displayMessage(delResult ? "刪除成功!" : "刪除失敗", file.toString(), MessageType.INFO);
-                            deleteAVFileLabel.setText(file.exists() ? "Done!" : "NotDone!");
-                            setCountLabel();
-                            // resetCacheFileList();
-                            removeFromCacheLst(file);
-                            dirCheckTextActionPerformed(null);
-                        } catch (Exception e) {
-                            JCommonUtil.handleException(e);
+                            });
+                        } catch (Exception ex) {
+                            JCommonUtil.handleException(ex);
                         }
                     }
                 }).start();
@@ -1876,19 +1881,19 @@ public class AVChoicerUI extends JFrame {
     }
 
     private void playAvFile(File avFile) {
-        if (StringUtils.isBlank(avExeText.getText())) {
-            executeAVMovieToPlayer(avFile);
-            return;
-        }
         try {
+            currentFileHandler.setFile(avFile);
+            System.out.println("檔案存在 : " + avFile.exists() + " -> " + avFile);
+            if (StringUtils.isBlank(avExeText.getText())) {
+                executeAVMovieToPlayer(avFile);
+                return;
+            }
+
             // -Dfile.encoding=UTF-8
             // File exe = getMediaPlayerExe();
             File exe = new File(avExeText.getText());
             String commandFormat = avExeFormatText.getText();
             String encoding = avExeEncodeText.getText();
-
-            currentFileHandler.setFile(avFile);
-            System.out.println("檔案存在 : " + avFile.exists() + " -> " + avFile);
 
             RuntimeBatPromptModeUtil t = RuntimeBatPromptModeUtil.newInstance();
             String command = String.format(commandFormat, exe, avFile.getCanonicalPath());
@@ -2246,52 +2251,83 @@ public class AVChoicerUI extends JFrame {
                 }
 
                 try {
+                    System.out.println(" key code = " + e.getKeyCode() + " / " + e.getKeyChar());
+
                     if (mJFXPanelToSwing.getFxPanel() != null && mJFXPanelToSwing.getScene() != null) {
-                        MediaControl mMediaControl = (MediaControl) mJFXPanelToSwing.getRoot();
-                        System.out.println("mMediaControl = " + mMediaControl);
-                        if (JnativehookKeyboardMouseHelper.isMaskKeyPress(e, "c")) {
-                            System.out.println("1min");
-                            if (e.getKeyCode() == NativeKeyEvent.VC_LEFT) {
-                                System.out.println("-1m");
-                                mMediaControl.forwardOrBackward(-1 * 60 * 1000);
-                            } else if (e.getKeyCode() == NativeKeyEvent.VC_RIGHT) {
-                                System.out.println("+1m");
-                                mMediaControl.forwardOrBackward(60 * 1000);
-                            }
-                        } else if (JnativehookKeyboardMouseHelper.isMaskKeyPress(e, "s")) {
-                            if (e.getKeyCode() == NativeKeyEvent.VC_LEFT) {
-                                System.out.println("-30s");
-                                mMediaControl.forwardOrBackward(-1 * 30 * 1000);
-                            } else if (e.getKeyCode() == NativeKeyEvent.VC_RIGHT) {
-                                System.out.println("+30s");
-                                mMediaControl.forwardOrBackward(30 * 1000);
-                            }
+                        javafx.scene.Parent parent = mJFXPanelToSwing.getRoot();
+
+                        if (!(parent instanceof MediaControl)) {
+                            System.out.println("當前面板未初始化為 MediaControl[112233]");
                         } else {
-                            if (e.getKeyCode() == NativeKeyEvent.VC_LEFT) {
-                                System.out.println("-15s");
-                                mMediaControl.forwardOrBackward(-1 * 15 * 1000);
-                            } else if (e.getKeyCode() == NativeKeyEvent.VC_RIGHT) {
-                                System.out.println("+15s");
-                                mMediaControl.forwardOrBackward(15 * 1000);
+                            MediaControl mMediaControl = (MediaControl) parent;
+                            System.out.println("mMediaControl = " + mMediaControl);
+                            if (JnativehookKeyboardMouseHelper.isMaskKeyPress(e, "c")) {
+                                System.out.println("1min");
+                                if (e.getKeyCode() == NativeKeyEvent.VC_LEFT) {
+                                    System.out.println("-1m");
+                                    mMediaControl.forwardOrBackward(-1 * 60 * 1000);
+                                } else if (e.getKeyCode() == NativeKeyEvent.VC_RIGHT) {
+                                    System.out.println("+1m");
+                                    mMediaControl.forwardOrBackward(60 * 1000);
+                                }
+                            } else if (JnativehookKeyboardMouseHelper.isMaskKeyPress(e, "s")) {
+                                if (e.getKeyCode() == NativeKeyEvent.VC_LEFT) {
+                                    System.out.println("-30s");
+                                    mMediaControl.forwardOrBackward(-1 * 30 * 1000);
+                                } else if (e.getKeyCode() == NativeKeyEvent.VC_RIGHT) {
+                                    System.out.println("+30s");
+                                    mMediaControl.forwardOrBackward(30 * 1000);
+                                }
+                            } else {
+                                if (e.getKeyCode() == NativeKeyEvent.VC_LEFT) {
+                                    System.out.println("-15s");
+                                    mMediaControl.forwardOrBackward(-1 * 15 * 1000);
+                                } else if (e.getKeyCode() == NativeKeyEvent.VC_RIGHT) {
+                                    System.out.println("+15s");
+                                    mMediaControl.forwardOrBackward(15 * 1000);
+                                }
+                            }
+
+                            // play/pause
+                            if (e.getKeyCode() == NativeKeyEvent.VC_SPACE) {
+                                System.out.println("play/pause");
+                                mMediaControl.playPauseClicked();
+                            }
+
+                            // fullscreen
+                            if (JnativehookKeyboardMouseHelper.isMaskKeyPress(e, "a") && //
+                            e.getKeyCode() == NativeKeyEvent.VC_ENTER) {
+                                JFrame mJFrame = AVChoicerUI.this;
+                                if (mJFrame.getExtendedState() != JFrame.MAXIMIZED_BOTH) {
+                                    // mJFrame.setUndecorated(true);
+                                    System.out.println("fullscreen on");
+                                    mJFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+                                } else if (mJFrame.getExtendedState() == JFrame.MAXIMIZED_BOTH) {
+                                    // mJFrame.setUndecorated(false);
+                                    System.out.println("fullscreen off");
+                                    mJFrame.setExtendedState(JFrame.NORMAL);
+                                }
+                            }
+
+                            // volume
+                            if (e.getKeyCode() == NativeKeyEvent.VC_UP) {
+                                System.out.println("volume +");
+                                mMediaControl.addVolume(0.1d);
+                            } else if (e.getKeyCode() == NativeKeyEvent.VC_DOWN) {
+                                System.out.println("volume -");
+                                mMediaControl.addVolume(-0.1d);
+                            }
+
+                            // play rate
+                            if (e.getKeyCode() == NativeKeyEvent.VC_OPEN_BRACKET) {
+                                System.out.println("play rate +");
+                                mMediaControl.addPlayRate(-0.1d);
+                            } else if (e.getKeyCode() == NativeKeyEvent.VC_CLOSE_BRACKET) {
+                                System.out.println("play rate -");
+                                mMediaControl.addPlayRate(0.1d);
                             }
                         }
-                        if (e.getKeyCode() == NativeKeyEvent.VC_SPACE) {
-                            System.out.println("play/pause");
-                            mMediaControl.playPauseClicked();
-                        }
-                        if (JnativehookKeyboardMouseHelper.isMaskKeyPress(e, "a") && //
-                        e.getKeyCode() == NativeKeyEvent.VC_ENTER) {
-                            JFrame mJFrame = AVChoicerUI.this;
-                            if (mJFrame.getExtendedState() != JFrame.MAXIMIZED_BOTH) {
-                                // mJFrame.setUndecorated(true);
-                                System.out.println("fullscreen on");
-                                mJFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
-                            } else if (mJFrame.getExtendedState() == JFrame.MAXIMIZED_BOTH) {
-                                // mJFrame.setUndecorated(false);
-                                System.out.println("fullscreen off");
-                                mJFrame.setExtendedState(JFrame.NORMAL);
-                            }
-                        }
+
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();

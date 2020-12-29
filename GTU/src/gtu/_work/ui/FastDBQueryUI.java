@@ -799,7 +799,8 @@ public class FastDBQueryUI extends JFrame {
         JTextAreaUtil.applyCloneLine(sqlTextArea);
 
         mSqlTextAreaJTextAreaSelectPositionHandler = JTextComponentSelectPositionHandler.newInst(sqlTextArea);
-        sqlTextAreaScroll = JCommonUtil.createScrollComponent(sqlTextArea);
+
+        sqlTextAreaScroll = JTextAreaUtil.createLineNumberWrap(sqlTextArea);// JCommonUtil.createScrollComponent(sqlTextArea);
         panel_2.add(sqlTextAreaScroll);
 
         JPanel sqlIdPanel = new JPanel();

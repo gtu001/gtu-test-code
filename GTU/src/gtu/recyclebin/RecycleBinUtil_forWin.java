@@ -25,10 +25,17 @@ public class RecycleBinUtil_forWin {
                 int resultCode = p.waitFor();
                 String resultStr = (resultCode == 0 ? "刪除成功" : "刪除失敗") + " : " + fileOrDir;
                 System.out.println(resultStr);
-                return resultCode == 0;
+                if (resultCode == 0) {
+                    return true;
+                } else {
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException e1) {
+                    }
+                }
             } catch (Exception e) {
                 try {
-                    Thread.currentThread().sleep(500);
+                    Thread.sleep(500);
                 } catch (InterruptedException e1) {
                 }
             }
