@@ -90,11 +90,11 @@ public class JavaFxMergeToSwing {
         protected abstract void appendToJFrame(Container container, JFXPanel fxPanel);
 
         public void execute(Container jframe) {
-            this.container = jframe;
-            if (this.fxPanel == null) {
-                this.fxPanel = new JFXPanel();
-            }
             try {
+                this.container = jframe;
+                if (this.fxPanel == null) {
+                    this.fxPanel = new JFXPanel();
+                }
                 this.appendToJFrame(jframe, fxPanel);
                 Platform.runLater(new Runnable() {
                     @Override
