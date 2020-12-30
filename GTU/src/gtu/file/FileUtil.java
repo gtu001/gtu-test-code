@@ -68,27 +68,9 @@ import sun.security.action.GetPropertyAction;
 public class FileUtil {
 
     public static void main(String[] args) {
-        // final JLabel lbl = new JLabel();
-        // JCommonUtil.applyDropFiles(lbl, new ActionListener() {
-        // @Override
-        // public void actionPerformed(ActionEvent e) {
-        // List<File> files = (List<File>) e.getSource();
-        // File file = files.get(0);
-        // lbl.setText(FileUtil.getSizeDescription(file.length()) + "__" +
-        // file.length());
-        // }
-        // });
-        // JFrameTest.simpleTestComponent(lbl);
-
-        String name = "-熊熊卓毓彤 (@beargenie) posted on Instagram- “大家端午佳節愉快❤️ 我是粽子的顏色🥰-@michelle_wu413 這次幫我染ㄧ個暖橘咖 顯白顯髮質好-@redcircle_office -頭髮長了 大家覺得我要剪短嗎？還是維持？” • Jun 25, 2020 at 10-58am UTC-_105420675_158377269137581_1579270419227492688_n.jpg";
-
-        name = fixName(name);
-
-        System.out.println("name == " + name);
-        System.out.println("name == " + StringUtil4FullChar.length(name));
-
-        FileUtil.saveToFile(new File(FileUtil.DESKTOP_DIR, name), name, "UTF8");
-
+        File file1 = new File("C:\\Users\\gtu00\\OneDrive\\Desktop\\xxx");
+        File file2 = new File("C:\\Users\\gtu00\\OneDrive\\Desktop\\xxx2");
+        moveFileByBat(file1, file2);
         System.out.println(getSizeLength(8.93, "mb"));
     }
 
@@ -496,9 +478,9 @@ public class FileUtil {
         String errorMsg = "";
         String command = "";
         if (OsInfoUtil.isWindows()) {
-            command = String.format(" move -Y \"%s\" \"%s\"", fromFile, toFile);
+            command = String.format(" move /Y \"%s\" \"%s\"", fromFile, toFile);
         } else {
-            command = String.format(" mv -T \"%s\" \"%s\"", fromFile, toFile);
+            command = String.format(" mv -Tf \"%s\" \"%s\"", fromFile, toFile);
         }
         RuntimeBatPromptModeUtil inst = RuntimeBatPromptModeUtil.newInstance();
         inst.command(command);
@@ -2129,3 +2111,4 @@ public class FileUtil {
         }
     }
 }
+
