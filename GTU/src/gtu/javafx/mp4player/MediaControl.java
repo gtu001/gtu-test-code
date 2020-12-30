@@ -12,6 +12,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -142,6 +143,17 @@ public class MediaControl extends BorderPane {
         HBox.setHgrow(timeSlider, Priority.ALWAYS);
         timeSlider.setMinWidth(50);
         timeSlider.setMaxWidth(Double.MAX_VALUE);
+
+        timeSlider.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                timeSlider.setValueChanging(true);
+                double value = (event.getX() / timeSlider.getWidth()) * timeSlider.getMax();
+                timeSlider.setValue(value);
+                timeSlider.setValueChanging(false);
+            }
+        });
+
         timeSlider.valueProperty().addListener(new InvalidationListener() {
             public void invalidated(Observable ov) {
                 if (timeSlider.isValueChanging()) {

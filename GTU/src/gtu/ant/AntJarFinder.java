@@ -158,19 +158,16 @@ public class AntJarFinder extends Task {
 
     private void appendDebugPackageDef(PackageName pk, File jarFile) {
         String mode = pk.mode;
-        String classPath = pk.text;
+        String classPath = StringUtils.trimToEmpty(pk.text);
+        String pathname = StringUtils.trimToEmpty(pk.pathname);
         String jarName = jarFile.getName();
-        _packagenamesDebugLst.add(String.format("<packagename mode=\"%s\" name=\"%s\">%s</packagename>", mode, jarName, classPath));
+        _packagenamesDebugLst.add(String.format("<packagename mode=\"%s\" name=\"%s\" pathname=\"%s\" unjar=\"\">%s</packagename>", mode, jarName, pathname, classPath));
     }
 
     private void execute(PackageName pk, Set<File> scanDir, File copyToDir) {
         try {
-            JarFinder finder = JarFinder.newInstance();
-
             final List<File> sameJarList = new ArrayList<File>();
             info("搜尋 :" + pk.text);
-
-            finder.pattern(pk.text);
 
             // for exact jar files ↓↓↓↓↓↓↓
             if (StringUtils.isNotBlank(pk.name) && allJarLst != null) {
@@ -203,8 +200,38 @@ public class AntJarFinder extends Task {
                     return;
                 }
             }
+
+            // 直接給 pathname
+            if (StringUtils.isNotBlank(pk.pathname)) {
+                File findIndicateJar = null;
+                File jarFile = new File(pk.pathname);
+                if (jarFile.exists()) {
+                    debug("直接找到檔案 : " + jarFile);
+                    findIndicateJar = jarFile;
+                }
+
+                if (findIndicateJar != null) {
+                    if (StringUtils.isNotBlank(pk.unjar)) {
+                        // 直接解壓縮
+                        File buildDir = new File(StringUtils.trimToEmpty(helper.getParseAfterValue(pk.unjar)));
+                        info("[直接解壓縮]:" + buildDir);
+                        ZipUtils.getInstance().unzipFile_SECURE(findIndicateJar, buildDir);
+                    } else {
+                        this.copyFile(findIndicateJar, copyToDir);
+                    }
+                    appendDebugPackageDef(pk, findIndicateJar);
+                    return;
+                }
+            }
             // for exact jar files ↑↑↑↑↑↑↑
 
+            JarFinder finder = JarFinder.newInstance();
+            if(StringUtils.isBlank(pk.text)) {
+                System.err.println("搜尋的classpath不可為空 : " + pk.text);
+                throw new BuildException("搜尋的classpath不可為空 : " + pk.text);
+            }
+            finder.pattern(pk.text);
+            
             for (File search : scanDir) {
                 finder.setDir(search);
                 debug("搜尋來源目錄 : " + search);
@@ -537,9 +564,14 @@ public class AntJarFinder extends Task {
         private String mode;
         private String name;
         private String unjar;
+        private String pathname;
 
         public void addText(String text) {
             this.text = text;
+        }
+
+        public void setPathname(String pathname) {
+            this.pathname = pathname;
         }
 
         public void setName(String name) {

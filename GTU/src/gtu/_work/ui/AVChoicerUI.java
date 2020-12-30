@@ -2074,6 +2074,10 @@ public class AVChoicerUI extends JFrame {
     private void readyMoveBtnAction() {
         final DefaultListModel model = (DefaultListModel) readyMoveLst.getModel();
         File targetDir = JCommonUtil.filePathCheck(readyMoveToDirText.getText(), "移動到目錄為空", true);
+        if (!targetDir.exists() || !targetDir.isDirectory()) {
+            JCommonUtil._jOptionPane_showMessageDialog_error("目的目錄不存在 : " + targetDir);
+            return;
+        }
         if (model.getSize() == 0) {
             return;
         }

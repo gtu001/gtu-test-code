@@ -378,7 +378,7 @@ public class JdbcDBUtil {
      * 
      * @throws SQLException
      */
-    private static void callPSetUser(Connection con) throws SQLException {
+    public static void callPSetUser(Connection con) throws SQLException {
         try {
             CallableStatement call = con.prepareCall("{call pkg_pub_app_context.P_SET_APP_USER_ID(401)}");
             call.execute();
@@ -386,6 +386,44 @@ public class JdbcDBUtil {
             System.out.println("callPSetUser : " + ex.getMessage());
         }
     }
+    
+    public static String callFunction(String functionSql, Object[] params, Connection conn) {
+        String resultString = null;
+        try {
+            String callSql = "{ call ? := " + functionSql + " }";
+
+            conn.setAutoCommit(true);
+            CallableStatement stmt = conn.prepareCall(callSql);
+            stmt.registerOutParameter(1, java.sql.Types.NVARCHAR);
+            
+            int ii = 2;
+            for (Object param : params) {
+                stmt.setObject(ii, param);
+                ii++;
+            }
+
+            int result = stmt.executeUpdate();
+            System.out.println("updateResult : " + result);
+            resultString = stmt.getString(1);
+            System.out.println("Result : " + resultString);
+
+            conn.close();
+            conn = null;
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (conn != null) {
+                    conn.close();
+                    conn = null;
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return resultString;
+    }
+    
 
     /**
      * 可以供新增修改刪除使用

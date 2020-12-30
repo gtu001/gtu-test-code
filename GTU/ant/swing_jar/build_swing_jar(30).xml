@@ -97,6 +97,9 @@
 			<packagename mode="small" name="jcc-bate-0.7.3.jar">taobe.tec.jcc.JChineseConvertor</packagename>
 			<packagename mode="small">com.sun.jna.platform.FileUtils</packagename>
 			<packagename mode="pom" name="jnativehook-2.1.0.jar">org.jnativehook.keyboard.NativeKeyListener</packagename>
+			<packagename mode="pom" name="" pathname="C:\Program Files\Java\jre1.8.0_251\lib\ext\jfxrt.jar"></packagename>
+			
+
 			
 
 		</jarfinder>
