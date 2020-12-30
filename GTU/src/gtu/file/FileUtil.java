@@ -57,6 +57,8 @@ import gtu.binary.StringUtil4FullChar;
 import gtu.date.DateUtil;
 import gtu.recyclebin.RecycleBinTrashcanUtil;
 import gtu.recyclebin.RecycleBinUtil_forWin;
+import gtu.runtime.ProcessWatcher;
+import gtu.runtime.RuntimeBatPromptModeUtil;
 import sun.security.action.GetPropertyAction;
 
 /**
@@ -480,6 +482,32 @@ public class FileUtil {
             mFileMoveSpeedCalculator.end("copyDirectory");
             return isAllOk;
         } else {
+            return false;
+        }
+    }
+
+    public static boolean moveFileByBat(File fromFile, File toFile) {
+        if (fromFile.isFile() == toFile.isFile() || //
+                fromFile.isDirectory() == toFile.isDirectory()) {
+        } else {
+            System.out.println("[moveFileByBat]必須同為檔案或目錄！");
+            return false;
+        }
+        String errorMsg = "";
+        String command = "";
+        if (OsInfoUtil.isWindows()) {
+            command = String.format(" move -Y \"%s\" \"%s\"", fromFile, toFile);
+        } else {
+            command = String.format(" mv -T \"%s\" \"%s\"", fromFile, toFile);
+        }
+        RuntimeBatPromptModeUtil inst = RuntimeBatPromptModeUtil.newInstance();
+        inst.command(command);
+        ProcessWatcher watcher = ProcessWatcher.newInstance(inst.apply());
+        errorMsg = watcher.getErrorStreamToString();
+        if (StringUtils.isBlank(errorMsg)) {
+            return true;
+        } else {
+            System.err.println("[moveFileByBat] Fail : " + errorMsg);
             return false;
         }
     }

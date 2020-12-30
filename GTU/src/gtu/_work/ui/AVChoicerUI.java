@@ -86,8 +86,6 @@ import gtu.number.NumberUtil;
 import gtu.properties.PropertiesGroupUtils_ByKey;
 import gtu.properties.PropertiesUtil;
 import gtu.properties.PropertiesUtilBean;
-import gtu.recyclebin.RecycleBinTrashcanUtil;
-import gtu.recyclebin.RecycleBinUtil_forWin;
 import gtu.runtime.DesktopUtil;
 import gtu.runtime.ProcessWatcher;
 import gtu.runtime.RuntimeBatPromptModeUtil;
@@ -2111,7 +2109,7 @@ public class AVChoicerUI extends JFrame {
                         if (file.file.isDirectory()) {
                             try {
                                 // FileUtils.moveDirectory(file.file, moveTo);
-                                boolean result = FileUtil.moveDirectory(file.file, targetDir);
+                                boolean result = FileUtil.moveFileByBat(file.file, targetDir);
                                 if (!result) {
                                     file.moveStateChs = "Error...";
                                     file.moveStateColor = "RED";
@@ -2124,7 +2122,7 @@ public class AVChoicerUI extends JFrame {
                         } else if (file.file.isFile()) {
                             try {
                                 // FileUtils.moveFile(file.file, moveTo);
-                                boolean result = FileUtil.moveFile(file.file, moveTo);
+                                boolean result = FileUtil.moveFileByBat(file.file, moveTo);
                                 if (!result) {
                                     file.moveStateChs = "Error...";
                                     file.moveStateColor = "RED";
