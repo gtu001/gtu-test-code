@@ -13,6 +13,7 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -40,6 +41,7 @@ import org.jnativehook.mouse.NativeMouseWheelListener;
 
 import gtu.date.DateFormatUtil;
 import gtu.file.FileUtil;
+import gtu.keyboard_mouse.KeyboardMouseMacroOperater.MoveDefine;
 import gtu.swing.util.HideInSystemTrayHelper;
 import gtu.swing.util.JCommonUtil;
 
@@ -48,6 +50,7 @@ public class KeyboardMouseMacroCreater implements NativeKeyListener, NativeMouse
     private static final Logger logger = Logger.getLogger(KeyboardMouseMacroCreater.class.getPackage().getName());
 
     public static void main(String[] args) {
+        JnativehookKeyboardMouseHelper.getInstance().disableLogger();
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 KeyboardMouseMacroCreater t = new KeyboardMouseMacroCreater();
@@ -60,6 +63,7 @@ public class KeyboardMouseMacroCreater implements NativeKeyListener, NativeMouse
     private Callable<Boolean> isOperaterRunning;
     private ActionListener afterWriteMacroData;
     private HideInSystemTrayHelper hideInSystemTrayHelper;
+    public static final NullInputType NULL_INPUT_TYPE = new NullInputType();
 
     /**
      * 取得預設Macro List Dir
@@ -80,6 +84,7 @@ public class KeyboardMouseMacroCreater implements NativeKeyListener, NativeMouse
         localConsoleHandler.setLevel(Level.WARNING);
         logger.addHandler(localConsoleHandler);
         startHook();
+        JnativehookKeyboardMouseHelper.getInstance().disableLogger();
     }
 
     private void checkRigisterHook(boolean onOff) {
@@ -222,8 +227,31 @@ public class KeyboardMouseMacroCreater implements NativeKeyListener, NativeMouse
                 }
                 throw new RuntimeException("無法取得參數!:" + line);
             }
-        },//
-        ;
+        }, //
+        RepeatAndDelay("(\\d+)\\tRepeatAndDelay\\((\\d+)\\,(\\d+)\\,(\\d+)\\)", "RepeatAndDelay") {
+            @Override
+            InputType get(String line) {
+                Matcher mth = ptn.matcher(line);
+                if (mth.find()) {
+                    RepeatInputType d = new RepeatInputType();
+                    d.currentTime = Long.parseLong(mth.group(1));
+                    int stackSize = Integer.parseInt(mth.group(2));
+                    d.periodTime = Long.parseLong(mth.group(3));
+                    d.untilTime = Long.parseLong(mth.group(4));
+                    if (KeyboardMouseMacroOperater.CURRENT_MOVE.get() != null) {
+                        MoveDefine move = KeyboardMouseMacroOperater.CURRENT_MOVE.get();
+                        if (move.previousLineInputType.get() != null) {
+                            for (int ii = 0; ii < stackSize; ii++) {
+                                InputType input = move.previousLineInputType.get().pop();
+                                d.stacks.addFirst(input);
+                            }
+                        }
+                    }
+                    return d;
+                }
+                return NULL_INPUT_TYPE;
+            }
+        };
 
         final Pattern ptn;
         final String title;
@@ -322,6 +350,24 @@ public class KeyboardMouseMacroCreater implements NativeKeyListener, NativeMouse
 
     static class CustomInputType extends InputType {
         Runnable run;
+
+        @Override
+        public String toString() {
+            return "CustomInputType [currentTime=" + currentTime + ", type=" + type + "]";
+        }
+    }
+
+    static class NullInputType extends InputType {
+        @Override
+        public String toString() {
+            return "CustomInputType [currentTime=" + currentTime + ", type=" + type + "]";
+        }
+    }
+
+    static class RepeatInputType extends InputType {
+        LinkedList<InputType> stacks = new LinkedList<InputType>();
+        long periodTime;
+        long untilTime;
 
         @Override
         public String toString() {
@@ -559,7 +605,7 @@ public class KeyboardMouseMacroCreater implements NativeKeyListener, NativeMouse
 
     private <T extends NativeInputEvent> void handleEvent(String type, T paramNativeKeyEvent) {
         if (startTime == -1) {
-            System.out.println("未啟動marco");
+            // System.out.println("未啟動marco");//========================================================================TODO
             return;
         }
         List<NativeInputEventZ> lst = new ArrayList<NativeInputEventZ>();

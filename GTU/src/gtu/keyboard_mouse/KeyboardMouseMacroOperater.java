@@ -2,7 +2,6 @@ package gtu.keyboard_mouse;
 
 import java.awt.AWTException;
 import java.awt.BorderLayout;
-import java.awt.CardLayout;
 import java.awt.Dialog.ModalityType;
 import java.awt.Dimension;
 import java.awt.EventQueue;
@@ -33,10 +32,12 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Stack;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -70,7 +71,9 @@ import gtu.keyboard_mouse.KeyboardMouseMacroCreater.EventPattern;
 import gtu.keyboard_mouse.KeyboardMouseMacroCreater.InputType;
 import gtu.keyboard_mouse.KeyboardMouseMacroCreater.KeyInputType;
 import gtu.keyboard_mouse.KeyboardMouseMacroCreater.MouseInputType;
+import gtu.keyboard_mouse.KeyboardMouseMacroCreater.NullInputType;
 import gtu.keyboard_mouse.KeyboardMouseMacroCreater.PasteInputType;
+import gtu.keyboard_mouse.KeyboardMouseMacroCreater.RepeatInputType;
 import gtu.keyboard_mouse.KeyboardMouseMacroCreater.ScreenshotInputType;
 import gtu.keyboard_mouse.KeyboardMouseMacroCreater.WheelInputType;
 import gtu.log.Log;
@@ -92,6 +95,7 @@ public class KeyboardMouseMacroOperater extends JFrame {
     }
 
     private static void doMain() {
+        JnativehookKeyboardMouseHelper.getInstance().disableLogger();
         EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
@@ -148,6 +152,7 @@ public class KeyboardMouseMacroOperater extends JFrame {
     protected ActionListener preRunning;
     protected ActionListener postRunning;
     static ProgressInfo PROGRESS_INFO = new ProgressInfo();
+    static final AtomicReference<MoveDefine> CURRENT_MOVE = new AtomicReference<MoveDefine>();
 
     /**
      * Create the frame.
@@ -426,7 +431,7 @@ public class KeyboardMouseMacroOperater extends JFrame {
         }
     }
 
-    private class MoveDefine {
+    protected class MoveDefine {
 
         Timer timer;
         Robot robot;
@@ -436,6 +441,7 @@ public class KeyboardMouseMacroOperater extends JFrame {
         long duringTotalTime = -1;
 
         private void readFile(File file) {
+            CURRENT_MOVE.set(this);
             BufferedReader reader = null;
             try {
                 reader = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
@@ -563,10 +569,13 @@ public class KeyboardMouseMacroOperater extends JFrame {
             try {
                 robot = new Robot();
                 MOTION_DEFINE_DO_STOP = false;
+                previousLineInputType.set(new Stack());
             } catch (AWTException e) {
                 e.printStackTrace();
             }
         }
+
+        AtomicReference<Stack<InputType>> previousLineInputType = new AtomicReference<Stack<InputType>>();
 
         private void findMove(String line) {
             line = StringUtils.trimToEmpty(line);
@@ -585,38 +594,61 @@ public class KeyboardMouseMacroOperater extends JFrame {
                 throw new RuntimeException("無法判斷行為 : " + line);
             }
 
+            executeCurrentLineInputType(inputType.currentTime, inputType);
+
+            previousLineInputType.get().push(inputType);
+        }
+
+        private void executeCurrentLineInputType(long currentTime, InputType inputType) {
             if (inputType instanceof CleanTextInputType) {
                 CleanTextInputType p = (CleanTextInputType) inputType;
-                addEvent(p.currentTime, getCleanTextEvent(p));
-                addEventForLog(p.currentTime, p);
+                addEvent(currentTime, getCleanTextEvent(p));
+                addEventForLog(currentTime, p);
             } else if (inputType instanceof MouseInputType) {
                 MouseInputType m = (MouseInputType) inputType;
-                addEvent(m.currentTime, getMouseEvent(m));
-                addEventForLog(m.currentTime, m);
+                addEvent(currentTime, getMouseEvent(m));
+                addEventForLog(currentTime, m);
             } else if (inputType instanceof KeyInputType) {
                 KeyInputType k = (KeyInputType) inputType;
-                addEvent(k.currentTime, getKeyboardEvent(k));
-                addEventForLog(k.currentTime, k);
+                addEvent(currentTime, getKeyboardEvent(k));
+                addEventForLog(currentTime, k);
             } else if (inputType instanceof DelayInputType) {
                 DelayInputType d = (DelayInputType) inputType;
-                addEvent(d.currentTime, getDelayEvent(d));
-                addEventForLog(d.currentTime, d);
+                addEvent(currentTime, getDelayEvent(d));
+                addEventForLog(currentTime, d);
             } else if (inputType instanceof PasteInputType) {
                 PasteInputType p = (PasteInputType) inputType;
-                addEvent(p.currentTime, getPasteEvent(p));
-                addEventForLog(p.currentTime, p);
+                addEvent(currentTime, getPasteEvent(p));
+                addEventForLog(currentTime, p);
             } else if (inputType instanceof WheelInputType) {
                 WheelInputType p = (WheelInputType) inputType;
-                addEvent(p.currentTime, getWheelEvent(p));
-                addEventForLog(p.currentTime, p);
+                addEvent(currentTime, getWheelEvent(p));
+                addEventForLog(currentTime, p);
             } else if (inputType instanceof ScreenshotInputType) {
                 ScreenshotInputType p = (ScreenshotInputType) inputType;
-                addEvent(p.currentTime, getScreenshotEvent(p));
-                addEventForLog(p.currentTime, p);
+                addEvent(currentTime, getScreenshotEvent(p));
+                addEventForLog(currentTime, p);
             } else if (inputType instanceof CustomInputType) {
                 CustomInputType p = (CustomInputType) inputType;
-                addEvent(p.currentTime, p.run);
-                addEventForLog(p.currentTime, p);
+                addEvent(currentTime, p.run);
+                addEventForLog(currentTime, p);
+            } else if (inputType instanceof RepeatInputType) {
+                RepeatInputType p = (RepeatInputType) inputType;
+                addEventForRepeatInputType(currentTime, p);
+                addEventForLog(currentTime, p);
+            } else if (inputType instanceof NullInputType) {
+                NullInputType p = (NullInputType) inputType;
+                // addEvent(currentTime, p);
+                // addEventForLog(currentTime, p);
+            }
+        }
+
+        private void addEventForRepeatInputType(long currentTime, RepeatInputType p) {
+            for (long starttime = p.currentTime; starttime <= p.untilTime; starttime += p.periodTime) {
+                for (int ii = 0; ii < p.stacks.size(); ii++) {
+                    InputType input = p.stacks.get(ii);
+                    executeCurrentLineInputType(starttime + (ii * 50), input);
+                }
             }
         }
 
