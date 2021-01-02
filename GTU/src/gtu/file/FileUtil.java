@@ -68,9 +68,8 @@ import sun.security.action.GetPropertyAction;
 public class FileUtil {
 
     public static void main(String[] args) {
-        File file1 = new File("C:\\Users\\gtu00\\OneDrive\\Desktop\\xxx");
         File file2 = new File("C:\\Users\\gtu00\\OneDrive\\Desktop\\xxx2");
-        moveFileByBat(file1, file2);
+        // moveFileByBat(file1, file2);
         System.out.println(getSizeLength(8.93, "mb"));
     }
 
@@ -788,7 +787,7 @@ public class FileUtil {
                 mListener2 = new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        boolean delResult = (boolean) e.getSource();
+                        Boolean delResult = (Boolean) e.getSource();
                         System.out.println((delResult ? "刪除成功" : "刪除失敗") + " : " + e.getActionCommand());
                     }
                 };

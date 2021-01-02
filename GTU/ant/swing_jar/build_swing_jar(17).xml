@@ -94,6 +94,7 @@
 			<packagename mode="small" name="google-collections-1.0.jar">com.google.common.collect.Multimap</packagename>
 			<packagename mode="small" name="forms-1.3.0.jar">com.jgoodies.forms.factories.FormFactory</packagename>
 			<packagename mode="small" name="commons-collections-3.2.jar">org.apache.commons.collections.map.SingletonMap</packagename>
+			<packagename mode="small" name="platform-3.4.0.jar">com.sun.jna.platform.FileUtils</packagename>
 
 			<packagename mode="small" name="jcc-bate-0.7.3.jar">taobe.tec.jcc.JChineseConvertor</packagename>
 			<packagename mode="small" name="jnativehook-2.1.0.jar">org.jnativehook.GlobalScreen</packagename>
