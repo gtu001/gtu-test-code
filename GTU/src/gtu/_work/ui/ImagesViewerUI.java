@@ -1,6 +1,7 @@
 package gtu._work.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.EventQueue;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
@@ -16,6 +17,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.EventObject;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.swing.Icon;
 import javax.swing.JFrame;
@@ -560,7 +562,8 @@ public class ImagesViewerUI extends JFrame {
 
             @Override
             public void nativeKeyReleased(NativeKeyEvent e) {
-                if (ImagesViewerUI.this.isVisible() && JCommonUtil.isVisibleOnScreen(ImagesViewerUI.this.ImageViewLbl)) {
+                System.out.println("isOnTop = " + JCommonUtil.isOnTop(ImagesViewerUI.this));
+                if (JCommonUtil.isOnTop(ImagesViewerUI.this)) {
                     if (NativeKeyEvent.VC_LEFT == e.getKeyCode()) {
                         mShowImageHandler.previous();
                     } else if (NativeKeyEvent.VC_RIGHT == e.getKeyCode()) {

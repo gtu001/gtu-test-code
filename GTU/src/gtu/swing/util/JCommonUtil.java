@@ -988,6 +988,7 @@ public class JCommonUtil {
                     }
                     popUtil.applyEvent(evt);//
                     popUtil.show();
+
                 }
             }
         });
@@ -1172,7 +1173,9 @@ public class JCommonUtil {
         if (window instanceof Frame) {
             Frame f = ((Frame) window);
             if (f.getState() == Frame.NORMAL) {
+                // if (!JCommonUtil.isOnTop(f)) {
                 f.setState(Frame.ICONIFIED);// 先縮小
+                System.out.println("-----先縮小");
             }
         }
         if (window instanceof JDialog) {
@@ -1422,6 +1425,19 @@ public class JCommonUtil {
         }
     }
 
+    public static boolean isOnTop(Window frame) {
+        boolean mainActive = frame.isActive();
+        boolean visible = frame.isVisible();
+        System.out.println("[isOnTop]focusCycleRoot = " + frame.isFocusCycleRoot());
+        System.out.println("[isOnTop]active = " + mainActive);
+        System.out.println("[isOnTop]visible = " + visible);
+        // System.out.println("@@---------------------------isOnTop Start ");
+        // Thread.dumpStack();
+        // System.out.println("@@---------------------------isOnTop End ");
+        return mainActive && visible;
+    }
+
+    @Deprecated
     public static boolean isVisibleOnScreen(Container comp1) {
         try {
             Point point = comp1.getLocationOnScreen();
@@ -1435,9 +1451,13 @@ public class JCommonUtil {
     }
 
     @Deprecated
-    private static void findChildren(Container comp1, AtomicReference<Component> focusOwner) {
+    public static void findChildren(Container comp1, AtomicReference<Component> focusOwner) {
         for (int ii = 0; ii < comp1.getComponentCount(); ii++) {
             Component comp = (Component) comp1.getComponent(ii);
+            if (comp.isFocusOwner()) {
+                focusOwner.set(comp);
+                return;
+            }
             if (comp instanceof Container) {
                 Container comp2 = (Container) comp;
                 if (comp2.getComponentCount() >= 1) {

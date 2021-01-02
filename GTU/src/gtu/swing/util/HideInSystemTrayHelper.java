@@ -257,15 +257,15 @@ public class HideInSystemTrayHelper {
                 System.out.println("[2] system tray not supported");
                 return;
             }
-            if (e.getNewState() == JFrame.ICONIFIED) {
-                try {
-                    tray.add(trayIcon);
-                    gtu.swing.util.JFrameUtil.setVisible(false, jframe);
-                    System.out.println("added to SystemTray");
-                } catch (AWTException ex) {
-                    System.out.println("unable to add to tray");
-                }
-            }
+            // if (e.getNewState() == JFrame.ICONIFIED) {
+            // try {
+            // tray.add(trayIcon);
+            // gtu.swing.util.JFrameUtil.setVisible(false, jframe);
+            // System.out.println("added to SystemTray");
+            // } catch (AWTException ex) {
+            // System.out.println("unable to add to tray");
+            // }
+            // }
             if (e.getNewState() == 7) {
                 try {
                     tray.add(trayIcon);

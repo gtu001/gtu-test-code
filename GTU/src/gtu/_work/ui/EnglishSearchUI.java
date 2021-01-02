@@ -230,7 +230,7 @@ public class EnglishSearchUI extends JFrame {
                 FRAME = new EnglishSearchUI();
             }
         }
-        if (gtu.swing.util.JFrameUtil.isVisible(FRAME) && FRAME.searchEnglishIdTextController.isFocusOwner()) {
+        if (JCommonUtil.isOnTop(FRAME)) {
             gtu.swing.util.JFrameUtil.setVisible(false, FRAME);
         } else {
             FRAME.bringToTop();
@@ -1378,7 +1378,8 @@ public class EnglishSearchUI extends JFrame {
     private ReentrantLock brinToTopLock = new ReentrantLock();
 
     private void bringToTop() {
-        if (searchEnglishIdTextController.isFocusOwner()) {
+        // if (searchEnglishIdTextController.isFocusOwner()) {
+        if (JCommonUtil.isOnTop(EnglishSearchUI.this)) {
             return;
         }
         if (brinToTopLock.tryLock()) {
@@ -1532,7 +1533,7 @@ public class EnglishSearchUI extends JFrame {
             this.appendMemoryBank(text, content);
             return true;
         } else if (propOtherMap.containsKey(text)) {
-            String content = (String)propOtherMap.get(text);
+            String content = (String) propOtherMap.get(text);
             meaningText.setText(content);
             googleTranslateArea_SetTooltip(text, content);
             this.appendMemoryBank(text, content);
