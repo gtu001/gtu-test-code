@@ -1,10 +1,8 @@
 package gtu._work.ui;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Image;
-import java.awt.TrayIcon.MessageType;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
@@ -36,6 +34,7 @@ import gtu.file.FileUtil;
 import gtu.image.ImageUtil;
 import gtu.keyboard_mouse.JnativehookKeyboardMouseHelper;
 import gtu.keyboard_mouse.JnativehookKeyboardMouseHelper.MyNativeKeyAdapter;
+import gtu.properties.PropertiesUtilBean;
 import gtu.runtime.DesktopUtil;
 import gtu.swing.util.HideInSystemTrayHelper;
 import gtu.swing.util.JCommonUtil;
@@ -63,6 +62,7 @@ public class ImagesViewerUI extends JFrame {
     private JLabel ImageViewLbl;
     private JScrollPane mImageViewLblJScrollPane;
     private ShowImageHandler mShowImageHandler;
+    private PropertiesUtilBean config = new PropertiesUtilBean(ImagesViewerUI.class);
 
     /**
      * Launch the application.
@@ -352,6 +352,10 @@ public class ImagesViewerUI extends JFrame {
                             break;
                         }
                     }
+                    if (file == null && currentFileLst1 != null && !currentFileLst1.isEmpty()) {
+                        file = currentFileLst1.get(0);
+                    }
+
                 }
                 if (!file.exists()) {
                     file = file.getParentFile();
@@ -381,14 +385,37 @@ public class ImagesViewerUI extends JFrame {
                 this.image = ImageUtil.getInstance().getBufferedImage(this.file);
                 String message = "[" + (currentIndex + 1) + "/" + currentFilesLst.size() + "]";
                 ImagesViewerUI.this.setTitle(message + " " + this.file.getName());
+
+                saveConfig();
             } catch (Exception ex) {
                 ex.printStackTrace();
-                if (ex.getMessage().contains("系統找不到指定的檔案")) {
+                if (ex.getMessage() != null && ex.getMessage().contains("系統找不到指定的檔案")) {
                     if (currentFilesLst != null && !currentFilesLst.isEmpty()) {
                         currentFilesLst.remove(this.file);
                         this.apply(null, currentFilesLst);
                     }
+                } else {
+                    this.apply(null, null);
                 }
+            }
+        }
+
+        private static final String COURRENT_DIR_CONFIG = "currentDir";
+
+        private void saveConfig() {
+            if (this.currentDir != null && this.currentDir.exists() && this.currentDir.isDirectory()) {
+                config.getConfigProp().setProperty(COURRENT_DIR_CONFIG, this.currentDir.getAbsolutePath());
+                config.store();
+            }
+        }
+
+        private void loadLatestConfig() {
+            config.reload();
+            String path = config.getConfigProp().getProperty(COURRENT_DIR_CONFIG);
+            File currentDir = new File(path);
+            if (currentDir != null && currentDir.exists() && currentDir.isDirectory()) {
+                this.apply(currentDir, null);
+                this.showImage();
             }
         }
 
@@ -552,7 +579,12 @@ public class ImagesViewerUI extends JFrame {
                 .getMenu();
         JMenu mainMenu = JMenuAppender.newInstance("file")//
                 .addMenuItem("item1", null)//
-                .addMenuItem("item2", (ActionListener) ActionAdapter.ActionListener.create(ActionDefine.TEST_DEFAULT_EVENT.name(), getSwingUtil()))//
+                .addMenuItem("讀取最後目錄", new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        mShowImageHandler.loadLatestConfig();
+                    }
+                })//
                 .addChildrenMenu(menu1)//
                 .getMenu();
         JMenuBarUtil.newInstance().addMenu(mainMenu).apply(this);

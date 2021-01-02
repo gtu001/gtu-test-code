@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 
 import gtu.file.FileUtil;
+import gtu.runtime.ProcessWatcher;
 
 public class RecycleBinUtil_forWin {
 
@@ -23,9 +24,17 @@ public class RecycleBinUtil_forWin {
                 String command = String.format("cmd /c call \"%s\" \"%s\" ", deleteBat, fileOrDir);
                 Process p = Runtime.getRuntime().exec(command);
                 int resultCode = p.waitFor();
+
+                ProcessWatcher watcher = ProcessWatcher.newInstance(p);
+                System.out.println("ERR Start ====================================");
+                System.out.println("ERR : " + watcher.getErrorStreamToString());
+                System.out.println("ERR End   ====================================");
+                System.out.println("Info Start ===================================");
+                System.out.println("Info : " + watcher.getInputStreamToString());
+                System.out.println("INfo End   ===================================");
                 String resultStr = (resultCode == 0 ? "刪除成功" : "刪除失敗") + " : " + fileOrDir;
                 System.out.println(resultStr);
-                if (resultCode == 0) {
+                if (resultCode == 0 && !fileOrDir.exists()) {
                     return true;
                 } else {
                     try {
