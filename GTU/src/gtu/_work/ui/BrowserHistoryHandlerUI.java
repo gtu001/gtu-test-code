@@ -1238,7 +1238,6 @@ public class BrowserHistoryHandlerUI extends JFrame {
 
         int width = 0;
 
-
         private void append(String url) {
             if (ICON_HOLDER_MAP.containsKey(url)) {
                 return;
@@ -2851,7 +2850,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
             EventQueue.invokeLater(new Runnable() {
                 public void run() {
                     try {
-                        if (JFrameUtil.isVisible(BrowserHistoryHandlerUI.this)) {
+                        if (JCommonUtil.isOnTop(BrowserHistoryHandlerUI.this)) {
                             gtu.swing.util.JFrameUtil.setVisible(false, BrowserHistoryHandlerUI.this);
                         } else {
                             bringToTop();
