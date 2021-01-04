@@ -2,6 +2,7 @@ package gtu.javafx;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
+import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
@@ -50,7 +51,7 @@ public class JavaFxMergeToSwing {
         jframe.setLayout(new BorderLayout());
         jframe.add(panel, BorderLayout.CENTER);
         jframe.add(panel2, BorderLayout.SOUTH);
-
+        
         JButton openMovieBtn = new JButton("開啟檔案");
         openMovieBtn.addMouseListener(new MouseAdapter() {
             @Override
@@ -77,6 +78,15 @@ public class JavaFxMergeToSwing {
                 jframe.add(fxPanel, BorderLayout.CENTER);
             }
         };
+        
+        jframe.addComponentListener(new java.awt.event.ComponentAdapter() {
+            public void componentResized(ComponentEvent e) {
+                if (mJFXPanelToSwing.getRoot() != null && mJFXPanelToSwing.getRoot() instanceof MediaControl) {
+                    MediaControl mediaControl = ((MediaControl) mJFXPanelToSwing.getRoot());
+                    mediaControl.resize();
+                }
+            }
+        });
         mJFXPanelToSwing.execute(jframe);
     }
 

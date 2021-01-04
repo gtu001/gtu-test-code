@@ -77,17 +77,33 @@ public class FastDBQueryUI_ReserveSqlDlg extends JDialog {
                 appendOrStr = "or";
             }
             sb.append("   " + appendOrStr + " ( \r\n");
-            for (int jj = 0; jj < innerSqlLst.size(); jj++) {
-                Triple<String, Class, Object> arry = innerSqlLst.get(jj);
-                String appendAndStr = "";
-                if (jj != 0) {
-                    appendAndStr = "and";
-                }
-                if (choiceMap == null || choiceMap.isEmpty() || choiceMap.containsKey(arry.getLeft())) {
+
+            if (choiceMap == null || choiceMap.isEmpty()) {
+                for (int jj = 0; jj < innerSqlLst.size(); jj++) {
+                    Triple<String, Class, Object> arry = innerSqlLst.get(jj);
+                    String appendAndStr = "";
+                    if (jj != 0) {
+                        appendAndStr = "and";
+                    }
                     sb.append("     " + appendAndStr + " ").append(getColumn(arry.getLeft())).append(" = ");
                     sb.append(getStringValue(arry)).append("\r\n");
                 }
+            } else {
+                boolean isFirst = true;
+                for (int jj = 0; jj < innerSqlLst.size(); jj++) {
+                    Triple<String, Class, Object> arry = innerSqlLst.get(jj);
+                    String appendAndStr = "and";
+                    if (isFirst) {
+                        appendAndStr = "";
+                    }
+                    if (choiceMap.containsKey(arry.getLeft())) {
+                        sb.append("     " + appendAndStr + " ").append(getColumn(arry.getLeft())).append(" = ");
+                        sb.append(getStringValue(arry)).append("\r\n");
+                        isFirst = false;
+                    }
+                }
             }
+
             sb.append("     ) \r\n");
         }
         sqlTextArea.setText(sb.toString());

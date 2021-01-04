@@ -3719,11 +3719,14 @@ public class FastDBQueryUI extends JFrame {
                         Validate.isTrue(false, "查詢結果為空!");
                     }
 
-                    Triple<List<String>, List<Class<?>>, List<Object[]>> orignQueryResult = JdbcDBUtil.queryForList_customColumns(//
-                            String.format(" select * from %s where 1=1 ", shemaTable), //
-                            new Object[0], getDataSource().getConnection(), true, 1);
+                    // Triple<List<String>, List<Class<?>>, List<Object[]>>
+                    // orignQueryResult =
+                    // JdbcDBUtil.queryForList_customColumns(//
+                    // String.format(" select * from %s where 1=1 ",
+                    // shemaTable), //
+                    // new Object[0], getDataSource().getConnection(), true, 1);
 
-                    Pair<List<String>, List<Object[]>> excelImportLst = transRealRowToQuyerLstIndex(orignQueryResult);
+                    Pair<List<String>, List<Object[]>> excelImportLst = transRealRowToQuyerLstIndex();// orignQueryResult
 
                     int selectRowIndex = queryResultTable.getSelectedRow();
 
@@ -3934,6 +3937,17 @@ public class FastDBQueryUI extends JFrame {
                             }
                             mFastDBQueryUI_ReserveSqlDlg = FastDBQueryUI_ReserveSqlDlg.newInstance(getRandom_TableNSchema(), sqlLst);
                             mFastDBQueryUI_ReserveSqlDlg.show();
+                        } catch (Exception ex) {
+                            JCommonUtil.handleException(ex);
+                        }
+                    }
+                });//
+
+                ppap.addJMenuItem("逆向產生SelectSQL [替換SQL條件]", new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        try {
+                            new ToStringReplaceOldSql().execute("selectIndex");
                         } catch (Exception ex) {
                             JCommonUtil.handleException(ex);
                         }
@@ -4197,7 +4211,7 @@ public class FastDBQueryUI extends JFrame {
         return false;
     }
 
-    private Pair<List<String>, List<Object[]>> transRealRowToQuyerLstIndex(Triple<List<String>, List<Class<?>>, List<Object[]>> excelImportLst) {
+    private Pair<List<String>, List<Object[]>> transRealRowToQuyerLstIndex() {
         TreeMap<Integer, String> columnMapping = getQueryResult_ColumnDefine();
         List<String> leftLst = new ArrayList<String>(columnMapping.values());
         JTableUtil util = JTableUtil.newInstance(queryResultTable);
@@ -5353,6 +5367,18 @@ public class FastDBQueryUI extends JFrame {
                     }
                 }
             });//
+
+            jpopUtil.addJMenuItem("以ToString()替換SQL條件", new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    try {
+                        new ToStringReplaceOldSql().execute("clipboard");
+                    } catch (Exception ex) {
+                        JCommonUtil.handleException(ex);
+                    }
+                }
+            });//
+
             if (mUndoSaveHanlder.hasRecord()) {
                 jpopUtil.addJMenuItem("儲存回復!!!", new ActionListener() {
                     @Override
@@ -8456,6 +8482,97 @@ public class FastDBQueryUI extends JFrame {
         }
     }
 
+    // --------------------------------------------------------------------------------------------------------------------------
+
+    private class ToStringReplaceOldSql {
+        Pattern fieldEqualValuePtn = Pattern.compile("(\\w+)\\s*\\=\\s*(\\'.+?\\'|\\-?[\\.\\d]+)");
+
+        private boolean isQuoteStartEnd(String replaceBefore) {
+            if (replaceBefore.length() > 0 && replaceBefore.substring(0, 1).contentEquals("'") && StringUtils.substring(replaceBefore, -1).equals("'")) {
+                return true;
+            }
+            return false;
+        }
+
+        public String replaceGroup(Matcher mth, int groupIndex, String replaceStr) {
+            int offset = mth.start();
+            int start = mth.start(groupIndex) - offset;
+            int end = mth.end(groupIndex) - offset;
+            String replaceBefore = mth.group(groupIndex);
+            if (isQuoteStartEnd(replaceBefore) && !isQuoteStartEnd(replaceStr)) {
+                replaceStr = "'" + replaceStr + "'";
+            }
+            String groupOrigin = mth.group();
+            groupOrigin = StringUtils.rightPad(groupOrigin, mth.group().length());
+            StringBuilder sb = new StringBuilder(groupOrigin);
+            sb.replace(start, end, StringUtils.defaultString(replaceStr));
+            return sb.toString();
+        }
+
+        private void execute(String fromType) {
+            String sql = StringUtils.defaultString(sqlTextArea.getText());
+
+            ImportFromClipboard mImportFromClipboard = new ImportFromClipboard();
+            String clipboardText = ClipboardUtil.getInstance().getContents();
+
+            List<String> titles = null;
+            Object[] rowData = null;
+
+            if ("clipboard".equalsIgnoreCase(fromType)) {
+                mImportFromClipboard.parseMain2(clipboardText);
+                titles = mImportFromClipboard.titles;
+                rowData = mImportFromClipboard.rowLst.get(0);
+
+            } else if ("selectIndex".equalsIgnoreCase(fromType)) {
+                Pair<List<String>, List<Object[]>> excelImportLst = transRealRowToQuyerLstIndex();// orignQueryResult
+                int selectRowIndex = queryResultTable.getSelectedRow();
+                titles = excelImportLst.getLeft();
+                rowData = excelImportLst.getRight().get(selectRowIndex);
+            }
+
+            if (rowData == null || titles == null || rowData.length == 0) {
+                JCommonUtil._jOptionPane_showMessageDialog_error("無法選擇套用SQL[0893] : " + fromType);
+                return;
+            }
+
+            StringBuffer sb = new StringBuffer();
+
+            Matcher mth = fieldEqualValuePtn.matcher(sql);
+            while (mth.find()) {
+                String column = mth.group(1);
+                String valueStr = "";
+
+                boolean findOk = false;
+                A: for (int ii = 0; ii < titles.size(); ii++) {
+                    String column2 = titles.get(ii);
+                    if (StringUtils.equalsIgnoreCase(column, column2)) {
+                        Object value = rowData[ii];
+                        if (value != null) {
+                            valueStr = String.valueOf(value);
+                        }
+                        findOk = true;
+                        break A;
+                    }
+                }
+
+                String groupStr = mth.group();
+                if (findOk) {
+                    groupStr = this.replaceGroup(mth, 2, valueStr);
+                }
+                mth.appendReplacement(sb, groupStr);
+            }
+
+            mth.appendTail(sb);
+            sqlTextArea.setText(sb.toString());
+        }
+    }
+
+    // --------------------------------------------------------------------------------------------------------------------------
+    // --------------------------------------------------------------------------------------------------------------------------
+    // --------------------------------------------------------------------------------------------------------------------------
+    // --------------------------------------------------------------------------------------------------------------------------
+    // --------------------------------------------------------------------------------------------------------------------------
+    // --------------------------------------------------------------------------------------------------------------------------
     // --------------------------------------------------------------------------------------------------------------------------
     // --------------------------------------------------------------------------------------------------------------------------
     // --------------------------------------------------------------------------------------------------------------------------

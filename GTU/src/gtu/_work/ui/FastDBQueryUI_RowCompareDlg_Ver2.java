@@ -31,6 +31,7 @@ import org.apache.commons.lang3.tuple.Triple;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.hssf.util.HSSFColor;
+import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 
 import gtu._work.ui.FastDBQueryUI_CrudDlgUI.DataType;
@@ -211,6 +212,14 @@ public class FastDBQueryUI_RowCompareDlg_Ver2 extends JDialog {
         }
     }
 
+    private String fixValue(Object v1) {
+        String v11 = v1 == null ? "" : String.valueOf(v1);
+        if ("null".equals(v11)) {
+            return "";
+        }
+        return v11;
+    }
+
     private DefaultTableModel initImportRowTable(String row1Label, String row2Label) {
         DefaultTableModel model = JTableUtil.createModel(false, "欄位", row1Label, row2Label);
         importRowTable.setModel(model);
@@ -228,8 +237,8 @@ public class FastDBQueryUI_RowCompareDlg_Ver2 extends JDialog {
                 JTableUtil util = JTableUtil.newInstance(importRowTable);
                 Object v1 = util.getRealValueAt(row, 1);
                 Object v2 = util.getRealValueAt(row, 2);
-                String v11 = v1 == null ? "" : String.valueOf(v1);
-                String v22 = v2 == null ? "" : String.valueOf(v2);
+                String v11 = fixValue(v1);
+                String v22 = fixValue(v2);
                 if (!StringUtils.equals(v11, v22)) {
                     return Pair.of(Color.RED, null);
                 }
@@ -242,8 +251,8 @@ public class FastDBQueryUI_RowCompareDlg_Ver2 extends JDialog {
                 JTableUtil util = JTableUtil.newInstance(importRowTable);
                 Object v1 = util.getRealValueAt(row, 1);
                 Object v2 = util.getRealValueAt(row, 2);
-                String v11 = v1 == null ? "" : String.valueOf(v1);
-                String v22 = v2 == null ? "" : String.valueOf(v2);
+                String v11 = fixValue(v1);
+                String v22 = fixValue(v2);
                 if (!StringUtils.equals(v11, v22)) {
                     return Pair.of(Color.GREEN, null);
                 }
@@ -256,8 +265,8 @@ public class FastDBQueryUI_RowCompareDlg_Ver2 extends JDialog {
                 JTableUtil util = JTableUtil.newInstance(importRowTable);
                 Object v1 = util.getRealValueAt(row, 1);
                 Object v2 = util.getRealValueAt(row, 2);
-                String v11 = v1 == null ? "" : String.valueOf(v1);
-                String v22 = v2 == null ? "" : String.valueOf(v2);
+                String v11 = fixValue(v1);
+                String v22 = fixValue(v2);
                 if (!StringUtils.equals(v11, v22)) {
                     return Pair.of(Color.GREEN, null);
                 }
@@ -325,57 +334,135 @@ public class FastDBQueryUI_RowCompareDlg_Ver2 extends JDialog {
 
             ExcelUtil_Xls97 util = ExcelUtil_Xls97.getInstance();
             HSSFWorkbook wb = new HSSFWorkbook();
-            HSSFSheet sheet = wb.createSheet("比對結果");
 
-            CellStyleHandler row0Cs = ExcelWriter.CellStyleHandler.newInstance(wb.createCellStyle())//
-                    .setForegroundColor(new HSSFColor.LAVENDER());
-            CellStyleHandler leftChangeCs = ExcelWriter.CellStyleHandler.newInstance(wb.createCellStyle())//
-                    .setForegroundColor(new HSSFColor.PINK());
-            CellStyleHandler leftCs = ExcelWriter.CellStyleHandler.newInstance(wb.createCellStyle())//
-                    .setForegroundColor(new HSSFColor.AQUA());
-            CellStyleHandler changeCs = ExcelWriter.CellStyleHandler.newInstance(wb.createCellStyle())//
-                    .setForegroundColor(new HSSFColor.YELLOW());
-            CellStyleHandler nonChangeCs = ExcelWriter.CellStyleHandler.newInstance(wb.createCellStyle())//
-                    .setForegroundColor(new HSSFColor.WHITE());
+            {
+                HSSFSheet sheet = wb.createSheet("比對結果");
 
-            row0Cs.setSheet(sheet);
-            leftCs.setSheet(sheet);
-            changeCs.setSheet(sheet);
-            leftChangeCs.setSheet(sheet);
-            nonChangeCs.setSheet(sheet);
+                CellStyleHandler row0Cs = ExcelWriter.CellStyleHandler.newInstance(wb.createCellStyle())//
+                        .setForegroundColor(new HSSFColor.LAVENDER());
+                CellStyleHandler leftChangeCs = ExcelWriter.CellStyleHandler.newInstance(wb.createCellStyle())//
+                        .setForegroundColor(new HSSFColor.PINK());
+                CellStyleHandler leftCs = ExcelWriter.CellStyleHandler.newInstance(wb.createCellStyle())//
+                        .setForegroundColor(new HSSFColor.AQUA());
+                CellStyleHandler changeCs = ExcelWriter.CellStyleHandler.newInstance(wb.createCellStyle())//
+                        .setForegroundColor(new HSSFColor.YELLOW());
+                CellStyleHandler nonChangeCs = ExcelWriter.CellStyleHandler.newInstance(wb.createCellStyle())//
+                        .setForegroundColor(new HSSFColor.WHITE());
 
-            Row row0 = sheet.createRow(0);
-            util.getCellChk(row0, 0).setCellValue("欄位");
-            util.getCellChk(row0, 1).setCellValue(row1Label);
-            util.getCellChk(row0, 2).setCellValue(row2Label);
-            row0Cs.applyStyle(0, 0);
-            row0Cs.applyStyle(0, 1);
-            row0Cs.applyStyle(0, 2);
+                row0Cs.setSheet(sheet);
+                leftCs.setSheet(sheet);
+                changeCs.setSheet(sheet);
+                leftChangeCs.setSheet(sheet);
+                nonChangeCs.setSheet(sheet);
 
-            for (int ii = 0; ii < titleLst.size(); ii++) {
-                String title = titleLst.get(ii);
-                String value1 = String.valueOf(row1.get(ii));
-                String value2 = String.valueOf(row2.get(ii));
+                Row row0 = sheet.createRow(0);
+                util.getCellChk(row0, 0).setCellValue("欄位");
+                util.getCellChk(row0, 1).setCellValue(row1Label);
+                util.getCellChk(row0, 2).setCellValue(row2Label);
+                row0Cs.applyStyle(0, 0);
+                row0Cs.applyStyle(0, 1);
+                row0Cs.applyStyle(0, 2);
 
-                Row rowx = sheet.createRow(ii + 1);
-                util.getCellChk(rowx, 0).setCellValue(title);
-                util.getCellChk(rowx, 1).setCellValue(value1);
-                util.getCellChk(rowx, 2).setCellValue(value2);
+                for (int ii = 0; ii < titleLst.size(); ii++) {
+                    String title = titleLst.get(ii);
+                    String value1 = String.valueOf(row1.get(ii));
+                    String value2 = String.valueOf(row2.get(ii));
 
-                if (!StringUtils.equals(value1, value2)) {
-                    leftChangeCs.applyStyle(ii + 1, 0);
-                    changeCs.applyStyle(ii + 1, 1);
-                    changeCs.applyStyle(ii + 1, 2);
-                } else {
-                    leftCs.applyStyle(ii + 1, 0);
-                    nonChangeCs.applyStyle(ii + 1, 1);
-                    nonChangeCs.applyStyle(ii + 1, 2);
+                    Row rowx = sheet.createRow(ii + 1);
+                    util.getCellChk(rowx, 0).setCellValue(title);
+                    util.getCellChk(rowx, 1).setCellValue(value1);
+                    util.getCellChk(rowx, 2).setCellValue(value2);
+
+                    String v11 = fixValue(value1);
+                    String v22 = fixValue(value2);
+
+                    if (!StringUtils.equals(v11, v22)) {
+                        leftChangeCs.applyStyle(ii + 1, 0);
+                        changeCs.applyStyle(ii + 1, 1);
+                        changeCs.applyStyle(ii + 1, 2);
+                    } else {
+                        leftCs.applyStyle(ii + 1, 0);
+                        nonChangeCs.applyStyle(ii + 1, 1);
+                        nonChangeCs.applyStyle(ii + 1, 2);
+                    }
                 }
+
+                util.setSheetWidth(sheet, new short[] { 8000, 13000, 13000 });
             }
 
-            util.setSheetWidth(sheet, new short[] { 8000, 13000, 13000 });
-            // util.autoCellSize(sheet);
-            String filename = FastDBQueryUI.class.getSimpleName() + "_" + DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMddHHmmss") + ".xls";
+            {
+                HSSFSheet sheet = wb.createSheet("比對結果2");
+
+                CellStyleHandler row0Cs = ExcelWriter.CellStyleHandler.newInstance(wb.createCellStyle())//
+                        .setForegroundColor(new HSSFColor.LAVENDER());
+                CellStyleHandler leftChangeCs = ExcelWriter.CellStyleHandler.newInstance(wb.createCellStyle())//
+                        .setForegroundColor(new HSSFColor.PINK());
+                CellStyleHandler leftCs = ExcelWriter.CellStyleHandler.newInstance(wb.createCellStyle())//
+                        .setForegroundColor(new HSSFColor.AQUA());
+                CellStyleHandler changeCs = ExcelWriter.CellStyleHandler.newInstance(wb.createCellStyle())//
+                        .setForegroundColor(new HSSFColor.YELLOW());
+                CellStyleHandler nonChangeCs = ExcelWriter.CellStyleHandler.newInstance(wb.createCellStyle())//
+                        .setForegroundColor(new HSSFColor.WHITE());
+
+                row0Cs.setSheet(sheet);
+                leftCs.setSheet(sheet);
+                changeCs.setSheet(sheet);
+                leftChangeCs.setSheet(sheet);
+                nonChangeCs.setSheet(sheet);
+
+                Row sheetRow0 = sheet.createRow(0);
+                Row sheetRow1 = sheet.createRow(1);
+                Row sheetRow2 = sheet.createRow(2);
+
+                util.getCellChk(sheetRow0, 0).setCellValue("欄位");
+                util.getCellChk(sheetRow1, 0).setCellValue(row1Label);
+                util.getCellChk(sheetRow2, 0).setCellValue(row2Label);
+
+                row0Cs.applyStyle(util.getCellChk(sheetRow0, 0));
+                row0Cs.applyStyle(util.getCellChk(sheetRow1, 0));
+                row0Cs.applyStyle(util.getCellChk(sheetRow2, 0));
+
+                // title
+                for (int ii = 0; ii < titleLst.size(); ii++) {
+                    String titleValue = titleLst.get(ii);
+                    Cell c0 = util.getCellChk(sheetRow0, ii + 1);
+                    c0.setCellValue(titleValue);
+                    row0Cs.applyStyle(c0);
+                }
+
+                for (int ii = 0; ii < titleLst.size(); ii++) {
+                    String value1 = String.valueOf(row1.get(ii));
+                    String value2 = String.valueOf(row2.get(ii));
+
+                    Cell c1 = util.getCellChk(sheetRow1, ii + 1);
+                    Cell c2 = util.getCellChk(sheetRow2, ii + 1);
+
+                    c1.setCellValue(value1);
+                    c2.setCellValue(value2);
+
+                    String v11 = fixValue(value1);
+                    String v22 = fixValue(value2);
+
+                    if (!StringUtils.equals(v11, v22)) {
+                        leftChangeCs.applyStyle(0, ii + 1);
+                        changeCs.applyStyle(c1);
+                        changeCs.applyStyle(c2);
+                    } else {
+                        leftCs.applyStyle(0, ii + 1);
+                        nonChangeCs.applyStyle(c1);
+                        nonChangeCs.applyStyle(c2);
+                    }
+                }
+
+                util.autoCellSize(sheet);
+            }
+
+            String filename1 = FastDBQueryUI.class.getSimpleName() + "_" + DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMddHHmmss");
+            filename1 = JCommonUtil._jOptionPane_showInputDialog("輸入檔名", filename1);
+            if (StringUtils.isBlank(filename1)) {
+                return;
+            }
+            String filename = filename1 + ".xls";
             File xlsFile = new File(FileUtil.DESKTOP_DIR, filename);
             util.writeExcel(xlsFile, wb);
             JCommonUtil._jOptionPane_showMessageDialog_info("產生比對檔:" + filename);
