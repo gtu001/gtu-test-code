@@ -49,7 +49,17 @@ public class FastDBQueryUI_XlsColumnDefLoader {
     private ActionListener loadingInfoListener;
 
     public static final String FIND_TABLE_NAME_NA_DEF = "無差別";
-    
+
+    public boolean isInitOk() {
+        if (configLst == null || configLst.isEmpty()) {
+            return false;
+        }
+        if (columnDef == null) {
+            return false;
+        }
+        return false;
+    }
+
     public FastDBQueryUI_XlsColumnDefLoader(File customDir, List<XlsColumnDefClz> configLst) {
         this.customDir = customDir;
         if (configLst != null) {
@@ -127,7 +137,7 @@ public class FastDBQueryUI_XlsColumnDefLoader {
             }
         }
     }
-    
+
     public String getDBColumnChinese_NA(final String column, boolean forTooltip) {
         final List<TableDef> tbs = new ArrayList<TableDef>(tabLst);
         for (TableDef tb : tbs) {
@@ -217,7 +227,7 @@ public class FastDBQueryUI_XlsColumnDefLoader {
             }
         };
     }
-    
+
     public Transformer getTableTitleTransformer(final String tableName) {
         final List<TableDef> tbs = getTable(tableName);
         if (tbs.isEmpty()) {

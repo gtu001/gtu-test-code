@@ -7538,7 +7538,7 @@ public class FastDBQueryUI extends JFrame {
                 xlsLoader = (FastDBQueryUI_XlsColumnDefLoader) TAB_UI1.getResourcesPool().get(xlsLoaderResourceKey);
             }
             boolean isNeedExecute = false;
-            if (xlsLoader == null || reset) {
+            if (isXlsLoaderInit() || reset) {
                 xlsLoader = new FastDBQueryUI_XlsColumnDefLoader(null, mXlsColumnDefDlg.getConfig());
                 xlsLoader.setLoadingInfoListener(loadingInfoListener);
                 isNeedExecute = true;
@@ -7565,10 +7565,21 @@ public class FastDBQueryUI extends JFrame {
             if (!dir.exists()) {
                 dir.mkdirs();
             }
-            if (xlsLoader == null || reset) {
+            if (isXlsLoaderInit() || reset) {
                 checkXlsLoader(reset, true);
             }
             if (tableColumnDefText.getSelectedItem() != null && StringUtils.isNotBlank((String) tableColumnDefText.getSelectedItem())) {
+                return true;
+            }
+            return false;
+        }
+
+        private boolean isXlsLoaderInit() {
+            if (xlsLoader != null && xlsLoader.isInitOk()) {
+                return true;
+            }
+            xlsLoader = (FastDBQueryUI_XlsColumnDefLoader) TAB_UI1.getResourcesPool().get(xlsLoaderResourceKey);
+            if (xlsLoader != null && xlsLoader.isInitOk()) {
                 return true;
             }
             return false;
@@ -7579,7 +7590,7 @@ public class FastDBQueryUI extends JFrame {
             if (!dir.exists()) {
                 dir.mkdirs();
             }
-            if (xlsLoader == null) {
+            if (isXlsLoaderInit()) {//
                 checkXlsLoader(false, false);
             }
         }
@@ -7602,7 +7613,7 @@ public class FastDBQueryUI extends JFrame {
         public String getChinese(String column, String table) {
             try {
                 init2(false);
-                if (xlsLoader == null) {
+                if (isXlsLoaderInit()) {
                     return null;
                 }
                 if (StringUtils.isBlank(table)) {
@@ -8530,7 +8541,9 @@ public class FastDBQueryUI extends JFrame {
                 boolean findOk = false;
                 A: for (int ii = 0; ii < titles.size(); ii++) {
                     String column2 = titles.get(ii);
-                    if (StringUtils.equalsIgnoreCase(column, column2)) {
+                    String column3 = StringUtilForDb.javaToDbField(column2);
+                    if (StringUtils.equalsIgnoreCase(column, column2) || //
+                            StringUtils.equalsIgnoreCase(column, column3)) {
                         Object value = rowData[ii];
                         if (value != null) {
                             valueStr = String.valueOf(value);
