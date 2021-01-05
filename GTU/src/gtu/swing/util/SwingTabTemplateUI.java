@@ -352,6 +352,45 @@ public class SwingTabTemplateUI {
         return childFrame;
     }
 
+    public JFrame addTab(String tabName, JFrame childFrame, boolean moveToNew) {
+        try {
+            JPanel panel = new JPanel();
+            tabbedPane.addTab(tabName, null, panel, null);
+            panel.setLayout(new BorderLayout(0, 0));
+            panel.add(childFrame.getContentPane(), BorderLayout.CENTER);
+            jframeKeeperLst.add(childFrame);
+            if (moveToNew) {
+                tabbedPane.setSelectedIndex(tabbedPane.getTabCount() - 1);
+            }
+        } catch (Exception ex) {
+            JCommonUtil.handleException(ex);
+        }
+        return childFrame;
+    }
+
+    public boolean removeAllTabs() {
+        for (int ii = 0; ii < this.getTabCount(); ii++) {
+            if (removeTab(ii) == null) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public JFrame removeTab(int index) {
+        JFrame childFrame = null;
+        try {
+            if (index >= 0 && index < getJframeKeeperLst().size()) {
+                childFrame = getJframeKeeperLst().get(index);
+                tabbedPane.remove(index);
+                jframeKeeperLst.remove(index);
+            }
+        } catch (Exception ex) {
+            JCommonUtil.handleException(ex);
+        }
+        return childFrame;
+    }
+
     public JFrame getJframe() {
         return jframe;
     }

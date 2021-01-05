@@ -10,7 +10,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -404,6 +403,7 @@ public class FastDBQueryUI extends JFrame {
     private JComboBox sqlListSortCombobox;
     private JLabel lblNewLabel_22;
     private AtomicReference<ColumnSearchFilter> columnFilterHolder = new AtomicReference<ColumnSearchFilter>();
+    private static AllTabPageProcess mAllPageProcess;
 
     private final Predicate IGNORE_PREDICT = new Predicate() {
         @Override
@@ -515,6 +515,7 @@ public class FastDBQueryUI extends JFrame {
         tabUI.startUI();
         tabUI.getSysTrayUtil().createDefaultTray();
         TAB_UI1 = tabUI;
+        initApplyAppMenu();
     }
 
     /**
@@ -524,7 +525,7 @@ public class FastDBQueryUI extends JFrame {
      * @throws FileNotFoundException
      * @throws ClassNotFoundException
      */
-    public FastDBQueryUI() throws FileNotFoundException, IOException, ClassNotFoundException {
+    public FastDBQueryUI() {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         java.awt.Dimension scr_size = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
         setBounds(100, 100, (int) (scr_size.width * 0.8), (int) (scr_size.height * 0.8));
@@ -2359,7 +2360,7 @@ public class FastDBQueryUI extends JFrame {
     /**
      * 初始化sqlList
      */
-    private void initLoadSqlListConfig() throws IOException {
+    private void initLoadSqlListConfig() {
         sqlIdConfigBeanHandler.init(sqlIdCategoryComboBox_Auto.getTextComponent().getText());
         sqlIdListDSMappingHandler.init();
 
@@ -2473,7 +2474,7 @@ public class FastDBQueryUI extends JFrame {
     /**
      * 初始化dataSource
      */
-    private void initDataSourceProperties(Map<String, String> param) throws IOException {
+    private void initDataSourceProperties(Map<String, String> param) {
         if (param == null || param.isEmpty()) {
             param = dataSourceConfig.loadConfig();
         }
@@ -3605,24 +3606,16 @@ public class FastDBQueryUI extends JFrame {
      * 下一組連線設定
      */
     private void nextConnBtnClick() {
-        try {
-            dataSourceConfig.next();
-            initDataSourceProperties(null);
-        } catch (IOException e) {
-            JCommonUtil.handleException(e);
-        }
+        dataSourceConfig.next();
+        initDataSourceProperties(null);
     }
 
     /**
      * 上一組連線設定
      */
     private void previousConnBtnClick() {
-        try {
-            dataSourceConfig.previous();
-            initDataSourceProperties(null);
-        } catch (IOException e) {
-            JCommonUtil.handleException(e);
-        }
+        dataSourceConfig.previous();
+        initDataSourceProperties(null);
     }
 
     /**
@@ -5454,11 +5447,7 @@ public class FastDBQueryUI extends JFrame {
 
             JCommonUtil._jOptionPane_showMessageDialog_info("刪除" + (!paramFile.exists() ? "成功" : "失敗"));
 
-            try {
-                initLoadSqlListConfig();
-            } catch (IOException e) {
-                JCommonUtil.handleException(e);
-            }
+            initLoadSqlListConfig();
         }
     }
 
@@ -6190,16 +6179,12 @@ public class FastDBQueryUI extends JFrame {
     }
 
     public void reloadAllProperties() {
-        try {
-            initLoadSqlListConfig();
-            sqlIdListDSMappingHandler.init();
-            // loadParameterTableConfig();//不需要
-            refSearchListConfigHandler.reload();
-            etcConfigHandler.reload();
-            dataSourceConfig = new PropertiesGroupUtils_ByKey(new File(JAR_PATH_FILE, "dataSource.properties"));
-        } catch (IOException e) {
-            JCommonUtil.handleException("reloadAllProperties ERR : " + e.getMessage(), e);
-        }
+        initLoadSqlListConfig();
+        sqlIdListDSMappingHandler.init();
+        // loadParameterTableConfig();//不需要
+        refSearchListConfigHandler.reload();
+        etcConfigHandler.reload();
+        dataSourceConfig = new PropertiesGroupUtils_ByKey(new File(JAR_PATH_FILE, "dataSource.properties"));
     }
 
     private static class HardcodeParamDetecter {
@@ -8568,7 +8553,82 @@ public class FastDBQueryUI extends JFrame {
     }
 
     // --------------------------------------------------------------------------------------------------------------------------
+    private static class AllTabPageProcess {
+        private String FILE_END_NAME = "_(tabs).yml";
+
+        SwingTabTemplateUI TAB_UI1;
+
+        public AllTabPageProcess(SwingTabTemplateUI TAB_UI1) {
+            this.TAB_UI1 = TAB_UI1;
+        }
+
+        public void save() {
+            List<JFrame> list = TAB_UI1.getJframeKeeperLst();
+            List<SqlIdConfigBean> list2 = new ArrayList<SqlIdConfigBean>();
+            for (int ii = 0; ii < list.size(); ii++) {
+                FastDBQueryUI frame = (FastDBQueryUI) list.get(ii);
+                SqlIdConfigBean bean = frame.getCurrentEditSqlIdConfigBean();
+                list2.add(bean);
+            }
+            String filename = FastDBQueryUI.class.getSimpleName() + "_頁籤_" + DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMddHHmmss");
+            filename = JCommonUtil._jOptionPane_showInputDialog("頁籤暫存檔", filename);
+            File ymlFile = new File(FileUtil.DESKTOP_DIR, filename + FILE_END_NAME);
+            YamlMapUtil.getInstance().saveToFilePlain(ymlFile, list2, false, null);
+            JCommonUtil._jOptionPane_showMessageDialog_info("儲存檔案：" + ymlFile.getName());
+        }
+
+        public void restore(File file) {
+            if (!file.getName().endsWith(FILE_END_NAME)) {
+                JCommonUtil._jOptionPane_showMessageDialog_error("檔案格式必須為*" + FILE_END_NAME);
+                return;
+            }
+            List<SqlIdConfigBean> list2 = YamlMapUtil.getInstance().loadFromFile(file, SqlIdConfigBean.class, null);
+            if (list2.isEmpty()) {
+                JCommonUtil._jOptionPane_showMessageDialog_error("沒有任何頁！");
+                return;
+            }
+            TAB_UI1.removeAllTabs();
+            for (int ii = 0; ii < list2.size(); ii++) {
+                FastDBQueryUI newFrame = new FastDBQueryUI();
+                SqlIdConfigBean sqlBean1 = list2.get(ii);
+                if (StringUtils.isBlank(sqlBean1.sqlId)) {
+                    sqlBean1.sqlId = "未命名";
+                }
+                newFrame.sqlIdText.setText(sqlBean1.sqlId);
+                if (StringUtils.isNotBlank(sqlBean1.sql)) {
+                    newFrame.sqlTextArea.setText(sqlBean1.sql);
+                }
+                newFrame.sqlListMouseClicked(null, sqlBean1);
+                TAB_UI1.addTab(sqlBean1.toString(), (JFrame) newFrame, false);
+            }
+        }
+    }
+
     // --------------------------------------------------------------------------------------------------------------------------
+    private static void initApplyAppMenu() {
+        mAllPageProcess = new AllTabPageProcess(TAB_UI1);
+
+        JMenu menu1 = JMenuAppender.newInstance("暫存頁籤")//
+                .addMenuItem("讀取", new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        File file = JCommonUtil._jFileChooser_selectFileOnly();
+                        mAllPageProcess.restore(file);
+                    }
+                })//
+                .addMenuItem("儲存", new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        mAllPageProcess.save();
+                    }
+                })//
+                .getMenu();
+        JMenu mainMenu = JMenuAppender.newInstance("file")//
+                .addMenuItem("item1", null)//
+                .addChildrenMenu(menu1)//
+                .getMenu();
+        JMenuBarUtil.newInstance().addMenu(mainMenu).apply(TAB_UI1.getJframe());
+    }
     // --------------------------------------------------------------------------------------------------------------------------
     // --------------------------------------------------------------------------------------------------------------------------
     // --------------------------------------------------------------------------------------------------------------------------

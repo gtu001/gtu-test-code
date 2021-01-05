@@ -479,6 +479,10 @@ public class FileUtil {
         if (OsInfoUtil.isWindows()) {
             command = String.format(" move /Y \"%s\" \"%s\"", fromFile, toFile);
         } else {
+            if (fromFile.isDirectory()) {
+                toFile = new File(toFile, fromFile.getName());
+                toFile.mkdirs();
+            }
             command = String.format(" mv -Tf \"%s\" \"%s\"", fromFile, toFile);
         }
         RuntimeBatPromptModeUtil inst = RuntimeBatPromptModeUtil.newInstance();
@@ -2110,4 +2114,3 @@ public class FileUtil {
         }
     }
 }
-
