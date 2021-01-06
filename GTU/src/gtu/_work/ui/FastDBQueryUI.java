@@ -7538,7 +7538,7 @@ public class FastDBQueryUI extends JFrame {
                 xlsLoader = (FastDBQueryUI_XlsColumnDefLoader) TAB_UI1.getResourcesPool().get(xlsLoaderResourceKey);
             }
             boolean isNeedExecute = false;
-            if (isXlsLoaderInit() || reset) {
+            if (!isXlsLoaderInit() || reset) {
                 xlsLoader = new FastDBQueryUI_XlsColumnDefLoader(null, mXlsColumnDefDlg.getConfig());
                 xlsLoader.setLoadingInfoListener(loadingInfoListener);
                 isNeedExecute = true;
@@ -7565,7 +7565,7 @@ public class FastDBQueryUI extends JFrame {
             if (!dir.exists()) {
                 dir.mkdirs();
             }
-            if (isXlsLoaderInit() || reset) {
+            if (!isXlsLoaderInit() || reset) {
                 checkXlsLoader(reset, true);
             }
             if (tableColumnDefText.getSelectedItem() != null && StringUtils.isNotBlank((String) tableColumnDefText.getSelectedItem())) {
@@ -7590,7 +7590,7 @@ public class FastDBQueryUI extends JFrame {
             if (!dir.exists()) {
                 dir.mkdirs();
             }
-            if (isXlsLoaderInit()) {//
+            if (!isXlsLoaderInit()) {//
                 checkXlsLoader(false, false);
             }
         }
@@ -7613,7 +7613,7 @@ public class FastDBQueryUI extends JFrame {
         public String getChinese(String column, String table) {
             try {
                 init2(false);
-                if (isXlsLoaderInit()) {
+                if (!isXlsLoaderInit()) {
                     return null;
                 }
                 if (StringUtils.isBlank(table)) {
