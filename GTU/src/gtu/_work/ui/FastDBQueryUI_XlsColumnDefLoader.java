@@ -57,7 +57,7 @@ public class FastDBQueryUI_XlsColumnDefLoader {
         if (columnDef == null) {
             return false;
         }
-        return false;
+        return true;
     }
 
     public FastDBQueryUI_XlsColumnDefLoader(File customDir, List<XlsColumnDefClz> configLst) {

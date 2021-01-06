@@ -11,14 +11,18 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.EventObject;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.Stack;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -29,17 +33,16 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.JTextPane;
 import javax.swing.JToggleButton;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.DocumentEvent;
 
+import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.time.DateFormatUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -52,16 +55,18 @@ import gtu.selenium.SeleniumUtil;
 import gtu.string.StringUtil_;
 import gtu.swing.util.HideInSystemTrayHelper;
 import gtu.swing.util.JCommonUtil;
+import gtu.swing.util.JCommonUtil.HandleDocumentEvent;
 import gtu.swing.util.JFrameRGBColorPanel;
 import gtu.swing.util.JFrameUtil;
 import gtu.swing.util.JListUtil;
 import gtu.swing.util.JMouseEventUtil;
+import gtu.swing.util.JPopupMenuUtil;
+import gtu.swing.util.JTextAreaPromptHandlerExample.JTextAreaPromptHandler;
 import gtu.swing.util.JTextAreaUtil;
 import gtu.swing.util.JToggleButtonUtil;
 import gtu.swing.util.SwingActionUtil;
 import gtu.swing.util.SwingActionUtil.Action;
 import gtu.swing.util.SwingActionUtil.ActionAdapter;
-import gtu.swing.util.TextLineNumber;
 import gtu.yaml.util.YamlUtil;
 import gtu.yaml.util.YamlUtilBean;
 
@@ -94,6 +99,9 @@ public class SeleniumTestUI extends JFrame {
     private PropertiesUtilBean config = new PropertiesUtilBean(SeleniumTestUI.class);
     private JLabel lblDriver;
     private JTextField webDriverText;
+
+    private static Stack<GotoStatus> GOTO_STACK = new Stack<GotoStatus>();
+    private static final String PARAM_SPLIT_STR = "\\#\\^\\#";
 
     /**
      * Launch the application.
@@ -235,9 +243,80 @@ public class SeleniumTestUI extends JFrame {
         panel_10.add(executeBtn);
 
         scriptArea = new JTextArea();
+
         JTextAreaUtil.applyCommonSetting(scriptArea);
         JTextAreaUtil.applyEnterKeyFixPosition(scriptArea);
         JTextAreaUtil.applyTabKey(scriptArea);
+
+        final JTextAreaPromptHandler textAreaPromptHandler = new JTextAreaPromptHandler(scriptArea) {
+            List<String> currentLst2 = new ArrayList<String>();
+
+            @Override
+            protected boolean isShowPopupMenu(String commaBefore, String commaAfter) {
+                final Set<String> commandSet = new TreeSet<String>();
+                for (PatternEnum e : PatternEnum.values()) {
+                    if (e.commands != null) {
+                        if (StringUtils.isNotBlank(commaBefore) && e.isNeedHasCommaBefore) {
+                            for (String command : e.commands) {
+                                commandSet.add(command);
+                            }
+                        } else if (StringUtils.isBlank(commaBefore) && !e.isNeedHasCommaBefore) {
+                            for (String command : e.commands) {
+                                commandSet.add(command);
+                            }
+                        }
+                    }
+                }
+                currentLst2.clear();
+                currentLst2.addAll(commandSet);
+                return !currentLst2.isEmpty();
+            }
+
+            @Override
+            protected void applyJMenuItems(JPopupMenuUtil util) {
+                for (String str : currentLst2) {
+                    util.addJMenuItem(str, new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            replaceCommafter(str);
+                            util.dismiss();
+                        }
+                    });
+                }
+            }
+        };
+
+        scriptArea.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                boolean isConsume = false;
+                if (e.getKeyCode() == KeyEvent.VK_TAB || e.getKeyCode() == KeyEvent.VK_ENTER && textAreaPromptHandler != null) {
+                    isConsume = textAreaPromptHandler.performSelectTopColumn(e);
+                    if (!isConsume) {
+                        JTextAreaUtil.triggerTabKey(scriptArea, e);
+                    }
+                } else if (e.getKeyCode() == KeyEvent.VK_ESCAPE && textAreaPromptHandler != null) {
+                    isConsume = textAreaPromptHandler.performSelectClose();
+                } else if (e.getKeyCode() == KeyEvent.VK_UP || e.getKeyCode() == KeyEvent.VK_DOWN && textAreaPromptHandler != null) {
+                    isConsume = textAreaPromptHandler.performSelectUpDown(e);
+                } else if (!isConsume && textAreaPromptHandler != null) {
+                    textAreaPromptHandler.performUpdateLocation();
+                    isConsume = textAreaPromptHandler.checkPopupListFocus(e);
+                }
+                if (isConsume) {
+                    e.consume();
+                    System.out.println("-----Consume");
+                }
+            }
+        });
+
+        scriptArea.getDocument().addDocumentListener(JCommonUtil.getDocumentListener(new HandleDocumentEvent() {
+            @Override
+            public void process(DocumentEvent event) {
+                textAreaPromptHandler.init(event);
+                textAreaPromptHandler.mainProcess();
+            }
+        }));
 
         panel_1.add(JTextAreaUtil.createLineNumberWrap(scriptArea), BorderLayout.CENTER);
 
@@ -404,14 +483,24 @@ public class SeleniumTestUI extends JFrame {
                 if (mSeleniumService != null) {
                     mSeleniumService.stop = true;
                 }
-                mSeleniumService = new SeleniumService() {
+                mSeleniumService = new SeleniumService(SeleniumTestUI.this) {
                     @Override
                     void setCurrentLineNumber(int lineNumber) {
                         lineNumberLbl.setText("" + lineNumber);
                     }
 
                     @Override
-                    List<String> getContent() {
+                    String getTitle() {
+                        return StringUtils.defaultString(scriptNameText.getText());
+                    }
+
+                    @Override
+                    String getContent() {
+                        return StringUtils.defaultString(scriptArea.getText());
+                    }
+
+                    @Override
+                    List<String> getContentLst() {
                         return StringUtil_.readContentToList(scriptArea.getText(), true, false, false);
                     }
 
@@ -497,14 +586,14 @@ public class SeleniumTestUI extends JFrame {
     }
 
     private enum PatternEnum {
-        GET_URL(Pattern.compile("(?:get|url)\\((.*)\\)")) {
+        GET_URL(Pattern.compile("(?:get|url)\\((.*)\\)"), false, new String[] { "url()" }) {
             @Override
             void apply001(Matcher mth, int lineNumber, SeleniumService self) {
                 String url = PatternEnum.parseValue(mth.group(1), self);
                 self.driver.get(url);
             }
         }, //
-        CSS(Pattern.compile("(\\w+)\\s*\\=\\s*(csss?)\\((.*)\\)")) {
+        CSS(Pattern.compile("(\\w+)\\s*\\=\\s*(csss?)\\((.*)\\)"), false, new String[] { "css()" }) {
             @Override
             void apply001(Matcher mth, int lineNumber, SeleniumService self) {
                 String var = mth.group(1);
@@ -512,19 +601,23 @@ public class SeleniumTestUI extends JFrame {
                 String express = PatternEnum.parseValue(mth.group(3), self);
                 String word1 = express;
                 String word2 = "";
+                long waitSeconds = 20;
                 if (express.contains(",")) {
-                    String[] expresses = express.split(",", -1);
+                    String[] expresses = express.split(PARAM_SPLIT_STR, -1);
                     word1 = expresses[0];
                     word2 = expresses[1];
+                    if (expresses.length >= 3) {
+                        waitSeconds = Long.parseLong(expresses[2]);
+                    }
                 }
                 Object elements = null;
                 String desc = "";
                 if ("csss".equalsIgnoreCase(cssType)) {
-                    List<WebElement> list = SeleniumUtil.WebElementControl.waitPageElementByCsss(word1, word2, self.driver);
+                    List<WebElement> list = SeleniumUtil.WebElementControl.waitPageElementByCsss(word1, word2, self.driver, 10, 500, waitSeconds);
                     elements = list;
                     desc = "List-" + list.size();
                 } else if ("css".equalsIgnoreCase(cssType)) {
-                    elements = SeleniumUtil.WebElementControl.waitPageElementByCss(word1, word2, self.driver);
+                    elements = SeleniumUtil.WebElementControl.waitPageElementByCss(word1, word2, self.driver, 10, 500, waitSeconds);
                     desc = "Node";
                 }
                 if (elements == null) {
@@ -535,23 +628,31 @@ public class SeleniumTestUI extends JFrame {
                 self.elementMap.put(var, elements);
             }
         }, //
-        XPATH(Pattern.compile("(\\w+)\\s*\\=\\s*(xpaths?)\\((.*)\\)")) {
+        XPATH(Pattern.compile("(\\w+)\\s*\\=\\s*(xpaths?)\\((.*)\\)"), false, new String[] { "xpath()" }) {
             @Override
             void apply001(Matcher mth, int lineNumber, SeleniumService self) {
                 String var = mth.group(1);
                 String xpathType = mth.group(2);
                 String express = PatternEnum.parseValue(mth.group(3), self);
                 String word1 = express;
-                WebElement element = SeleniumUtil.WebElementControl.waitPageElementByXpath(word1, self.driver);
+                long waitSeconds = 20;
+                if (express.contains(",")) {
+                    String[] expresses = express.split(PARAM_SPLIT_STR, -1);
+                    word1 = expresses[0];
+                    if (expresses.length >= 2) {
+                        waitSeconds = Long.parseLong(expresses[1]);
+                    }
+                }
+                WebElement element = SeleniumUtil.WebElementControl.waitPageElementByXpath(word1, self.driver, 10, 500, waitSeconds);
                 self.elementMap.put(var, element);
                 Object elements = null;
                 String desc = "";
                 if ("xpaths".equalsIgnoreCase(xpathType)) {
-                    List<WebElement> list = SeleniumUtil.WebElementControl.waitPageElementByXpaths(word1, self.driver);
+                    List<WebElement> list = SeleniumUtil.WebElementControl.waitPageElementByXpaths(word1, self.driver, 10, 500, waitSeconds);
                     elements = list;
                     desc = "List-" + list.size();
                 } else if ("xpath".equalsIgnoreCase(xpathType)) {
-                    elements = SeleniumUtil.WebElementControl.waitPageElementByXpath(word1, self.driver);
+                    elements = SeleniumUtil.WebElementControl.waitPageElementByXpath(word1, self.driver, 10, 500, waitSeconds);
                     desc = "Node";
                 }
                 if (elements == null) {
@@ -562,7 +663,7 @@ public class SeleniumTestUI extends JFrame {
                 self.elementMap.put(var, elements);
             }
         }, //
-        SET_VAL(Pattern.compile("(\\w+)\\.val\\((.*)\\)")) {
+        SET_VAL(Pattern.compile("(\\w+)\\.val\\((.*)\\)"), true, new String[] { "val()" }) {
             @Override
             void apply001(Matcher mth, int lineNumber, SeleniumService self) {
                 String var = mth.group(1);
@@ -576,7 +677,7 @@ public class SeleniumTestUI extends JFrame {
                 }
             }
         }, //
-        GET_VAL(Pattern.compile("(\\w+)\\s*\\=\\s*(\\w+)\\.val\\(\\)")) {
+        GET_VAL(Pattern.compile("(\\w+)\\s*\\=\\s*(\\w+)\\.val\\(\\)"), true, new String[] { "val()" }) {
             @Override
             void apply001(Matcher mth, int lineNumber, SeleniumService self) {
                 String textVar = mth.group(1);
@@ -591,7 +692,7 @@ public class SeleniumTestUI extends JFrame {
                 }
             }
         }, //
-        DATE(Pattern.compile("(\\w+)\\s*\\=\\s*(date|twdate)\\((.*)\\)")) {
+        DATE(Pattern.compile("(\\w+)\\s*\\=\\s*(date|twdate)\\((.*)\\)"), false, new String[] { "date()", "twdate()" }) {
             @Override
             void apply001(Matcher mth, int lineNumber, SeleniumService self) {
                 String dateVar = mth.group(1);
@@ -607,7 +708,7 @@ public class SeleniumTestUI extends JFrame {
                     }
                 } else {
                     try {
-                        String[] dates = dateValue.split(",", -1);
+                        String[] dates = dateValue.split(PARAM_SPLIT_STR, -1);
                         String method = dates[0];
                         String addVal = dates[1];
                         int addVal2 = Integer.parseInt(addVal);
@@ -633,7 +734,7 @@ public class SeleniumTestUI extends JFrame {
                 self.valueMap.put(dateVar, dateValue);
             }
         }, //
-        CLICK(Pattern.compile("(\\w+)\\.click\\(\\)")) {
+        CLICK(Pattern.compile("(\\w+)\\.click\\(\\)"), true, new String[] { "click()" }) {
             @Override
             void apply001(Matcher mth, int lineNumber, SeleniumService self) {
                 String var = mth.group(1);
@@ -646,13 +747,13 @@ public class SeleniumTestUI extends JFrame {
                 }
             }
         }, //
-        CLICK_UNTIL(Pattern.compile("click\\((.+)\\)")) {
+        CLICK_UNTIL(Pattern.compile("click\\((.+)\\)"), false, new String[] { "click()" }) {
             @Override
             void apply001(Matcher mth, int lineNumber, SeleniumService self) {
                 String var = mth.group(1);
                 boolean clickSuccess = false;
                 if (var.contains(",")) {
-                    String[] arry = var.split(",", -1);
+                    String[] arry = var.split(PARAM_SPLIT_STR, -1);
                     String type = StringUtils.trimToEmpty(arry[0]);
                     String express = StringUtils.trimToEmpty(arry[0]);
                     if ("css".equalsIgnoreCase(type)) {
@@ -668,7 +769,7 @@ public class SeleniumTestUI extends JFrame {
                 }
             }
         }, //
-        PAUSE(Pattern.compile("pause\\((.*)\\)")) {
+        PAUSE(Pattern.compile("pause\\((.*)\\)"), false, new String[] { "pause()" }) {
             @Override
             void apply001(Matcher mth, int lineNumber, SeleniumService self) {
                 String var = mth.group(1);
@@ -684,7 +785,7 @@ public class SeleniumTestUI extends JFrame {
                 }
             }
         }, //
-        CLEAR(Pattern.compile("(\\w+)\\.clear\\(\\)")) {
+        CLEAR(Pattern.compile("(\\w+)\\.clear\\(\\)"), true, new String[] { "clear()" }) {
             @Override
             void apply001(Matcher mth, int lineNumber, SeleniumService self) {
                 String var = mth.group(1);
@@ -697,7 +798,7 @@ public class SeleniumTestUI extends JFrame {
                 }
             }
         }, //
-        ENTER(Pattern.compile("(\\w+)\\.enter\\(\\)")) {
+        ENTER(Pattern.compile("(\\w+)\\.enter\\(\\)"), true, new String[] { "enter()" }) {
             @Override
             void apply001(Matcher mth, int lineNumber, SeleniumService self) {
                 String var = mth.group(1);
@@ -710,7 +811,7 @@ public class SeleniumTestUI extends JFrame {
                 }
             }
         }, //
-        SELECT_ONE(Pattern.compile("(\\w+)\\.select\\((value|text|index)\\=(.*)\\)")) {
+        SELECT_ONE(Pattern.compile("(\\w+)\\.select\\((value|text|index)\\=(.*)\\)"), true, new String[] { "select()" }) {
             @Override
             void apply001(Matcher mth, int lineNumber, SeleniumService self) {
                 String var = mth.group(1);
@@ -735,7 +836,7 @@ public class SeleniumTestUI extends JFrame {
                 }
             }
         }, //
-        SHOW_SELECT(Pattern.compile("show(?:Select|Option|Options)\\((\\w+)\\)")) {
+        SHOW_SELECT(Pattern.compile("show(?:Select|Option|Options)\\((\\w+)\\)"), false, new String[] { "showOptions()" }) {
             @Override
             void apply001(Matcher mth, int lineNumber, SeleniumService self) {
                 String var = PatternEnum.parseValue(mth.group(1), self);
@@ -750,7 +851,7 @@ public class SeleniumTestUI extends JFrame {
                 }
             }
         }, //
-        EQ_GET(Pattern.compile("(\\w+)\\s*\\=\\s*(\\w+)\\.(?:eq|get)\\((\\d+)\\)")) {
+        EQ_GET(Pattern.compile("(\\w+)\\s*\\=\\s*(\\w+)\\.(?:eq|get)\\((\\d+)\\)"), true, new String[] { "eq()", "get()" }) {
             @Override
             void apply001(Matcher mth, int lineNumber, SeleniumService self) {
                 String var1 = mth.group(1);
@@ -771,7 +872,7 @@ public class SeleniumTestUI extends JFrame {
                 }
             }
         }, //
-        FIND_XPATH(Pattern.compile("(\\w+)\\s*\\=\\s*(\\w+)\\.findXpath\\((.*)\\)")) {
+        FIND_XPATH(Pattern.compile("(\\w+)\\s*\\=\\s*(\\w+)\\.findXpath\\((.*)\\)"), true, new String[] { "findXpath()" }) {
 
             private boolean process(String var1, String var2, String express, WebElement element, SeleniumService self) {
                 List<WebElement> elements2 = (List<WebElement>) element.findElements(By.xpath(express));
@@ -814,7 +915,7 @@ public class SeleniumTestUI extends JFrame {
                 }
             }
         }, //
-        SLEEP(Pattern.compile("(?:wait|sleep)\\(([\\.\\d]+)\\)")) {
+        SLEEP(Pattern.compile("(?:wait|sleep)\\(([\\.\\d]+)\\)"), false, new String[] { "sleep()" }) {
             @Override
             void apply001(Matcher mth, int lineNumber, SeleniumService self) {
                 double sleeptime = Math.abs(Double.parseDouble(mth.group(1)));
@@ -826,7 +927,7 @@ public class SeleniumTestUI extends JFrame {
                 }
             }
         }, //
-        SHOW_INFO(Pattern.compile("showInfo\\(\\)")) {
+        SHOW_INFO(Pattern.compile("showInfo\\(\\)"), false, new String[] { "showInfo()" }) {
             @Override
             void apply001(Matcher mth, int lineNumber, SeleniumService self) {
                 System.out.println("################");
@@ -848,7 +949,7 @@ public class SeleniumTestUI extends JFrame {
                 System.out.println("################");
             }
         }, //
-        SAVE_HTML(Pattern.compile("savehtml\\((\\w*)\\)", Pattern.CASE_INSENSITIVE)) {
+        SAVE_HTML(Pattern.compile("savehtml\\((\\w*)\\)", Pattern.CASE_INSENSITIVE), false, new String[] { "saveHtml()" }) {
             @Override
             void apply001(Matcher mth, int lineNumber, SeleniumService self) {
                 String var1 = PatternEnum.parseValue(mth.group(1), self);
@@ -861,7 +962,7 @@ public class SeleniumTestUI extends JFrame {
                 System.out.println("存檔 : " + saveFile);
             }
         }, //
-        HTML(Pattern.compile("(\\w+)\\.html\\((\\w*)\\)")) {
+        HTML(Pattern.compile("(\\w+)\\.html\\((\\w*)\\)"), true, new String[] { "html()" }) {
             @Override
             void apply001(Matcher mth, int lineNumber, SeleniumService self) {
                 String var1 = mth.group(1);
@@ -888,7 +989,7 @@ public class SeleniumTestUI extends JFrame {
                 }
             }
         }, //
-        SWITCH_TO(Pattern.compile("switchTo\\((.*)\\)")) {
+        SWITCH_TO(Pattern.compile("switchTo\\((.*)\\)"), false, new String[] { "switchTo()" }) {
             @Override
             void apply001(Matcher mth, int lineNumber, SeleniumService self) {
                 String var1 = mth.group(1);
@@ -920,14 +1021,28 @@ public class SeleniumTestUI extends JFrame {
                 }
             }
         }, //
-        PRINT(Pattern.compile("print\\((.*)\\)")) {
+        SHOW_WINDOWS(Pattern.compile("showWindows\\(\\)"), false, new String[] { "showWindows()" }) {
+            @Override
+            void apply001(Matcher mth, int lineNumber, SeleniumService self) {
+                SeleniumUtil.WebElementControl.getWindowHandles(self.driver);
+            }
+        }, //
+        PRINT(Pattern.compile("print\\((.*)\\)"), false, new String[] { "print()" }) {
             @Override
             void apply001(Matcher mth, int lineNumber, SeleniumService self) {
                 String var1 = mth.group(1);
                 System.out.println(var1);
             }
         }, //
-        PROMPT(Pattern.compile("(\\w+)\\s*\\=\\s*prompt\\((.*)\\)")) {
+        MESSAGE(Pattern.compile("(?:message|msg|debug|info)\\((.*)\\)"), false, new String[] { "msg()" }) {
+            @Override
+            void apply001(Matcher mth, int lineNumber, SeleniumService self) {
+                String var1 = mth.group(1);
+                JCommonUtil._jOptionPane_showMessageDialog_info(var1, "行:" + lineNumber);
+                System.out.println(var1);
+            }
+        }, //
+        PROMPT(Pattern.compile("(\\w+)\\s*\\=\\s*prompt\\((.*)\\)"), false, new String[] { "prompt()" }) {
             @Override
             void apply001(Matcher mth, int lineNumber, SeleniumService self) {
                 String var1 = mth.group(1);
@@ -940,12 +1055,39 @@ public class SeleniumTestUI extends JFrame {
                 System.out.println("設定變數 : " + var1 + "\t" + var2);
             }
         }, //
-        GOTO(Pattern.compile("GOTO\\((\\w+)\\)")) {
+        TRY_PROMPT(Pattern.compile("try_prompt\\(\\)"), false, new String[] { "try_prompt()" }) {
+            @Override
+            void apply001(Matcher mth, int lineNumber, SeleniumService self) {
+                String tryMessage = "";
+                do {
+                    tryMessage = JCommonUtil._jOptionPane_showInputDialog("測試語法", tryMessage);
+                    if (StringUtils.isBlank(tryMessage)) {
+                        System.out.println("結束測試!!");
+                        break;
+                    }
+                    System.out.println("測試語法 : " + tryMessage);
+                    System.out.println("[測試語法]Start =================================");
+                    for (PatternEnum e : PatternEnum.values()) {
+                        Matcher mth2 = e.ptn.matcher(tryMessage);
+                        if (mth2.matches()) {
+                            e.apply002(mth2, lineNumber, self);
+                        }
+                    }
+                    System.out.println("[測試語法]End   =================================");
+                } while (true);
+            }
+        }, //
+        GOTO(Pattern.compile("GOTO\\((\\w+)\\)"), false, new String[] { "GOTO()" }) {
             @Override
             void apply001(Matcher mth, int lineNumber, SeleniumService self) {
                 String var1 = PatternEnum.parseValue(mth.group(1), self);
                 if (StringUtils.isNotBlank(var1)) {
                     System.out.println("Goto 前往 title :" + var1);
+                    GotoStatus mGotoStatus = new GotoStatus();
+                    mGotoStatus.ii = self.ii;
+                    mGotoStatus.fromTitle = self.getTitle();
+                    mGotoStatus.fromContent = self.getContent();
+                    GOTO_STACK.add(mGotoStatus);
                     self.Goto(var1, self);
                 }
             }
@@ -953,9 +1095,13 @@ public class SeleniumTestUI extends JFrame {
         ;
 
         final Pattern ptn;
+        final String[] commands;
+        final boolean isNeedHasCommaBefore;
 
-        PatternEnum(Pattern ptn) {
+        PatternEnum(Pattern ptn, boolean isNeedHasCommaBefore, String[] commands) {
             this.ptn = ptn;
+            this.isNeedHasCommaBefore = isNeedHasCommaBefore;
+            this.commands = commands;
         }
 
         private static String parseValue(String value, SeleniumService self) {
@@ -990,11 +1136,21 @@ public class SeleniumTestUI extends JFrame {
     private abstract class SeleniumService {
         abstract void setCurrentLineNumber(int lineNumber);
 
-        abstract List<String> getContent();
+        abstract List<String> getContentLst();
+
+        abstract String getContent();
+
+        abstract String getTitle();
 
         abstract void Goto(String title, SeleniumService self);
 
         abstract boolean isPause();
+
+        SeleniumTestUI mSeleniumTestUI;
+
+        SeleniumService(SeleniumTestUI mSeleniumTestUI) {
+            this.mSeleniumTestUI = mSeleniumTestUI;
+        }
 
         int ii = 0;
 
@@ -1009,9 +1165,16 @@ public class SeleniumTestUI extends JFrame {
             driver = SeleniumUtil.getInstance().getDriver(driverPath);
             ii = 0;
             for (;;) {
-                List<String> contentLst = getContent();
+                List<String> contentLst = getContentLst();
                 if (ii > contentLst.size() - 1) {
-                    break;
+                    // 確認回到原腳本
+                    if (GOTO_STACK.isEmpty()) {
+                        break;
+                    } else {
+                        if (!moveBackToOrignContent(contentLst, GOTO_STACK)) {
+                            break;
+                        }
+                    }
                 }
                 while (isPause()) {
                     try {
@@ -1040,5 +1203,25 @@ public class SeleniumTestUI extends JFrame {
                 }
             }
         }
+
+        private boolean moveBackToOrignContent(List<String> contentLst, Stack<GotoStatus> gotoStack) {
+            contentLst.clear();
+            GotoStatus mGotoStatus = gotoStack.pop();
+            mSeleniumTestUI.scriptNameText.setText(mGotoStatus.fromTitle);
+            mSeleniumTestUI.scriptArea.setText(mGotoStatus.fromContent);
+            List<String> lst = StringUtil_.readContentToList(mGotoStatus.fromContent, true, false, false);
+            contentLst.addAll(lst);
+            ii = mGotoStatus.ii;
+            if (ii > contentLst.size() - 1) {
+                return false;// out of script
+            }
+            return true;
+        }
+    }
+
+    private static class GotoStatus {
+        String fromTitle;
+        String fromContent;
+        int ii;
     }
 }

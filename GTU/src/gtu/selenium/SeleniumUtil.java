@@ -2,6 +2,7 @@ package gtu.selenium;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -185,6 +186,12 @@ public class SeleniumUtil {
             }
         }
 
+        public static Set<String> getWindowHandles(WebDriver driver) {
+            Set<String> windows = driver.getWindowHandles();
+            System.out.println("getWindowHandles = " + windows);
+            return windows;
+        }
+
         private static void _TimeSleep_(long time) {
             try {
                 Thread.currentThread().sleep(time);
@@ -195,13 +202,13 @@ public class SeleniumUtil {
         public static WebElement waitPageElementByCss(final String css, final String text, final WebDriver driver) {
             final int retryTime = 10;
             final long retryWait = 500;
-            return waitPageElementByCss(css, text, driver, retryTime, retryWait);
+            return waitPageElementByCss(css, text, driver, retryTime, retryWait, WAIT_IN_SECONDS);
         }
 
-        public static WebElement waitPageElementByCss(final String css, final String text, final WebDriver driver, final int retryTime, final long retryWait) {
+        public static WebElement waitPageElementByCss(final String css, final String text, final WebDriver driver, final int retryTime, final long retryWait, final long waitTimeOutSeconds) {
             for (int t = 0; t < retryTime; t++) {
                 try {
-                    new WebDriverWait(driver, WAIT_IN_SECONDS).until(//
+                    new WebDriverWait(driver, waitTimeOutSeconds).until(//
                             new java.util.function.Function<WebDriver, Boolean>() {
                                 @Override
                                 public Boolean apply(WebDriver t) {
@@ -230,13 +237,13 @@ public class SeleniumUtil {
         public static List<WebElement> waitPageElementByCsss(final String css, final String text, final WebDriver driver) {
             final int retryTime = 10;
             final long retryWait = 500;
-            return waitPageElementByCsss(css, text, driver, retryTime, retryWait);
+            return waitPageElementByCsss(css, text, driver, retryTime, retryWait, WAIT_IN_SECONDS);
         }
 
-        public static List<WebElement> waitPageElementByCsss(final String css, final String text, final WebDriver driver, final int retryTime, final long retryWait) {
+        public static List<WebElement> waitPageElementByCsss(final String css, final String text, final WebDriver driver, final int retryTime, final long retryWait, final long waitTimeOutSeconds) {
             for (int t = 0; t < retryTime; t++) {
                 try {
-                    new WebDriverWait(driver, WAIT_IN_SECONDS).until(//
+                    new WebDriverWait(driver, waitTimeOutSeconds).until(//
                             new java.util.function.Function<WebDriver, Boolean>() {
                                 @Override
                                 public Boolean apply(WebDriver t) {
@@ -267,13 +274,13 @@ public class SeleniumUtil {
         public static WebElement waitPageElementByXpath(final String xpath, final WebDriver driver) {
             final int retryTime = 10;
             final long retryWait = 500;
-            return waitPageElementByXpath(xpath, driver, retryTime, retryWait);
+            return waitPageElementByXpath(xpath, driver, retryTime, retryWait, WAIT_IN_SECONDS);
         }
 
-        public static WebElement waitPageElementByXpath(final String xpath, final WebDriver driver, final int retryTime, final long retryWait) {
+        public static WebElement waitPageElementByXpath(final String xpath, final WebDriver driver, final int retryTime, final long retryWait, final long waitTimeOutSeconds) {
             for (int t = 0; t < retryTime; t++) {
                 try {
-                    new WebDriverWait(driver, WAIT_IN_SECONDS).until(//
+                    new WebDriverWait(driver, waitTimeOutSeconds).until(//
                             new java.util.function.Function<WebDriver, Boolean>() {
                                 @Override
                                 public Boolean apply(WebDriver t) {
@@ -297,13 +304,13 @@ public class SeleniumUtil {
         public static List<WebElement> waitPageElementByXpaths(final String xpath, final WebDriver driver) {
             final int retryTime = 10;
             final long retryWait = 500;
-            return waitPageElementByXpaths(xpath, driver, retryTime, retryWait);
+            return waitPageElementByXpaths(xpath, driver, retryTime, retryWait, WAIT_IN_SECONDS);
         }
 
-        public static List<WebElement> waitPageElementByXpaths(final String xpath, final WebDriver driver, final int retryTime, final long retryWait) {
+        public static List<WebElement> waitPageElementByXpaths(final String xpath, final WebDriver driver, final int retryTime, final long retryWait, final long waitTimeOutSeconds) {
             for (int t = 0; t < retryTime; t++) {
                 try {
-                    new WebDriverWait(driver, WAIT_IN_SECONDS).until(//
+                    new WebDriverWait(driver, waitTimeOutSeconds).until(//
                             new java.util.function.Function<WebDriver, Boolean>() {
                                 @Override
                                 public Boolean apply(WebDriver t) {
