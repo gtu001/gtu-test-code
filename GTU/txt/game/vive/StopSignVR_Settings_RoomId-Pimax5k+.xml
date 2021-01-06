@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Stop Sign VR Copyright (c) 2019-2020 Reality Inside Ltd. (s.r.o.). All rights reserved. -->
+<!-- Contact: Raivr on Reddit -->
+<Settings app="Stop Sign VR" savedatetime="2021-01-07T00:27:02" runtimeversion="1.15.16" trackingsystemname="aapvr" hmdmanufacturer="pimax vr, inc." hmdmodel="pimax 5k plus" hmdserial="320495122211">
+	<Parameters>
+		<Param name="SettingsFileVersion" type="string" readonly="true" info="This value is Read Only." value="a00010021"/>
+		<Param name="NumBackupConfigFilesToKeep" type="int" info="When saving changes or when changing the boxes in VR, a backup is made." value="12" minvalue="1" maxvalue="50" defaultvalue="10"/>
+		<Param name="AutoLaunchWithSteamVR" type="bool" info="Start the StopSignVR runtime automatically when starting SteamVR?" value="true" defaultvalue="true"/>
+		<Param name="AlertMode" type="bool" info="When 'No' is selected, StopSignVR is in Edit Mode and you can move and resize the boxes." value="true" defaultvalue="false"/>
+		<Param name="UseBoxes" type="bool" info="Use boxes to warn against hitting valuable real equipment." value="true" defaultvalue="true"/>
+		<Param name="TurnOffAllImpactPrediction" type="bool" info="Disables alerts for impact prediction. The boxes and proximity warnings are still functional. " value="false" defaultvalue="false"/>
+		<Param name="TurnOffAllProximityWarnings" type="bool" info="Disables proximity warnings (the smaller stop sign and ticking sound when close to a box or wall)." value="false" defaultvalue="false"/>
+		<Param name="ImpactPredictionSensitivity" type="float" info="1 = insensitive, 9 = high sensitivity." value="4.94f" minvalue="0.00f" maxvalue="9.99f" defaultvalue="4.99f"/>
+		<Param name="UseBoundariesMasterSwitch" type="bool" info="Master switch to turn on/off all Stop Sign warnings based on boundaries (walls, ceiling and floor)." value="false" defaultvalue="false"/>
+		<Param name="UseImpactPredictionForPlayAreaBoundaries" type="bool" info="Predict impact with Chaperone/Guardian/Boundaries walls." value="true" defaultvalue="true"/>
+		<Param name="UseImpactPredictionForCeiling" type="bool" info="Predict impact with Ceiling. Uses ceiling height as defined in SteamVR." value="true" defaultvalue="true"/>
+		<Param name="UseImpactPredictionForFloor" type="bool" info="Predict impact with the floor." value="false" defaultvalue="false"/>
+		<Param name="UseProximityWarningForPlayAreaBoundaries" type="bool" info="Get proximity warnings when close to Chaperone/Guardian/Boundaries walls (smaller stop sign + ticking sound)." value="true" defaultvalue="true"/>
+		<Param name="UseProximityWarningForCeiling" type="bool" info="Get proximity warnings when close to the ceiling (smaller stop sign + ticking sound)." value="true" defaultvalue="true"/>
+		<Param name="UseProximityWarningForFloor" type="bool" info="Get proximity warnings when close to the floor (smaller stop sign + ticking sound)." value="false" defaultvalue="false"/>
+		<Param name="MaximumDimensionToConsiderPlayAreaStandingOnly_Meters" type="float" info="If at least one side of the play area is smaller, it is considered a Standing Only area and Stop Sign alerts and warnings are disabled." value="1.100f" minvalue="0.000f" maxvalue="10.000f" defaultvalue="1.100f"/>
+		<Param name="ShowCollisionBoundsPlaySpaceRectangle" type="bool" info="Turn on a rectangle on the floor indicating the play area. This overrules the setting for turning it off." value="false" defaultvalue="false"/>
+		<Param name="ShowCollisionBoundsGroundPerimeter" type="bool" info="Turn on a line on the floor indicating the position of the Chaperone/Guardian/Boundaries walls. This overrules the setting for turning it off." value="false" defaultvalue="false"/>
+		<Param name="ShowCollisionBoundsCenterMarker" type="bool" info="Turn on a marker on the floor indicating the center of the play area. This overrules the setting for turning it off." value="false" defaultvalue="false"/>
+		<Param name="HideCollisionBoundsPlaySpaceRectangle_UseWithCare" type="bool" info="Turn off the rectangle on the floor indicating the play area." value="false" defaultvalue="false"/>
+		<Param name="HideCollisionBoundsGroundPerimeter_UseWithCare" type="bool" info="Turn off the line on the floor indicating the position of the Chaperone/Guardian/Boundaries walls." value="false" defaultvalue="false"/>
+		<Param name="HideCollisionBoundsCenterMarker" type="bool" info="Turn off the marker on the floor indicating the center of the play area." value="false" defaultvalue="false"/>
+		<Param name="ProximityWarningSignSize_Meters" type="float" info="Width of the proximity alert stop sign that is shown when close to boxes and walls." value="0.200f" minvalue="0.000f" maxvalue="1.000f" defaultvalue="0.250f"/>
+		<Param name="AlertWarningSignSize_Meters" type="float" info="Width of the impact warning alert stop sign." value="0.200f" minvalue="0.000f" maxvalue="1.000f" defaultvalue="0.350f"/>
+		<Param name="UseSound" type="bool" info="When 'No' is selected all StopSignVR sounds are turned off." value="true" defaultvalue="true"/>
+		<Param name="UseSpatialAudio" type="bool" info="When 'Yes' is selected the alert sounds are positioned in 3D by Steam Audio's HRTF-based binaural rendering." value="true" defaultvalue="true"/>
+		<Param name="ProximityWarningSoundFileName" type="file" info="Sound for the proximity warnings. Use 32bit float WAV, pcm, mono. Sample frequency *must* be 24 kHz." value="Geiger_tick_float32pcm24000mono.wav" defaultvalue="Geiger_tick_float32pcm24000mono.wav"/>
+		<Param name="ProximityWarningSoundVolume" type="float" info="Volume to use for the proximity warnings sound." value="0.00f" minvalue="0.00f" maxvalue="1.00f" defaultvalue="0.50f"/>
+		<Param name="AlertSoundFileName" type="file" info="Sound for the impact alerts. Use 32bit float WAV, pcm, mono. Sample frequency *must* be 24 kHz." value="Horn1_float32pcm24000mono.wav" defaultvalue="Horn1_float32pcm24000mono.wav"/>
+		<Param name="AlertSoundVolume" type="float" info="Volume to use for the impact alerts sound." value="0.01f" minvalue="0.00f" maxvalue="1.00f" defaultvalue="0.50f"/>
+		<Param name="ProximityWarningActivationDistance_Meters" type="float" info="Distance in meters at which the proximity alerts activate." value="0.200f" minvalue="0.000f" maxvalue="2.000f" defaultvalue="0.300f"/>
+		<Param name="ProximityWarningTransparency" type="float" info="Opacity of the proximity alert stop sign. 0.0 = fully transparent, 1.0 = opaque." value="0.80f" minvalue="0.00f" maxvalue="1.00f" defaultvalue="0.50f"/>
+		<Param name="UseHapticFeedbackForAlerts" type="bool" info="Rumble the controller when alerting for impacts." value="true" defaultvalue="true"/>
+		<Param name="UseHapticFeedbackForProximityWarnings" type="bool" info="Rumble the controller when close to boxes and walls." value="false" defaultvalue="false"/>
+		<Param name="UseHudVignette" type="bool" info="Show a Heads-Up Display for alerts and warnings when stop sign is out of sight." value="false" defaultvalue="false"/>
+		<Param name="HudViewportFovHorizontal" type="float" info="Horizontal Field of View of the open area in the HUD (Heads-Up Display) viewport." value="70.0f" minvalue="0.1f" maxvalue="179.0f" defaultvalue="70.0f"/>
+		<Param name="HudViewportFovVertical" type="float" info="Vertical Field of View of the open area in the HUD (Heads-Up Display) viewport." value="70.0f" minvalue="0.1f" maxvalue="179.0f" defaultvalue="70.0f"/>
+		<Param name="HudTightenOutOfViewDetectionDegreesLeftRight" type="float" info="Make larger if HUD shows too late (horizontally)." value="10.0f" minvalue="-90.0f" maxvalue="90.0f" defaultvalue="10.0f"/>
+		<Param name="HudTightenOutOfViewDetectionDegreesTopBottom" type="float" info="Make larger if HUD shows too late (vertically)." value="10.0f" minvalue="-90.0f" maxvalue="90.0f" defaultvalue="10.0f"/>
+		<Param name="UseCustomBoundarySystem" type="bool" info="For use with WMR or if you want a less intrusive boundary system. Uses the chaperone color and wall height defined in SteamVR." value="false" defaultvalue="false"/>
+		<Param name="UseCustomBoundarySystemForStandingOnlyPlayArea" type="bool" info="When the Custom Boundary System is enabled, this setting will also enable it for Standing Only play areas." value="false" defaultvalue="false"/>
+		<Param name="UseImportedWMRBoundaries" type="bool" info="For Windows Mixed Reality (WMR) headsets on SteamVR. Use the WMR boundaries for the Boundary++ grids." value="true" defaultvalue="true"/>
+		<Param name="HideNativeSteamVRChaperoneGrid" type="bool" info="Don't show the SteamVR chaperone grid when using Boundary++." value="false" defaultvalue="false"/>
+		<Param name="HideBoundaryPlusPlusWhileDashboardActive" type="bool" info="Hide Boundary++ grids while the SteamVR dashboard is active (turn on if dashboard acts choppy on older systems)." value="false" defaultvalue="false"/>
+		<Param name="IgnoreHeadsetDistanceForCeilingBoundary" type="bool" info="For low ceilings that would otherwise activate too often." value="false" defaultvalue="false"/>
+		<Param name="BoundaryMaxSegments" type="int" visible="false" info="Max number of segments to use for the Boundary++ grids." value="64" minvalue="12" maxvalue="128" defaultvalue="64"/>
+		<Param name="BoundaryMinAverageSegmentLength" type="float" visible="false" info="Minimum average boundary segment length." value="0.25f" minvalue="0.15f" maxvalue="0.50f" defaultvalue="0.25f"/>
+		<Param name="BoundaryMinSegmentLength" type="float" visible="false" info="Minimum boundary segment length." value="0.10f" minvalue="0.05f" maxvalue="0.25f" defaultvalue="0.10f"/>
+		<Param name="BoundaryQualitySettingA" type="int" info="Visual quality of the Custom Boundary System (Restart needed) - A." value="3" minvalue="1" maxvalue="4" defaultvalue="3"/>
+		<Param name="BoundaryQualitySettingB" type="int" info="Visual quality of the Custom Boundary System (Restart needed) - B." value="2" minvalue="1" maxvalue="4" defaultvalue="2"/>
+		<Param name="StandingOnlyPlayAreaWidth_Meters" type="float" info="For Standing Only setups. Set play area width to the supplied distance in meters." value="1.00f" minvalue="0.60f" maxvalue="10.00f" defaultvalue="1.00f"/>
+		<Param name="StandingOnlyPlayAreaDepth_Meters" type="float" info="For Standing Only setups. Set play area depth to the supplied distance in meters." value="1.00f" minvalue="0.60f" maxvalue="10.00f" defaultvalue="1.00f"/>
+		<Param name="BoundaryMaxOpaquenessOfGrid" type="float" info="This caps the transparency you set in the SteamVR play area settings for the Chaperone transparency." value="1.00f" minvalue="0.00f" maxvalue="1.00f" defaultvalue="1.00f"/>
+		<Param name="BoundaryMaxOpaquenessForLogoOnWalls" type="float" info="The 'logo on the walls' is the letters STOP. Reduce this number if you want to see through the logo." value="1.00f" minvalue="0.00f" maxvalue="1.00f" defaultvalue="1.00f"/>
+		<Param name="BoundaryMaxOpaquenessForViewBlockingThroughWalls" type="float" info="Reduce this number if you want to see through the area inside the grid octagons (around the STOP logo) when you're close to a boundary." value="1.00f" minvalue="0.00f" maxvalue="1.00f" defaultvalue="1.00f"/>
+		<Param name="BoundaryMaxOpaquenessForViewBlockingThroughCeiling" type="float" info="Reduce this number if you want to see through the area inside the grid octagons when you're close to the ceiling." value="1.00f" minvalue="0.00f" maxvalue="1.00f" defaultvalue="1.00f"/>
+		<Param name="BoundaryBlockViewWhenCloseToWalls" type="bool" info="When true (default), your view will be blocked where you're close to a wall grid." value="true" defaultvalue="true"/>
+		<Param name="BoundaryBlockViewWhenCloseToCeiling" type="bool" info="When true (default), your view will be blocked where you're close to the ceiling grid." value="true" defaultvalue="true"/>
+		<Param name="BoundaryActivationDistanceMultiplier" type="float" info="If using both the default Chaperone and the Boundary++ warning grid system, you can choose which one comes up earlier. Values &gt; 1.0 will have Boundary++ come up before default Chaperone. Values &lt; 1.0 causes it to show later than default Chaperone." value="1.00f" minvalue="0.25f" maxvalue="4.00f" defaultvalue="1.00f"/>
+		<Param name="NumBoxes" type="int" visible="false" info="This value is calculated. Do not change." value="5" minvalue="0" maxvalue="8" defaultvalue="0"/>
+		<Param name="c_checksum1" type="checksum" visible="false" readonly="true" value="\x72\x41\x73\x5b\x68\x70\x5b\x51\x57\x6b\x57\x4e\x67\x59\x41\x63\x58\x1f\x7e\x41\x49\x7c\x51\x49\x62\x51\x49\x62\x51\x49\x34\x4d\x59\x62\x4f\x4b\x67\x53\x4c\x61\x52\x4d\x66\x7\x55\x72\x4c\x49\x7c\x51\x4e\x6b\x52\x49\x65\x51\x40\x34\x4d\x59\x72\x41\x73\x5b\x68\x70\x5b\x51\x57\x62\x51\x49\x62\x51\x49\x62\x51\x1f\x7e\x41\x48\x7c\x51\x49\x62\x51\x49\x62\x51\x49\x34\x4d\x59\x62\x4f\x49\x62\x51\x49\x62\x51\x49\x62\x7\x55\x72\x51\x57\x62\x54\x41\x65\x54\x4d\x63\x59\x1f\x7e\x41\x59\x72\x6b\x70\x5b\x68\x70\x7f\x51\x57\x60\x54\x4b\x67\x52\x4a\x66\x55\x1f\x7e\x41\x49\x7c\x51\x49\x62\x51\x49\x62\x51\x49\x34\x4d\x59\x62\x4f\x40\x64\x56\x4c\x6a\x59\x48\x6b\x7\x55\x72\x4c\x49\x7c\x52\x4d\x61\x58\x4d\x6b\x50\x4e\x34"/>
+	</Parameters>
+	<Boxes>
+		<Box Name="1" Width="0.250000f" Height="0.250000f" Depth="0.250000f" FullOnDistance_Meters="0.500f" FullOffDistance_Meters="0.800f" Active="true" IgnoreHeadsetDistance="false" AlertForImpacts="true" ProximityWarningWhenClose="true" SidesImage="BoxSkin_WireframeBlue.png" TextureQuality="50">
+			<Center HmdMatrix34="
+				1.00000000f, 0.00000000f, 0.00000000f, -1.00000000f, 
+				0.00000000f, 1.00000000f, 0.00000000f, 1.00000000f, 
+				0.00000000f, 0.00000000f, 1.00000000f, -0.49999997f"/>
+		</Box>
+		<Box Name="2" Width="0.231351f" Height="0.258900f" Depth="1.004811f" FullOnDistance_Meters="0.500f" FullOffDistance_Meters="0.800f" Active="true" IgnoreHeadsetDistance="false" AlertForImpacts="true" ProximityWarningWhenClose="true" SidesImage="BoxSkin_WireframeBlue.png" TextureQuality="50">
+			<Center HmdMatrix34="
+				0.99370599f, 0.11093200f, -0.01556100f, -0.42272300f, 
+				-0.11122000f, 0.99361402f, -0.01901100f, 0.45109999f, 
+				0.01335300f, 0.02062200f, 0.99969900f, 0.38438004f"/>
+		</Box>
+		<Box Name="3" Width="0.735503f" Height="0.251459f" Depth="0.279407f" FullOnDistance_Meters="0.500f" FullOffDistance_Meters="0.800f" Active="false" IgnoreHeadsetDistance="false" AlertForImpacts="true" ProximityWarningWhenClose="true" SidesImage="BoxSkin_WireframeBlue.png" TextureQuality="30">
+			<Center HmdMatrix34="
+				0.99965203f, -0.02032800f, -0.01681000f, 0.22079501f, 
+				0.01979900f, 0.99932098f, -0.03104500f, 0.71803498f, 
+				0.01742900f, 0.03070200f, 0.99937600f, -0.48778397f"/>
+		</Box>
+		<Box Name="4" Width="0.641475f" Height="0.250000f" Depth="0.250000f" FullOnDistance_Meters="0.500f" FullOffDistance_Meters="0.800f" Active="true" IgnoreHeadsetDistance="false" AlertForImpacts="true" ProximityWarningWhenClose="true" SidesImage="BoxSkin_WireframeBlue.png" TextureQuality="10">
+			<Center HmdMatrix34="
+				-0.99999398f, 0.00306100f, -0.00235600f, 0.18280500f, 
+				0.00311400f, 0.99970901f, -0.02395600f, 1.37269998f, 
+				0.00228300f, -0.02396200f, -0.99971199f, 0.91270101f"/>
+		</Box>
+		<Box Name="5" Width="0.689931f" Height="0.250000f" Depth="0.250000f" FullOnDistance_Meters="0.500f" FullOffDistance_Meters="0.800f" Active="true" IgnoreHeadsetDistance="false" AlertForImpacts="true" ProximityWarningWhenClose="true" SidesImage="BoxSkin_WireframeBlue.png" TextureQuality="100">
+			<Center HmdMatrix34="
+				0.01359532f, 0.00606194f, -0.99988902f, 1.09301472f, 
+				-0.00552065f, 0.99996579f, 0.00598836f, 1.28474665f, 
+				0.99989277f, 0.00543843f, 0.01362768f, 0.04123791f"/>
+		</Box>
+		<Box Name="NewBox" Width="0.250f" Height="0.250f" Depth="0.250f" FullOnDistance_Meters="0.500f" FullOnDistance_Meters_MinValue="0.000f" FullOnDistance_Meters_MaxValue="999.998f" FullOnDistance_Meters_DefaultValue="0.500f" FullOffDistance_Meters="0.800f" FullOffDistance_Meters_MinValue="0.000f" FullOffDistance_Meters_MaxValue="999.999f" FullOffDistance_Meters_DefaultValue="0.800f" Active="true" IgnoreHeadsetDistance="false" AlertForImpacts="true" ProximityWarningWhenClose="true" SidesImage="BoxSkin_CautionBox.png" TextureQuality="50" TextureQuality_MinValue="1" TextureQuality_MaxValue="100" TextureQuality_DefaultValue="50">
+			<Center HmdMatrix34="
+				1.000f, 0.000f, 0.000f, 0.000f,
+				0.000f, 1.000f, 0.000f, 1.000f,
+				0.000f, 0.000f, 1.000f, 0.000f"/>
+		</Box>
+		<!--
+		Add extra boxes by copying and uncommenting these lines. Change Box Name from 'x' to correct number:
+		<Box Name="x" Width="0.25f" Height="0.25f" Depth="0.25f" FullOnDistance_Meters="0.50f" FullOffDistance_Meters="0.80f" Active="true" AlertForImpacts="true" SilentWarningWhenClose="true" SidesImage="BoxSkin_CautionBox.png"> TextureQuality="50"
+			<Center HmdMatrix34="
+				1.0f, 0.0f, 0.0f, 0.00f,
+				0.0f, 1.0f, 0.0f, 1.00f,
+				0.0f, 0.0f, 1.0f, 0.00f"/>
+		</Box>
+		-->
+		<!--
+pimax5k+
+
+1=NA
+2=床
+3=桌
+4=跑步機
+5=櫃
+
+BoxSkin_BarbedWire.png
+BoxSkin_CautionBox.png
+BoxSkin_WireframeBlue.png
+BoxSkin_CoasterCork.png
+BoxSkin_GridOrange.png
+		-->
+	</Boxes>
+</Settings>
