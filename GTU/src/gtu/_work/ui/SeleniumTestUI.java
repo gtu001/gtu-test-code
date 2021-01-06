@@ -258,11 +258,15 @@ public class SeleniumTestUI extends JFrame {
                     if (e.commands != null) {
                         if (StringUtils.isNotBlank(commaBefore) && e.isNeedHasCommaBefore) {
                             for (String command : e.commands) {
-                                commandSet.add(command);
+                                if (command.startsWith(commaAfter)) {
+                                    commandSet.add(command);
+                                }
                             }
                         } else if (StringUtils.isBlank(commaBefore) && !e.isNeedHasCommaBefore) {
                             for (String command : e.commands) {
-                                commandSet.add(command);
+                                if (command.startsWith(commaAfter)) {
+                                    commandSet.add(command);
+                                }
                             }
                         }
                     }
