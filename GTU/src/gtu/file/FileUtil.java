@@ -468,31 +468,52 @@ public class FileUtil {
     }
 
     public static boolean moveFileByBat(File fromFile, File toFile) {
-        if (fromFile.isFile() == toFile.isFile() || //
-                fromFile.isDirectory() == toFile.isDirectory()) {
-        } else {
-            System.out.println("[moveFileByBat]必須同為檔案或目錄！");
-            return false;
-        }
-        String errorMsg = "";
-        String command = "";
-        if (OsInfoUtil.isWindows()) {
-            command = String.format(" move /Y \"%s\" \"%s\"", fromFile, toFile);
-        } else {
-            if (fromFile.isDirectory()) {
-                toFile = new File(toFile, fromFile.getName());
-                toFile.mkdirs();
+        try {
+            if (fromFile.isFile() == toFile.isFile() || //
+                    fromFile.isDirectory() == toFile.isDirectory()) {
+            } else {
+                System.out.println("[moveFileByBat]必須同為檔案或目錄！");
+                return false;
             }
-            command = String.format(" mv -Tf \"%s\" \"%s\"", fromFile, toFile);
-        }
-        RuntimeBatPromptModeUtil inst = RuntimeBatPromptModeUtil.newInstance();
-        inst.command(command);
-        ProcessWatcher watcher = ProcessWatcher.newInstance(inst.apply());
-        errorMsg = watcher.getErrorStreamToString();
-        if (StringUtils.isBlank(errorMsg)) {
-            return true;
-        } else {
-            System.err.println("[moveFileByBat] Fail : " + errorMsg);
+            String command = "";
+            if (OsInfoUtil.isWindows()) {
+                if (fromFile.isDirectory()) {
+                    File chkExistDir = new File(toFile, fromFile.getName());
+                    if (chkExistDir.exists()) {
+                        String[] lst = chkExistDir.list();
+                        if (lst == null || lst.length == 0) {
+                            chkExistDir.delete();
+                        } else {
+                            toFile = new File(toFile, fromFile.getName() + "_" + System.currentTimeMillis());
+                        }
+                    }
+                }
+                command = String.format(" move /Y \"%s\" \"%s\"", fromFile, toFile);
+            } else {
+                if (fromFile.isDirectory()) {
+                    toFile = new File(toFile, fromFile.getName());
+                    toFile.mkdirs();
+                }
+                command = String.format(" mv -Tf \"%s\" \"%s\"", fromFile, toFile);
+            }
+            RuntimeBatPromptModeUtil inst = RuntimeBatPromptModeUtil.newInstance();
+            inst.command(command);
+            ProcessWatcher watcher = ProcessWatcher.newInstance(inst.apply("UTF8"));
+            String inputMsg = watcher.getInputStreamToString();
+            String errorMsg = watcher.getErrorStreamToString();
+            System.out.println("============================================");
+            System.out.println("inputMsg : " + inputMsg);
+            System.out.println("============================================");
+            System.out.println("errorMsg : " + errorMsg);
+            System.out.println("============================================");
+            if (StringUtils.isBlank(errorMsg)) {
+                return true;
+            } else {
+                System.err.println("[moveFileByBat] Fail : " + errorMsg);
+                return false;
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
             return false;
         }
     }

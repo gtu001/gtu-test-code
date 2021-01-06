@@ -116,6 +116,7 @@ public class RuntimeBatPromptModeUtil {
             reader = new BufferedReader(new StringReader(cmd));
             for (String line = null; (line = reader.readLine()) != null;) {
                 sb.append(prefix);
+                sb.append(StringUtils.leftPad(" ", 200));
                 sb.append(line);
                 sb.append(chgLine);
             }
