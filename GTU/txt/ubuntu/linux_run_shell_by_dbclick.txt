@@ -3,6 +3,14 @@
 
 安裝sudo apt-get install dconf-editor
 
+
+IfNotFound 
+	sudo add-apt-repository universe
+	sudo apt update
+	sudo apt install dconf-cli dconf-editor
+
+
+
 按 Alt+F2, 輸入 dconf-editor 按 Enter.
 
 搜尋路徑 org/gnome/nautilus/preferences
