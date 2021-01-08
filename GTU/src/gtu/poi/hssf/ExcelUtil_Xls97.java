@@ -20,17 +20,23 @@ import java.util.TreeMap;
 
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.hssf.usermodel.HSSFRichTextString;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.CreationHelper;
+import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellRangeAddress;
 
+import gtu.file.FileUtil;
 import gtu.regex.RegExpUtil;
 
 public class ExcelUtil_Xls97 {
@@ -694,6 +700,39 @@ public class ExcelUtil_Xls97 {
             ex.printStackTrace();
             return null;
         }
+    }
+
+    public static void debugShowColorListXls() {
+        ExcelUtil_Xls97 inst = ExcelUtil_Xls97.getInstance();
+        HSSFWorkbook wb = new HSSFWorkbook();
+        HSSFSheet sheet = wb.createSheet();
+        Map<Integer, HSSFColor> indexHash = HSSFColor.getIndexHash();
+        int rowIdx = 0;
+        HSSFRow titleRow = sheet.createRow(rowIdx);
+        inst.getCellChk(titleRow, 0).setCellValue("color class");
+        inst.getCellChk(titleRow, 1).setCellValue("short index");
+        inst.getCellChk(titleRow, 2).setCellValue("color");
+
+        rowIdx++;
+        for (Integer key : indexHash.keySet()) {
+            HSSFColor color = indexHash.get(key);
+
+            HSSFRow row = sheet.createRow(rowIdx);
+
+            inst.getCellChk(row, 0).setCellValue("new HSSFColor." + color.getClass().getSimpleName() + "()");
+            inst.getCellChk(row, 1).setCellValue(color.getIndex());
+
+            HSSFCellStyle cellStyle = wb.createCellStyle();
+            cellStyle.setFillForegroundColor(color.getIndex());
+            cellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
+            inst.getCellChk(row, 2).setCellStyle(cellStyle);
+
+            rowIdx++;
+        }
+        inst.autoCellSize(sheet);
+        File xlsFile = new File(FileUtil.DESKTOP_PATH, "poi_color_清單.xls");
+        inst.writeExcel(xlsFile, wb);
     }
 
     private static final ExcelUtil_Xls97 INSTANCE = new ExcelUtil_Xls97();
