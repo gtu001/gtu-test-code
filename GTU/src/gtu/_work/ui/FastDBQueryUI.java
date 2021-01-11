@@ -85,6 +85,7 @@ import org.apache.commons.collections.Transformer;
 import org.apache.commons.collections.map.LRUMap;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang.builder.ToStringStyle;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
@@ -204,6 +205,7 @@ public class FastDBQueryUI extends JFrame {
     private SqlIdColumnHolder mSqlIdColumnHolder = new SqlIdColumnHolder();
     public LoggerAppender updateLogger = new LoggerAppender(new File(JAR_PATH_FILE, "updateLog_" + DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMdd") + ".txt"));
     private static final String SQL_PARAM_PTN = "\\:([a-zA-Z]\\w*)";
+    private static final int SQL_PARAM_PTN_LENGTH = 2;
     private static PropertiesGroupUtils_ByKey dataSourceConfig = new PropertiesGroupUtils_ByKey(new File(JAR_PATH_FILE, "dataSource.properties"));
     private static PropertiesUtilBean defaultConfig = new PropertiesUtilBean(JAR_PATH_FILE, FastDBQueryUI.class.getSimpleName() + "_default");
 
@@ -1078,7 +1080,8 @@ public class FastDBQueryUI extends JFrame {
                                     }
                                     new SimpleTextDlg(StringUtils.join(lst, "^"), "", null).show();
                                 }
-                            }).applyEvent(e)//
+                            })//
+                            .applyEvent(e)//
                             .show();
                 }
             }
@@ -1142,7 +1145,14 @@ public class FastDBQueryUI extends JFrame {
                                 public void actionPerformed(ActionEvent e) {
                                     updateColumnParameters();
                                 }
-                            }).applyEvent(e)//
+                            })//
+                            .addJMenuItem("顯示查詢SQL", new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    showAfterCurrentSQL();
+                                }
+                            })//
+                            .applyEvent(e)//
                             .show();
                 }
             }
@@ -2904,6 +2914,103 @@ public class FastDBQueryUI extends JFrame {
         }
     }
 
+    /**
+     * 執行sql
+     */
+    private void showAfterCurrentSQL() {
+        try {
+            JTableUtil util = JTableUtil.newInstance(parametersTable);
+
+            Map<String, Object> paramMap = new HashMap<String, Object>();
+            Map<String, String> sqlInjectMap = new LinkedHashMap<String, String>();
+
+            Set<String> forceAddColumns = new HashSet<String>();
+
+            for (int ii = 0; ii < parametersTable.getRowCount(); ii++) {
+                Boolean isInUse = (Boolean) util.getRealValueAt(ii, ParameterTableColumnDef.USE.idx);
+                if (isInUse == null) {
+                    isInUse = false;
+                }
+
+                String columnName = (String) util.getRealValueAt(ii, ParameterTableColumnDef.COLUMN.idx);
+                String value = (String) util.getRealValueAt(ii, ParameterTableColumnDef.VALUE.idx);
+
+                if (SqlParam.sqlInjectionPATTERN.matcher(columnName).matches()) {
+                    // sql Injection
+                    if (isInUse) {
+                        sqlInjectMap.put(columnName, StringUtils.trimToEmpty(value));
+                    } else {
+                        sqlInjectMap.put(columnName, null);
+                    }
+                } else {
+                    // 一般處理
+                    DataType dataType = (DataType) util.getRealValueAt(ii, ParameterTableColumnDef.TYPE.idx);
+                    if (isInUse) {
+                        paramMap.put(columnName, getRealValue(value, dataType));
+                    } else {
+                        paramMap.put(columnName, null);
+                    }
+
+                    if (dataType.isForceAddColumn()) {
+                        forceAddColumns.add(columnName);
+                    }
+                }
+            }
+
+            String currentSQL = getCurrentSQL();
+
+            // 取得執行sql物件
+            SqlParam param = parseSqlToParam(currentSQL);
+
+            // 檢查參數是否異動
+            for (String columnName : param.paramSet) {
+                if (!paramMap.containsKey(columnName) && !sqlInjectMap.containsKey(columnName)) {
+                    Validate.isTrue(false, "參數有異動!, 請重新按儲存按鈕");
+                }
+            }
+
+            String resultSql = "";
+
+            // 組參數列
+            List<Object> parameterList = new ArrayList<Object>();
+            if (param.getClass() == SqlParam.class) {
+                for (String columnName : param.paramList) {
+                    if (!paramMap.containsKey(columnName)) {
+                        Validate.isTrue(false, "參數未設定 : " + columnName);
+                    }
+                    parameterList.add(paramMap.get(columnName));
+                }
+
+                resultSql = SqlParam.parseToSqlParam_ToSQL2222(currentSQL, paramMap);
+            } else if (param.getClass() == SqlParam_IfExists.class) {
+                parameterList.addAll(((SqlParam_IfExists) param).processParamMap(paramMap, sqlInjectMap, forceAddColumns));
+                resultSql = ((SqlParam_IfExists) param).processParamMap_ToSQL2222(paramMap, sqlInjectMap, forceAddColumns);
+            }
+
+            // 設定 sqlInjectionMap
+            param.sqlInjectionMap.putAll(sqlInjectMap);
+
+            // System.out.println("尚未執行=====================================================");
+            // System.out.println(param.getQuestionSql());
+            // for (int i = 0; i < parameterList.size(); i++) {
+            // System.out.println("param[" + i + "]:\"" + parameterList.get(i) +
+            // "\" (" + (parameterList.get(i) != null ?
+            // parameterList.get(i).getClass().getName() : "NA") + ")");
+            // }
+            // System.out.println("尚未執行=====================================================");
+
+            // 判斷執行模式
+            if (querySqlRadio.isSelected()) {
+                new SimpleTextDlg(resultSql, "", null).show();
+            } else if (updateSqlRadio.isSelected()) {
+                new SimpleTextDlg(resultSql, "", null).show();
+            }
+        } catch (Exception ex) {
+            JCommonUtil.handleException(ex);
+        } finally {
+        }
+    }
+
     private void setupCustomColumnDefExcelChinese() {
         List<String> tabLst = new ArrayList<String>();
         tabLst.add(getRandom_TableNSchema());
@@ -3235,6 +3342,86 @@ public class FastDBQueryUI extends JFrame {
             return sb.toString();
         }
 
+        public static String parseToSqlParam_ToSQL2222(String sql, Map<String, Object> paramMap) {
+            String orignSQL = sql.toString();
+
+            // 拿掉 註解
+            sql = SqlParam.getIgnoreCommonentSql(orignSQL);
+
+            // 拖曳 字串部分 "'" 前置處理 ↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+            Pair<String, Map<Pair<Integer, Integer>, String>> pair = getQuoteSQL_And_ReplaceMap(sql);
+            sql = pair.getLeft();
+            Map<Pair<Integer, Integer>, String> repMap = pair.getRight();
+            // 拖曳 字串部分 "'" 前置處理 ↑↑↑↑↑↑↑↑↑↑↑↑↑↑
+
+            // 一般處理
+            Pattern ptn = Pattern.compile(SQL_PARAM_PTN);
+            Matcher mth = ptn.matcher(sql);// <----------------
+
+            List<String> paramList = new ArrayList<String>();
+            Set<String> paramSet = new LinkedHashSet<String>();
+
+            StringBuffer sb2 = new StringBuffer();
+
+            while (mth.find()) {
+                String key = mth.group(1);
+                if (StringUtils.length(key) < SQL_PARAM_PTN_LENGTH) {
+                    throw new RuntimeException("參數變數長度不足("+SQL_PARAM_PTN_LENGTH+") : " + key);
+                }
+
+                int length = mth.group().length();
+                if (isNotParam(key)) {
+                    continue;
+                }
+                paramList.add(key);
+                paramSet.add(key);
+                String questMark = StringUtils.rightPad("?" + (paramList.size() - 1) + "?", length, " ");
+                mth.appendReplacement(sb2, questMark);
+            }
+            mth.appendTail(sb2);
+
+            // -------------------------------------------------------------------------------------------------
+            // 拖曳 字串部分 "'" 後置處理 ↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+            for (Pair<Integer, Integer> p : repMap.keySet()) {
+                String orignSqlGroup = repMap.get(p);
+                sb2 = sb2.replace(p.getLeft(), p.getRight(), orignSqlGroup);
+            }
+            // 拖曳 字串部分 "'" 後置處理 ↑↑↑↑↑↑↑↑↑↑↑↑↑↑
+            // -------------------------------------------------------------------------------------------------
+
+            SqlParam sqlParam = new SqlParam();
+            sqlParam.orginialSql = orignSQL;
+            sqlParam.paramSet = paramSet;
+            sqlParam.questionSql = sb2.toString();
+            sqlParam.paramList = paramList;
+            sqlParam.parseToSqlInjectionMap(orignSQL);
+
+            // ------------------------------------------------------------
+            StringBuffer sb3 = new StringBuffer();
+
+            Pattern ptn2 = Pattern.compile("\\?(\\d+)\\?");
+            Matcher mth2 = ptn2.matcher(sb2.toString());
+
+            while (mth2.find()) {
+                int index = Integer.parseInt(mth2.group(1));
+                String key = paramList.get(index);
+                Object value = paramMap.get(key);
+                String strValue = "";
+                if (value != null) {
+                    strValue = "'" + value + "'";
+                    try {
+                        Double.parseDouble((String) value);
+                        strValue = String.valueOf(value);
+                    } catch (Exception ex) {
+                    }
+                }
+                mth2.appendReplacement(sb3, strValue);
+            }
+            mth2.appendTail(sb3);
+
+            return sb3.toString();
+        }
+
         public static SqlParam parseToSqlParam(String sql, String orignSQL) {
             // 拖曳 字串部分 "'" 前置處理 ↓↓↓↓↓↓↓↓↓↓↓↓↓↓
             Pair<String, Map<Pair<Integer, Integer>, String>> pair = getQuoteSQL_And_ReplaceMap(sql);
@@ -3253,6 +3440,10 @@ public class FastDBQueryUI extends JFrame {
 
             while (mth.find()) {
                 String key = mth.group(1);
+                if (StringUtils.length(key) < SQL_PARAM_PTN_LENGTH) {
+                    throw new RuntimeException("參數變數長度不足("+SQL_PARAM_PTN_LENGTH+") : " + key);
+                }
+
                 int length = mth.group().length();
                 if (isNotParam(key)) {
                     continue;
@@ -3373,6 +3564,10 @@ public class FastDBQueryUI extends JFrame {
                     List<String> params = new ArrayList<String>();
                     while (mth2.find()) {
                         String para = mth2.group(1);
+                        if (StringUtils.length(para) < SQL_PARAM_PTN_LENGTH) {
+                            throw new RuntimeException("參數變數長度不足("+SQL_PARAM_PTN_LENGTH+") : " + para);
+                        }
+
                         if (isNotParam(para)) {
                             continue;
                         }
@@ -3415,6 +3610,10 @@ public class FastDBQueryUI extends JFrame {
 
             while (mth.find()) {
                 String col = mth.group(1);
+                if (StringUtils.length(col) < SQL_PARAM_PTN_LENGTH) {
+                    throw new RuntimeException("參數變數長度不足("+SQL_PARAM_PTN_LENGTH+") : " + col);
+                }
+
                 Object value = paramMap.get(col);
 
                 if (isNotParam(col)) {
@@ -3478,6 +3677,103 @@ public class FastDBQueryUI extends JFrame {
 
             this.questionSql = sb.toString();
             return rtnParamLst;
+        }
+
+        public String processParamMap_ToSQL2222(Map<String, Object> paramMap, Map<String, String> sqlInjectionMap, Set<String> forceAddColumns) {
+            String orginialSqlBackup = getIgnoreCommonentSql(this.orginialSql.toString());
+            StringBuffer sb = new StringBuffer();
+
+            List<Object> rtnParamLst = new ArrayList<Object>();
+
+            int tempStartPos = 0;
+
+            for (Pair<List<String>, int[]> row : paramListFix) {
+                int[] start_end = row.getRight();
+
+                String markSql = orginialSqlBackup.substring(start_end[0], start_end[1]);
+                String replaceToSql_FIX = StringUtils.rightPad("", markSql.length());
+
+                if (isParametersAllOk(row.getLeft(), paramMap, sqlInjectionMap, forceAddColumns) || markSql.matches("\\:\\w+")) {
+                    replaceToSql_FIX = this.toQuestionMarkSql_ToSQL2222(markSql, rtnParamLst, paramMap, sqlInjectionMap);
+                }
+
+                sb.append(orginialSqlBackup.substring(tempStartPos, start_end[0]));
+                sb.append(replaceToSql_FIX);
+
+                tempStartPos = start_end[1];
+            }
+
+            if (tempStartPos != 0) {
+                sb.append(orginialSqlBackup.substring(tempStartPos));
+            }
+
+            StringBuffer sb2 = new StringBuffer();
+
+            Pattern ptn = Pattern.compile("\\?(\\d+)\\?");
+            Matcher mth2 = ptn.matcher(sb.toString());
+
+            while (mth2.find()) {
+                int index = Integer.parseInt(mth2.group(1));
+                Object value = rtnParamLst.get(index);
+                String strValue = "";
+                if (value != null) {
+                    strValue = "'" + value + "'";
+                    try {
+                        Double.parseDouble((String) value);
+                        strValue = String.valueOf(value);
+                    } catch (Exception ex) {
+                    }
+                }
+                mth2.appendReplacement(sb2, strValue);
+            }
+            mth2.appendTail(sb2);
+
+            return sb2.toString();
+        }
+
+        private String toQuestionMarkSql_ToSQL2222(String markSql, List<Object> rtnParamLst, Map<String, Object> paramMap, Map<String, String> sqlInjectionMap) {
+            // -----------------------------------------------------------------------------
+            Pattern ptn = Pattern.compile(SQL_PARAM_PTN);
+            Matcher mth = ptn.matcher(markSql);
+            StringBuffer sb = new StringBuffer();
+
+            while (mth.find()) {
+                String col = mth.group(1);
+                if (StringUtils.length(col) < SQL_PARAM_PTN_LENGTH) {
+                    throw new RuntimeException("參數變數長度不足("+SQL_PARAM_PTN_LENGTH+") : " + col);
+                }
+
+                Object value = paramMap.get(col);
+
+                if (isNotParam(col)) {
+                    continue;
+                }
+
+                rtnParamLst.add(value);
+                String replaceVal = StringUtils.rightPad("?" + (rtnParamLst.size() - 1) + "?", mth.group().length());
+
+                mth.appendReplacement(sb, replaceVal);
+            }
+            mth.appendTail(sb);
+
+            // ------------------------------------------------------------------------------
+            markSql = sb.toString();
+            sb.setLength(0);
+            Pattern ptn2 = Pattern.compile("\\_\\#.*?\\#\\_");
+            Matcher mth2 = ptn2.matcher(markSql);
+
+            while (mth2.find()) {
+                String col = mth2.group(0);
+                if (sqlInjectionMap.containsKey(col)) {
+                    mth2.appendReplacement(sb, (String) sqlInjectionMap.get(col));
+                } else {
+                    mth2.appendReplacement(sb, col);
+                }
+            }
+            mth2.appendTail(sb);
+            String rtnStr = sb.toString().replaceAll("[\\[\\]]", " ");
+            // ------------------------------------------------------------------------------
+            return rtnStr;
         }
     }
 
