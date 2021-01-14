@@ -613,6 +613,21 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
         JTableUtil.setColumnAlign(rowTable, ColumnOrderDef.currentLength.ordinal(), JLabel.RIGHT);
         JTableUtil.setColumnAlign(rowTable, ColumnOrderDef.maxLength.ordinal(), JLabel.RIGHT);
 
+        JTableUtil.newInstance(rowTable).setColumnColor_byCondition(ColumnOrderDef.columnName.ordinal(), new JTableUtil.TableColorDef() {
+            public Pair<Color, Color> getTableColour(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                JTableUtil util = JTableUtil.newInstance(rowTable);
+                String columnName = (String) util.getRealValueAt(row, ColumnOrderDef.columnName.ordinal());
+                Map<String, ColumnConf> conf = rowMap.get();
+                if (conf.containsKey(columnName)) {
+                    ColumnConf cf = conf.get(columnName);
+                    if (cf.isAddFromCustomTableName) {
+                        return Pair.of(Color.LIGHT_GRAY, null);
+                    }
+                }
+                return null;
+            }
+        });
+
         JTableUtil.newInstance(rowTable).setColumnColor_byCondition(ColumnOrderDef.value.ordinal(), new JTableUtil.TableColorDef() {
             public Pair<Color, Color> getTableColour(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 JTableUtil util = JTableUtil.newInstance(rowTable);
@@ -812,7 +827,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                             FieldInfo4DbSqlCreater info = tableInfo.getColumnInfo().get(columnName);
                             columnPkConf.get(rowColumnName).maxLength = info.getColumnDisplaySize();
                             if (useRealColumn) {
-                                columnPkConf.get(rowColumnName).bakupColumnName = rowColumnName;
+                                columnPkConf.get(rowColumnName).bakupColumnName = columnName;
                             }
                             break C;
                         }
@@ -1704,9 +1719,12 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                         System.out.println("mergePkConfig ==null pk setting== : " + columnName);
                         continue;
                     }
-                    if (c2 == null && c1.isAddFromCustomTableName == true) {
+                    if (!rowMap.get().containsKey(columnName)) {
                         ColumnConf c11 = new ColumnConf();
                         c11.columnName = c1.columnName;
+                        c11.isPk = c1.isPk;
+                        c11.maxLength = c1.maxLength;
+                        c11.isAddFromCustomTableName = c1.isAddFromCustomTableName;
                         c2 = c11;
                         rowMap.get().put(columnName, c2);
                     }
@@ -1851,21 +1869,8 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
 
         private List<Map<String, String>> getAllRecoreds(boolean isAllData) {
             Map<Integer, Map<String, String>> rtnMap = new LinkedHashMap<Integer, Map<String, String>>();
-            List<String> cols = queryList.getLeft();
+            // List<String> cols = queryList.getLeft();
             if (isAllData) {
-                // List<Object[]> qlst = queryList.getRight();
-                // for (int iii = 0; iii < qlst.size(); iii++) {
-                // Object[] row = qlst.get(iii);
-                // Map<String, String> map = new LinkedHashMap<String,
-                // String>();
-                // for (int ii = 0; ii < cols.size(); ii++) {
-                // String col = cols.get(ii);
-                // String value = row[ii] != null ? String.valueOf(row[ii]) :
-                // null;
-                // map.put(col, value);
-                // }
-                // rtnMap.put(iii, map);
-                // }
                 for (int iii = 0; iii < rowMapLst.size(); iii++) {
                     Map<String, Object> map = rowMapLst.get(iii);
                     Map<String, String> map2 = new LinkedHashMap<String, String>();
@@ -1875,6 +1880,14 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                         if (val != null) {
                             strVal = String.valueOf(val);
                         }
+                        // ↓↓↓↓↓↓ 使用真column
+                        if (columnPkConf.containsKey(key)) {
+                            ColumnConf df = columnPkConf.get(key);
+                            if (StringUtils.isNotBlank(df.bakupColumnName)) {
+                                key = df.bakupColumnName;
+                            }
+                        }
+                        // ↑↑↑↑↑↑ 使用真column
                         map2.put(key, strVal);
                     }
                     rtnMap.put(iii, map2);
@@ -1884,7 +1897,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                 Map<String, ColumnConf> confMap = rowMapLstHolder.get(index);
                 Map<String, String> map = new LinkedHashMap<String, String>();
                 boolean hasModify = false;
-                for (String col : cols) {
+                for (String col : columnPkConf.keySet()) {
                     ColumnConf df = confMap.get(col);
                     String strVal = "";
                     if (df != null) {
