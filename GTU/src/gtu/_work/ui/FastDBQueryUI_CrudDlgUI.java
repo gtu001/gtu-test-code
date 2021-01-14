@@ -797,6 +797,10 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                 Set<String> failed = new LinkedHashSet<String>();
 
                 Map<String, ColumnConf> columnPkConf = new HashMap<String, ColumnConf>();
+                
+                if(columnsLst == null || columnsLst.isEmpty()) {
+                    Validate.isTrue(false, "資料欄位尚未初始化！[columnsLst-123]");
+                }
 
                 for (String columnName : columnsLst) {
                     ColumnConf df = new ColumnConf();
