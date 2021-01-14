@@ -164,6 +164,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
 
     static class ColumnConf {
         String columnName;
+        String bakupColumnName;
         Object value;
         Object orignValue;// 用來判斷是否改過
         DataType dtype;
@@ -774,8 +775,8 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                     tableInfo.setTableName(tableAndSchema);
                 }
 
-                List<String> success = new ArrayList<String>();
-                List<String> failed = new ArrayList<String>();
+                Set<String> success = new LinkedHashSet<String>();
+                Set<String> failed = new LinkedHashSet<String>();
 
                 Map<String, ColumnConf> columnPkConf = new HashMap<String, ColumnConf>();
 
@@ -787,11 +788,23 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
 
                 for (String rowColumnName : columnPkConf.keySet()) {
                     boolean findOk = false;
-                    for (String columnName : tableInfo.getColumnInfo().keySet()) {
-                        if (StringUtils.equals(rowColumnName, columnName)) {
+                    C: for (String columnName : tableInfo.getColumnInfo().keySet()) {
+                        boolean useRealColumn = false;
+                        if (StringUtils.containsIgnoreCase(rowColumnName, columnName)) {
+                            findOk = true;
+                        }
+                        String bakupColumnName = StringUtilForDb.javaToDbField(columnName);
+                        if (StringUtils.containsIgnoreCase(rowColumnName, bakupColumnName)) {
+                            findOk = true;
+                            useRealColumn = true;
+                        }
+                        if (findOk) {
                             FieldInfo4DbSqlCreater info = tableInfo.getColumnInfo().get(columnName);
                             columnPkConf.get(rowColumnName).maxLength = info.getColumnDisplaySize();
-                            findOk = true;
+                            if (useRealColumn) {
+                                columnPkConf.get(rowColumnName).bakupColumnName = bakupColumnName;
+                            }
+                            break C;
                         }
                     }
                     if (!findOk) {
@@ -804,7 +817,17 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                         columnPkConf.get(columnName).isPk = true;
                         success.add(columnName);
                     } else {
-                        failed.add(columnName);
+                        C: for (String columnName2 : columnPkConf.keySet()) {
+                            String bakupColumnName = StringUtilForDb.javaToDbField(columnName2);
+                            if (StringUtils.equalsIgnoreCase(columnName, bakupColumnName)) {
+                                columnPkConf.get(columnName).isPk = true;
+                                success.add(columnName);
+                                break C;
+                            } else {
+                                failed.add(columnName);
+                                break C;
+                            }
+                        }
                     }
                 }
 
@@ -1832,6 +1855,11 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                             }
                         }
                     }
+                    // ↓↓↓↓↓↓ 使用真column
+                    if (StringUtils.isNotBlank(df.bakupColumnName)) {
+                        col = df.bakupColumnName;
+                    }
+                    // ↑↑↑↑↑↑ 使用真column
                     map.put(col, strVal);
                 }
                 if (hasModify) {

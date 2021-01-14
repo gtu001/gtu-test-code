@@ -2865,7 +2865,7 @@ public class FastDBQueryUI extends JFrame {
                     rowFilterTextDoFilter.run();
                 }
             } else if (updateSqlRadio.isSelected()) {
-                int modifyResult = JdbcDBUtil.modify(param.questionSql, parameterList.toArray(), getDataSource().getConnection(), true);
+                int modifyResult = JdbcDBUtil.modify(param.getQuestionSql(), parameterList.toArray(), getDataSource().getConnection(), true);
                 JCommonUtil._jOptionPane_showMessageDialog_info("update : " + modifyResult);
             }
 
@@ -2986,18 +2986,18 @@ public class FastDBQueryUI extends JFrame {
                 parameterList.addAll(((SqlParam_IfExists) param).processParamMap(paramMap, sqlInjectMap, forceAddColumns));
                 resultSql = ((SqlParam_IfExists) param).processParamMap_ToSQL2222(paramMap, sqlInjectMap, forceAddColumns);
             }
-
-            // 設定 sqlInjectionMap
-            param.sqlInjectionMap.putAll(sqlInjectMap);
-
-            // System.out.println("尚未執行=====================================================");
-            // System.out.println(param.getQuestionSql());
-            // for (int i = 0; i < parameterList.size(); i++) {
-            // System.out.println("param[" + i + "]:\"" + parameterList.get(i) +
-            // "\" (" + (parameterList.get(i) != null ?
-            // parameterList.get(i).getClass().getName() : "NA") + ")");
-            // }
-            // System.out.println("尚未執行=====================================================");
+            
+            {
+                Matcher mth = SqlParam.sqlInjectionPATTERN.matcher(resultSql);
+                StringBuffer sb = new StringBuffer();
+                while (mth.find()) {
+                    String key = mth.group();
+                    String replaceStr = StringUtils.trimToEmpty(sqlInjectMap.get(key));
+                    mth.appendReplacement(sb, replaceStr);
+                }
+                mth.appendTail(sb);
+                resultSql = sb.toString();
+            }
 
             // 判斷執行模式
             if (querySqlRadio.isSelected()) {
