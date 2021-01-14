@@ -110,6 +110,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
     private JFrameRGBColorPanel jFrameRGBColorPanel;
     private JRadioButton rdbtnSelect;
     private List<String> columnsLst;
+    private List<String> addFromCustomTableColumnLst = new ArrayList<String>();
     private DBTypeFormatHandler dBTypeFormatHandler;
     private KeyEventExecuteHandler keyEventExecuteHandler;
     private RecordsHandler mRecordsHandler;
@@ -164,7 +165,6 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
 
     static class ColumnConf {
         String columnName;
-        String bakupColumnName;
         Object value;
         Object orignValue;// 用來判斷是否改過
         DataType dtype;
@@ -172,6 +172,9 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
         boolean isIgnore;
         boolean isModify = false;
         Integer maxLength;
+
+        String bakupColumnName;
+        boolean isAddFromCustomTableName = false;
 
         boolean IsModifyGo() {
             String v1 = value != null ? String.valueOf(value) : null;
@@ -780,35 +783,55 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
 
                 Map<String, ColumnConf> columnPkConf = new HashMap<String, ColumnConf>();
 
-                for (String columnName : rowMap.get().keySet()) {
+                for (String columnName : columnsLst) {
                     ColumnConf df = new ColumnConf();
                     df.isPk = false;
+                    df.isAddFromCustomTableName = false;
+                    df.bakupColumnName = "";
+                    df.columnName = columnName;
                     columnPkConf.put(columnName, df);
                 }
+
+                List<String> finOkColumnLst = new ArrayList<String>();
 
                 for (String rowColumnName : columnPkConf.keySet()) {
                     boolean findOk = false;
                     C: for (String columnName : tableInfo.getColumnInfo().keySet()) {
                         boolean useRealColumn = false;
-                        if (StringUtils.containsIgnoreCase(rowColumnName, columnName)) {
+                        if (StringUtils.equalsIgnoreCase(rowColumnName, columnName)) {
                             findOk = true;
+                            finOkColumnLst.add(columnName);
                         }
-                        String bakupColumnName = StringUtilForDb.javaToDbField(columnName);
-                        if (StringUtils.containsIgnoreCase(rowColumnName, bakupColumnName)) {
+                        if (StringUtils.equalsIgnoreCase(rowColumnName, StringUtilForDb.dbFieldToJava(columnName))) {
                             findOk = true;
                             useRealColumn = true;
+                            finOkColumnLst.add(rowColumnName);
+                            finOkColumnLst.add(columnName);
                         }
                         if (findOk) {
                             FieldInfo4DbSqlCreater info = tableInfo.getColumnInfo().get(columnName);
                             columnPkConf.get(rowColumnName).maxLength = info.getColumnDisplaySize();
                             if (useRealColumn) {
-                                columnPkConf.get(rowColumnName).bakupColumnName = bakupColumnName;
+                                columnPkConf.get(rowColumnName).bakupColumnName = rowColumnName;
                             }
                             break C;
                         }
                     }
                     if (!findOk) {
                         columnPkConf.get(rowColumnName).maxLength = null;
+                    }
+                }
+
+                addFromCustomTableColumnLst.clear();
+                for (String columnName : tableInfo.getColumnInfo().keySet()) {
+                    if (!finOkColumnLst.contains(columnName)) {
+                        ColumnConf df = new ColumnConf();
+                        df.columnName = columnName;
+                        df.isAddFromCustomTableName = true;
+                        FieldInfo4DbSqlCreater info = tableInfo.getColumnInfo().get(columnName);
+                        df.maxLength = info.getColumnDisplaySize();
+                        columnPkConf.put(columnName, df);
+                        addFromCustomTableColumnLst.add(columnName);
                     }
                 }
 
@@ -913,7 +936,11 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
         FindTextHandler finder = new FindTextHandler(searchText.getText(), "^");
         boolean allMatch = finder.isAllMatch();
 
-        B: for (String columnName : columnsLst) {
+        List<String> columnsLst2 = new ArrayList<String>();
+        columnsLst2.addAll(columnsLst);
+        columnsLst2.addAll(addFromCustomTableColumnLst);
+
+        B: for (String columnName : columnsLst2) {
             ColumnConf df = rowMap.get().get(columnName);
             if (allMatch) {
                 model.addRow(df.toArry());
@@ -1677,8 +1704,16 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                         System.out.println("mergePkConfig ==null pk setting== : " + columnName);
                         continue;
                     }
+                    if (c2 == null && c1.isAddFromCustomTableName == true) {
+                        ColumnConf c11 = new ColumnConf();
+                        c11.columnName = c1.columnName;
+                        c2 = c11;
+                        rowMap.get().put(columnName, c2);
+                    }
                     c2.isPk = c1.isPk;
                     c2.maxLength = c1.maxLength;
+                    c2.isAddFromCustomTableName = c1.isAddFromCustomTableName;
+                    c2.bakupColumnName = c1.bakupColumnName;
                 }
             }
         }
@@ -1721,11 +1756,20 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
             // 將表設定值拉進來
             mergePkConfig();
 
-            columnsLst = new ArrayList<String>();
+            List<String> columnsLst222 = new ArrayList<String>();
             for (String col : rowMap.get().keySet()) {
                 ColumnConf df = rowMap.get().get(col);
                 model.addRow(df.toArry());
-                columnsLst.add(col);
+                columnsLst222.add(col);
+            }
+
+            if (reset) {
+                columnsLst = Collections.unmodifiableList(columnsLst222);
+            }
+
+            for (String col : addFromCustomTableColumnLst) {
+                ColumnConf df = rowMap.get().get(col);
+                model.addRow(df.toArry());
             }
 
             System.out.println("-------------init size : " + rowMap.get().size());
