@@ -36,7 +36,6 @@ import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Enumeration;
@@ -64,6 +63,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JViewport;
+import javax.swing.RowFilter;
 import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
 import javax.swing.event.RowSorterEvent;
@@ -2197,6 +2197,23 @@ public class JTableUtil {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+    }
+    // ----------------------------------------------------------------------------------------------------------------------
+
+    public void setRowFilter(final ActionListener mListener) {
+        RowFilter<DefaultTableModel, Object> filter = new RowFilter<DefaultTableModel, Object>() {
+            @Override
+            public boolean include(RowFilter.Entry<? extends DefaultTableModel, ? extends Object> entry) {
+                RowFilter.Entry entry2 = (RowFilter.Entry) entry;
+                ActionEvent event = new ActionEvent(entry2, (int) entry2.getIdentifier(), "");
+                mListener.actionPerformed(event);
+                if (event.getSource() instanceof Boolean) {
+                    return (boolean) event.getSource();
+                }
+                return true;
+            }
+        };
+        ((TableRowSorter) table.getRowSorter()).setRowFilter(filter);
     }
     // ----------------------------------------------------------------------------------------------------------------------
 }
