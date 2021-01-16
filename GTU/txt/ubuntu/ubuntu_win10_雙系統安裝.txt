@@ -1,4 +1,6 @@
 ﻿
+0. 下載ubuntu ISO, 安裝ubuntu開機usb -> https://rufus.ie/
+
 1. 切割磁區 先裝win10
 
 
