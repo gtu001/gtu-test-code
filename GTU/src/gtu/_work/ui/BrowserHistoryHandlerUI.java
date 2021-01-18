@@ -356,6 +356,10 @@ public class BrowserHistoryHandlerUI extends JFrame {
                     saveBatFileBtnAction();
                 }
             });
+
+            useRemarkOpenHiddenCmdChk = new JCheckBox("隱藏cmd");
+            useRemarkOpenHiddenCmdChk.setSelected(true);
+            panel_4.add(useRemarkOpenHiddenCmdChk);
             panel_4.add(saveBatFileBtn);
 
             hiddenChk = new JCheckBox("隱藏");
@@ -2776,7 +2780,11 @@ public class BrowserHistoryHandlerUI extends JFrame {
                 inst.runInBatFile(false);
             }
             if (!isSaveBatFile) {
-                inst.runInBatFile(false);
+                if (useRemarkOpenHiddenCmdChk.isSelected()) {
+                    inst.runInBatFile(false);
+                } else {
+                    inst.runInBatFile(true);
+                }
                 int waittingTime = 0;
                 try {
                     waittingTime = Integer.parseInt(batWaittingTimeText.getText());
@@ -3333,6 +3341,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
     private JTextField logWatcherBufferSizeText;
     private JCheckBox logWatcherScorllLockChk;
     private JComboBox screenSelectComboBox;
+    private JCheckBox useRemarkOpenHiddenCmdChk;
 
     private class LogWatcherPeriodTask extends TimerTask {
         boolean stop = false;

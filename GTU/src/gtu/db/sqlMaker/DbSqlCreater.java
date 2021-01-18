@@ -365,6 +365,8 @@ public class DbSqlCreater {
          */
         public String createInsertSql(Map<String, String> valmap, Set<String> ignoreColumns, boolean ignorePk) {
             validateData(ignorePk);
+            this.beforeFilterValueMap(valmap, columns);
+
             StringBuilder sb = new StringBuilder();
             String value = null;
             sb.append(String.format("INSERT INTO %s  (", getTableAndSchema()));
@@ -391,6 +393,25 @@ public class DbSqlCreater {
             return sb.toString();
         }
 
+        public void beforeFilterValueMap(Map<String, String> valmap, Set<String> filterColumns) {
+            if (filterColumns == null || filterColumns.isEmpty()) {
+                return;
+            }
+            Set<String> columns1 = new HashSet<String>(valmap.keySet());
+            for (String column : columns1) {
+                boolean findOk = false;
+                A: for (String column2 : filterColumns) {
+                    if (StringUtils.equalsIgnoreCase(column, column2)) {
+                        findOk = true;
+                        break A;
+                    }
+                }
+                if (!findOk) {
+                    valmap.remove(column);
+                }
+            }
+        }
+
         public String createUpdateSql(Map<String, String> valmap, Map<String, String> pkValMap, boolean ignoreNull, Set<String> ignoreColumns) {
             return createUpdateSql(valmap, pkValMap, ignoreNull, ignoreColumns, false);
         }
@@ -400,6 +421,9 @@ public class DbSqlCreater {
          */
         public String createUpdateSql(Map<String, String> valmap, Map<String, String> pkValMap, boolean ignoreNull, Set<String> ignoreColumns, boolean ignorePk) {
             validateData(false);
+            this.beforeFilterValueMap(valmap, columns);
+            this.beforeFilterValueMap(pkValMap, pkColumns);
+
             StringBuilder sb = new StringBuilder();
             sb.append("UPDATE " + getTableAndSchema() + " SET ");
             for (String key : columns) {
@@ -442,6 +466,8 @@ public class DbSqlCreater {
          */
         public String createSelectSql(Map<String, String> valmap, boolean ignorePk) {
             validateData(ignorePk);
+            this.beforeFilterValueMap(valmap, columns);
+
             StringBuilder sb = new StringBuilder();
             sb.append("SELECT * FROM " + getTableAndSchema() + " WHERE ");
             for (String key : pkColumns) {
@@ -464,6 +490,8 @@ public class DbSqlCreater {
          */
         public String createDeleteSql(Map<String, String> valmap, boolean ignorePk) {
             validateData(ignorePk);
+            this.beforeFilterValueMap(valmap, columns);
+
             StringBuilder sb = new StringBuilder();
             sb.append("DELETE FROM " + getTableAndSchema() + " WHERE ");
             for (String key : pkColumns) {

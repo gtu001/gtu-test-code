@@ -406,7 +406,6 @@ public class FastDBQueryUI extends JFrame {
     private JLabel lblNewLabel_22;
     private AtomicReference<ColumnSearchFilter> columnFilterHolder = new AtomicReference<ColumnSearchFilter>();
     private static AllTabPageProcess mAllPageProcess;
-    private ColumnSearchFilterHelper mColumnSearchFilterHelper = new ColumnSearchFilterHelper();
 
     private final Predicate IGNORE_PREDICT = new Predicate() {
         @Override
@@ -1380,17 +1379,29 @@ public class FastDBQueryUI extends JFrame {
         columnFilterText.setToolTipText("分隔符號為\"^\"");
 
         columnFilterText.getDocument().addDocumentListener(JCommonUtil.getDocumentListener(new HandleDocumentEvent() {
+            ColumnSearchFilter columnFilter;
+
             @Override
             public void process(DocumentEvent event) {
-                mColumnSearchFilterHelper.process();
+                try {
+                    if (checkIsNeedResetQueryResultTable(true)) {
+                        return;
+                    }
+                    if (distinctHasClicked) {
+                        queryModeProcess(queryList, true, null, null);
+                        distinctHasClicked = false;
+                    }
+                    if (columnFilter == null || isResetQuery) {
+                        columnFilter = new ColumnSearchFilter(queryResultTable, "^", new Object[] { QUERY_RESULT_COLUMN_NO });
+                        isResetQuery = false;
+                        columnFilterHolder.set(columnFilter);
+                    }
+                    columnFilter.filterText(columnFilterText.getText());
+                } catch (Exception ex) {
+                    JCommonUtil.handleException(ex);
+                }
             }
         }));
-
-        columnFilterText.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                mColumnSearchFilterHelper.process();
-            }
-        });
 
         lblNewLabel_3 = new JLabel("資料過濾");
         panel_13.add(lblNewLabel_3);
@@ -1443,35 +1454,21 @@ public class FastDBQueryUI extends JFrame {
                 @Override
                 public void mouseReleased(MouseEvent e) {
                     if (JMouseEventUtil.buttonRightClick(1, e)) {
-                        JPopupMenuUtil util = JPopupMenuUtil.newInstance(f)//
-                                .addJMenuItem("空白換成\"^\"", new ActionListener() {
-                                    @Override
-                                    public void actionPerformed(ActionEvent e) {
-                                        String[] texts = StringUtils.split(f.getText(), " ");
-                                        List<String> arry = new ArrayList<String>();
-                                        for (String x : texts) {
-                                            x = StringUtils.trimToEmpty(x);
-                                            if (StringUtils.isNotBlank(x)) {
-                                                arry.add(x);
-                                            }
-                                        }
-                                        f.setText(StringUtils.join(arry, "^"));
+                        JPopupMenuUtil util = JPopupMenuUtil.newInstance(f).addJMenuItem("空白換成\"^\"", new ActionListener() {
+
+                            @Override
+                            public void actionPerformed(ActionEvent e) {
+                                String[] texts = StringUtils.split(f.getText(), " ");
+                                List<String> arry = new ArrayList<String>();
+                                for (String x : texts) {
+                                    x = StringUtils.trimToEmpty(x);
+                                    if (StringUtils.isNotBlank(x)) {
+                                        arry.add(x);
                                     }
-                                })//
-                                .addJMenuItem("空白換成[精準]\"^\"", new ActionListener() {
-                                    @Override
-                                    public void actionPerformed(ActionEvent e) {
-                                        String[] texts = StringUtils.split(f.getText(), " ");
-                                        List<String> arry = new ArrayList<String>();
-                                        for (String x : texts) {
-                                            x = StringUtils.trimToEmpty(x);
-                                            if (StringUtils.isNotBlank(x)) {
-                                                arry.add("/^" + x + "$/");
-                                            }
-                                        }
-                                        f.setText(StringUtils.join(arry, "^"));
-                                    }
-                                });
+                                }
+                                f.setText(StringUtils.join(arry, "^"));
+                            }
+                        });
                         util.addJMenuItem(new S2T_And_T2S_EventHandler(f).getMenuItem(false));
                         util.addJMenuItem(new S2T_And_T2S_EventHandler(f).getMenuItem(true));
                         util.applyEvent(e).show();
@@ -2989,7 +2986,7 @@ public class FastDBQueryUI extends JFrame {
                 parameterList.addAll(((SqlParam_IfExists) param).processParamMap(paramMap, sqlInjectMap, forceAddColumns));
                 resultSql = ((SqlParam_IfExists) param).processParamMap_ToSQL2222(paramMap, sqlInjectMap, forceAddColumns);
             }
-
+            
             {
                 Matcher mth = SqlParam.sqlInjectionPATTERN.matcher(resultSql);
                 StringBuffer sb = new StringBuffer();
@@ -3369,7 +3366,7 @@ public class FastDBQueryUI extends JFrame {
             while (mth.find()) {
                 String key = mth.group(1);
                 if (StringUtils.length(key) < SQL_PARAM_PTN_LENGTH) {
-                    throw new RuntimeException("參數變數長度不足(" + SQL_PARAM_PTN_LENGTH + ") : " + key);
+                    throw new RuntimeException("參數變數長度不足("+SQL_PARAM_PTN_LENGTH+") : " + key);
                 }
 
                 int length = mth.group().length();
@@ -3444,7 +3441,7 @@ public class FastDBQueryUI extends JFrame {
             while (mth.find()) {
                 String key = mth.group(1);
                 if (StringUtils.length(key) < SQL_PARAM_PTN_LENGTH) {
-                    throw new RuntimeException("參數變數長度不足(" + SQL_PARAM_PTN_LENGTH + ") : " + key);
+                    throw new RuntimeException("參數變數長度不足("+SQL_PARAM_PTN_LENGTH+") : " + key);
                 }
 
                 int length = mth.group().length();
@@ -3568,7 +3565,7 @@ public class FastDBQueryUI extends JFrame {
                     while (mth2.find()) {
                         String para = mth2.group(1);
                         if (StringUtils.length(para) < SQL_PARAM_PTN_LENGTH) {
-                            throw new RuntimeException("參數變數長度不足(" + SQL_PARAM_PTN_LENGTH + ") : " + para);
+                            throw new RuntimeException("參數變數長度不足("+SQL_PARAM_PTN_LENGTH+") : " + para);
                         }
 
                         if (isNotParam(para)) {
@@ -3614,7 +3611,7 @@ public class FastDBQueryUI extends JFrame {
             while (mth.find()) {
                 String col = mth.group(1);
                 if (StringUtils.length(col) < SQL_PARAM_PTN_LENGTH) {
-                    throw new RuntimeException("參數變數長度不足(" + SQL_PARAM_PTN_LENGTH + ") : " + col);
+                    throw new RuntimeException("參數變數長度不足("+SQL_PARAM_PTN_LENGTH+") : " + col);
                 }
 
                 Object value = paramMap.get(col);
@@ -3743,7 +3740,7 @@ public class FastDBQueryUI extends JFrame {
             while (mth.find()) {
                 String col = mth.group(1);
                 if (StringUtils.length(col) < SQL_PARAM_PTN_LENGTH) {
-                    throw new RuntimeException("參數變數長度不足(" + SQL_PARAM_PTN_LENGTH + ") : " + col);
+                    throw new RuntimeException("參數變數長度不足("+SQL_PARAM_PTN_LENGTH+") : " + col);
                 }
 
                 Object value = paramMap.get(col);
@@ -8942,31 +8939,6 @@ public class FastDBQueryUI extends JFrame {
         JMenuBarUtil.newInstance().addMenu(mainMenu).apply(TAB_UI1.getJframe());
     }
     // --------------------------------------------------------------------------------------------------------------------------
-
-    private class ColumnSearchFilterHelper {
-        ColumnSearchFilter columnFilter;
-
-        public void process() {
-            try {
-                if (checkIsNeedResetQueryResultTable(true)) {
-                    return;
-                }
-                if (distinctHasClicked) {
-                    queryModeProcess(queryList, true, null, null);
-                    distinctHasClicked = false;
-                }
-                if (columnFilter == null || isResetQuery) {
-                    columnFilter = new ColumnSearchFilter(queryResultTable, "^", new Object[] { QUERY_RESULT_COLUMN_NO });
-                    isResetQuery = false;
-                    columnFilterHolder.set(columnFilter);
-                }
-                columnFilter.filterText(columnFilterText.getText());
-            } catch (Exception ex) {
-                JCommonUtil.handleException(ex);
-            }
-        }
-    }
-
     // --------------------------------------------------------------------------------------------------------------------------
     // --------------------------------------------------------------------------------------------------------------------------
     // --------------------------------------------------------------------------------------------------------------------------
