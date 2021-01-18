@@ -340,6 +340,8 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
 
                         List<Map<String, String>> maybeMultiRowLst = new ArrayList<Map<String, String>>();
 
+                        System.out.println("Process Init Start ==================================");
+
                         // 第一筆的處理
                         for (String columnName : dialog.rowMap.get().keySet()) {
                             columnName = StringUtils.trimToEmpty(columnName);
@@ -349,10 +351,12 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                             boolean isPk = df.isPk;
                             if (df.isIgnore) {
                                 ignoreSet.add(columnName);
+                                System.out.println("\t ignore : " + columnName);
                             }
                             if (isPk) {
                                 pkColumns.add(columnName);
                                 noNullsCol.add(columnName);
+                                System.out.println("\t pk : " + columnName);
                             }
                             if (dtype == DataType.date) {
                                 dateCol.add(columnName);
@@ -362,6 +366,8 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                                 numberCol.add(columnName);
                             }
                         }
+
+                        System.out.println("Process Init End   ==================================");
 
                         // 其他筆的處理
                         if (dialog.mRecordsHandler.size() > 0) {
@@ -797,8 +803,8 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                 Set<String> failed = new LinkedHashSet<String>();
 
                 Map<String, ColumnConf> columnPkConf = new HashMap<String, ColumnConf>();
-                
-                if(columnsLst == null || columnsLst.isEmpty()) {
+
+                if (columnsLst == null || columnsLst.isEmpty()) {
                     Validate.isTrue(false, "資料欄位尚未初始化！[columnsLst-123]");
                 }
 
@@ -871,6 +877,22 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                             }
                         }
                     }
+                }
+
+                System.out.println("Debug Start ===========================================");
+                for (String columnName : columnPkConf.keySet()) {
+                    ColumnConf col = columnPkConf.get(columnName);
+                    if (col.isPk || col.isIgnore) {
+                        System.out.println("\t" + columnName + ": pk :" + col.isPk + " , ignore : " + col.isIgnore + " , isAddFromCustomTable : " + col.isAddFromCustomTableName + " , bakColumn : "
+                                + col.bakupColumnName);
+                    }
+                }
+                System.out.println("Debug End   ===========================================");
+
+                // 重設 pk 與 忽略
+                for (String columnName : rowMap.get().keySet()) {
+                    rowMap.get().get(columnName).isPk = false;
+                    rowMap.get().get(columnName).isIgnore = false;
                 }
 
                 // 重新設定 pk
@@ -1786,6 +1808,9 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
             }
 
             if (reset) {
+                if (columnsLst != null && !columnsLst.isEmpty()) {
+                    // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+                }
                 columnsLst = Collections.unmodifiableList(columnsLst222);
             }
 
