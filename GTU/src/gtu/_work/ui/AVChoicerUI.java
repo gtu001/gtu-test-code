@@ -1156,7 +1156,7 @@ public class AVChoicerUI extends JFrame {
                     return new Object[] { false, "檔案不存在!" };
                 }
 
-                FileUtils.moveFile(srcFile, toFile);
+                FileUtil.moveFileByBat(srcFile, toFile);
                 result = toFile.exists();
             } catch (Exception ex) {
                 errorMessage = ex.toString();
@@ -2458,11 +2458,7 @@ public class AVChoicerUI extends JFrame {
                 }
                 File moveToFile = new File(moveToDir, fromFile.getName());
                 try {
-                    // FileUtils.moveFile(fromFile, moveToFile);//XXX 這個會喬很久!!
-                    if (moveToFile.exists()) {
-                        moveToFile.delete();
-                    }
-                    fromFile.renameTo(moveToFile);
+                    FileUtil.moveFileByBat(fromFile, moveToFile);
                 } catch (Exception e) {
                     e.printStackTrace();
                 } finally {

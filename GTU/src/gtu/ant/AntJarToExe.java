@@ -39,16 +39,10 @@ public class AntJarToExe extends Task {
 
     public static void main(String[] args) {
         Map<String, Object> root = new HashMap<String, Object>();
-        // root.put("jarPath",
-        // "C:\\Users\\gtu00\\OneDrive\\Desktop/EnglishSearchUI.jar");
-        // root.put("exePath",
-        // "C:\\Users\\gtu00\\OneDrive\\Desktop/EnglishSearchUI.exe");
-        root.put("jarPath", "/home/gtu001/桌面/BrowserHistoryHandlerUI.jar");
-        root.put("exePath", "/home/gtu001/桌面/BrowserHistoryHandlerUI.exe");
-        // root.put("iconPath",
-        // "I:\\workstuff\\workspace\\gtu-test-code\\GTU\\src/resource/images/ico/janna.ico");
-        root.put("iconPath", "/media/gtu001/OLD_D/workstuff/workspace/gtu-test-code/GTU/src/resource/images/ico/tk_aiengine.ico");
-        root.put("singletonName", "BrowserHistoryHandlerUI");
+        root.put("jarPath", "/home/gtu001/Desktop/FastDBQueryUI.jar");
+        root.put("exePath", "/home/gtu001/Desktop/FastDBQueryUI.exe");
+        root.put("iconPath", "/media/gtu001/OLD_D/workstuff/workspace/gtu-test-code/GTU/src/resource/images/ico/big_boobs.ico");
+        root.put("singletonName", "FastDBQueryUI");
         URL url = AntJarToExe.class.getResource("AntJarToExe_Launch4j_config.xml");
         System.out.println("url 0-00 " + url);
         try {
@@ -69,6 +63,7 @@ public class AntJarToExe extends Task {
 
             System.out.println("done...");
         } catch (Exception e) {
+            e.printStackTrace();
             throw new BuildException(e);
         }
     }

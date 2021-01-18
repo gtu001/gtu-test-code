@@ -2776,6 +2776,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
                 inst.runInBatFile(false);
             }
             if (!isSaveBatFile) {
+                inst.runInBatFile(false);
                 int waittingTime = 0;
                 try {
                     waittingTime = Integer.parseInt(batWaittingTimeText.getText());

@@ -2205,10 +2205,10 @@ public class JTableUtil {
             @Override
             public boolean include(RowFilter.Entry<? extends DefaultTableModel, ? extends Object> entry) {
                 RowFilter.Entry entry2 = (RowFilter.Entry) entry;
-                ActionEvent event = new ActionEvent(entry2, (int) entry2.getIdentifier(), "");
+                ActionEvent event = new ActionEvent(entry2, (Integer) entry2.getIdentifier(), "");
                 mListener.actionPerformed(event);
                 if (event.getSource() instanceof Boolean) {
-                    return (boolean) event.getSource();
+                    return (Boolean) event.getSource();
                 }
                 return true;
             }
