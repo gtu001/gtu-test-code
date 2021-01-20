@@ -184,6 +184,7 @@ public class AVChoicerUI extends JFrame {
     private JLabel dropHereLbl;
     private JPanel jfxPanel;
     private JFXPanelToSwing mJFXPanelToSwing;
+    private JCheckBox emptyDirChkAllChk;
 
     /**
      * Launch the application.
@@ -719,6 +720,19 @@ public class AVChoicerUI extends JFrame {
             }
         });
 
+        emptyDirChkAllChk = new JCheckBox("");
+        emptyDirChkAllChk.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                boolean chkAll = emptyDirChkAllChk.isSelected();
+                DefaultTableModel model = (DefaultTableModel) emptyDirList.getModel();
+                for (int ii = 0; ii < model.getRowCount(); ii++) {
+                    model.setValueAt(chkAll, ii, 0);
+                }
+                emptyDirList.repaint();
+            }
+        });
+        panel_29.add(emptyDirChkAllChk);
+
         emptyDirTargetText = new JTextField();
         JCommonUtil.jTextFieldSetFilePathMouseEvent(emptyDirTargetText, true, new ActionListener() {
             @Override
@@ -782,6 +796,33 @@ public class AVChoicerUI extends JFrame {
         panel_28.add(panel_32, BorderLayout.SOUTH);
 
         emptyDirList = new JTable();
+        JCommonUtil.applyDropFiles(emptyDirList, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                List<File> files = (List<File>) e.getSource();
+                if (files.isEmpty()) {
+                    return;
+                }
+                File file = files.get(0);
+                if (file != null && file.exists()) {
+                    emptyDirListCheckDir(file);
+                }
+            }
+        });
+        JCommonUtil.applyDropFiles(panel_28, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                List<File> files = (List<File>) e.getSource();
+                if (files.isEmpty()) {
+                    return;
+                }
+                File file = files.get(0);
+                if (file != null && file.exists()) {
+                    emptyDirListCheckDir(file);
+                }
+            }
+        });
+
         initEmptyDirList();
 
         panel_28.add(JCommonUtil.createScrollComponent(emptyDirList), BorderLayout.CENTER);
@@ -896,7 +937,7 @@ public class AVChoicerUI extends JFrame {
             }
         });
 
-        JCommonUtil.applyDropFiles(this, new ActionListener() {
+        JCommonUtil.applyDropFiles(choiceAVBtn, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 List<File> lst = (List<File>) e.getSource();
@@ -1115,7 +1156,7 @@ public class AVChoicerUI extends JFrame {
                     return new Object[] { false, "檔案不存在!" };
                 }
 
-                FileUtils.moveFile(srcFile, toFile);
+                FileUtil.moveFileByBat(srcFile, toFile);
                 result = toFile.exists();
             } catch (Exception ex) {
                 errorMessage = ex.toString();
@@ -2417,11 +2458,7 @@ public class AVChoicerUI extends JFrame {
                 }
                 File moveToFile = new File(moveToDir, fromFile.getName());
                 try {
-                    // FileUtils.moveFile(fromFile, moveToFile);//XXX 這個會喬很久!!
-                    if (moveToFile.exists()) {
-                        moveToFile.delete();
-                    }
-                    fromFile.renameTo(moveToFile);
+                    FileUtil.moveFileByBat(fromFile, moveToFile);
                 } catch (Exception e) {
                     e.printStackTrace();
                 } finally {
@@ -2459,28 +2496,42 @@ public class AVChoicerUI extends JFrame {
             return;
         }
         if (emptyDirHolder.get() == null || !emptyDirHolder.get().exists() || !emptyDirHolder.get().isDirectory()) {
-            JCommonUtil._jOptionPane_showMessageDialog_error("必須設定淨空目錄");
-            return;
-        }
-        DefaultTableModel model = (DefaultTableModel) emptyDirList.getModel();
-        List<File> moveFiles = new ArrayList<File>();
-        List<String> moveLog = new ArrayList<String>();
-        JTableUtil util = JTableUtil.newInstance(emptyDirList);
-        for (int ii = 0; ii < model.getRowCount(); ii++) {
-            boolean isMoveOut = (Boolean) util.getValueAt(true, ii, checkCol);
-            if (isMoveOut) {
-                File moveFile = (File) util.getValueAt(true, ii, fileCol);
-                if (moveFile.exists()) {
-                    moveFiles.add(moveFile);
-                    moveLog.add(moveFile.getName());
+            // 單檔移動
+            DefaultTableModel model = (DefaultTableModel) emptyDirList.getModel();
+            JTableUtil util = JTableUtil.newInstance(emptyDirList);
+            for (int ii = 0; ii < model.getRowCount(); ii++) {
+                boolean isMoveOut = (Boolean) util.getValueAt(true, ii, checkCol);
+                if (isMoveOut) {
+                    File moveFile = (File) util.getValueAt(true, ii, fileCol);
+                    if (moveFile.exists()) {
+                        DefaultListModel model2 = (DefaultListModel) readyMoveLst.getModel();
+                        model2.addElement(new MoveFileZ(moveFile));
+                    }
                 }
             }
-        }
-        boolean confirmMove = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("是否移出以下檔案?\n" + StringUtils.join(moveLog, "\r\n"), "移出檔案數 : " + moveFiles.size());
-        if (confirmMove) {
-            MoveFileBatch tMoveFileBatch = new MoveFileBatch(moveFiles, moveToDir, emptyDirHolder.get());
-            DefaultListModel model2 = (DefaultListModel) readyMoveLst.getModel();
-            model2.addElement(tMoveFileBatch);
+            emptyDirList.setModel(new DefaultTableModel());
+        } else {
+            // 多檔移動
+            DefaultTableModel model = (DefaultTableModel) emptyDirList.getModel();
+            List<File> moveFiles = new ArrayList<File>();
+            List<String> moveLog = new ArrayList<String>();
+            JTableUtil util = JTableUtil.newInstance(emptyDirList);
+            for (int ii = 0; ii < model.getRowCount(); ii++) {
+                boolean isMoveOut = (Boolean) util.getValueAt(true, ii, checkCol);
+                if (isMoveOut) {
+                    File moveFile = (File) util.getValueAt(true, ii, fileCol);
+                    if (moveFile.exists()) {
+                        moveFiles.add(moveFile);
+                        moveLog.add(moveFile.getName());
+                    }
+                }
+            }
+            boolean confirmMove = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("是否移出以下檔案?\n" + StringUtils.join(moveLog, "\r\n"), "移出檔案數 : " + moveFiles.size());
+            if (confirmMove) {
+                MoveFileBatch tMoveFileBatch = new MoveFileBatch(moveFiles, moveToDir, emptyDirHolder.get());
+                DefaultListModel model2 = (DefaultListModel) readyMoveLst.getModel();
+                model2.addElement(tMoveFileBatch);
+            }
         }
     }
 }

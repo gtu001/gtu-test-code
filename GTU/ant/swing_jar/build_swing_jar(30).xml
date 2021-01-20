@@ -100,7 +100,7 @@
 			<!--
 			<packagename mode="pom" name="" pathname="C:\Program Files\Java\jre1.8.0_251\lib\ext\jfxrt.jar"></packagename>
 			-->
-			<packagename mode="pom" name="" pathname="/media/gtu001/OLD_D/my_tool/jfxrt/jfxrt.jar"></packagename>
+			<packagename mode="pom" name="" pathname="/media/gtu001/OLD_D/my_tool/jfxrt/jfxrt.jar" ignore="true"></packagename>
 
 			
 

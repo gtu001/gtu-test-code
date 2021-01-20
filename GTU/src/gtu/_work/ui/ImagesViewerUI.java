@@ -514,9 +514,9 @@ public class ImagesViewerUI extends JFrame {
 
         private void deleteImage() {
             if (this.file == null) {
-                System.out.println("刪除檔案不存在 : " + this.file);
+                System.out.println("刪除檔案不存在[a] : " + this.file);
             } else if (this.file != null && !this.file.exists()) {
-                System.out.println("刪除檔案不存在 : " + this.file);
+                System.out.println("刪除檔案不存在[b] : " + this.file);
                 currentFilesLst.remove(this.file);
                 this.apply(null, currentFilesLst);
                 this.showImage();

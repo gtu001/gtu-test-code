@@ -226,12 +226,18 @@ public class AntJarFinder extends Task {
             // for exact jar files ↑↑↑↑↑↑↑
 
             JarFinder finder = JarFinder.newInstance();
-            if(StringUtils.isBlank(pk.text)) {
+            if (StringUtils.isBlank(pk.text)) {
                 System.err.println("搜尋的classpath不可為空 : " + pk.text);
-                throw new BuildException("搜尋的classpath不可為空 : " + pk.text);
+                if ("true".equalsIgnoreCase(pk.ignore)) {
+                    System.err.println("此為可忽略jar檔!!");
+                    return;
+                } else {
+                    throw new BuildException("搜尋的classpath不可為空 : " + pk.text);
+                }
             }
+
             finder.pattern(pk.text);
-            
+
             for (File search : scanDir) {
                 finder.setDir(search);
                 debug("搜尋來源目錄 : " + search);
@@ -565,6 +571,7 @@ public class AntJarFinder extends Task {
         private String name;
         private String unjar;
         private String pathname;
+        private String ignore;
 
         public void addText(String text) {
             this.text = text;
@@ -584,6 +591,10 @@ public class AntJarFinder extends Task {
 
         public void setUnjar(String unjar) {
             this.unjar = unjar;
+        }
+
+        public void setIgnore(String ignore) {
+            this.ignore = ignore;
         }
 
         private AntJarFinder getOuterType() {

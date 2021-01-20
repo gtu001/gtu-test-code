@@ -41,6 +41,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -99,7 +100,9 @@ public class FileUtil {
             System.out.println("FileUtil : Windows 10");
         }
         if (System.getProperty("os.name").equals("Linux")) {
-            String tmpDesktop = System.getProperty("user.home") + File.separator + "桌面" + File.separator;
+            // String tmpDesktop = System.getProperty("user.home") +
+            // File.separator + "桌面" + File.separator;
+            String tmpDesktop = System.getProperty("user.home") + File.separator + "Desktop" + File.separator;
             destopPath = tmpDesktop;
             isOsWindowsSystem = false;
             System.out.println("FileUtil : Linux");
@@ -467,7 +470,9 @@ public class FileUtil {
         }
     }
 
-    public static boolean moveFileByBat(File fromFile, File toFile) {
+    public static synchronized boolean moveFileByBat(File fromFile, File toFile) {
+        System.out.println("[moveFileByBat] start ---------------------------------");
+        System.out.println("[moveFileByBat] fromFile : " + fromFile);
         try {
             if (fromFile.isFile() == toFile.isFile() || //
                     fromFile.isDirectory() == toFile.isDirectory()) {
@@ -475,27 +480,26 @@ public class FileUtil {
                 System.out.println("[moveFileByBat]必須同為檔案或目錄！");
                 return false;
             }
+            if (!fromFile.exists()) {
+                System.out.println("[moveFileByBat]來源檔遺失！");
+                return false;
+            }
             String command = "";
-            if (OsInfoUtil.isWindows()) {
-                if (fromFile.isDirectory()) {
-                    File chkExistDir = new File(toFile, fromFile.getName());
-                    if (chkExistDir.exists()) {
-                        String[] lst = chkExistDir.list();
-                        if (lst == null || lst.length == 0) {
-                            chkExistDir.delete();
-                        } else {
-                            toFile = new File(toFile, fromFile.getName() + "_" + System.currentTimeMillis());
-                        }
-                    }
+            if (fromFile.isDirectory()) {
+                File toFileDir = toFile;
+                toFile = new File(toFileDir, fromFile.getName());
+                if (toFile.exists()) {
+                    toFile = new File(toFileDir, fromFile.getName() + "_" + Math.abs(new Random().nextInt()));
                 }
+                toFile.mkdirs();
+            }
+            System.out.println("[moveFileByBat] toFile : " + toFile);
+            if (OsInfoUtil.isWindows()) {
                 command = String.format(" move /Y \"%s\" \"%s\"", fromFile, toFile);
             } else {
-                if (fromFile.isDirectory()) {
-                    toFile = new File(toFile, fromFile.getName());
-                    toFile.mkdirs();
-                }
                 command = String.format(" mv -Tf \"%s\" \"%s\"", fromFile, toFile);
             }
+            System.out.println("[moveFileByBat] command : " + command);
             RuntimeBatPromptModeUtil inst = RuntimeBatPromptModeUtil.newInstance();
             inst.command(command);
             ProcessWatcher watcher = ProcessWatcher.newInstance(inst.apply("UTF8"));
@@ -507,14 +511,17 @@ public class FileUtil {
             System.out.println("errorMsg : " + errorMsg);
             System.out.println("============================================");
             if (StringUtils.isBlank(errorMsg)) {
+                System.out.println("[moveFileByBat] success! ");
                 return true;
             } else {
-                System.err.println("[moveFileByBat] Fail : " + errorMsg);
+                System.out.println("[moveFileByBat] Fail : " + errorMsg);
                 return false;
             }
         } catch (Exception ex) {
             ex.printStackTrace();
             return false;
+        } finally {
+            System.out.println("[moveFileByBat] end   ---------------------------------");
         }
     }
 
@@ -752,8 +759,14 @@ public class FileUtil {
         } catch (IOException ex) {
             throw ex;
         } finally {
-            fis.close();
-            fos.close();
+            try {
+                fis.close();
+            } catch (Exception ex) {
+            }
+            try {
+                fos.close();
+            } catch (Exception ex) {
+            }
         }
 
         final long srcLen = srcFile.length(); // TODO See IO-386

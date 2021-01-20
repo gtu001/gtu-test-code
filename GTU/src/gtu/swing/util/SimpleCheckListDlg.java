@@ -3,20 +3,14 @@ package gtu.swing.util;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.BufferedReader;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -26,6 +20,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -38,20 +33,21 @@ import javax.swing.table.DefaultTableModel;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
-import gtu.clipboard.ClipboardUtil;
-import gtu.string.StringUtil_;
 import gtu.swing.util.JCommonUtil.HandleDocumentEvent;
 
 public class SimpleCheckListDlg extends JDialog {
 
     private final JPanel contentPanel = new JPanel();
     private JTable table;
+    private JTextField searchText;
+    private JCheckBox distinctCheckbox;
+    private MySearchHandler mMySearchHandler = new MySearchHandler();
+
     private ActionListener okButtonAction = new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e) {
         }
     };
-    private JTextField searchText;
 
     /**
      * Launch the application.
@@ -82,8 +78,6 @@ public class SimpleCheckListDlg extends JDialog {
             dialog.setVisible(true);
             dialog.okButtonAction = okButtonAction;
 
-            JTableUtil.setColumnWidths_Percent(dialog.table, new float[] { 10f, 90f });
-
             dialog.addWindowListener(new WindowAdapter() {
                 public void windowClosed(WindowEvent e) {
                     if (onCloseListener != null) {
@@ -108,12 +102,6 @@ public class SimpleCheckListDlg extends JDialog {
             dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
             dialog.setVisible(true);
             dialog.okButtonAction = okButtonAction;
-
-            Map<String, Object> preferences = new HashMap<String, Object>();
-            Map<Integer, Integer> presetColumns = new HashMap<Integer, Integer>();
-            presetColumns.put(0, 20);
-            preferences.put("presetColumns", presetColumns);
-            JTableUtil.setColumnWidths_ByDataContent(dialog.table, preferences, dialog.getInsets(), false);
 
             dialog.addWindowListener(new WindowAdapter() {
                 public void windowClosed(WindowEvent e) {
@@ -161,6 +149,141 @@ public class SimpleCheckListDlg extends JDialog {
         return rtnMap;
     }
 
+    private class MySearchHandler {
+
+        List<String> titleLst;
+        Map<String, String> titleMap;
+
+        protected Pair<String, List<Pattern>> filterPattern(String filterText) {
+            Pattern ptn = Pattern.compile("\\/(.*?)\\/");
+            Matcher mth = ptn.matcher(filterText);
+            StringBuffer sb = new StringBuffer();
+            List<Pattern> lst = new ArrayList<Pattern>();
+            while (mth.find()) {
+                String temp = mth.group(1);
+                Pattern tmpPtn = null;
+                if (StringUtils.isNotBlank(temp)) {
+                    try {
+                        tmpPtn = Pattern.compile(temp, Pattern.CASE_INSENSITIVE);
+                    } catch (Exception ex) {
+                    }
+                }
+                if (tmpPtn != null) {
+                    lst.add(tmpPtn);
+                    mth.appendReplacement(sb, "");
+                } else {
+                    mth.appendReplacement(sb, mth.group(0));
+                }
+            }
+            mth.appendTail(sb);
+            return Pair.of(sb.toString(), lst);
+        }
+
+        private boolean handleRow(int rowIdx) {
+            JTableUtil util = JTableUtil.newInstance(table);
+            for (int jj = 0; jj < table.getColumnCount(); jj++) {
+                Object val = util.getValueAt(true, rowIdx, jj);
+                if (val instanceof String) {
+                    String strVal = (String) val;
+                    if (textLst != null) {
+                        for (String txt : textLst) {
+                            if (strVal.toLowerCase().contains(txt)) {
+                                return true;
+                            }
+                        }
+                    }
+                    if (mthPtn != null) {
+                        for (Pattern pp : mthPtn.getRight()) {
+                            if (pp != null && pp.matcher(strVal).find()) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+
+        List<String> textLst;
+        Pair<String, List<Pattern>> mthPtn;
+
+        private void process() {
+            try {
+                Map<Integer, List<Integer>> changeColorMap = new HashMap<Integer, List<Integer>>();
+                if (StringUtils.isBlank(searchText.getText())) {
+                    JTableUtil.newInstance(table).setCellBackgroundColor(Color.green.brighter(), changeColorMap, Arrays.asList(0));
+                    return;
+                }
+
+                mthPtn = filterPattern(searchText.getText());
+
+                String text1 = StringUtils.trimToEmpty(mthPtn.getLeft());
+                String text = text1.toLowerCase();
+                textLst = new ArrayList<String>();
+                for (String t : text1.split("\\^", -1)) {
+                    t = StringUtils.trimToEmpty(t).toLowerCase();
+                    if (StringUtils.isNotBlank(t)) {
+                        textLst.add(t);
+                    }
+                }
+
+                JTableUtil util = JTableUtil.newInstance(table);
+                DefaultTableModel model = util.getModel();
+
+                for (int ii = 0; ii < model.getRowCount(); ii++) {
+                    List<Integer> lst = new ArrayList<Integer>();
+                    changeColorMap.put(ii, lst);
+                    A: for (int jj = 0; jj < table.getColumnCount(); jj++) {
+                        Object val = util.getValueAt(true, ii, jj);
+                        if (val instanceof String) {
+                            String strVal = (String) val;
+                            for (String txt : textLst) {
+                                if (strVal.toLowerCase().contains(txt)) {
+                                    lst.add(jj);
+                                    continue A;
+                                }
+                            }
+                            for (Pattern pp : mthPtn.getRight()) {
+                                if (pp != null && pp.matcher(strVal).find()) {
+                                    lst.add(jj);
+                                    continue A;
+                                }
+                            }
+                        }
+                    }
+                }
+                JTableUtil.newInstance(table).setCellBackgroundColor(Color.green.brighter(), changeColorMap, Arrays.asList(0));
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+
+        public void initTable() {
+            if (titleLst != null && !titleLst.isEmpty()) {
+                DefaultTableModel model = JTableUtil.createModel(new int[] { 0 }, new Object[] { "勾選", "項目" }, new Class[] { Boolean.class, String.class });
+                table.setModel(model);
+                for (String column : titleLst) {
+                    model.addRow(new Object[] { false, column });
+                }
+            } else if (titleMap != null && !titleMap.isEmpty()) {
+                DefaultTableModel model = JTableUtil.createModel(new int[] { 0 }, new Object[] { "勾選", "項目", "說明" }, new Class[] { Boolean.class, String.class, String.class });
+                table.setModel(model);
+                for (String column : titleMap.keySet()) {
+                    model.addRow(new Object[] { false, column, StringUtils.trimToEmpty(titleMap.get(column)) });
+                }
+            }
+            if (titleLst != null && !titleLst.isEmpty()) {
+                JTableUtil.setColumnWidths_Percent(table, new float[] { 10f, 90f });
+            } else if (titleMap != null && !titleMap.isEmpty()) {
+                Map<String, Object> preferences = new HashMap<String, Object>();
+                Map<Integer, Integer> presetColumns = new HashMap<Integer, Integer>();
+                presetColumns.put(0, 20);
+                preferences.put("presetColumns", presetColumns);
+                JTableUtil.setColumnWidths_ByDataContent(table, preferences, getInsets(), false);
+            }
+        }
+    }
+
     /**
      * Create the dialog.
      */
@@ -170,6 +293,10 @@ public class SimpleCheckListDlg extends JDialog {
         contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
         getContentPane().add(contentPanel, BorderLayout.CENTER);
         contentPanel.setLayout(new BorderLayout(0, 0));
+
+        mMySearchHandler.titleLst = titleLst;
+        mMySearchHandler.titleMap = titleMap;
+
         {
             JPanel panel = new JPanel();
             contentPanel.add(panel, BorderLayout.NORTH);
@@ -181,6 +308,23 @@ public class SimpleCheckListDlg extends JDialog {
                 searchText = new JTextField();
                 panel.add(searchText);
                 searchText.setColumns(30);
+
+                distinctCheckbox = new JCheckBox("");
+                panel.add(distinctCheckbox);
+                distinctCheckbox.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent arg0) {
+                        if (!distinctCheckbox.isSelected()) {
+                            mMySearchHandler.initTable();
+                            return;
+                        }
+                        JTableUtil.newInstance(table).setRowFilter(new ActionListener() {
+                            @Override
+                            public void actionPerformed(ActionEvent arg0) {
+                                arg0.setSource(mMySearchHandler.handleRow(arg0.getID()));
+                            }
+                        });
+                    }
+                });
 
                 searchText.addMouseListener(new MouseAdapter() {
                     @Override
@@ -208,82 +352,9 @@ public class SimpleCheckListDlg extends JDialog {
                 });
 
                 searchText.getDocument().addDocumentListener(JCommonUtil.getDocumentListener(new HandleDocumentEvent() {
-
-                    protected Pair<String, List<Pattern>> filterPattern(String filterText) {
-                        Pattern ptn = Pattern.compile("\\/(.*?)\\/");
-                        Matcher mth = ptn.matcher(filterText);
-                        StringBuffer sb = new StringBuffer();
-                        List<Pattern> lst = new ArrayList<Pattern>();
-                        while (mth.find()) {
-                            String temp = mth.group(1);
-                            Pattern tmpPtn = null;
-                            if (StringUtils.isNotBlank(temp)) {
-                                try {
-                                    tmpPtn = Pattern.compile(temp, Pattern.CASE_INSENSITIVE);
-                                } catch (Exception ex) {
-                                }
-                            }
-                            if (tmpPtn != null) {
-                                lst.add(tmpPtn);
-                                mth.appendReplacement(sb, "");
-                            } else {
-                                mth.appendReplacement(sb, mth.group(0));
-                            }
-                        }
-                        mth.appendTail(sb);
-                        return Pair.of(sb.toString(), lst);
-                    }
-
                     @Override
                     public void process(DocumentEvent event) {
-                        try {
-                            Map<Integer, List<Integer>> changeColorMap = new HashMap<Integer, List<Integer>>();
-                            if (StringUtils.isBlank(searchText.getText())) {
-                                JTableUtil.newInstance(table).setCellBackgroundColor(Color.green.brighter(), changeColorMap, Arrays.asList(0));
-                                return;
-                            }
-
-                            Pair<String, List<Pattern>> mthPtn = filterPattern(searchText.getText());
-
-                            String text1 = StringUtils.trimToEmpty(mthPtn.getLeft());
-                            String text = text1.toLowerCase();
-                            List<String> textLst = new ArrayList<String>();
-                            for (String t : text1.split("\\^", -1)) {
-                                t = StringUtils.trimToEmpty(t).toLowerCase();
-                                if (StringUtils.isNotBlank(t)) {
-                                    textLst.add(t);
-                                }
-                            }
-
-                            JTableUtil util = JTableUtil.newInstance(table);
-                            DefaultTableModel model = util.getModel();
-
-                            for (int ii = 0; ii < model.getRowCount(); ii++) {
-                                List<Integer> lst = new ArrayList<Integer>();
-                                changeColorMap.put(ii, lst);
-                                A: for (int jj = 0; jj < table.getColumnCount(); jj++) {
-                                    Object val = util.getValueAt(true, ii, jj);
-                                    if (val instanceof String) {
-                                        String strVal = (String) val;
-                                        for (String txt : textLst) {
-                                            if (strVal.toLowerCase().contains(txt)) {
-                                                lst.add(jj);
-                                                continue A;
-                                            }
-                                        }
-                                        for (Pattern pp : mthPtn.getRight()) {
-                                            if (pp != null && pp.matcher(strVal).find()) {
-                                                lst.add(jj);
-                                                continue A;
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                            JTableUtil.newInstance(table).setCellBackgroundColor(Color.green.brighter(), changeColorMap, Arrays.asList(0));
-                        } catch (Exception ex) {
-                            ex.printStackTrace();
-                        }
+                        mMySearchHandler.process();
                     }
                 }));
             }
@@ -305,19 +376,7 @@ public class SimpleCheckListDlg extends JDialog {
             JTableUtil.defaultSetting(table);
             contentPanel.add(JCommonUtil.createScrollComponent(table), BorderLayout.CENTER);
 
-            if (titleLst != null && !titleLst.isEmpty()) {
-                DefaultTableModel model = JTableUtil.createModel(new int[] { 0 }, new Object[] { "勾選", "項目" }, new Class[] { Boolean.class, String.class });
-                table.setModel(model);
-                for (String column : titleLst) {
-                    model.addRow(new Object[] { false, column });
-                }
-            } else if (titleMap != null && !titleMap.isEmpty()) {
-                DefaultTableModel model = JTableUtil.createModel(new int[] { 0 }, new Object[] { "勾選", "項目", "說明" }, new Class[] { Boolean.class, String.class, String.class });
-                table.setModel(model);
-                for (String column : titleMap.keySet()) {
-                    model.addRow(new Object[] { false, column, StringUtils.trimToEmpty(titleMap.get(column)) });
-                }
-            }
+            mMySearchHandler.initTable();
         }
         {
             JPanel buttonPane = new JPanel();
