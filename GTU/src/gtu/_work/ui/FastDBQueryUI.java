@@ -37,6 +37,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Scanner;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -1454,21 +1455,35 @@ public class FastDBQueryUI extends JFrame {
                 @Override
                 public void mouseReleased(MouseEvent e) {
                     if (JMouseEventUtil.buttonRightClick(1, e)) {
-                        JPopupMenuUtil util = JPopupMenuUtil.newInstance(f).addJMenuItem("空白換成\"^\"", new ActionListener() {
-
-                            @Override
-                            public void actionPerformed(ActionEvent e) {
-                                String[] texts = StringUtils.split(f.getText(), " ");
-                                List<String> arry = new ArrayList<String>();
-                                for (String x : texts) {
-                                    x = StringUtils.trimToEmpty(x);
-                                    if (StringUtils.isNotBlank(x)) {
-                                        arry.add(x);
+                        JPopupMenuUtil util = JPopupMenuUtil.newInstance(f)//
+                                .addJMenuItem("空白換成\"^\"", new ActionListener() {
+                                    @Override
+                                    public void actionPerformed(ActionEvent e) {
+                                        String[] texts = StringUtils.split(f.getText(), " ");
+                                        List<String> arry = new ArrayList<String>();
+                                        for (String x : texts) {
+                                            x = StringUtils.trimToEmpty(x);
+                                            if (StringUtils.isNotBlank(x)) {
+                                                arry.add(x);
+                                            }
+                                        }
+                                        f.setText(StringUtils.join(arry, "^"));
                                     }
-                                }
-                                f.setText(StringUtils.join(arry, "^"));
-                            }
-                        });
+                                })//
+                                .addJMenuItem("空白換成[準]\"^\"", new ActionListener() {
+                                    @Override
+                                    public void actionPerformed(ActionEvent e) {
+                                        String[] texts = StringUtils.split(f.getText(), " ");
+                                        List<String> arry = new ArrayList<String>();
+                                        for (String x : texts) {
+                                            x = StringUtils.trimToEmpty(x);
+                                            if (StringUtils.isNotBlank(x)) {
+                                                arry.add("/^" + x + "$/");
+                                            }
+                                        }
+                                        f.setText(StringUtils.join(arry, "^"));
+                                    }
+                                });
                         util.addJMenuItem(new S2T_And_T2S_EventHandler(f).getMenuItem(false));
                         util.addJMenuItem(new S2T_And_T2S_EventHandler(f).getMenuItem(true));
                         util.applyEvent(e).show();
@@ -2986,7 +3001,7 @@ public class FastDBQueryUI extends JFrame {
                 parameterList.addAll(((SqlParam_IfExists) param).processParamMap(paramMap, sqlInjectMap, forceAddColumns));
                 resultSql = ((SqlParam_IfExists) param).processParamMap_ToSQL2222(paramMap, sqlInjectMap, forceAddColumns);
             }
-            
+
             {
                 Matcher mth = SqlParam.sqlInjectionPATTERN.matcher(resultSql);
                 StringBuffer sb = new StringBuffer();
@@ -3366,7 +3381,7 @@ public class FastDBQueryUI extends JFrame {
             while (mth.find()) {
                 String key = mth.group(1);
                 if (StringUtils.length(key) < SQL_PARAM_PTN_LENGTH) {
-                    throw new RuntimeException("參數變數長度不足("+SQL_PARAM_PTN_LENGTH+") : " + key);
+                    throw new RuntimeException("參數變數長度不足(" + SQL_PARAM_PTN_LENGTH + ") : " + key);
                 }
 
                 int length = mth.group().length();
@@ -3441,7 +3456,7 @@ public class FastDBQueryUI extends JFrame {
             while (mth.find()) {
                 String key = mth.group(1);
                 if (StringUtils.length(key) < SQL_PARAM_PTN_LENGTH) {
-                    throw new RuntimeException("參數變數長度不足("+SQL_PARAM_PTN_LENGTH+") : " + key);
+                    throw new RuntimeException("參數變數長度不足(" + SQL_PARAM_PTN_LENGTH + ") : " + key);
                 }
 
                 int length = mth.group().length();
@@ -3565,7 +3580,7 @@ public class FastDBQueryUI extends JFrame {
                     while (mth2.find()) {
                         String para = mth2.group(1);
                         if (StringUtils.length(para) < SQL_PARAM_PTN_LENGTH) {
-                            throw new RuntimeException("參數變數長度不足("+SQL_PARAM_PTN_LENGTH+") : " + para);
+                            throw new RuntimeException("參數變數長度不足(" + SQL_PARAM_PTN_LENGTH + ") : " + para);
                         }
 
                         if (isNotParam(para)) {
@@ -3611,7 +3626,7 @@ public class FastDBQueryUI extends JFrame {
             while (mth.find()) {
                 String col = mth.group(1);
                 if (StringUtils.length(col) < SQL_PARAM_PTN_LENGTH) {
-                    throw new RuntimeException("參數變數長度不足("+SQL_PARAM_PTN_LENGTH+") : " + col);
+                    throw new RuntimeException("參數變數長度不足(" + SQL_PARAM_PTN_LENGTH + ") : " + col);
                 }
 
                 Object value = paramMap.get(col);
@@ -3740,7 +3755,7 @@ public class FastDBQueryUI extends JFrame {
             while (mth.find()) {
                 String col = mth.group(1);
                 if (StringUtils.length(col) < SQL_PARAM_PTN_LENGTH) {
-                    throw new RuntimeException("參數變數長度不足("+SQL_PARAM_PTN_LENGTH+") : " + col);
+                    throw new RuntimeException("參數變數長度不足(" + SQL_PARAM_PTN_LENGTH + ") : " + col);
                 }
 
                 Object value = paramMap.get(col);
