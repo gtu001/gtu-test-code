@@ -1962,8 +1962,7 @@ public class JTableUtil {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                row = JTableUtil.getRealRowPos(row, table);
-                row = JTableUtil.getRealRowPos(row, table);
+                // row = JTableUtil.getRealRowPos(row, table);
                 column = JTableUtil.getRealColumnPos(column, table);
                 if (colorRowIndexLst.contains(row)) {
                     c.setBackground(this.color);
@@ -1997,7 +1996,7 @@ public class JTableUtil {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                row = JTableUtil.getRealRowPos(row, table);
+                // row = JTableUtil.getRealRowPos(row, table);
                 column = JTableUtil.getRealColumnPos(column, table);
                 boolean findOk = false;
                 if (changeColorRowCellIdxMap.containsKey(row)) {

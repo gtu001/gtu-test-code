@@ -19,6 +19,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.math.BigDecimal;
 import java.sql.Connection;
@@ -37,7 +38,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Scanner;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -86,7 +86,6 @@ import org.apache.commons.collections.Transformer;
 import org.apache.commons.collections.map.LRUMap;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
-import org.apache.commons.lang.builder.ToStringStyle;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
@@ -5668,6 +5667,34 @@ public class FastDBQueryUI extends JFrame {
                         }
                         cloneToFrame1.sqlListMouseClicked(null, sqlBean1);
                         cloneToFrame1.executeSqlButtonClick();
+                    }
+                }
+            });//
+
+            jpopUtil.addJMenuItem("動態產生Where SQL [簡]", new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    try {
+                        List<String> lst = new ArrayList<String>();
+                        Matcher mth = null;
+                        Pattern ptn = Pattern.compile("\\w+");
+                        BufferedReader reader = new BufferedReader(new StringReader(ClipboardUtil.getInstance().getContents()));
+                        for (String line = null; (line = reader.readLine()) != null;) {
+                            mth = ptn.matcher(line);
+                            while (mth.find()) {
+                                lst.add(mth.group());
+                            }
+                        }
+                        StringBuffer sb = new StringBuffer();
+                        sb.append("select * \r\n");
+                        sb.append("from XXXXXXXXX t \r\n");
+                        sb.append("where 1=1 \r\n");
+                        for (String column : lst) {
+                            sb.append("    and t." + column + " = 'XXXXXXXX' \r\n");
+                        }
+                        new SimpleTextDlg(sb.toString(), "", null).show();
+                    } catch (Exception ex) {
+                        JCommonUtil.handleException(ex);
                     }
                 }
             });//

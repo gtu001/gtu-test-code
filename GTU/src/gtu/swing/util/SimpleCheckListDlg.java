@@ -125,8 +125,8 @@ public class SimpleCheckListDlg extends JDialog {
         JTableUtil t = JTableUtil.newInstance(table);
         DefaultTableModel model = (DefaultTableModel) table.getModel();
         for (int ii = 0; ii < model.getRowCount(); ii++) {
-            Boolean v = (Boolean) t.getValueAt(true, ii, 0);
-            String n = (String) t.getValueAt(true, ii, 1);
+            Boolean v = (Boolean) t.getValueAt(false, ii, 0);
+            String n = (String) t.getValueAt(false, ii, 1);
             if (v) {
                 pkLst.add(n);
             }
@@ -139,9 +139,9 @@ public class SimpleCheckListDlg extends JDialog {
         JTableUtil t = JTableUtil.newInstance(table);
         DefaultTableModel model = (DefaultTableModel) table.getModel();
         for (int ii = 0; ii < model.getRowCount(); ii++) {
-            Boolean v = (Boolean) t.getValueAt(true, ii, 0);
-            String n = (String) t.getValueAt(true, ii, 1);
-            String v2 = (String) t.getValueAt(true, ii, 2);
+            Boolean v = (Boolean) t.getValueAt(false, ii, 0);
+            String n = (String) t.getValueAt(false, ii, 1);
+            String v2 = (String) t.getValueAt(false, ii, 2);
             if (v) {
                 rtnMap.put(n, v2);
             }
@@ -182,7 +182,7 @@ public class SimpleCheckListDlg extends JDialog {
         private boolean handleRow(int rowIdx) {
             JTableUtil util = JTableUtil.newInstance(table);
             for (int jj = 0; jj < table.getColumnCount(); jj++) {
-                Object val = util.getValueAt(true, rowIdx, jj);
+                Object val = util.getValueAt(false, rowIdx, jj);
                 if (val instanceof String) {
                     String strVal = (String) val;
                     if (textLst != null) {
@@ -234,7 +234,7 @@ public class SimpleCheckListDlg extends JDialog {
                     List<Integer> lst = new ArrayList<Integer>();
                     changeColorMap.put(ii, lst);
                     A: for (int jj = 0; jj < table.getColumnCount(); jj++) {
-                        Object val = util.getValueAt(true, ii, jj);
+                        Object val = util.getValueAt(false, ii, jj);
                         if (val instanceof String) {
                             String strVal = (String) val;
                             for (String txt : textLst) {
