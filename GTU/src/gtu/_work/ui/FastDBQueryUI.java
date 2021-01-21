@@ -1078,7 +1078,7 @@ public class FastDBQueryUI extends JFrame {
                                             lst.add((String) parametersTable.getValueAt(row, col));
                                         }
                                     }
-                                    new SimpleTextDlg(StringUtils.join(lst, "^"), "", null).show();
+                                    SimpleTextDlg.newInstance(StringUtils.join(lst, "^"), "", null).show();
                                 }
                             })//
                             .applyEvent(e)//
@@ -1267,21 +1267,21 @@ public class FastDBQueryUI extends JFrame {
                         public void actionPerformed(ActionEvent e) {
                             JTableUtil tabUtil = JTableUtil.newInstance(queryResultTable);
                             List<Object> lst = tabUtil.getColumnTitleArray();
-                            new SimpleTextDlg(StringUtils.join(lst, " , "), "", null).show();
+                            SimpleTextDlg.newInstance(StringUtils.join(lst, " , "), "", null).show();
                         }
                     }).addJMenuItem("顯示全部(逗號)全部(多行)", new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
                             JTableUtil tabUtil = JTableUtil.newInstance(queryResultTable);
                             List<Object> lst = tabUtil.getColumnTitleArray();
-                            new SimpleTextDlg(StringUtils.join(lst, "\r\n"), "", null).show();
+                            SimpleTextDlg.newInstance(StringUtils.join(lst, "\r\n"), "", null).show();
                         }
                     }).addJMenuItem("顯示全部(逗號)全部(多行逗號)", new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
                             JTableUtil tabUtil = JTableUtil.newInstance(queryResultTable);
                             List<Object> lst = tabUtil.getColumnTitleArray();
-                            new SimpleTextDlg(StringUtils.join(lst, ",\r\n"), "", null).show();
+                            SimpleTextDlg.newInstance(StringUtils.join(lst, ",\r\n"), "", null).show();
                         }
                     }).addJMenuItem("Sql Column IN (...)", new ActionListener() {
                         @Override
@@ -1301,7 +1301,7 @@ public class FastDBQueryUI extends JFrame {
                                 @Override
                                 public void actionPerformed(ActionEvent e) {
                                     String pkMsg = StringUtils.join(mTableColumnDefTextHandler.getPkLst(), "\r\n");
-                                    new SimpleTextDlg(pkMsg, "", null).show();
+                                    SimpleTextDlg.newInstance(pkMsg, "", null).show();
                                 }
                             });
                         }
@@ -1309,7 +1309,7 @@ public class FastDBQueryUI extends JFrame {
                             @Override
                             public void actionPerformed(ActionEvent e) {
                                 String selectColumnString = mTableColumnDefTextHandler.getSelectColumns();
-                                new SimpleTextDlg(selectColumnString, "", null).show();
+                                SimpleTextDlg.newInstance(selectColumnString, "", null).show();
                             }
                         });
                     }
@@ -3015,9 +3015,9 @@ public class FastDBQueryUI extends JFrame {
 
             // 判斷執行模式
             if (querySqlRadio.isSelected()) {
-                new SimpleTextDlg(resultSql, "", null).show();
+                SimpleTextDlg.newInstance(resultSql, "", null).show();
             } else if (updateSqlRadio.isSelected()) {
-                new SimpleTextDlg(resultSql, "", null).show();
+                SimpleTextDlg.newInstance(resultSql, "", null).show();
             }
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
@@ -4343,7 +4343,7 @@ public class FastDBQueryUI extends JFrame {
                         String column = StringUtils.trimToEmpty(String.valueOf(colLst.get(selectColIdxArry[jj])));
                         strLst.add(alias + column);
                     }
-                    new SimpleTextDlg(StringUtils.join(strLst, ", "), "", null).show();
+                    SimpleTextDlg.newInstance(StringUtils.join(strLst, ", "), "", null).show();
                 }
             });
             chdMenu.addMenuItem("複製欄位逗號隔開 java", new ActionListener() {
@@ -4355,7 +4355,7 @@ public class FastDBQueryUI extends JFrame {
                         String column = StringUtils.trimToEmpty(String.valueOf(colLst.get(selectColIdxArry[jj])));
                         strLst.add(StringUtilForDb.dbFieldToJava_smartCheck(column));
                     }
-                    new SimpleTextDlg(StringUtils.join(strLst, ", "), "", null).show();
+                    SimpleTextDlg.newInstance(StringUtils.join(strLst, ", "), "", null).show();
                 }
             });
             chdMenu.addMenuItem("複製欄位換行", new ActionListener() {
@@ -4371,7 +4371,7 @@ public class FastDBQueryUI extends JFrame {
                         String column = StringUtils.trimToEmpty(String.valueOf(colLst.get(selectColIdxArry[jj])));
                         strLst.add(alias + column);
                     }
-                    new SimpleTextDlg(StringUtils.join(strLst, "\r\n"), "", null).show();
+                    SimpleTextDlg.newInstance(StringUtils.join(strLst, "\r\n"), "", null).show();
                 }
             });
             chdMenu.addMenuItem("複製欄位換行 java", new ActionListener() {
@@ -4383,7 +4383,7 @@ public class FastDBQueryUI extends JFrame {
                         String column = StringUtils.trimToEmpty(String.valueOf(colLst.get(selectColIdxArry[jj])));
                         strLst.add(StringUtilForDb.dbFieldToJava_smartCheck(column));
                     }
-                    new SimpleTextDlg(StringUtils.join(strLst, "\r\n"), "", null).show();
+                    SimpleTextDlg.newInstance(StringUtils.join(strLst, "\r\n"), "", null).show();
                 }
             });
             chdMenu.addMenuItem("複製欄位setter", new ActionListener() {
@@ -4397,7 +4397,7 @@ public class FastDBQueryUI extends JFrame {
                         column = "set" + StringUtils.capitalize(column) + "( XXXXXXXXXX );";
                         strLst.add("vo." + column);
                     }
-                    new SimpleTextDlg(StringUtils.join(strLst, "\r\n"), "", null).show();
+                    SimpleTextDlg.newInstance(StringUtils.join(strLst, "\r\n"), "", null).show();
                 }
             });
             chdMenu.addMenuItem("複製欄位setter copy", new ActionListener() {
@@ -4411,7 +4411,7 @@ public class FastDBQueryUI extends JFrame {
                         String resultStr = "vo.set" + StringUtils.capitalize(column) + "(" + "vo2.get" + StringUtils.capitalize(column) + "()" + ");";
                         strLst.add(resultStr);
                     }
-                    new SimpleTextDlg(StringUtils.join(strLst, "\r\n"), "", null).show();
+                    SimpleTextDlg.newInstance(StringUtils.join(strLst, "\r\n"), "", null).show();
                 }
             });
             chdMenu.addMenuItem("複製欄位setter 設值", new ActionListener() {
@@ -4436,7 +4436,7 @@ public class FastDBQueryUI extends JFrame {
                         String resultStr = "vo.set" + StringUtils.capitalize(column) + "(\"" + value + "\");";
                         strLst.add(resultStr);
                     }
-                    new SimpleTextDlg(StringUtils.join(strLst, "\r\n"), "", null).show();
+                    SimpleTextDlg.newInstance(StringUtils.join(strLst, "\r\n"), "", null).show();
                 }
             });
             ppap.addJMenuItem(chdMenu.getMenu());
@@ -4450,7 +4450,7 @@ public class FastDBQueryUI extends JFrame {
         JMenuItem item;
 
         JMenuItem_BasicMenu() {
-            mSimpleTextDlg = new SimpleTextDlg(JTableUtil.newInstance(queryResultTable).getSelectedValue(), "", null);
+            mSimpleTextDlg = SimpleTextDlg.newInstance(JTableUtil.newInstance(queryResultTable).getSelectedValue(), "", null);
             item = new JMenuItem("此資料長度 : " + mSimpleTextDlg.getMessage().getBytes().length);
             item.addActionListener(new ActionListener() {
                 @Override
@@ -5622,7 +5622,7 @@ public class FastDBQueryUI extends JFrame {
                 public void actionPerformed(ActionEvent e) {
                     String sql = getCurrentSQL();
                     String resultSql = getExportSqlToJavaCode(sql, false, true);
-                    new SimpleTextDlg(resultSql, "", null).show();
+                    SimpleTextDlg.newInstance(resultSql, "", null).show();
                 }
             });//
             jpopUtil.addJMenuItem("以java code方式將sql匯出[繁]", new ActionListener() {
@@ -5630,7 +5630,7 @@ public class FastDBQueryUI extends JFrame {
                 public void actionPerformed(ActionEvent e) {
                     String sql = getCurrentSQL();
                     String resultSql = getExportSqlToJavaCode(sql, true, true);
-                    new SimpleTextDlg(resultSql, "", null).show();
+                    SimpleTextDlg.newInstance(resultSql, "", null).show();
                 }
             });//
 
@@ -5692,7 +5692,7 @@ public class FastDBQueryUI extends JFrame {
                         for (String column : lst) {
                             sb.append("    and t." + column + " = 'XXXXXXXX' \r\n");
                         }
-                        new SimpleTextDlg(sb.toString(), "", null).show();
+                        SimpleTextDlg.newInstance(sb.toString(), "", null).show();
                     } catch (Exception ex) {
                         JCommonUtil.handleException(ex);
                     }
@@ -7402,7 +7402,7 @@ public class FastDBQueryUI extends JFrame {
             }
             String resultSql = StringUtils.join(lst, "','");
             resultSql = "'" + resultSql + "'";
-            new SimpleTextDlg(resultSql, "", null).show();
+            SimpleTextDlg.newInstance(resultSql, "", null).show();
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
         }

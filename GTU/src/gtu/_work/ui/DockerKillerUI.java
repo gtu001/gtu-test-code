@@ -310,7 +310,7 @@ public class DockerKillerUI extends JFrame {
                                 @Override
                                 public void actionPerformedInner(ActionEvent arg0) {
                                     String outputMsg = mDockerKiller.commandContainer("logs", deleteId);
-                                    SimpleTextDlg mSimpleTextDlg = new SimpleTextDlg(outputMsg, deleteId, new Dimension(650, 450));
+                                    SimpleTextDlg mSimpleTextDlg = SimpleTextDlg.newInstance(outputMsg, deleteId, new Dimension(650, 450));
                                     mSimpleTextDlg.show();
                                 }
                             })//
@@ -386,7 +386,7 @@ public class DockerKillerUI extends JFrame {
                                 @Override
                                 public void actionPerformedInner(ActionEvent e) {
                                     String volumeInfo = mDockerKiller.inspectVolume(deleteId);
-                                    SimpleTextDlg mSimpleTextDlg = new SimpleTextDlg(volumeInfo, deleteId, new Dimension(550, 350));
+                                    SimpleTextDlg mSimpleTextDlg = SimpleTextDlg.newInstance(volumeInfo, deleteId, new Dimension(550, 350));
                                     mSimpleTextDlg.show();
                                 }
                             })//

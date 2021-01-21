@@ -30,7 +30,11 @@ public class SimpleTextDlg {
         return strVal.get();
     }
 
-    public SimpleTextDlg(Object val, String title, final Dimension size) {
+    public static SimpleTextDlg newInstance(Object val, String title, final Dimension size) {
+        return new SimpleTextDlg(val, title, size);
+    }
+
+    private SimpleTextDlg(Object val, String title, final Dimension size) {
         dlg = new JDialog() {
             public Dimension getPreferredSize() {
                 if (size != null) {
