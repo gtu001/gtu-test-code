@@ -5356,21 +5356,38 @@ public class FastDBQueryUI extends JFrame {
             jpopUtil.addJMenuItem("SQL 基礎 Select", new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    String tableName = sqlTextArea.getSelectedText();
-                    if (StringUtils.isBlank(tableName)) {
-                        tableName = "TABLE_NAME";
+                    try {
+                        String selectText = sqlTextArea.getSelectedText();
+                        String space = JTextAreaUtil.getSpaceOfCaretPositionLine(sqlTextArea);
+                        List<String> lst = new ArrayList<String>();
+                        Matcher mth = null;
+                        Pattern ptn = Pattern.compile("\\w+");
+                        BufferedReader reader = new BufferedReader(new StringReader(selectText));
+                        for (String line = null; (line = reader.readLine()) != null;) {
+                            mth = ptn.matcher(line);
+                            while (mth.find()) {
+                                lst.add(mth.group());
+                            }
+                        }
+                        reader.close();
+                        StringBuffer sb = new StringBuffer();
+                        if (!lst.isEmpty()) {
+                            sb.append("select * \r\n");
+                            sb.append(space).append("from " + lst.get(0) + " t \r\n");
+                            sb.append(space).append("where 1=1 \r\n");
+                            if (lst.size() > 1) {
+                                for (int ii = 1; ii < lst.size(); ii++) {
+                                    String column = lst.get(ii);
+                                    sb.append(space).append("    and t." + column + " = 'XXXXXXXX' \r\n");
+                                }
+                            }
+                        }
+                        String prefix = StringUtils.substring(sqlTextArea.getText(), 0, sqlTextArea.getSelectionStart());
+                        String suffix = StringUtils.substring(sqlTextArea.getText(), sqlTextArea.getSelectionEnd());
+                        sqlTextArea.setText(prefix + sb + suffix);
+                    } catch (Exception ex) {
+                        JCommonUtil.handleException(ex);
                     }
-                    String space = JTextAreaUtil.getSpaceOfCaretPositionLine(sqlTextArea);
-                    StringBuilder sb = new StringBuilder();
-                    sb.append(space).append("\r\n");
-                    sb.append(space).append("\r\n");
-                    sb.append(space).append("select t.* \r\n");
-                    sb.append(space).append("from ").append(tableName).append(" t \r\n");
-                    sb.append(space).append("where 1=1 \r\n");
-                    sb.append(space).append("\r\n");
-                    String prefix = StringUtils.substring(sqlTextArea.getText(), 0, sqlTextArea.getSelectionStart());
-                    String suffix = StringUtils.substring(sqlTextArea.getText(), sqlTextArea.getSelectionEnd());
-                    sqlTextArea.setText(prefix + sb + suffix);
                 }
             });//
             jpopUtil.addJMenuItem("SQL 基礎 Select column append", new ActionListener() {
@@ -5667,34 +5684,6 @@ public class FastDBQueryUI extends JFrame {
                         }
                         cloneToFrame1.sqlListMouseClicked(null, sqlBean1);
                         cloneToFrame1.executeSqlButtonClick();
-                    }
-                }
-            });//
-
-            jpopUtil.addJMenuItem("動態產生Where SQL [簡]", new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    try {
-                        List<String> lst = new ArrayList<String>();
-                        Matcher mth = null;
-                        Pattern ptn = Pattern.compile("\\w+");
-                        BufferedReader reader = new BufferedReader(new StringReader(ClipboardUtil.getInstance().getContents()));
-                        for (String line = null; (line = reader.readLine()) != null;) {
-                            mth = ptn.matcher(line);
-                            while (mth.find()) {
-                                lst.add(mth.group());
-                            }
-                        }
-                        StringBuffer sb = new StringBuffer();
-                        sb.append("select * \r\n");
-                        sb.append("from XXXXXXXXX t \r\n");
-                        sb.append("where 1=1 \r\n");
-                        for (String column : lst) {
-                            sb.append("    and t." + column + " = 'XXXXXXXX' \r\n");
-                        }
-                        SimpleTextDlg.newInstance(sb.toString(), "", null).show();
-                    } catch (Exception ex) {
-                        JCommonUtil.handleException(ex);
                     }
                 }
             });//
@@ -8361,7 +8350,7 @@ public class FastDBQueryUI extends JFrame {
                 }
             } catch (NativeHookException e) {
                 JCommonUtil.handleException(e);
-                throw new RuntimeException(e);
+                // throw new RuntimeException(e);
             }
             GlobalScreen.removeNativeKeyListener(this);// 記得她媽先移除否則會多掛listener
             GlobalScreen.addNativeKeyListener(this);
