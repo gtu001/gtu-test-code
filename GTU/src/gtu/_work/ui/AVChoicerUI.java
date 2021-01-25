@@ -2451,25 +2451,34 @@ public class AVChoicerUI extends JFrame {
                 return true;
             }
             int failCount = 0;
+            List<File> moveToList = new ArrayList<File>();
             for (File fromFile : moveFiles) {
                 long fileSize = fromFile.length();
                 if (!moveToDir.exists()) {
                     moveToDir.mkdirs();
                 }
                 File moveToFile = new File(moveToDir, fromFile.getName());
+                moveToList.add(moveToFile);
                 try {
                     FileUtil.moveFileByBat(fromFile, moveToFile);
                 } catch (Exception e) {
                     e.printStackTrace();
                 } finally {
-                    boolean moveResult = false;
-                    if (moveToFile.exists() && fileSize == moveToFile.length()) {
-                        moveResult = true;
-                    } else {
-                        failCount++;
-                    }
-                    moveLog2.add((moveResult ? moveToFile : fromFile) + "\t" + (moveResult ? "成功" : "失敗"));
                 }
+            }
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException e1) {
+                e1.printStackTrace();
+            }
+            for (File moveToFile : moveToList) {
+                boolean moveResult = false;
+                if (moveToFile.exists()) {
+                    moveResult = true;
+                } else {
+                    failCount++;
+                }
+                moveLog2.add((moveResult ? moveToFile : moveToFile) + "\t" + (moveResult ? "成功" : "失敗"));
             }
             if (failCount > 0) {
                 // ClipboardUtil.getInstance().setContents(StringUtils.join(moveLog2,

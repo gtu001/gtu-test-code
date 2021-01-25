@@ -341,7 +341,7 @@ public class FastDBQueryUI_RowCompareDlg_Ver2 extends JDialog {
                 CellStyleHandler row0Cs = ExcelWriter.CellStyleHandler.newInstance(wb.createCellStyle())//
                         .setForegroundColor(new HSSFColor.LAVENDER());
                 CellStyleHandler leftChangeCs = ExcelWriter.CellStyleHandler.newInstance(wb.createCellStyle())//
-                        .setForegroundColor(new HSSFColor.PINK());
+                        .setForegroundColor(new HSSFColor.SEA_GREEN());
                 CellStyleHandler leftCs = ExcelWriter.CellStyleHandler.newInstance(wb.createCellStyle())//
                         .setForegroundColor(new HSSFColor.AQUA());
                 CellStyleHandler changeCs = ExcelWriter.CellStyleHandler.newInstance(wb.createCellStyle())//
@@ -396,7 +396,7 @@ public class FastDBQueryUI_RowCompareDlg_Ver2 extends JDialog {
                 CellStyleHandler row0Cs = ExcelWriter.CellStyleHandler.newInstance(wb.createCellStyle())//
                         .setForegroundColor(new HSSFColor.LAVENDER());
                 CellStyleHandler leftChangeCs = ExcelWriter.CellStyleHandler.newInstance(wb.createCellStyle())//
-                        .setForegroundColor(new HSSFColor.PINK());
+                        .setForegroundColor(new HSSFColor.SEA_GREEN());
                 CellStyleHandler leftCs = ExcelWriter.CellStyleHandler.newInstance(wb.createCellStyle())//
                         .setForegroundColor(new HSSFColor.AQUA());
                 CellStyleHandler changeCs = ExcelWriter.CellStyleHandler.newInstance(wb.createCellStyle())//
