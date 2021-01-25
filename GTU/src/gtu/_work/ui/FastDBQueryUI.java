@@ -160,6 +160,7 @@ import gtu.swing.util.JTableUtil.JTooltipTable;
 import gtu.swing.util.JTextAreaUtil;
 import gtu.swing.util.JTextFieldUtil;
 import gtu.swing.util.JTextFieldUtil.JTextComponentSelectPositionHandler;
+import gtu.swing.util.SwingActionUtil.ActionAdapter;
 import gtu.swing.util.JTextUndoUtil;
 import gtu.swing.util.JTooltipUtil;
 import gtu.swing.util.KeyEventExecuteHandler;
@@ -406,6 +407,7 @@ public class FastDBQueryUI extends JFrame {
     private JLabel lblNewLabel_22;
     private AtomicReference<ColumnSearchFilter> columnFilterHolder = new AtomicReference<ColumnSearchFilter>();
     private static AllTabPageProcess mAllPageProcess;
+    private static final String QUERY_RESULT_POOL_KEY = "queryResultPool";
 
     private final Predicate IGNORE_PREDICT = new Predicate() {
         @Override
@@ -4081,6 +4083,8 @@ public class FastDBQueryUI extends JFrame {
                     }
                 });//
 
+                ppap.addJMenuItem(addQueryResultPoolHandlerMenus());
+
                 addKeepSelectionOnly(ppap);
                 addSelectionTitle(ppap);
 
@@ -4893,7 +4897,7 @@ public class FastDBQueryUI extends JFrame {
                 }
 
             } else if (radio_import_clipboard == selBtn) {
-                new ImportFromClipboard().parseMain();
+                new ImportFromClipboard().parseMain(null);
             } else if (radio_export_excel == selBtn) {
                 final AtomicReference<Triple<List<String>, List<Class<?>>, List<Object[]>>> tmpQueryList = new AtomicReference<Triple<List<String>, List<Class<?>>, List<Object[]>>>();
                 if (filterRowsQueryList != null && !isResetQuery) {
@@ -8464,7 +8468,6 @@ public class FastDBQueryUI extends JFrame {
                     } catch (JSONException e) {
                         map = _parseToString(line);
                     }
-
                     if (titles == null && map != null) {
                         List<String> titLst = new ArrayList<String>();
                         for (String tit : map.keySet()) {
@@ -8473,7 +8476,7 @@ public class FastDBQueryUI extends JFrame {
                         titles = titLst;
                     }
 
-                    if (titles != null) {
+                    if (titles != null && !titles.isEmpty()) {
                         Object[] row = new Object[titles.size()];
                         for (int ii = 0; ii < titles.size(); ii++) {
                             String tit = titles.get(ii);
@@ -8484,6 +8487,32 @@ public class FastDBQueryUI extends JFrame {
                             row[ii] = value;
                         }
                         rowLst.add(row);
+                    }
+                }
+            }
+
+            if (TAB_UI1 != null) {
+                QueryResultPoolHandler mQueryResultPoolHandler = (QueryResultPoolHandler) TAB_UI1.getResourcesPool().get(QUERY_RESULT_POOL_KEY);
+                if (mQueryResultPoolHandler != null) {
+                    if (titles == null || titles.isEmpty()) {
+                        titles = mQueryResultPoolHandler.excelImportLst.getLeft();
+                        Object[] row = mQueryResultPoolHandler.excelImportLst.getRight().get(mQueryResultPoolHandler.selectRowIndex);
+                        rowLst.add(row);
+                    } else {
+                        Object[] rowData = new Object[titles.size()];
+                        List<String> titles2 = mQueryResultPoolHandler.excelImportLst.getLeft();
+                        Object[] row = mQueryResultPoolHandler.excelImportLst.getRight().get(mQueryResultPoolHandler.selectRowIndex);
+                        for (int ii = 0; ii < titles.size(); ii++) {
+                            String col1 = titles.get(ii);
+                            A: for (int jj = 0; jj < titles2.size(); jj++) {
+                                String col2 = titles2.get(jj);
+                                if (StringUtils.equalsIgnoreCase(col1, col2)) {
+                                    rowData[ii] = row[jj];
+                                    break A;
+                                }
+                            }
+                        }
+                        rowLst.add(rowData);
                     }
                 }
             }
@@ -8524,14 +8553,23 @@ public class FastDBQueryUI extends JFrame {
             return rtnMap;
         }
 
-        public void parseMain() {
+        public void parseMain(Boolean isAppend) {
             try {
                 String text = ClipboardUtil.getInstance().getContents();
                 parseMain2(text);
 
                 DefaultTableModel model = (DefaultTableModel) queryResultTable.getModel();
 
-                if (!radio_import_excel_isAppend.isSelected()) {
+                boolean useNewModel = false;
+                if (queryList.getRight() == null) {
+                    useNewModel = true;
+                } else if (isAppend != null) {
+                    useNewModel = !isAppend;
+                } else if (!radio_import_excel_isAppend.isSelected()) {
+                    useNewModel = true;
+                }
+
+                if (useNewModel) {
                     model = JTableUtil.createModel(true, titles.toArray());
                     queryResultTable.setModel(model);
 
@@ -8580,14 +8618,21 @@ public class FastDBQueryUI extends JFrame {
 
                     List<Object[]> appendRowsLst = new ArrayList<Object[]>();
                     for (int ii = 0; ii < rowLst.size(); ii++) {
-                        List<Object> rows = new ArrayList<Object>();
+                        TreeMap<Integer, Object> rowMap = new TreeMap<Integer, Object>();
+                        for (int jj = 0; jj < titlesN.size(); jj++) {
+                            if (titlesMap.containsKey(jj)) {
+                                int colMappingIdx = titlesMap.get(jj);
+                                rowMap.put(jj, rowLst.get(ii)[colMappingIdx]);
+                            } else {
+                                rowMap.put(jj, null);
+                            }
+                        }
+
                         if (isButtonStart) {
-                            rows.add(createSelectionBtn("*" + ii));
+                            rowMap.put(0, createSelectionBtn("*" + ii));
                         }
-                        for (int jj : titlesMap.values()) {
-                            rows.add(rowLst.get(ii)[jj]);
-                        }
-                        Object[] realRow = rows.toArray();
+
+                        Object[] realRow = rowMap.values().toArray();
                         model.addRow(realRow);
                         appendRowsLst.add(realRow);
                     }
@@ -8969,7 +9014,64 @@ public class FastDBQueryUI extends JFrame {
                 .getMenu();
         JMenuBarUtil.newInstance().addMenu(mainMenu).apply(TAB_UI1.getJframe());
     }
+
     // --------------------------------------------------------------------------------------------------------------------------
+    private JMenu addQueryResultPoolHandlerMenus() {
+        final QueryResultPoolHandler mQueryResultPoolHandler = new QueryResultPoolHandler();
+        JMenu mainMenu = JMenuAppender.newInstance("資料共用池" + (mQueryResultPoolHandler.hasData() ? "(1)" : "(0)"))//
+                .addMenuItem("複製此筆至池", new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        mQueryResultPoolHandler.put();
+                    }
+                })//
+                .addMenuItem("重現共用池資料[新]", new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        new ImportFromClipboard().parseMain(false);
+                    }
+                })//
+                .addMenuItem("重現共用池資料[附加]", new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        new ImportFromClipboard().parseMain(true);
+                    }
+                })//
+                .addMenuItem("清除共用池", new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        mQueryResultPoolHandler.remove();
+                    }
+                })//
+                .getMenu();
+        return mainMenu;
+    }
+
+    private class QueryResultPoolHandler {
+        Pair<List<String>, List<Object[]>> excelImportLst;
+        int selectRowIndex;
+
+        private void put() {
+            if (TAB_UI1 != null) {
+                excelImportLst = transRealRowToQuyerLstIndex();// orignQueryResult
+                selectRowIndex = queryResultTable.getSelectedRow();
+                TAB_UI1.getResourcesPool().put(QUERY_RESULT_POOL_KEY, this);
+            }
+        }
+
+        private boolean hasData() {
+            if (TAB_UI1 != null) {
+                return TAB_UI1.getResourcesPool().containsKey(QUERY_RESULT_POOL_KEY);
+            }
+            return false;
+        }
+
+        private void remove() {
+            if (TAB_UI1 != null) {
+                TAB_UI1.getResourcesPool().remove(QUERY_RESULT_POOL_KEY);
+            }
+        }
+    }
     // --------------------------------------------------------------------------------------------------------------------------
     // --------------------------------------------------------------------------------------------------------------------------
     // --------------------------------------------------------------------------------------------------------------------------
