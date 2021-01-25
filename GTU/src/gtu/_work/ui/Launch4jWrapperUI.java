@@ -233,14 +233,13 @@ public class Launch4jWrapperUI extends JFrame {
                 root.put("exePath", exePathFile.getAbsolutePath());
                 root.put("iconPath", iconPath);
                 root.put("singletonName", "BrowserHistoryHandlerUI");
-                URL url = Launch4jWrapperUI.class.getResource("AntJarToExe_Launch4j_config.xml");
+
+                URL url = ClassLoader.getSystemResource("gtu/ant/AntJarToExe_Launch4j_config.xml");
+
                 System.out.println("url 0-00 " + url);
                 File tempFile = File.createTempFile("antJarToExe_", ".xml");
                 FreeMarkerSimpleUtil.replace(tempFile, url, root);
                 System.out.println("DEST - " + tempFile);
-                // File tempFile2 = new File(FileUtil.DESKTOP_PATH,
-                // tempFile.getName());
-                // FileUtil.copyFile(tempFile, tempFile2);
 
                 Process process = RuntimeBatPromptModeUtil.newInstance().command(String.format("java -jar \"%s\" \"%s\"", launch4jPath, tempFile)).apply();
                 ProcessWatcher p = ProcessWatcher.newInstance(process);
