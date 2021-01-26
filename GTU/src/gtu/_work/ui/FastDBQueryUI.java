@@ -37,6 +37,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Scanner;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -792,6 +793,19 @@ public class FastDBQueryUI extends JFrame {
             public void mouseMoved(MouseEvent e) {
                 int caretPosition = sqlTextArea.viewToModel(e.getPoint());
                 showParagraph(caretPosition);
+            }
+        });
+
+        sqlTextArea.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusLost(FocusEvent e) {
+                if (TAB_UI1 != null) {
+                    String tableName = getRandom_TableNSchema();
+                    if (StringUtils.isBlank(tableName)) {
+                        tableName = null;
+                    }
+                    TAB_UI1.setToolTipTextAt(null, tableName);
+                }
             }
         });
 
@@ -4501,6 +4515,9 @@ public class FastDBQueryUI extends JFrame {
     private String getRandom_TableNSchema() {
         Pattern ptn = Pattern.compile("from\\s+(\\w+[\\.\\w]+|\\w+)", Pattern.CASE_INSENSITIVE | Pattern.DOTALL | Pattern.MULTILINE);
         String sql = StringUtils.trimToEmpty(currentSQL.get());
+        if (StringUtils.isBlank(sql)) {
+            sql = sqlTextArea.getText();
+        }
         Matcher mth = ptn.matcher(sql);
         if (mth.find()) {
             return mth.group(1);
@@ -5916,18 +5933,29 @@ public class FastDBQueryUI extends JFrame {
 
             lst.clear();
             sqlIdListProp = PropertiesUtil.loadProperties(sqlIdListFile, null, false);
-            Set<String> categoryLst = new TreeSet<String>();
             for (Enumeration<Object> enu = sqlIdListProp.keys(); enu.hasMoreElements();) {
                 String key = (String) enu.nextElement();
                 String value = sqlIdListProp.getProperty(key);
                 SqlIdConfigBean bean = SqlIdConfigBean.of(key, value);
-                lst.add(bean);
-                if (!categoryLst.contains(bean.category)) {
-                    categoryLst.add(bean.category);
+                if (!lst.contains(bean)) {
+                    lst.add(bean);
                 }
             }
             ListUtil.sortIgnoreCase(lst);
-            sqlIdCategoryComboBox_Auto.applyComboxBoxList(new ArrayList<String>(categoryLst), category);
+            sqlIdCategoryComboBox_Auto.applyComboxBoxList(getCategoryLst(lst), category);
+        }
+
+        private List<String> getCategoryLst(List<SqlIdConfigBean> lst) {
+            Scanner scan = null;
+            Set<String> categoryLst = new TreeSet<String>();
+            for (SqlIdConfigBean bean : lst) {
+                scan = new Scanner(StringUtils.defaultString(bean.category));
+                while (scan.hasNext()) {
+                    String catetory = StringUtils.trimToEmpty(scan.next());
+                    categoryLst.add(catetory);
+                }
+            }
+            return new ArrayList<String>(categoryLst);
         }
 
         private void updateSqlIdCategoryComboBox4Tab1() {
@@ -8561,7 +8589,7 @@ public class FastDBQueryUI extends JFrame {
                 DefaultTableModel model = (DefaultTableModel) queryResultTable.getModel();
 
                 boolean useNewModel = false;
-                if (queryList.getRight() == null) {
+                if (queryList == null || queryList.getRight() == null) {
                     useNewModel = true;
                 } else if (isAppend != null) {
                     useNewModel = !isAppend;
@@ -8586,7 +8614,7 @@ public class FastDBQueryUI extends JFrame {
                     queryList = Triple.of(titles, clzLst, rowLst);
                 } else {
 
-                    if (queryList.getRight() == null) {
+                    if (queryList == null || queryList.getRight() == null) {
                         JCommonUtil._jOptionPane_showMessageDialog_error("附加模式必須先有查詢結果!");
                         return;
                     }
@@ -9100,7 +9128,7 @@ public class FastDBQueryUI extends JFrame {
                 excelImportLst = transRealRowToQuyerLstIndex();// orignQueryResult
                 selectRowIndex = queryResultTable.getSelectedRow();
                 key = System.currentTimeMillis();
-                
+
                 {
                     name = getCurrentEditSqlIdConfigBean().getSqlId();
                     if (StringUtils.isBlank(name)) {
@@ -9111,7 +9139,7 @@ public class FastDBQueryUI extends JFrame {
                     }
                     name += "(" + (selectRowIndex + 1) + ")";
                 }
-                
+
                 if (TAB_UI1.getResourcesPool().containsKey(QUERY_RESULT_POOL_KEY)) {
                     map = (LRUMap) TAB_UI1.getResourcesPool().get(QUERY_RESULT_POOL_KEY);
                 } else {

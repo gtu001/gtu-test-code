@@ -444,4 +444,11 @@ public class SwingTabTemplateUI {
         }
         return null;
     }
+
+    public void setToolTipTextAt(Integer tabIndex, String tooltip) {
+        if (tabIndex == null) {
+            tabIndex = getSelectTabIndex();
+        }
+        tabbedPane.setToolTipTextAt(tabIndex, tooltip);
+    }
 }
