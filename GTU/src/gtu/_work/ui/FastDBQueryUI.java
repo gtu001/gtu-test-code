@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.StringReader;
+import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -80,6 +81,7 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.text.JTextComponent;
 
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
 import org.apache.commons.collections.Transformer;
@@ -8966,6 +8968,113 @@ public class FastDBQueryUI extends JFrame {
     }
 
     // --------------------------------------------------------------------------------------------------------------------------
+    public static class SqlIdConfigBeanAndParameters extends SqlIdConfigBean {
+        Map<String, String> params = new LinkedHashMap<String, String>();
+        String sqlParamCommentArea;
+        String columnFilterText;
+        String rowFilterText;
+        String sqlQueryText;
+        String sqlContentFilterText;
+        String sqlIdCategoryComboBox4Tab1;
+
+        public Map<String, String> getParams() {
+            return params;
+        }
+
+        public void setParams(Map<String, String> params) {
+            this.params = params;
+        }
+
+        public String getSqlParamCommentArea() {
+            return sqlParamCommentArea;
+        }
+
+        public void setSqlParamCommentArea(String sqlParamCommentArea) {
+            this.sqlParamCommentArea = sqlParamCommentArea;
+        }
+
+        public String getColumnFilterText() {
+            return columnFilterText;
+        }
+
+        public void setColumnFilterText(String columnFilterText) {
+            this.columnFilterText = columnFilterText;
+        }
+
+        public String getRowFilterText() {
+            return rowFilterText;
+        }
+
+        public void setRowFilterText(String rowFilterText) {
+            this.rowFilterText = rowFilterText;
+        }
+
+        public String getSqlQueryText() {
+            return sqlQueryText;
+        }
+
+        public void setSqlQueryText(String sqlQueryText) {
+            this.sqlQueryText = sqlQueryText;
+        }
+
+        public String getSqlContentFilterText() {
+            return sqlContentFilterText;
+        }
+
+        public void setSqlContentFilterText(String sqlContentFilterText) {
+            this.sqlContentFilterText = sqlContentFilterText;
+        }
+
+        public String getSqlIdCategoryComboBox4Tab1() {
+            return sqlIdCategoryComboBox4Tab1;
+        }
+
+        public void setSqlIdCategoryComboBox4Tab1(String sqlIdCategoryComboBox4Tab1) {
+            this.sqlIdCategoryComboBox4Tab1 = sqlIdCategoryComboBox4Tab1;
+        }
+
+        private void copyFrom(SqlIdConfigBean bean) {
+            try {
+                BeanUtils.copyProperties(this, bean);
+            } catch (Exception e) {
+            }
+        }
+    }
+
+    private static class ParameterHandler {
+        JTable parametersTable;
+
+        public ParameterHandler(JTable parametersTable) {
+            this.parametersTable = parametersTable;
+        }
+
+        private Map<String, String> getParameters() {
+            Map<String, String> params = new LinkedHashMap<String, String>();
+            DefaultTableModel model = (DefaultTableModel) parametersTable.getModel();
+            JTableUtil u = JTableUtil.newInstance(parametersTable);
+            for (int ii = 0; ii < model.getRowCount(); ii++) {
+                String column = (String) u.getValueAt(false, ii, ParameterTableColumnDef.COLUMN.idx);
+                String value = (String) u.getValueAt(false, ii, ParameterTableColumnDef.VALUE.idx);
+                params.put(column, value);
+            }
+            return params;
+        }
+
+        private void restoreParameters(Map<String, String> params) {
+            DefaultTableModel model = (DefaultTableModel) parametersTable.getModel();
+            JTableUtil u = JTableUtil.newInstance(parametersTable);
+            for (String key : params.keySet()) {
+                for (int ii = 0; ii < model.getRowCount(); ii++) {
+                    String column = (String) u.getValueAt(false, ii, ParameterTableColumnDef.COLUMN.idx);
+                    String value = params.get(key);
+                    if (StringUtils.equalsIgnoreCase(key, column)) {
+                        u.setValueAt(false, value, ii, ParameterTableColumnDef.VALUE.idx);
+                    }
+                }
+            }
+        }
+    }
+
     private static class AllTabPageProcess {
         private String FILE_END_NAME = "_(tabs).yml";
 
@@ -8977,11 +9086,22 @@ public class FastDBQueryUI extends JFrame {
 
         public void save() {
             List<JFrame> list = TAB_UI1.getJframeKeeperLst();
-            List<SqlIdConfigBean> list2 = new ArrayList<SqlIdConfigBean>();
+            List<SqlIdConfigBeanAndParameters> list2 = new ArrayList<SqlIdConfigBeanAndParameters>();
             for (int ii = 0; ii < list.size(); ii++) {
                 FastDBQueryUI frame = (FastDBQueryUI) list.get(ii);
                 SqlIdConfigBean bean = frame.getCurrentEditSqlIdConfigBean();
-                list2.add(bean);
+                SqlIdConfigBeanAndParameters bean2 = new SqlIdConfigBeanAndParameters();
+                bean2.copyFrom(bean);
+                bean2.params = new ParameterHandler(frame.parametersTable).getParameters();
+                // 欄位 ↓↓↓↓↓
+                bean2.sqlParamCommentArea = StringUtils.defaultString(frame.sqlParamCommentArea.getText());
+                bean2.columnFilterText = StringUtils.defaultString(frame.columnFilterText.getText());
+                bean2.rowFilterText = StringUtils.defaultString(frame.rowFilterText.getText());
+                bean2.sqlQueryText = StringUtils.defaultString(frame.sqlQueryText.getText());
+                bean2.sqlContentFilterText = StringUtils.defaultString(frame.sqlContentFilterText.getText());
+                bean2.sqlIdCategoryComboBox4Tab1 = StringUtils.defaultString(frame.sqlIdCategoryComboBox4Tab1_Auto.getTextComponent().getText());
+                // 欄位↑↑↑↑↑
+                list2.add(bean2);
             }
             String filename = FastDBQueryUI.class.getSimpleName() + "_頁籤_" + DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMddHHmmss");
             filename = JCommonUtil._jOptionPane_showInputDialog("頁籤暫存檔", filename);
@@ -8995,7 +9115,7 @@ public class FastDBQueryUI extends JFrame {
                 JCommonUtil._jOptionPane_showMessageDialog_error("檔案格式必須為*" + FILE_END_NAME);
                 return;
             }
-            List<SqlIdConfigBean> list2 = YamlMapUtil.getInstance().loadFromFile(file, SqlIdConfigBean.class, null);
+            List<SqlIdConfigBeanAndParameters> list2 = YamlMapUtil.getInstance().loadFromFile(file, SqlIdConfigBeanAndParameters.class, null);
             if (list2.isEmpty()) {
                 JCommonUtil._jOptionPane_showMessageDialog_error("沒有任何頁！");
                 return;
@@ -9003,7 +9123,7 @@ public class FastDBQueryUI extends JFrame {
             TAB_UI1.removeAllTabs();
             for (int ii = 0; ii < list2.size(); ii++) {
                 FastDBQueryUI newFrame = new FastDBQueryUI();
-                SqlIdConfigBean sqlBean1 = list2.get(ii);
+                SqlIdConfigBeanAndParameters sqlBean1 = list2.get(ii);
                 if (StringUtils.isBlank(sqlBean1.sqlId)) {
                     sqlBean1.sqlId = "未命名";
                 }
@@ -9012,6 +9132,15 @@ public class FastDBQueryUI extends JFrame {
                     newFrame.sqlTextArea.setText(sqlBean1.sql);
                 }
                 newFrame.sqlListMouseClicked(null, sqlBean1);
+                new ParameterHandler(newFrame.parametersTable).restoreParameters(sqlBean1.params);
+                // 欄位 ↓↓↓↓↓
+                newFrame.sqlParamCommentArea.setText(sqlBean1.sqlParamCommentArea);
+                newFrame.columnFilterText.setText(sqlBean1.columnFilterText);
+                newFrame.rowFilterText.setText(sqlBean1.rowFilterText);
+                newFrame.sqlQueryText.setText(sqlBean1.sqlQueryText);
+                newFrame.sqlContentFilterText.setText(sqlBean1.sqlContentFilterText);
+                newFrame.sqlIdCategoryComboBox4Tab1_Auto.getTextComponent().setText(sqlBean1.sqlIdCategoryComboBox4Tab1);
+                // 欄位↑↑↑↑↑
                 TAB_UI1.addTab(sqlBean1.toString(), (JFrame) newFrame, false);
             }
         }
