@@ -801,13 +801,7 @@ public class FastDBQueryUI extends JFrame {
         sqlTextArea.addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
-                if (TAB_UI1 != null) {
-                    String tableName = getRandom_TableNSchema();
-                    if (StringUtils.isBlank(tableName)) {
-                        tableName = null;
-                    }
-                    TAB_UI1.setToolTipTextAt(null, tableName);
-                }
+                sqlTextAreaFocusLost();
             }
         });
 
@@ -3825,6 +3819,7 @@ public class FastDBQueryUI extends JFrame {
         // sqlTextArea.setText(sqlBean.sql);
         JTextAreaUtil.setText_withoutTriggerChange(sqlTextArea, sqlBean.sql);
         sqlTextAreaScroll.invalidate();
+        sqlTextAreaFocusLost();
         // ---------------------------------------
         sqlIdCategoryComboBox.setSelectedItem(sqlBean.category);
         sqlIdColorButtonChangeColor(getSqlBeanColor2(sqlBean.color));
@@ -3848,6 +3843,16 @@ public class FastDBQueryUI extends JFrame {
 
         // 取得sql執行類型
         mSqlIdExecuteTypeHandler.processExecuteType(sqlBean.sqlId);
+    }
+
+    private void sqlTextAreaFocusLost() {
+        if (TAB_UI1 != null) {
+            String tableName = getRandom_TableNSchema();
+            if (StringUtils.isBlank(tableName)) {
+                tableName = null;
+            }
+            TAB_UI1.setToolTipTextAt(null, tableName);
+        }
     }
 
     private void changeTabUITitile(SqlIdConfigBean mSqlIdConfigBean) {
