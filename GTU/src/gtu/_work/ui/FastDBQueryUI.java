@@ -9132,6 +9132,7 @@ public class FastDBQueryUI extends JFrame {
                 if (StringUtils.isBlank(sqlBean1.sqlId)) {
                     sqlBean1.sqlId = "未命名";
                 }
+                TAB_UI1.addTab(sqlBean1.toString(), (JFrame) newFrame, false);
                 newFrame.sqlIdText.setText(sqlBean1.sqlId);
                 if (StringUtils.isNotBlank(sqlBean1.sql)) {
                     newFrame.sqlTextArea.setText(sqlBean1.sql);
@@ -9146,7 +9147,6 @@ public class FastDBQueryUI extends JFrame {
                 newFrame.sqlContentFilterText.setText(sqlBean1.sqlContentFilterText);
                 newFrame.sqlIdCategoryComboBox4Tab1_Auto.getTextComponent().setText(sqlBean1.sqlIdCategoryComboBox4Tab1);
                 // 欄位↑↑↑↑↑
-                TAB_UI1.addTab(sqlBean1.toString(), (JFrame) newFrame, false);
             }
         }
     }
