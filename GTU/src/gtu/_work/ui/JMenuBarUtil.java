@@ -27,6 +27,11 @@ public class JMenuBarUtil {
             menu.setText(text);
         }
 
+        public JMenuAppender addJMenuItem(String text, ActionListener actionListener) {
+            addMenuItem(text, actionListener);
+            return this;
+        }
+
         public JMenuAppender addMenuItem(String text, ActionListener actionListener) {
             JMenuItem m1 = new JMenuItem();
             m1.setText(text);
@@ -78,9 +83,9 @@ public class JMenuBarUtil {
         JMenu menu2 = JMenuAppender.newInstance("test1").addMenuItem("1111", null).addMenuItem("22222", null).addChildrenMenu(menu1).getMenu();
 
         JMenuBarUtil.newInstance().addMenu(menu2).apply(frame);
-        
+
         JCommonUtil.setJFrameCenter(frame);
         frame.pack();
-         gtu.swing.util.JFrameUtil.setVisible(true,frame);
+        gtu.swing.util.JFrameUtil.setVisible(true, frame);
     }
 }

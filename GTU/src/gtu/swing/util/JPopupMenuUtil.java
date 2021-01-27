@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.EventObject;
 import java.util.List;
 
+import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.MenuElement;
@@ -18,13 +19,21 @@ import javax.swing.MenuSelectionManager;
 
 import org.apache.commons.lang.StringUtils;
 
+import gtu._work.ui.JMenuBarUtil.JMenuAppender;
+
 public class JPopupMenuUtil {
 
     JPopupMenu jPopupMenu1;
     Component component;
     EventObject event;
     Rectangle rect;
-    List<JMenuItem> menuList;
+    List<JMenuItemHolder> menuList;
+
+    private class JMenuItemHolder {
+        JMenuItem item;
+        boolean isSeparator;
+        Component component;
+    }
 
     public static final ActionListener DO_THING_ACTIONLISTENER = new ActionListener() {
         public void actionPerformed(ActionEvent paramActionEvent) {
@@ -39,14 +48,20 @@ public class JPopupMenuUtil {
         } else {
             jPopupMenu1 = new JScrollPopupMenu();
         }
-        menuList = new ArrayList<JMenuItem>();
+        menuList = new ArrayList<JMenuItemHolder>();
     }
 
     public JPopupMenuUtil addJMenuItem(JMenuItem... items) {
         if (items == null || items.length == 0) {
             return this;
         }
-        menuList.addAll(Arrays.asList(items));
+        List<JMenuItemHolder> lst = new ArrayList<JMenuItemHolder>();
+        for (JMenuItem item : items) {
+            JMenuItemHolder item2 = new JMenuItemHolder();
+            item2.item = item;
+            lst.add(item2);
+        }
+        menuList.addAll(lst);
         return this;
     }
 
@@ -63,40 +78,55 @@ public class JPopupMenuUtil {
     public JPopupMenuUtil show() {
         if (event instanceof MouseEvent) {
             MouseEvent e1 = (MouseEvent) event;
-            for (JMenuItem menu : menuList) {
-                jPopupMenu1.add(menu);
-            }
+            appendToJPopupMenu1();
             jPopupMenu1.show(component, e1.getX(), e1.getY());
         } else if (rect != null) {
-            for (JMenuItem menu : menuList) {
-                jPopupMenu1.add(menu);
-            }
+            appendToJPopupMenu1();
             jPopupMenu1.show(component, (int) rect.getX(), (int) rect.getY());
         } else {
-            for (JMenuItem menu : menuList) {
-                jPopupMenu1.add(menu);
-            }
+            appendToJPopupMenu1();
             jPopupMenu1.show(component, 0, 0);
         }
         return this;
     }
 
+    private void appendToJPopupMenu1() {
+        for (JMenuItemHolder menu : menuList) {
+            if (menu.component != null) {
+                jPopupMenu1.add(menu.component);
+                continue;
+            }
+
+            if (menu.isSeparator) {
+                jPopupMenu1.addSeparator();
+                continue;
+            }
+
+            jPopupMenu1.add(menu.item);
+        }
+    }
+
+    public JPopupMenuUtil addSeparator() {
+        return addJMenuItem("", false, true, null, null);
+    }
+
     public JPopupMenuUtil addJMenuItem(String text) {
-        return addJMenuItem(text, true, null);
+        return addJMenuItem(text, true, false, null, null);
     }
 
     public JPopupMenuUtil addJMenuItem(String text, boolean enabled) {
-        return addJMenuItem(text, enabled, null);
+        return addJMenuItem(text, enabled, false, null, null);
     }
 
     public JPopupMenuUtil addJMenuItem(String text, ActionListener actionListener) {
-        return addJMenuItem(text, true, actionListener);
+        return addJMenuItem(text, true, false, actionListener, null);
     }
 
-    public JPopupMenuUtil addJMenuItem(String text, boolean enabled, ActionListener actionListener) {
-        if (StringUtils.isEmpty(text)) {
-            return this;
-        }
+    public JPopupMenuUtil addJMenuItem(Component component1) {
+        return addJMenuItem("", true, false, null, component1);
+    }
+
+    public JPopupMenuUtil addJMenuItem(String text, boolean enabled, boolean isSeparator, ActionListener actionListener, Component component1) {
         if (actionListener == null) {
             actionListener = DO_THING_ACTIONLISTENER;
         }
@@ -104,7 +134,11 @@ public class JPopupMenuUtil {
         item.setText(text);
         item.addActionListener(actionListener);
         item.setEnabled(enabled);
-        menuList.add(item);
+        JMenuItemHolder item2 = new JMenuItemHolder();
+        item2.item = item;
+        item2.isSeparator = isSeparator;
+        item2.component = component1;
+        menuList.add(item2);
         return this;
     }
 
@@ -112,7 +146,13 @@ public class JPopupMenuUtil {
         if (list == null || list.isEmpty()) {
             return this;
         }
-        menuList.addAll(list);
+        List<JMenuItemHolder> lst = new ArrayList<JMenuItemHolder>();
+        for (JMenuItem item : list) {
+            JMenuItemHolder item2 = new JMenuItemHolder();
+            item2.item = item;
+            lst.add(item2);
+        }
+        menuList.addAll(lst);
         return this;
     }
 
@@ -125,7 +165,11 @@ public class JPopupMenuUtil {
     }
 
     public List<JMenuItem> getMenuList() {
-        return menuList;
+        List<JMenuItem> lst = new ArrayList<JMenuItem>();
+        for (JMenuItemHolder item : menuList) {
+            lst.add(item.item);
+        }
+        return lst;
     }
 
     public void dismiss() {
@@ -146,6 +190,7 @@ public class JPopupMenuUtil {
         }
     }
 
+    // ===============================================================================================================
     // ===============================================================================================================
 
     public static JMenuItem getCurrentSelectItem() {

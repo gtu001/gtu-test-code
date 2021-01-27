@@ -809,6 +809,11 @@ public class StringUtil_ {
         return lst;
     }
 
+    public static String readContentAgain(String content, boolean trim, boolean emptyIgnore, boolean distinct) {
+        List<String> lst = readContentToList(content, trim, emptyIgnore, distinct);
+        return StringUtils.join(lst, "\r\n");
+    }
+
     public static String oracleDecodeAsString(Object... strs) {
         if (strs == null) {
             throw new RuntimeException("decode args 不可為空!");
