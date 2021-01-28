@@ -219,6 +219,18 @@ public class BrowserHistoryHandlerUI extends JFrame {
     private JButton logWatcherBtn;
     private JTextField logWatcherPeriodText;
     private static SynchronizedMap ICON_HOLDER_MAP = SynchronizedMap.create(new HashMap<String, Pair<Boolean, Icon>>());
+    private LogWatcherPeriodTask mLogWatcherPeriodTask = null;
+    private JButton logWatcherClearBtn;
+    private JCheckBox logWatcherFrontChk;
+    private JLabel logWatcherSizeChangeLbl;
+    private JLabel logWatcherFindSizeLbl;
+    private JTextField logWatcherCustomFileText;
+    private YellowMarkJTextPaneHandler mYellowMarkJTextPaneHandler;
+    private JButton periodTaskChkBtn;
+    private JTextField logWatcherBufferSizeText;
+    private JCheckBox logWatcherScorllLockChk;
+    private JComboBox screenSelectComboBox;
+    private JCheckBox useRemarkOpenCmdChk;
 
     /**
      * Launch the application.
@@ -357,9 +369,9 @@ public class BrowserHistoryHandlerUI extends JFrame {
                 }
             });
 
-            useRemarkOpenHiddenCmdChk = new JCheckBox("隱藏cmd");
-            useRemarkOpenHiddenCmdChk.setSelected(true);
-            panel_4.add(useRemarkOpenHiddenCmdChk);
+            useRemarkOpenCmdChk = new JCheckBox("開啟cmd");
+            useRemarkOpenCmdChk.setSelected(true);
+            panel_4.add(useRemarkOpenCmdChk);
             panel_4.add(saveBatFileBtn);
 
             hiddenChk = new JCheckBox("隱藏");
@@ -1378,6 +1390,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
             String orderMark = StringUtils.trimToEmpty((String) orderMarkComboBox.getSelectedItem());//
             String bootStart = StringUtils.trimToEmpty(String.valueOf(bootstartCombobox.getSelectedItem()));
             String periodSec = StringUtils.trimToEmpty(periodSecText.getText());
+            String isOpenCmd = useRemarkOpenCmdChk.isSelected() ? "Y" : "N";//
 
             Validate.notNull(bookmarkConfig, "請先設定bookmark設定黨路徑");
             // Validate.notEmpty(url, "url 為空");
@@ -1409,6 +1422,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
             d.orderMark = orderMark;
             d.bootStart = bootStart;
             d.periodSec = periodSec;
+            d.isOpenCmd = isOpenCmd;
 
             bookmarkConfig.getConfigProp().setProperty(url, UrlConfig.getConfigValue(d));
             bookmarkConfig.store();
@@ -1423,6 +1437,28 @@ public class BrowserHistoryHandlerUI extends JFrame {
             mLastestUpdateKeeper.update(true);
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
+        }
+    }
+
+    private void setUrlConfigToUI(UrlConfig d, boolean throwEx) {
+        try {
+            System.out.println(ReflectionToStringBuilder.toString(d));
+            urlText.setText(d.url);
+            titleText.setText(d.title);
+            mHyperlinkJTextPaneHandler.setText(d.remark);
+            modifyTimeLabel.setText(d.timestamp);
+            tagComboBoxUtil.setSelectItemAndText(d.tag);
+            commandTypeSetting.setValue(d.commandType);
+            useRemarkOpenChk.setSelected("Y".equalsIgnoreCase(d.isUseRemarkOpen));
+            hiddenChk.setSelected("Y".equalsIgnoreCase(d.isHidden));
+            bootstartCombobox.setSelectedItem(StringUtils.trimToEmpty(d.bootStart));
+            periodSecText.setText(StringUtils.trimToEmpty(d.periodSec));
+            logWatcherCustomFileText.setText(d.url);
+            useRemarkOpenCmdChk.setSelected("Y".equalsIgnoreCase(d.isOpenCmd));
+        } catch (Exception ex) {
+            if (throwEx) {
+                throw new RuntimeException(ex);
+            }
         }
     }
 
@@ -2054,6 +2090,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
         String bootStart; // 開啟馬上執行
         String updateTimestamp; // 最後修改時間
         String periodSec;// 週期執行
+        String isOpenCmd;
 
         private static SpecialCharHandler specialCharHandler;
 
@@ -2075,8 +2112,9 @@ public class BrowserHistoryHandlerUI extends JFrame {
             String bootStart = specialCharHandler.getBeforeSave(d.bootStart);
             String updateTimestamp = specialCharHandler.getBeforeSave(d.updateTimestamp);
             String periodSec = specialCharHandler.getBeforeSave(d.periodSec);
+            String isOpenCmd = specialCharHandler.getBeforeSave(d.isOpenCmd);
             return title + "^" + tag + "^" + remark + "^" + timestamp + "^" + commandType + "^" + timestampLastest + "^" + clickTimes + "^" + isUseRemarkOpen + "^" + isHidden + "^" + orderMark + "^"
-                    + bootStart + "^" + updateTimestamp + "^" + periodSec;
+                    + bootStart + "^" + updateTimestamp + "^" + periodSec + "^" + isOpenCmd;
         }
 
         private static String getArryStr(String[] args, int index) {
@@ -2102,6 +2140,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
                 String bootStart = getArryStr(args, 10);
                 String updateTimestamp = getArryStr(args, 11);
                 String periodSec = getArryStr(args, 12);
+                String isOpenCmd = getArryStr(args, 13);
 
                 UrlConfig d = new UrlConfig();
                 d.title = title;
@@ -2118,6 +2157,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
                 d.bootStart = bootStart;
                 d.updateTimestamp = updateTimestamp;
                 d.periodSec = periodSec;
+                d.isOpenCmd = isOpenCmd;
 
                 return d;
             }
@@ -2256,27 +2296,6 @@ public class BrowserHistoryHandlerUI extends JFrame {
             }
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
-        }
-    }
-
-    private void setUrlConfigToUI(UrlConfig d, boolean throwEx) {
-        try {
-            System.out.println(ReflectionToStringBuilder.toString(d));
-            urlText.setText(d.url);
-            titleText.setText(d.title);
-            mHyperlinkJTextPaneHandler.setText(d.remark);
-            modifyTimeLabel.setText(d.timestamp);
-            tagComboBoxUtil.setSelectItemAndText(d.tag);
-            commandTypeSetting.setValue(d.commandType);
-            useRemarkOpenChk.setSelected("Y".equals(d.isUseRemarkOpen));
-            hiddenChk.setSelected("Y".equals(d.isHidden));
-            bootstartCombobox.setSelectedItem(StringUtils.trimToEmpty(d.bootStart));
-            periodSecText.setText(StringUtils.trimToEmpty(d.periodSec));
-            logWatcherCustomFileText.setText(d.url);
-        } catch (Exception ex) {
-            if (throwEx) {
-                throw new RuntimeException(ex);
-            }
         }
     }
 
@@ -2780,10 +2799,10 @@ public class BrowserHistoryHandlerUI extends JFrame {
                 inst.runInBatFile(false);
             }
             if (!isSaveBatFile) {
-                if (useRemarkOpenHiddenCmdChk.isSelected()) {
-                    inst.runInBatFile(false);
-                } else {
+                if (useRemarkOpenCmdChk.isSelected()) {
                     inst.runInBatFile(true);
+                } else {
+                    inst.runInBatFile(false);
                 }
                 int waittingTime = 0;
                 try {
@@ -3330,18 +3349,6 @@ public class BrowserHistoryHandlerUI extends JFrame {
 
     // LogWatcher ↓↓↓↓↓↓
     // ====================================================================================================================
-    private LogWatcherPeriodTask mLogWatcherPeriodTask = null;
-    private JButton logWatcherClearBtn;
-    private JCheckBox logWatcherFrontChk;
-    private JLabel logWatcherSizeChangeLbl;
-    private JLabel logWatcherFindSizeLbl;
-    private JTextField logWatcherCustomFileText;
-    private YellowMarkJTextPaneHandler mYellowMarkJTextPaneHandler;
-    private JButton periodTaskChkBtn;
-    private JTextField logWatcherBufferSizeText;
-    private JCheckBox logWatcherScorllLockChk;
-    private JComboBox screenSelectComboBox;
-    private JCheckBox useRemarkOpenHiddenCmdChk;
 
     private class LogWatcherPeriodTask extends TimerTask {
         boolean stop = false;

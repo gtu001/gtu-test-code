@@ -122,7 +122,7 @@ public class FastDBQueryUI_ReserveSqlDlg extends JDialog {
         if (mSimpleCheckListDlg != null) {
             mSimpleCheckListDlg.dispose();
         }
-        mSimpleCheckListDlg = SimpleCheckListDlg.newInstance(title, titleMap, new ActionListener() {
+        mSimpleCheckListDlg = SimpleCheckListDlg.newInstance(title, titleMap, true, new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
                 choiceMap = mSimpleCheckListDlg.getCheckedMap();
                 processSql();

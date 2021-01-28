@@ -237,7 +237,7 @@ public class JdbcDBUtil {
         }
     }
 
-    public static List<Map<String, Object>> queryForList(String sql, Object param[], Connection con, boolean isCloseConn) throws Exception {
+    public static List<Map<String, Object>> queryForList(String sql, Object param[], Connection con, boolean isCloseConn) {
         List<Map<String, Object>> rsList = new ArrayList<Map<String, Object>>();
         java.sql.ResultSet rs = null;
         System.out.println("sql : " + sql);
@@ -273,7 +273,7 @@ public class JdbcDBUtil {
         } catch (Exception e) {
             System.out.println(e.getMessage());
             e.printStackTrace();
-            throw e;
+            throw new RuntimeException(e);
         } finally {
             try {
                 rs.close();

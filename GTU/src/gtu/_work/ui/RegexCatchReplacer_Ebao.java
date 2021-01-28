@@ -269,7 +269,7 @@ public class RegexCatchReplacer_Ebao extends javax.swing.JFrame {
                         resultBtn1.addActionListener(new ActionListener() {
                             public void actionPerformed(ActionEvent evt) {
                                 JTableUtil tableUtil = JTableUtil.newInstance(resultArea);
-                                int[] rowPoss = tableUtil.getSelectedRows();
+                                int[] rowPoss = tableUtil.getSelectedRows(true);
                                 DefaultTableModel model = tableUtil.getModel();
                                 List<Object> valueList = new ArrayList<Object>();
                                 for (int ii = 0; ii < rowPoss.length; ii++) {

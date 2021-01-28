@@ -121,9 +121,17 @@ public class JPopupMenuUtil {
     public JPopupMenuUtil addJMenuItem(String text, ActionListener actionListener) {
         return addJMenuItem(text, true, false, actionListener, null);
     }
+    
+    public JPopupMenuUtil addJMenuItem(String text, boolean enabled, ActionListener actionListener) {
+        return addJMenuItem(text, enabled, false, actionListener, null);
+    }
 
     public JPopupMenuUtil addJMenuItem(Component component1) {
         return addJMenuItem("", true, false, null, component1);
+    }
+    
+    public JPopupMenuUtil addJMenuItem(Component component1, boolean enabled) {
+        return addJMenuItem("", enabled, false, null, component1);
     }
 
     public JPopupMenuUtil addJMenuItem(String text, boolean enabled, boolean isSeparator, ActionListener actionListener, Component component1) {

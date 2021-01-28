@@ -57,7 +57,7 @@ public class SimpleCheckListDlg extends JDialog {
         map.put("aaa", "bbbbbbbb");
         map.put("ccc", "dddddddd");
         List<String> lst3 = Arrays.asList("aa", "bb", "cc", "dd");
-        final SimpleCheckListDlg dlg = SimpleCheckListDlg.newInstance("XXXXXX", map, new ActionListener() {
+        final SimpleCheckListDlg dlg = SimpleCheckListDlg.newInstance("XXXXXX", map, true, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 System.out.println(((SimpleCheckListDlg) e.getSource()).getCheckedList());
@@ -70,13 +70,17 @@ public class SimpleCheckListDlg extends JDialog {
         });
     }
 
-    public static SimpleCheckListDlg newInstance(String title, List<String> titleLst, ActionListener okButtonAction, final ActionListener onCloseListener) {
+    public static SimpleCheckListDlg newInstance(String title, List<String> titleLst, boolean isFocusLoseClose, ActionListener okButtonAction, final ActionListener onCloseListener) {
         try {
             final SimpleCheckListDlg dialog = new SimpleCheckListDlg(titleLst, null);
             dialog.setTitle(title);
             dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
             dialog.setVisible(true);
             dialog.okButtonAction = okButtonAction;
+
+            if (isFocusLoseClose) {
+                new DialogFocusListener(dialog).start();
+            }
 
             dialog.addWindowListener(new WindowAdapter() {
                 public void windowClosed(WindowEvent e) {
@@ -95,13 +99,17 @@ public class SimpleCheckListDlg extends JDialog {
         }
     }
 
-    public static SimpleCheckListDlg newInstance(String title, Map<String, String> titleMap, ActionListener okButtonAction, final ActionListener onCloseListener) {
+    public static SimpleCheckListDlg newInstance(String title, Map<String, String> titleMap, boolean isFocusLoseClose, ActionListener okButtonAction, final ActionListener onCloseListener) {
         try {
             final SimpleCheckListDlg dialog = new SimpleCheckListDlg(null, titleMap);
             dialog.setTitle(title);
             dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
             dialog.setVisible(true);
             dialog.okButtonAction = okButtonAction;
+
+            if (isFocusLoseClose) {
+                new DialogFocusListener(dialog).start();
+            }
 
             dialog.addWindowListener(new WindowAdapter() {
                 public void windowClosed(WindowEvent e) {
@@ -117,6 +125,28 @@ public class SimpleCheckListDlg extends JDialog {
             return dialog;
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private static class DialogFocusListener extends Thread {
+        private JDialog dlg;
+
+        DialogFocusListener(JDialog dlg) {
+            this.dlg = dlg;
+        }
+
+        public void run() {
+            while (true) {
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    break;
+                }
+                if (!JCommonUtil.isOnTop(dlg)) {
+                    dlg.dispose();
+                    break;
+                }
+            }
         }
     }
 

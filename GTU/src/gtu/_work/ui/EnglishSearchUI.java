@@ -1667,7 +1667,7 @@ public class EnglishSearchUI extends JFrame {
                                     mSimpleCheckListDlg.dispose();
                                 }
                                 notFoundWord.set(text);
-                                mSimpleCheckListDlg = SimpleCheckListDlg.newInstance("相似單字", wordMap, new ActionListener() {
+                                mSimpleCheckListDlg = SimpleCheckListDlg.newInstance("相似單字", wordMap, true, new ActionListener() {
                                     @Override
                                     public void actionPerformed(ActionEvent e) {
                                         List<String> wordLst2 = ((SimpleCheckListDlg) e.getSource()).getCheckedList();
