@@ -20,10 +20,12 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import gtu.swing.util.JCommonUtil;
+import gtu.swing.util.JDialogHelper;
 import gtu.swing.util.JFrameUtil;
 
 public class EnglishSearchUI_TVModeDlg extends JDialog {
 
+    private static final long serialVersionUID = 1L;
     private final JPanel contentPanel = new JPanel();
     private JSlider slider;
     private JTextArea textArea;
@@ -58,10 +60,7 @@ public class EnglishSearchUI_TVModeDlg extends JDialog {
                 dialog.setFontSize(fontSize);
             }
             dialog.setVisible(true);
-            
-            DialogFocusListener mDialogFocusListener = new DialogFocusListener(dialog);
-            mDialogFocusListener.start();
-            
+            JDialogHelper.applyAutoClose(dialog);
             if (setFontSizeCallback != null) {
                 dialog.setFontSizeCallback = setFontSizeCallback;
             }
@@ -73,28 +72,6 @@ public class EnglishSearchUI_TVModeDlg extends JDialog {
             JCommonUtil.handleException(e);
         }
         return dialog;
-    }
-
-    private static class DialogFocusListener extends Thread {
-        private JDialog dlg;
-
-        DialogFocusListener(JDialog dlg) {
-            this.dlg = dlg;
-        }
-
-        public void run() {
-            while (true) {
-                try {
-                    Thread.sleep(500);
-                } catch (InterruptedException e) {
-                    break;
-                }
-                if (!JCommonUtil.isOnTop(dlg)) {
-                    dlg.dispose();
-                    break;
-                }
-            }
-        }
     }
 
     private JSlider getJSlider(Integer defaultFontSize) {

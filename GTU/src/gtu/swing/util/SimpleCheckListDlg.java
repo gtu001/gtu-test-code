@@ -79,7 +79,7 @@ public class SimpleCheckListDlg extends JDialog {
             dialog.okButtonAction = okButtonAction;
 
             if (isFocusLoseClose) {
-                new DialogFocusListener(dialog).start();
+                JDialogHelper.applyAutoClose(dialog);
             }
 
             dialog.addWindowListener(new WindowAdapter() {
@@ -108,7 +108,7 @@ public class SimpleCheckListDlg extends JDialog {
             dialog.okButtonAction = okButtonAction;
 
             if (isFocusLoseClose) {
-                new DialogFocusListener(dialog).start();
+                JDialogHelper.applyAutoClose(dialog);
             }
 
             dialog.addWindowListener(new WindowAdapter() {
@@ -125,28 +125,6 @@ public class SimpleCheckListDlg extends JDialog {
             return dialog;
         } catch (Exception e) {
             throw new RuntimeException(e);
-        }
-    }
-
-    private static class DialogFocusListener extends Thread {
-        private JDialog dlg;
-
-        DialogFocusListener(JDialog dlg) {
-            this.dlg = dlg;
-        }
-
-        public void run() {
-            while (true) {
-                try {
-                    Thread.sleep(500);
-                } catch (InterruptedException e) {
-                    break;
-                }
-                if (!JCommonUtil.isOnTop(dlg)) {
-                    dlg.dispose();
-                    break;
-                }
-            }
         }
     }
 
