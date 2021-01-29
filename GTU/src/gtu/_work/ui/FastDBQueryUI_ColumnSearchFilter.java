@@ -215,7 +215,7 @@ public class FastDBQueryUI_ColumnSearchFilter {
     private void addColorCellMatch(int rowIdx, int cellIdx, Map<Integer, List<Integer>> changeColorRowCellIdxMap) {
         List<Integer> cellLst = new ArrayList<Integer>();
         if (changeColorRowCellIdxMap.containsKey(rowIdx)) {
-            cellLst = changeColorRowCellIdxMap.get(changeColorRowCellIdxMap);
+            cellLst = changeColorRowCellIdxMap.get(rowIdx);
         }
         cellLst.add(cellIdx);
         changeColorRowCellIdxMap.put(rowIdx, cellLst);
@@ -290,10 +290,10 @@ public class FastDBQueryUI_ColumnSearchFilter {
 
                 if (!finder.isAnd) {
                     // is or
-                    for (String text : finder.getArry()) {
+                    C : for (String text : finder.getArry()) {
                         if (value.contains(text)) {
                             this._____addMatchRow_____(realCol, rowIdx, isKeepMatchOnly, rows, qList);
-                            break B;
+                            break C;
                         }
                     }
                 } else {

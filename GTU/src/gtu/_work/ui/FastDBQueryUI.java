@@ -9214,18 +9214,15 @@ public class FastDBQueryUI extends JFrame {
 
         appender.addMenuItem("Select PK [Oracle]", new ActionListener() {
 
-            Pattern ptn = Pattern.compile("\\w+");
-
             private Pair<String, String> getTableNSchema(String tableNameAndSchema) {
-                Matcher mth = ptn.matcher(tableNameAndSchema);
                 String tableName = "";
                 String schema = "";
-                while (mth.find()) {
-                    if (StringUtils.isBlank(tableName)) {
-                        tableName = mth.group();
-                    } else {
-                        schema = mth.group();
-                    }
+                String[] arry = tableNameAndSchema.split("\\.", -1);
+                if (arry.length == 1) {
+                    tableName = StringUtils.trimToEmpty(arry[0]);
+                } else if (arry.length >= 2) {
+                    schema = StringUtils.trimToEmpty(arry[0]);
+                    tableName = StringUtils.trimToEmpty(arry[1]);
                 }
                 return Pair.of(tableName, schema);
             }
@@ -9233,7 +9230,7 @@ public class FastDBQueryUI extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    String tableNameAndSchema = StringUtils.trimToEmpty(JCommonUtil._jOptionPane_showInputDialog("TableName [Schema]", ""));
+                    String tableNameAndSchema = StringUtils.trimToEmpty(JCommonUtil._jOptionPane_showInputDialog("schema.table", ""));
                     if (StringUtils.isBlank(tableNameAndSchema)) {
                         return;
                     }
