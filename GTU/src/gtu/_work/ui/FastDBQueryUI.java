@@ -1323,7 +1323,7 @@ public class FastDBQueryUI extends JFrame {
 
         lblNewLabel_14 = new JLabel();
         panel_13.add(lblNewLabel_14);
-        
+
         queryResultFakeDataChk = new JCheckBox("");
         queryResultFakeDataChk.setToolTipText("查無資料時使用假資料!");
         queryResultFakeDataChk.setSelected(true);
@@ -9209,6 +9209,70 @@ public class FastDBQueryUI extends JFrame {
                 String prefix = StringUtils.substring(sqlTextArea.getText(), 0, sqlTextArea.getSelectionStart());
                 String suffix = StringUtils.substring(sqlTextArea.getText(), sqlTextArea.getSelectionEnd());
                 sqlTextArea.setText(prefix + sb + suffix);
+            }
+        });//
+
+        appender.addMenuItem("Select PK [Oracle]", new ActionListener() {
+
+            Pattern ptn = Pattern.compile("\\w+");
+
+            private Pair<String, String> getTableNSchema(String tableNameAndSchema) {
+                Matcher mth = ptn.matcher(tableNameAndSchema);
+                String tableName = "";
+                String schema = "";
+                while (mth.find()) {
+                    if (StringUtils.isBlank(tableName)) {
+                        tableName = mth.group();
+                    } else {
+                        schema = mth.group();
+                    }
+                }
+                return Pair.of(tableName, schema);
+            }
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    String tableNameAndSchema = StringUtils.trimToEmpty(JCommonUtil._jOptionPane_showInputDialog("TableName [Schema]", ""));
+                    if (StringUtils.isBlank(tableNameAndSchema)) {
+                        return;
+                    }
+                    Pair<String, String> tabNSch = getTableNSchema(tableNameAndSchema);
+                    StringBuilder sb1 = new StringBuilder();
+                    sb1.append("   SELECT cols.table_name, cols.column_name, cols.position, cons.status, cons.owner, cons.CONSTRAINT_NAME   \n");//
+                    sb1.append("   FROM all_constraints cons, all_cons_columns cols  \n");//
+                    sb1.append("   WHERE 1=1  \n");//
+                    sb1.append("     and   cols.table_name = upper('" + StringUtils.trimToEmpty(tabNSch.getLeft()) + "')   \n");//
+                    if (StringUtils.isNotBlank(tabNSch.getRight())) {
+                        sb1.append("     and   cols.owner = upper('" + StringUtils.trimToEmpty(tabNSch.getRight()) + "')  \n");
+                    }
+                    sb1.append("   AND cons.constraint_type = 'P'  \n");//
+                    sb1.append("   AND cons.constraint_name = cols.constraint_name  \n");//
+                    sb1.append("   AND cons.owner = cols.owner  \n");//
+                    sb1.append("   ORDER BY cols.table_name, cols.position  \n");//
+
+                    List<Map<String, Object>> qLst = JdbcDBUtil.queryForList(sb1.toString(), getDataSource().getConnection(), true);
+
+                    String schemaPrefix = "";
+                    if (StringUtils.isNotBlank(tabNSch.getRight())) {
+                        schemaPrefix = StringUtils.trimToEmpty(tabNSch.getRight()) + ".";
+                    }
+
+                    StringBuilder sb = new StringBuilder();
+                    sb.append(space.get()).append(" select * \r\n");
+                    sb.append(space.get()).append(" from " + schemaPrefix + StringUtils.trimToEmpty(tabNSch.getLeft()) + " t \r\n");
+                    sb.append(space.get()).append(" where 1=1 \r\n");
+                    for (Map<String, Object> map : qLst) {
+                        String cond = (String) map.get("COLUMN_NAME");
+                        sb.append(space.get()).append("     and " + "t" + "." + cond + " = 'XXXXXXXXXXXX' \r\n");//
+                    }
+
+                    String prefix = StringUtils.substring(sqlTextArea.getText(), 0, sqlTextArea.getSelectionStart());
+                    String suffix = StringUtils.substring(sqlTextArea.getText(), sqlTextArea.getSelectionEnd());
+                    sqlTextArea.setText(prefix + sb + suffix);
+                } catch (Exception ex) {
+                    JCommonUtil.handleException(ex);
+                }
             }
         });//
         return appender.getMenu();
