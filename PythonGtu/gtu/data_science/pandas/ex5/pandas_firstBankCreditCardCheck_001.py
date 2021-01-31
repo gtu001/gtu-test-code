@@ -64,6 +64,10 @@ def main(filePath):
     for i in range(0, pandasUtil.sheetsCount(sheetSet)) :
         df = pandasUtil.loadSheet(sheetSet, index=i)
 
+        if pandasUtil.isEmptyDataFrame(df) :
+            print("跳過空的sheet")
+            continue
+
         sheetName = pandasUtil.getSheetName(i, sheetSet)
 
         dd1 = dataFrameProcess(df)
@@ -87,7 +91,7 @@ def main(filePath):
 
 
 if __name__ == '__main__' :
-    filePath = fileUtil.getCurrentDir(__file__) + "firstBankCreditCardCheck_20201217133047.xlsx"
+    filePath = fileUtil.getCurrentDir(__file__) + "firstBankCreditCardCheck_20210130152307.xlsx"
     main(filePath)
 
     # dfs = pd.DataFrame()
