@@ -29,7 +29,7 @@ def loadExcel(filePath, sheetName=None, headerRowIndices=[0], indexColIndices=[0
     names = None  # 若無column title 在此自訂
     sheets = pd.read_excel(filePath, sheet_name=sheetName, header=headerRowIndices, \
                   skiprows=None, \
-                  skip_footer=0, index_col=indexColIndices, names=names, \
+                  skipfooter=0, index_col=indexColIndices, names=names, \
                   usecols=None, parse_dates=False, date_parser=None, \
                   na_values=None, thousands=None, convert_float=True, \
                   converters=converters, dtype=None, true_values=None, \
@@ -77,6 +77,11 @@ class WriteExcelHandler :
         self.writer.save()
 
 
+
+def isEmptyDataFrame(df) :
+    if df.empty:
+        return True
+    return False
 
 
 
@@ -141,4 +146,10 @@ class DataFrameHandler :
 
     def getDataFrame(self):
         return self.df
-        
+
+
+
+
+if __name__ == '__main__' :
+    # checkSelf.checkMembersToHtml(pd)
+    print("done...")

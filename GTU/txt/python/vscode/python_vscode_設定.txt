@@ -3,7 +3,8 @@
 
 安裝python plugin
 	Python
-	Python Extended
+	Python Extended <--可能是錯的
+	Python Extension <--才對
 
 在專案根目錄建立 ".env" 檔案
 	裡面放值(設定絕對路徑)

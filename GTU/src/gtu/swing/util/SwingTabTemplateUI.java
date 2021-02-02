@@ -1,10 +1,8 @@
 package gtu.swing.util;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
-import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
@@ -22,7 +20,6 @@ import java.util.TreeMap;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -43,6 +40,8 @@ public class SwingTabTemplateUI {
     private CloneTabInterfaceGtu001 cloneTabInterfaceGtu001;
     private Map<String, Object> resourcesPool = new HashMap<String, Object>();
     private SysTrayUtil sysTray = SysTrayUtil.newInstance();
+    private boolean isFixTabName;
+    private List<String> tooltipLst = new ArrayList<String>();
 
     /**
      * Launch the application.
@@ -127,24 +126,47 @@ public class SwingTabTemplateUI {
                                         String message = "<html>移除分頁 : " + tabbedPane.getTitleAt(idx) + "</html>";
                                         boolean confirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption(message, "是否移除分頁");
                                         if (confirm) {
-                                            tabbedPane.remove(idx);
-                                            jframeKeeperLst.remove(idx);
+                                            removeTab(idx);
+                                        }
+                                    }
+                                });//
+                            }
+                            if (idx > 0) {
+                                popupUtil.addJMenuItem("移除左邊分頁", new ActionListener() {
+                                    @Override
+                                    public void actionPerformed(ActionEvent e) {
+                                        int tabSize = idx;
+                                        for (int removeIdx = 0, ii = 0; ii < tabSize; ii++) {
+                                            removeTab(removeIdx);
+                                        }
+                                    }
+                                });//
+                            }
+                            if (getTabCount() - 1 > idx) {
+                                popupUtil.addJMenuItem("移除右邊分頁", new ActionListener() {
+                                    @Override
+                                    public void actionPerformed(ActionEvent e) {
+                                        int tabSize = getTabCount();
+                                        for (int removeIdx = idx + 1, ii = idx + 1; ii < tabSize; ii++) {
+                                            removeTab(removeIdx);
                                         }
                                     }
                                 });//
                             }
                         }
-                        /*
-                         * popupUtil.addJMenuItem("修改分頁名子", new ActionListener()
-                         * {
-                         * 
-                         * @Override public void actionPerformed(ActionEvent e)
-                         * { String newName =
-                         * JCommonUtil._jOptionPane_showInputDialog( "修改分頁名子",
-                         * tabbedPane.getTitleAt(idx)); if
-                         * (StringUtils.isBlank(newName)) { return; }
-                         * tabbedPane.setTitleAt(idx, newName); } });//
-                         */
+
+                        if (isFixTabName) {
+                            popupUtil.addJMenuItem("修改分頁名子", new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    String newName = JCommonUtil._jOptionPane_showInputDialog("修改分頁名子", tabbedPane.getTitleAt(idx));
+                                    if (StringUtils.isBlank(newName)) {
+                                        return;
+                                    }
+                                    tabbedPane.setTitleAt(idx, newName);
+                                }
+                            });//
+                        }
 
                         popupUtil.applyEvent(e);
                         popupUtil.show();
@@ -326,6 +348,7 @@ public class SwingTabTemplateUI {
             panel.setLayout(new BorderLayout(0, 0));
             panel.add(childFrame.getContentPane(), BorderLayout.CENTER);
             jframeKeeperLst.add(childFrame);
+            this.setToolTipTextAt(jframeKeeperLst.size() - 1, null);
             if (moveToNew) {
                 tabbedPane.setSelectedIndex(tabbedPane.getTabCount() - 1);
             }
@@ -343,6 +366,7 @@ public class SwingTabTemplateUI {
             panel.setLayout(new BorderLayout(0, 0));
             panel.add(childFrame.getContentPane(), BorderLayout.CENTER);
             jframeKeeperLst.add(childFrame);
+            this.setToolTipTextAt(jframeKeeperLst.size() - 1, null);
             if (moveToNew) {
                 tabbedPane.setSelectedIndex(tabbedPane.getTabCount() - 1);
             }
@@ -359,6 +383,7 @@ public class SwingTabTemplateUI {
             panel.setLayout(new BorderLayout(0, 0));
             panel.add(childFrame.getContentPane(), BorderLayout.CENTER);
             jframeKeeperLst.add(childFrame);
+            this.setToolTipTextAt(jframeKeeperLst.size() - 1, null);
             if (moveToNew) {
                 tabbedPane.setSelectedIndex(tabbedPane.getTabCount() - 1);
             }
@@ -384,7 +409,9 @@ public class SwingTabTemplateUI {
                 childFrame = getJframeKeeperLst().get(index);
                 tabbedPane.remove(index);
                 jframeKeeperLst.remove(index);
+                tooltipLst.remove(index);
             }
+            flushTooltips();
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
         }
@@ -449,6 +476,22 @@ public class SwingTabTemplateUI {
         if (tabIndex == null) {
             tabIndex = getSelectTabIndex();
         }
-        tabbedPane.setToolTipTextAt(tabIndex, tooltip);
+        if (tooltipLst.size() - 1 < tabIndex) {
+            tooltipLst.add("");
+        }
+        tooltipLst.set(tabIndex, tooltip);
+        flushTooltips();
+    }
+
+    private void flushTooltips() {
+        for (int ii = 0; ii < tooltipLst.size(); ii++) {
+            String tooltip1 = tooltipLst.get(ii);
+            int tabIndex1 = ii;
+            if (StringUtils.isNotBlank(tooltip1)) {
+                tooltip1 = "、" + tooltip1;
+            }
+            String html = "<html><font color='BLUE'><b>" + tabIndex1 + "</b></font>" + StringUtils.trimToEmpty(tooltip1) + "<html>";
+            tabbedPane.setToolTipTextAt(tabIndex1, html);
+        }
     }
 }

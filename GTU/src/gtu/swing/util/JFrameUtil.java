@@ -143,7 +143,7 @@ public class JFrameUtil {
         };
         if (lockFile.exists()) {
             System.out.println("Unable to create and/or lock file: " + lockFile);
-            boolean forceOpen = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("已有存在的執行,是否要強制開啟?", "強制開啟");
+            boolean forceOpen = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("已有存在的執行,是否要強制開啟?", "強制開啟" + lockFile.getName());
             if (forceOpen) {
                 lockFile.delete();
                 addHook.run();

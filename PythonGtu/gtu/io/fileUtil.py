@@ -65,6 +65,7 @@ def get_line_number2(phrase, file_name):
 def getDesktopDir(fileName="", folder=""):
 	'''取得桌面路徑'''
 # 	home = str(Path.home())
+	linuxDesktopDir = "Desktop" #桌面
 	home = expanduser("~")
 	if stringUtil.isBlank(folder) :
 		mPath = ""
@@ -74,7 +75,7 @@ def getDesktopDir(fileName="", folder=""):
 			else :
 				mPath = home + os.sep + "Desktop" + os.sep + fileName
 		else :
-			mPath = "/home/gtu001/桌面" + os.sep + fileName
+			mPath = "/home/gtu001/" + linuxDesktopDir + os.sep + fileName 
 		if os.sep in fileName :
 			dirPath = getParentDir(mPath)
 			mkdirs(dirPath)
@@ -87,7 +88,7 @@ def getDesktopDir(fileName="", folder=""):
 			else :
 				mDir = home + os.sep + "Desktop" + os.sep + folder
 		else :
-			mDir = "/home/gtu001/桌面" + os.sep + folder
+			mDir = "/home/gtu001/" + linuxDesktopDir + os.sep + folder
 		mkdirs(mDir)
 		return mDir + os.sep + fileName
 
@@ -393,6 +394,8 @@ def length(filepath) :
 
 
 if __name__ == '__main__':
-	listFile_example4()
+	# listFile_example4()
+	path = getDesktopDir()
+	print("path ", path)
 	print("done..")
 	
