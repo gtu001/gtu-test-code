@@ -1922,7 +1922,11 @@ public class EnglishSearchUI extends JFrame {
     }
 
     private int writeNewData2(String word, boolean isDelete) throws IOException {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(getAppendTextFile()), "utf8"));
+        File file = getAppendTextFile();
+        if (!file.exists()) {
+            file.createNewFile();
+        }
+        BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), "utf8"));
         Set<String> set = new LinkedHashSet<String>();
         word = getFixWord(word);
         for (String line = null; (line = reader.readLine()) != null;) {

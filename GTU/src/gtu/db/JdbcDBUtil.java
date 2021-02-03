@@ -261,10 +261,10 @@ public class JdbcDBUtil {
                 for (int ii = 0; ii < colList.size(); ii++) {
                     String col = colList.get(ii);
                     Object value = null;
-                    if (typeList.get(ii - 1) == java.sql.Clob.class) {
-                        value = rs.getString(ii);
+                    if (typeList.get(ii) == java.sql.Clob.class) {
+                        value = rs.getString(ii + 1);
                     } else {
-                        value = rs.getObject(ii);
+                        value = rs.getObject(ii + 1);
                     }
                     map.put(col, value);
                 }
@@ -334,10 +334,10 @@ public class JdbcDBUtil {
                 for (int ii = 1; ii <= cols; ii++) {
                     try {
                         Object value = null;
-                        if (typeList.get(ii - 1) == java.sql.Clob.class) {
-                            value = rs.getString(ii);
+                        if (typeList.get(ii) == java.sql.Clob.class) {
+                            value = rs.getString(ii + 1);
                         } else {
-                            value = rs.getObject(ii);
+                            value = rs.getObject(ii + 1);
                         }
                         lst.add(value);
                     } catch (Exception ex) {

@@ -26,6 +26,11 @@ public class DraggableTabbedPane extends JTabbedPane {
         public void beforeMoveFromTo(int fromIndex, int toIndex) {
             System.out.println("MoveFromTo : " + fromIndex + " -> " + toIndex);
         }
+
+        @Override
+        public void afterMoveFromTo(int fromIndex, int toIndex) {
+            System.out.println("MoveFromTo : " + fromIndex + " -> " + toIndex);
+        }
     };
 
     public DraggableTabbedPane() {
@@ -85,6 +90,11 @@ public class DraggableTabbedPane extends JTabbedPane {
                         String title = getTitleAt(draggedTabIndex);
                         removeTabAt(draggedTabIndex);
                         insertTab(title, null, comp, null, tabNumber);
+
+                        // 更改 tab index
+                        if (draggableTabbedPaneMove != null) {
+                            draggableTabbedPaneMove.afterMoveFromTo(draggedTabIndex, tabNumber);
+                        }
                     }
                 }
 
@@ -96,6 +106,8 @@ public class DraggableTabbedPane extends JTabbedPane {
 
     public interface DraggableTabbedPaneMove {
         void beforeMoveFromTo(int fromIndex, int toIndex);
+
+        void afterMoveFromTo(int fromIndex, int toIndex);
     }
 
     public void setEventOfMove(DraggableTabbedPaneMove draggableTabbedPaneMove) {

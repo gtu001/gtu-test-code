@@ -26,7 +26,7 @@ public class KeyEventExecuteHandler {
     private Transformer isDoExecuteEvent;
     private Component[] ignoreComps;
     private Predicate isIgnoreComps;
-    
+
     public static KeyEventExecuteHandler newInstance(Window self, String title, Transformer isDoExecuteEvent, Runnable runnable) {
         return new KeyEventExecuteHandler(self, title, isDoExecuteEvent, runnable, null, null);
     }
@@ -63,6 +63,11 @@ public class KeyEventExecuteHandler {
                         if (isIgnoreComps.evaluate(j)) {
                             continue A;
                         }
+                    }
+
+                    if (j == null) {
+                        System.err.println("!!! 未初始化 : " + f.getName());
+                        continue;
                     }
 
                     j.addKeyListener(new KeyAdapter() {

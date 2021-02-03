@@ -190,15 +190,31 @@ public class SwingTabTemplateUI {
             @Override
             public void beforeMoveFromTo(int fromIndex, int toIndex) {
                 TreeMap<Integer, JFrame> oldMap = new TreeMap<Integer, JFrame>();
+                TreeMap<Integer, String> tooltipMap = new TreeMap<Integer, String>();
                 for (int ii = 0; ii < jframeKeeperLst.size(); ii++) {
                     JFrame f = jframeKeeperLst.get(ii);
                     oldMap.put(ii, f);
+                    tooltipMap.put(ii, tooltipLst.get(ii));
                 }
-                JFrame from = oldMap.get(fromIndex);
-                JFrame to = oldMap.get(toIndex);
-                oldMap.put(fromIndex, to);
-                oldMap.put(toIndex, from);
-                jframeKeeperLst = new ArrayList<JFrame>(oldMap.values());
+                {
+                    JFrame from = oldMap.get(fromIndex);
+                    JFrame to = oldMap.get(toIndex);
+                    oldMap.put(fromIndex, to);
+                    oldMap.put(toIndex, from);
+                    jframeKeeperLst = new ArrayList<JFrame>(oldMap.values());
+                }
+                {
+                    String from = tooltipMap.get(fromIndex);
+                    String to = tooltipMap.get(toIndex);
+                    tooltipMap.put(fromIndex, to);
+                    tooltipMap.put(toIndex, from);
+                    tooltipLst = new ArrayList<String>(tooltipMap.values());
+                }
+            }
+
+            @Override
+            public void afterMoveFromTo(int fromIndex, int toIndex) {
+                flushTooltips();
             }
         });
         jframe.addWindowFocusListener(new WindowFocusListener() {

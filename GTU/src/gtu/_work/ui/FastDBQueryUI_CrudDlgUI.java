@@ -36,6 +36,8 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.AbstractButton;
 import javax.swing.ButtonGroup;
@@ -49,7 +51,9 @@ import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JTabbedPane;
 import javax.swing.JTable;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
@@ -79,7 +83,6 @@ import gtu.string.StringUtilForDb;
 import gtu.swing.util.JButtonGroupUtil;
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JCommonUtil.HandleDocumentEvent;
-import gtu.swing.util.SwingActionUtil.ActionAdapter;
 import gtu.swing.util.JFrameRGBColorPanel;
 import gtu.swing.util.JMouseEventUtil;
 import gtu.swing.util.JPopupMenuUtil;
@@ -121,6 +124,21 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
     private JLabel recordsLbl;
     private JButton resetRecordBtn;
     private JCheckBox forAllQueryResultCheckBox;
+    private JTabbedPane masterJTabbedPane;
+    private JPanel sqlAppendPanel;
+    private JPanel panel_1;
+    private JPanel panel_2;
+    private JPanel panel_3;
+    private JPanel panel_4;
+    private JLabel lblSql;
+    private JTextArea sqlTextArea;
+    private JButton sqlQueryBtn;
+    private JTable sqlTable;
+    private MySearchHandler mMySearchHandler;
+    private JTextField sqlSearchText;
+    private JCheckBox sqlDistinctCheckbox;
+    private JButton sqlQuerySetbackBtn;
+    private JCheckBox sqlColumnCheckAllChk;
 
     private enum ColumnOrderDef {
         columnName("欄位", 25, false), //
@@ -1345,10 +1363,13 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
 
         this.setTitle("CRUD處理");
 
-        setBounds(100, 100, 680, 463);
+        setBounds(100, 100, 890, 597);
         getContentPane().setLayout(new BorderLayout());
         contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
-        getContentPane().add(contentPanel, BorderLayout.CENTER);
+
+        masterJTabbedPane = new JTabbedPane();
+        getContentPane().add(masterJTabbedPane, BorderLayout.CENTER);
+        masterJTabbedPane.add(contentPanel, "CRUD");
         contentPanel.setLayout(new BorderLayout(0, 0));
         {
             JPanel panel = new JPanel();
@@ -1665,6 +1686,141 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
             }
         }
 
+        // =================================================================================================================
+        // =================================================================================================================
+
+        sqlAppendPanel = new JPanel();
+        masterJTabbedPane.add(sqlAppendPanel, "SQL");
+        sqlAppendPanel.setLayout(new BorderLayout(0, 0));
+        {
+            panel_1 = new JPanel();
+            sqlAppendPanel.add(panel_1, BorderLayout.NORTH);
+            {
+                sqlColumnCheckAllChk = new JCheckBox("");
+                panel_1.add(sqlColumnCheckAllChk);
+                sqlColumnCheckAllChk.setToolTipText("全選");
+                sqlColumnCheckAllChk.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        boolean check = sqlColumnCheckAllChk.isSelected();
+                        DefaultTableModel model = (DefaultTableModel) sqlTable.getModel();
+                        for (int ii = 0; ii < model.getRowCount(); ii++) {
+                            model.setValueAt(check, ii, 0);
+                        }
+                    }
+                });
+            }
+            {
+                lblSql = new JLabel("SQL");
+                panel_1.add(lblSql);
+            }
+            {
+                sqlTextArea = new JTextArea();
+                sqlTextArea.setColumns(90);
+                sqlTextArea.setRows(2);
+                panel_1.add(JCommonUtil.createScrollComponent(sqlTextArea));
+            }
+            {
+                sqlQueryBtn = new JButton("Query");
+                panel_1.add(sqlQueryBtn);
+
+                sqlQueryBtn.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        try {
+                            String sql = JCommonUtil.isBlankErrorMsg(sqlTextArea, "必須填入sql");
+                            List<Map<String, Object>> queryLst = JdbcDBUtil.queryForList(sql, new Object[0], _parent.getDataSource().getConnection(), true);
+                            if (queryLst.isEmpty()) {
+                                JCommonUtil._jOptionPane_showMessageDialog_error("無資料");
+                                return;
+                            } else if (queryLst.size() > 1) {
+                                JCommonUtil._jOptionPane_showMessageDialog_error("資料多於一筆");
+                            }
+                            Map<String, Object> titleMap = queryLst.get(0);
+                            Map<String, String> titleMap2 = new LinkedHashMap<String, String>();
+                            for (String col : titleMap.keySet()) {
+                                Object val = titleMap.get(col);
+                                String value = null;
+                                if (val != null) {
+                                    value = String.valueOf(val);
+                                }
+                                titleMap2.put(col, value);
+                            }
+                            mMySearchHandler.titleMap = titleMap2;
+                            mMySearchHandler.initTable();
+                        } catch (Exception ex) {
+                            JCommonUtil.handleException(ex);
+                        }
+                    }
+                });
+
+            }
+
+            {
+                panel_2 = new JPanel();
+                sqlAppendPanel.add(panel_2, BorderLayout.WEST);
+            }
+            {
+                panel_3 = new JPanel();
+                sqlAppendPanel.add(panel_3, BorderLayout.EAST);
+            }
+            {
+                panel_4 = new JPanel();
+                sqlAppendPanel.add(panel_4, BorderLayout.SOUTH);
+                {
+                    sqlDistinctCheckbox = new JCheckBox("");
+                    panel_4.add(sqlDistinctCheckbox);
+                    sqlDistinctCheckbox.addActionListener(new ActionListener() {
+                        public void actionPerformed(ActionEvent arg0) {
+                            if (!sqlDistinctCheckbox.isSelected()) {
+                                mMySearchHandler.initTable();
+                                return;
+                            }
+                            JTableUtil.newInstance(sqlTable).setRowFilter(new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent arg0) {
+                                    arg0.setSource(mMySearchHandler.handleRow(arg0.getID()));
+                                }
+                            });
+                        }
+                    });
+
+                    sqlSearchText = new JTextField();
+                    panel_4.add(sqlSearchText);
+                    sqlSearchText.setColumns(30);
+                    {
+                        sqlQuerySetbackBtn = new JButton("設定勾選項目");
+                        sqlQuerySetbackBtn.addActionListener(new ActionListener() {
+                            public void actionPerformed(ActionEvent e) {
+                                mMySearchHandler.doSetbackAction();
+                            }
+                        });
+                        panel_4.add(sqlQuerySetbackBtn);
+                    }
+
+                    sqlSearchText.getDocument().addDocumentListener(JCommonUtil.getDocumentListener(new HandleDocumentEvent() {
+                        @Override
+                        public void process(DocumentEvent event) {
+                            mMySearchHandler.process();
+                        }
+                    }));
+                }
+            }
+            {
+                sqlTable = new JTable();
+                JTableUtil.defaultSetting(sqlTable);
+                sqlAppendPanel.add(JCommonUtil.createScrollComponent(sqlTable), BorderLayout.CENTER);
+
+                mMySearchHandler = new MySearchHandler();
+                mMySearchHandler.initTable();
+                mMySearchHandler.process();
+            }
+        }
+
+        // ================================================================================================================
+        // ================================================================================================================
+        // ================================================================================================================
+
         this.keyEventExecuteHandler = KeyEventExecuteHandler.newInstance(this, null, null, new Runnable() {
 
             @Override
@@ -1672,6 +1828,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                 JCommonUtil.triggerButtonActionPerformed(okButton);
             }
         }, new Component[] {});
+
         JCommonUtil.setJFrameCenter(this);
         JCommonUtil.defaultToolTipDelay();
         jFrameRGBColorPanel = new JFrameRGBColorPanel(this);
@@ -1722,7 +1879,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
         }
         _parent.getEditColumnConfig().store();
     }
-
+    
     private class RecordsHandler {
         List<Map<String, Object>> rowMapLst;
         Map<Integer, Map<String, ColumnConf>> rowMapLstHolder = new TreeMap<Integer, Map<String, ColumnConf>>();
@@ -1846,6 +2003,12 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
             searchTextFilter();
         }
 
+        private void reflush() {
+            init(false);
+            // 刷新table
+            searchTextFilter();
+        }
+
         private void resetRecordBtnAction() {
             init(true);
             // 刷新table
@@ -1958,5 +2121,207 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
 
     private void applyThisValueToAll(String column, String value) {
         mRecordsHandler.applyThisValueToAll(false, column, value);
+    }
+
+    private class MySearchHandler {
+
+        List<String> titleLst;
+        Map<String, String> titleMap;
+
+        protected Pair<String, List<Pattern>> filterPattern(String filterText) {
+            Pattern ptn = Pattern.compile("\\/(.*?)\\/");
+            Matcher mth = ptn.matcher(filterText);
+            StringBuffer sb = new StringBuffer();
+            List<Pattern> lst = new ArrayList<Pattern>();
+            while (mth.find()) {
+                String temp = mth.group(1);
+                Pattern tmpPtn = null;
+                if (StringUtils.isNotBlank(temp)) {
+                    try {
+                        tmpPtn = Pattern.compile(temp, Pattern.CASE_INSENSITIVE);
+                    } catch (Exception ex) {
+                    }
+                }
+                if (tmpPtn != null) {
+                    lst.add(tmpPtn);
+                    mth.appendReplacement(sb, "");
+                } else {
+                    mth.appendReplacement(sb, mth.group(0));
+                }
+            }
+            mth.appendTail(sb);
+            return Pair.of(sb.toString(), lst);
+        }
+
+        private boolean handleRow(int rowIdx) {
+            JTableUtil util = JTableUtil.newInstance(sqlTable);
+
+            for (int jj = 0; jj < sqlTable.getColumnCount(); jj++) {
+                Object val = util.getValueAt(false, rowIdx, jj);
+                if (val instanceof String) {
+                    String strVal = (String) val;
+                    if (textLst != null) {
+                        for (String txt : textLst) {
+                            if (strVal.toLowerCase().contains(txt)) {
+                                return true;
+                            }
+                        }
+                    }
+                    if (mthPtn != null) {
+                        for (Pattern pp : mthPtn.getRight()) {
+                            if (pp != null && pp.matcher(strVal).find()) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Object val = util.getValueAt(false, rowIdx, 1);
+            // if (val instanceof String) {
+            // String column = (String) val;
+            // for (String column2 : rowMap.get().keySet()) {
+            // ColumnConf conf = rowMap.get().get(column2);
+            // if (StringUtils.isNotBlank(conf.bakupColumnName)) {
+            // if (StringUtils.equalsIgnoreCase(conf.bakupColumnName, column)) {
+            // return true;
+            // }
+            // }
+            // if (StringUtils.equalsIgnoreCase(column2, column)) {
+            // return true;
+            // }
+            // }
+            // }
+            return false;
+        }
+
+        List<String> textLst;
+        Pair<String, List<Pattern>> mthPtn;
+
+        private void process() {
+            try {
+                Map<Integer, List<Integer>> changeColorMap = new HashMap<Integer, List<Integer>>();
+                if (StringUtils.isBlank(sqlSearchText.getText())) {
+                    JTableUtil.newInstance(sqlTable).setCellBackgroundColor(Color.green.brighter(), changeColorMap, Arrays.asList(0));
+                    return;
+                }
+
+                mthPtn = filterPattern(sqlSearchText.getText());
+
+                String text1 = StringUtils.trimToEmpty(mthPtn.getLeft());
+                String text = text1.toLowerCase();
+                textLst = new ArrayList<String>();
+                for (String t : text1.split("\\^", -1)) {
+                    t = StringUtils.trimToEmpty(t).toLowerCase();
+                    if (StringUtils.isNotBlank(t)) {
+                        textLst.add(t);
+                    }
+                }
+
+                JTableUtil util = JTableUtil.newInstance(sqlTable);
+                DefaultTableModel model = util.getModel();
+
+                B: for (int ii = 0; ii < model.getRowCount(); ii++) {
+                    List<Integer> lst = new ArrayList<Integer>();
+                    changeColorMap.put(ii, lst);
+
+                    /*
+                     * A: for (int jj = 0; jj < sqlTable.getColumnCount(); jj++)
+                     * { Object val = util.getValueAt(false, ii, jj); if (val
+                     * instanceof String) { String strVal = (String) val; for
+                     * (String txt : textLst) { if
+                     * (strVal.toLowerCase().contains(txt)) { lst.add(jj);
+                     * continue A; } } for (Pattern pp : mthPtn.getRight()) { if
+                     * (pp != null && pp.matcher(strVal).find()) { lst.add(jj);
+                     * continue A; } } } }
+                     */
+
+                    Object val = util.getValueAt(false, ii, 1);
+                    if (val instanceof String) {
+                        String column = (String) val;
+
+                        for (String column2 : rowMap.get().keySet()) {
+                            ColumnConf conf = rowMap.get().get(column2);
+                            if (StringUtils.isNotBlank(conf.bakupColumnName)) {
+                                if (StringUtils.equalsIgnoreCase(conf.bakupColumnName, column)) {
+                                    lst.add(1);
+                                    continue B;
+                                }
+                            }
+
+                            if (StringUtils.equalsIgnoreCase(column2, column)) {
+                                lst.add(1);
+                                continue B;
+                            }
+                        }
+                    }
+                }
+                JTableUtil.newInstance(sqlTable).setCellBackgroundColor(Color.green.brighter(), changeColorMap, Arrays.asList(0));
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+
+        private void doSetbackAction() {
+            try {
+                JTableUtil util = JTableUtil.newInstance(sqlTable);
+                DefaultTableModel model = util.getModel();
+
+                B: for (int ii = 0; ii < model.getRowCount(); ii++) {
+                    Boolean check = (Boolean) util.getValueAt(false, ii, 0);
+                    if (check != null && check) {
+                        Object refColumn = util.getValueAt(false, ii, 1);
+                        Object selectVal = util.getValueAt(false, ii, 2);
+                        if (refColumn instanceof String) {
+                            String column = (String) refColumn;
+
+                            for (String column2 : rowMap.get().keySet()) {
+                                ColumnConf conf = rowMap.get().get(column2);
+                                if (StringUtils.isNotBlank(conf.bakupColumnName)) {
+                                    if (StringUtils.equalsIgnoreCase(conf.bakupColumnName, column)) {
+                                        conf.value = selectVal;
+                                        continue B;
+                                    }
+                                }
+
+                                if (StringUtils.equalsIgnoreCase(column2, column)) {
+                                    conf.value = selectVal;
+                                    continue B;
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                mRecordsHandler.reflush();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+
+        public void initTable() {
+            if (titleLst != null && !titleLst.isEmpty()) {
+                DefaultTableModel model = JTableUtil.createModel(new int[] { 0 }, new Object[] { "勾選", "項目" }, new Class[] { Boolean.class, String.class });
+                sqlTable.setModel(model);
+                for (String column : titleLst) {
+                    model.addRow(new Object[] { false, column });
+                }
+            } else if (titleMap != null && !titleMap.isEmpty()) {
+                DefaultTableModel model = JTableUtil.createModel(new int[] { 0 }, new Object[] { "勾選", "項目", "說明" }, new Class[] { Boolean.class, String.class, String.class });
+                sqlTable.setModel(model);
+                for (String column : titleMap.keySet()) {
+                    model.addRow(new Object[] { false, column, StringUtils.trimToEmpty(titleMap.get(column)) });
+                }
+            }
+            if (titleLst != null && !titleLst.isEmpty()) {
+                JTableUtil.setColumnWidths_Percent(sqlTable, new float[] { 10f, 90f });
+            } else if (titleMap != null && !titleMap.isEmpty()) {
+                Map<String, Object> preferences = new HashMap<String, Object>();
+                Map<Integer, Integer> presetColumns = new HashMap<Integer, Integer>();
+                presetColumns.put(0, 20);
+                preferences.put("presetColumns", presetColumns);
+                JTableUtil.setColumnWidths_ByDataContent(sqlTable, preferences, getInsets(), false);
+            }
+        }
     }
 }
