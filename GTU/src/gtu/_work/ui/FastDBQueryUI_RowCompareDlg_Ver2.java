@@ -457,6 +457,11 @@ public class FastDBQueryUI_RowCompareDlg_Ver2 extends JDialog {
                 util.autoCellSize(sheet);
             }
 
+            {
+                // 寫sql
+                _parent.appendExcelSQLSheet(wb);
+            }
+
             String filename1 = FastDBQueryUI.class.getSimpleName() + "_" + DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMddHHmmss");
             filename1 = JCommonUtil._jOptionPane_showInputDialog("輸入檔名", filename1);
             if (StringUtils.isBlank(filename1)) {

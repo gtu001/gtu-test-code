@@ -401,7 +401,7 @@ public class FastDBQueryUI extends JFrame {
     private SqlIdExecuteTypeHandler mSqlIdExecuteTypeHandler;
     private JButton sqlIdColorButton;
     private JCheckBox radio_import_excel_isAppend;
-    private AtomicReference<String> currentSQL = new AtomicReference<String>();
+    public AtomicReference<String> currentSQL = new AtomicReference<String>();
     private JCheckBox recordWatcherToggleAutoChk;
     private FastDBQueryUI_ReserveSqlDlg mFastDBQueryUI_ReserveSqlDlg;
     private JComboBox sqlListSortCombobox;
@@ -4948,55 +4948,12 @@ public class FastDBQueryUI extends JFrame {
                         }
 
                         HSSFWorkbook wk = new HSSFWorkbook();
-                        HSSFSheet sheet0 = wk.createSheet("string value sheet");
                         HSSFSheet sheet1 = wk.createSheet("orign value sheet");
-                        HSSFSheet sheet2 = wk.createSheet("sql");
-                        ExcelColorCreater mExcelColorCreater = ExcelColorCreater.newInstance(wk);
+                        HSSFSheet sheet0 = wk.createSheet("string value sheet");
 
                         // 寫sql
                         {
-                            JTableUtil paramUtl = JTableUtil.newInstance(parametersTable);
-                            Row sqlRow = exlUtl.getRowChk(sheet2, 0);
-                            Cell sqlCell = exlUtl.getCellChk(sqlRow, 0);
-                            sqlCell.setCellValue(StringUtils.trimToEmpty(currentSQL.get()));
-                            sqlRow.setHeightInPoints((10 * sheet2.getDefaultRowHeightInPoints()));
-
-                            if (paramUtl.getModel().getRowCount() > 0) {
-                                int sqlRowPos = 2;
-                                CellStyleHandler titleCs1 = ExcelWriter.CellStyleHandler.newInstance(wk.createCellStyle())//
-                                        .setForegroundColor(mExcelColorCreater.of("#678F8D"));
-                                CellStyleHandler titleCs2 = ExcelWriter.CellStyleHandler.newInstance(wk.createCellStyle())//
-                                        .setForegroundColor(mExcelColorCreater.of("#77A88D")).setAlignment(HSSFCellStyle.ALIGN_CENTER);
-                                CellStyleHandler titleCs3 = ExcelWriter.CellStyleHandler.newInstance(wk.createCellStyle())//
-                                        .setForegroundColor(mExcelColorCreater.of("#FFD000"));
-                                Cell c00 = exlUtl.getCellChk(exlUtl.getRowChk(sheet2, sqlRowPos), 0);
-                                Cell c01 = exlUtl.getCellChk(exlUtl.getRowChk(sheet2, sqlRowPos), 1);
-                                sqlRowPos++;
-                                titleCs1.applyStyle(c00);
-                                titleCs1.applyStyle(c01);
-                                c00.setCellValue("以下為參數列表");
-                                Cell c10 = exlUtl.getCellChk(exlUtl.getRowChk(sheet2, sqlRowPos), 0);
-                                Cell c11 = exlUtl.getCellChk(exlUtl.getRowChk(sheet2, sqlRowPos), 1);
-                                titleCs2.applyStyle(c10);
-                                titleCs2.applyStyle(c11);
-                                c10.setCellValue("參數名稱");
-                                c11.setCellValue("值");
-                                sqlRowPos++;
-                                for (int ii = 0; ii < paramUtl.getModel().getRowCount(); ii++) {
-                                    int col1 = JTableUtil.getRealColumnPos(ParameterTableColumnDef.COLUMN.idx, parametersTable);
-                                    int val1 = JTableUtil.getRealColumnPos(ParameterTableColumnDef.VALUE.idx, parametersTable);
-                                    Object col = paramUtl.getRealValueAt(JTableUtil.getRealRowPos(ii, parametersTable), col1);
-                                    Object val = paramUtl.getRealValueAt(JTableUtil.getRealRowPos(ii, parametersTable), val1);
-
-                                    Cell cc1 = exlUtl.getCellChk(exlUtl.getRowChk(sheet2, sqlRowPos), 0);
-                                    Cell cc2 = exlUtl.getCellChk(exlUtl.getRowChk(sheet2, sqlRowPos), 1);
-                                    cc1.setCellValue(String.valueOf(col));
-                                    cc2.setCellValue(String.valueOf(val));
-                                    titleCs3.applyStyle(cc1);
-                                    titleCs3.applyStyle(cc2);
-                                    sqlRowPos++;
-                                }
-                            }
+                            appendExcelSQLSheet(wk);
                         }
 
                         // 寫資料
@@ -5110,7 +5067,6 @@ public class FastDBQueryUI extends JFrame {
 
                         exlUtl.autoCellSize(sheet0);
                         exlUtl.autoCellSize(sheet1);
-                        exlUtl.setSheetWidth(sheet2, new short[] { 8000, 8000 });
 
                         prog.dismiss();
 
@@ -5169,6 +5125,55 @@ public class FastDBQueryUI extends JFrame {
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
         }
+    }
+
+    public void appendExcelSQLSheet(HSSFWorkbook wk) {
+        final ExcelUtil_Xls97 exlUtl = ExcelUtil_Xls97.getInstance();
+        HSSFSheet sheet2 = wk.createSheet("sql");
+        ExcelColorCreater mExcelColorCreater = ExcelColorCreater.newInstance(wk);
+        JTableUtil paramUtl = JTableUtil.newInstance(parametersTable);
+        Row sqlRow = exlUtl.getRowChk(sheet2, 0);
+        Cell sqlCell = exlUtl.getCellChk(sqlRow, 0);
+        sqlCell.setCellValue(StringUtils.trimToEmpty(currentSQL.get()));
+        sqlRow.setHeightInPoints((10 * sheet2.getDefaultRowHeightInPoints()));
+
+        if (paramUtl.getModel().getRowCount() > 0) {
+            int sqlRowPos = 2;
+            CellStyleHandler titleCs1 = ExcelWriter.CellStyleHandler.newInstance(wk.createCellStyle())//
+                    .setForegroundColor(mExcelColorCreater.of("#678F8D"));
+            CellStyleHandler titleCs2 = ExcelWriter.CellStyleHandler.newInstance(wk.createCellStyle())//
+                    .setForegroundColor(mExcelColorCreater.of("#77A88D")).setAlignment(HSSFCellStyle.ALIGN_CENTER);
+            CellStyleHandler titleCs3 = ExcelWriter.CellStyleHandler.newInstance(wk.createCellStyle())//
+                    .setForegroundColor(mExcelColorCreater.of("#FFD000"));
+            Cell c00 = exlUtl.getCellChk(exlUtl.getRowChk(sheet2, sqlRowPos), 0);
+            Cell c01 = exlUtl.getCellChk(exlUtl.getRowChk(sheet2, sqlRowPos), 1);
+            sqlRowPos++;
+            titleCs1.applyStyle(c00);
+            titleCs1.applyStyle(c01);
+            c00.setCellValue("以下為參數列表");
+            Cell c10 = exlUtl.getCellChk(exlUtl.getRowChk(sheet2, sqlRowPos), 0);
+            Cell c11 = exlUtl.getCellChk(exlUtl.getRowChk(sheet2, sqlRowPos), 1);
+            titleCs2.applyStyle(c10);
+            titleCs2.applyStyle(c11);
+            c10.setCellValue("參數名稱");
+            c11.setCellValue("值");
+            sqlRowPos++;
+            for (int ii = 0; ii < paramUtl.getModel().getRowCount(); ii++) {
+                int col1 = JTableUtil.getRealColumnPos(ParameterTableColumnDef.COLUMN.idx, parametersTable);
+                int val1 = JTableUtil.getRealColumnPos(ParameterTableColumnDef.VALUE.idx, parametersTable);
+                Object col = paramUtl.getRealValueAt(JTableUtil.getRealRowPos(ii, parametersTable), col1);
+                Object val = paramUtl.getRealValueAt(JTableUtil.getRealRowPos(ii, parametersTable), val1);
+
+                Cell cc1 = exlUtl.getCellChk(exlUtl.getRowChk(sheet2, sqlRowPos), 0);
+                Cell cc2 = exlUtl.getCellChk(exlUtl.getRowChk(sheet2, sqlRowPos), 1);
+                cc1.setCellValue(String.valueOf(col));
+                cc2.setCellValue(String.valueOf(val));
+                titleCs3.applyStyle(cc1);
+                titleCs3.applyStyle(cc2);
+                sqlRowPos++;
+            }
+        }
+        exlUtl.setSheetWidth(sheet2, new short[] { 8000, 8000 });
     }
 
     private void removeConnectionBtnAction() {
