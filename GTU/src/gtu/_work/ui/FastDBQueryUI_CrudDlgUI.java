@@ -139,6 +139,10 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
     private JCheckBox sqlDistinctCheckbox;
     private JButton sqlQuerySetbackBtn;
     private JCheckBox sqlColumnCheckAllChk;
+    private JButton sqlQueryPreviousBtn;
+    private JButton sqlQueryNextBtn;
+    private JLabel sqlQueryCountLbl;
+    private SqlQueryHolder mSqlQueryHolder;
 
     private enum ColumnOrderDef {
         columnName("欄位", 25, false), //
@@ -1363,7 +1367,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
 
         this.setTitle("CRUD處理");
 
-        setBounds(100, 100, 890, 597);
+        setBounds(100, 100, 750, 531);
         getContentPane().setLayout(new BorderLayout());
         contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 
@@ -1716,7 +1720,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
             }
             {
                 sqlTextArea = new JTextArea();
-                sqlTextArea.setColumns(90);
+                sqlTextArea.setColumns(60);
                 sqlTextArea.setRows(2);
                 panel_1.add(JCommonUtil.createScrollComponent(sqlTextArea));
             }
@@ -1725,29 +1729,12 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                 panel_1.add(sqlQueryBtn);
 
                 sqlQueryBtn.addActionListener(new ActionListener() {
+
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         try {
-                            String sql = JCommonUtil.isBlankErrorMsg(sqlTextArea, "必須填入sql");
-                            List<Map<String, Object>> queryLst = JdbcDBUtil.queryForList(sql, new Object[0], _parent.getDataSource().getConnection(), true);
-                            if (queryLst.isEmpty()) {
-                                JCommonUtil._jOptionPane_showMessageDialog_error("無資料");
-                                return;
-                            } else if (queryLst.size() > 1) {
-                                JCommonUtil._jOptionPane_showMessageDialog_error("資料多於一筆");
-                            }
-                            Map<String, Object> titleMap = queryLst.get(0);
-                            Map<String, String> titleMap2 = new LinkedHashMap<String, String>();
-                            for (String col : titleMap.keySet()) {
-                                Object val = titleMap.get(col);
-                                String value = null;
-                                if (val != null) {
-                                    value = String.valueOf(val);
-                                }
-                                titleMap2.put(col, value);
-                            }
-                            mMySearchHandler.titleMap = titleMap2;
-                            mMySearchHandler.initTable();
+                            mSqlQueryHolder = new SqlQueryHolder();
+                            mSqlQueryHolder.query();
                         } catch (Exception ex) {
                             JCommonUtil.handleException(ex);
                         }
@@ -1767,6 +1754,40 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
             {
                 panel_4 = new JPanel();
                 sqlAppendPanel.add(panel_4, BorderLayout.SOUTH);
+                {
+                    sqlQueryPreviousBtn = new JButton("<");
+                    sqlQueryPreviousBtn.addActionListener(new ActionListener() {
+                        public void actionPerformed(ActionEvent e) {
+                            try {
+                                if (mSqlQueryHolder != null) {
+                                    mSqlQueryHolder.previous();
+                                }
+                            } catch (Exception ex) {
+                                JCommonUtil.handleException(ex);
+                            }
+                        }
+                    });
+                    {
+                        sqlQueryCountLbl = new JLabel("      ");
+                        panel_4.add(sqlQueryCountLbl);
+                    }
+                    panel_4.add(sqlQueryPreviousBtn);
+                }
+                {
+                    sqlQueryNextBtn = new JButton(">");
+                    sqlQueryNextBtn.addActionListener(new ActionListener() {
+                        public void actionPerformed(ActionEvent e) {
+                            try {
+                                if (mSqlQueryHolder != null) {
+                                    mSqlQueryHolder.next();
+                                }
+                            } catch (Exception ex) {
+                                JCommonUtil.handleException(ex);
+                            }
+                        }
+                    });
+                    panel_4.add(sqlQueryNextBtn);
+                }
                 {
                     sqlDistinctCheckbox = new JCheckBox("");
                     panel_4.add(sqlDistinctCheckbox);
@@ -1879,7 +1900,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
         }
         _parent.getEditColumnConfig().store();
     }
-    
+
     private class RecordsHandler {
         List<Map<String, Object>> rowMapLst;
         Map<Integer, Map<String, ColumnConf>> rowMapLstHolder = new TreeMap<Integer, Map<String, ColumnConf>>();
@@ -2292,7 +2313,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                         }
                     }
                 }
-                
+
                 mRecordsHandler.reflush();
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -2300,27 +2321,79 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
         }
 
         public void initTable() {
-            if (titleLst != null && !titleLst.isEmpty()) {
-                DefaultTableModel model = JTableUtil.createModel(new int[] { 0 }, new Object[] { "勾選", "項目" }, new Class[] { Boolean.class, String.class });
-                sqlTable.setModel(model);
-                for (String column : titleLst) {
-                    model.addRow(new Object[] { false, column });
-                }
-            } else if (titleMap != null && !titleMap.isEmpty()) {
+            if (titleMap != null) {
                 DefaultTableModel model = JTableUtil.createModel(new int[] { 0 }, new Object[] { "勾選", "項目", "說明" }, new Class[] { Boolean.class, String.class, String.class });
                 sqlTable.setModel(model);
                 for (String column : titleMap.keySet()) {
                     model.addRow(new Object[] { false, column, StringUtils.trimToEmpty(titleMap.get(column)) });
                 }
             }
-            if (titleLst != null && !titleLst.isEmpty()) {
-                JTableUtil.setColumnWidths_Percent(sqlTable, new float[] { 10f, 90f });
-            } else if (titleMap != null && !titleMap.isEmpty()) {
+            if (titleMap != null) {
                 Map<String, Object> preferences = new HashMap<String, Object>();
                 Map<Integer, Integer> presetColumns = new HashMap<Integer, Integer>();
                 presetColumns.put(0, 20);
                 preferences.put("presetColumns", presetColumns);
                 JTableUtil.setColumnWidths_ByDataContent(sqlTable, preferences, getInsets(), false);
+            }
+        }
+    }
+
+    private class SqlQueryHolder {
+        int currentIdx = 0;
+        List<Map<String, Object>> queryLst;
+
+        private void _process() {
+            sqlQueryCountLbl.setText((currentIdx + 1) + "/" + queryLst.size());
+            Map<String, Object> titleMap = queryLst.get(currentIdx);
+            Map<String, String> titleMap2 = new LinkedHashMap<String, String>();
+            for (String col : titleMap.keySet()) {
+                Object val = titleMap.get(col);
+                String value = null;
+                if (val != null) {
+                    value = String.valueOf(val);
+                }
+                titleMap2.put(col, value);
+            }
+            mMySearchHandler.titleMap = titleMap2;
+            mMySearchHandler.initTable();
+        }
+
+        public void next() {
+            if (queryLst != null && !queryLst.isEmpty()) {
+                if (currentIdx >= queryLst.size() - 1) {
+                } else {
+                    currentIdx++;
+                    _process();
+                }
+            }
+        }
+
+        public void previous() {
+            if (queryLst != null && !queryLst.isEmpty()) {
+                if (currentIdx <= 0) {
+                } else {
+                    currentIdx--;
+                    _process();
+                }
+            }
+        }
+
+        public void query() {
+            try {
+                String sql = JCommonUtil.isBlankErrorMsg(sqlTextArea, "必須填入sql");
+                queryLst = JdbcDBUtil.queryForList(sql, new Object[0], _parent.getDataSource().getConnection(), true);
+                if (queryLst.isEmpty()) {
+                    mMySearchHandler.titleMap = Collections.EMPTY_MAP;
+                    mMySearchHandler.initTable();
+                    JCommonUtil._jOptionPane_showMessageDialog_error("無資料");
+                    return;
+                }
+                currentIdx = 0;
+                _process();
+            } catch (Exception ex) {
+                mMySearchHandler.titleMap = Collections.EMPTY_MAP;
+                mMySearchHandler.initTable();
+                JCommonUtil.handleException(ex);
             }
         }
     }
