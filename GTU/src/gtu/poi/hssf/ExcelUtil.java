@@ -836,5 +836,24 @@ public class ExcelUtil {
         }
     }
 
+    public void applyAutoHeight(Sheet sheet, Workbook wb2) {
+        CellStyle style = wb2.createCellStyle();
+        style.setWrapText(true);
+        for (int ii = 0; ii <= sheet.getLastRowNum(); ii++) {
+            Row row = sheet.getRow(ii);
+            if (row == null) {
+                continue;
+            }
+            row.setRowStyle(style);
+            row.setHeight((short) -1);
+            for (int jj = 0; jj < row.getLastCellNum(); jj++) {
+                Cell cell = row.getCell(jj);
+                if (cell != null) {
+                    cell.setCellStyle(style);
+                }
+            }
+        }
+    }
+
     private static final ExcelUtil INSTANCE = new ExcelUtil();
 }

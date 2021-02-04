@@ -3802,7 +3802,7 @@ public class FastDBQueryUI extends JFrame {
 
         sqlIdText.setText(sqlBean.sqlId);
         // ---------------------------------------
-        // sqlTextArea.setText(sqlBean.sql);setT
+        // sqlTextArea.setText(sqlBean.sql);
         JTextAreaUtil.setText_withoutTriggerChange(sqlTextArea, sqlBean.sql);
         sqlTextAreaScroll.invalidate();
         sqlTextAreaFocusLost();
