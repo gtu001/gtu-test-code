@@ -316,7 +316,7 @@ public class JdbcDBUtil {
         System.out.println("sql : " + sql);
         try {
             java.sql.PreparedStatement ps = con.prepareStatement(sql);
-            if(maxRowsLimit > 0) {
+            if (maxRowsLimit > 0) {
                 ps.setMaxRows(maxRowsLimit);
             }
             doSettingParameters(con, ps, param);
@@ -331,7 +331,8 @@ public class JdbcDBUtil {
 
             A: while (rs.next()) {
                 List<Object> lst = new ArrayList<Object>();
-                for (int ii = 1; ii <= cols; ii++) {
+                for (int ii = 0; ii < colList.size(); ii++) {
+                    String col = colList.get(ii);
                     try {
                         Object value = null;
                         if (typeList.get(ii) == java.sql.Clob.class) {
@@ -341,7 +342,7 @@ public class JdbcDBUtil {
                         }
                         lst.add(value);
                     } catch (Exception ex) {
-                        String errorMsg = String.format("getColumn ERROR [%d][%s] : ", ii, colList.get(ii - 1)) + ex.getMessage();
+                        String errorMsg = String.format("getColumn ERROR [%d][%s] : ", ii, col) + ex.getMessage();
                         System.out.println(errorMsg);
                         ex.printStackTrace();
                         JCommonUtil.handleException(errorMsg, ex, true, "", "yyyyMMdd.HHmm", true, false);
@@ -386,7 +387,7 @@ public class JdbcDBUtil {
             System.out.println("callPSetUser : " + ex.getMessage());
         }
     }
-    
+
     public static String callFunction(String functionSql, Object[] params, Connection conn) {
         String resultString = null;
         try {
@@ -395,7 +396,7 @@ public class JdbcDBUtil {
             conn.setAutoCommit(true);
             CallableStatement stmt = conn.prepareCall(callSql);
             stmt.registerOutParameter(1, java.sql.Types.NVARCHAR);
-            
+
             int ii = 2;
             for (Object param : params) {
                 stmt.setObject(ii, param);
@@ -423,7 +424,6 @@ public class JdbcDBUtil {
         }
         return resultString;
     }
-    
 
     /**
      * 可以供新增修改刪除使用
