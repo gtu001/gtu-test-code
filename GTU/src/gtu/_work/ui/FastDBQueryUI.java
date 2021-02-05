@@ -100,6 +100,7 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
@@ -1162,7 +1163,7 @@ public class FastDBQueryUI extends JFrame {
                             .addJMenuItem("顯示查詢SQL", new ActionListener() {
                                 @Override
                                 public void actionPerformed(ActionEvent e) {
-                                    showAfterCurrentSQL();
+                                    getShowAfterCurrentSQL(true);
                                 }
                             })//
                             .applyEvent(e)//
@@ -2924,7 +2925,8 @@ public class FastDBQueryUI extends JFrame {
     /**
      * 執行sql
      */
-    private void showAfterCurrentSQL() {
+    private String getShowAfterCurrentSQL(boolean showDlg) {
+        String resultSql = "";
         try {
             JTableUtil util = JTableUtil.newInstance(parametersTable);
 
@@ -2976,8 +2978,6 @@ public class FastDBQueryUI extends JFrame {
                 }
             }
 
-            String resultSql = "";
-
             // 組參數列
             List<Object> parameterList = new ArrayList<Object>();
             if (param.getClass() == SqlParam.class) {
@@ -3009,15 +3009,18 @@ public class FastDBQueryUI extends JFrame {
             resultSql = StringUtil_.readContentAgain(resultSql, false, true, false);
 
             // 判斷執行模式
-            if (querySqlRadio.isSelected()) {
-                SimpleTextDlg.newInstance(resultSql, "", null).show();
-            } else if (updateSqlRadio.isSelected()) {
-                SimpleTextDlg.newInstance(resultSql, "", null).show();
+            if (showDlg) {
+                if (querySqlRadio.isSelected()) {
+                    SimpleTextDlg.newInstance(resultSql, "", null).show();
+                } else if (updateSqlRadio.isSelected()) {
+                    SimpleTextDlg.newInstance(resultSql, "", null).show();
+                }
             }
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
         } finally {
         }
+        return resultSql;
     }
 
     private void setupCustomColumnDefExcelChinese() {
@@ -5135,7 +5138,12 @@ public class FastDBQueryUI extends JFrame {
         Row sqlRow = exlUtl.getRowChk(sheet2, 0);
         Cell sqlCell = exlUtl.getCellChk(sqlRow, 0);
         sqlCell.setCellValue(StringUtils.trimToEmpty(currentSQL.get()));
-        sqlRow.setHeightInPoints((10 * sheet2.getDefaultRowHeightInPoints()));
+        Cell sqlCell2 = exlUtl.getCellChk(sqlRow, 1);
+        sqlCell2.setCellValue(getShowAfterCurrentSQL(false));
+        sqlRow.setHeight((short) -1);
+        CellStyle rowHeightStyle = wk.createCellStyle();
+        rowHeightStyle.setWrapText(true);
+        sqlRow.setRowStyle(rowHeightStyle);
 
         if (paramUtl.getModel().getRowCount() > 0) {
             int sqlRowPos = 2;
