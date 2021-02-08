@@ -1,6 +1,7 @@
 package gtu.google.bookmark;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -21,21 +22,53 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 
+import gtu.file.FileUtil;
+
 public class GoogleBookmarkService {
 
     public static void main(String[] args) {
-        // TODO Auto-generated method stub
-
+        GoogleBookmarkService t = new GoogleBookmarkService();
+        boolean loginResult = t.googleLogin();
+        System.out.println("登入結果 : " + loginResult);
     }
+
+    // https://my.oschina.net/elinac/blog/698050
+    // google bookmark api
+    // https://www.google.com/bookmarks/?output=xml&num=10000000
+    // https://blog.csdn.net/zidangtou515/article/details/83700570
 
     CloseableHttpClient mClient = HttpClients.createDefault();
     String mSig;
+
+    public String getHtmlContent(InputStream inputStream) {
+        StringBuffer sb = new StringBuffer();
+        BufferedReader reader = null;
+        try {
+            reader = new BufferedReader(new InputStreamReader(inputStream));
+            for (String line = null; (line = reader.readLine()) != null;) {
+                sb.append(line);
+            }
+            FileUtil.saveToFile(new File(FileUtil.DESKTOP_PATH, "____tmp.html"), sb.toString(), "UTF8");
+        } catch (Exception ex) {
+            throw new RuntimeException("getSignature ERR : " + ex.getMessage(), ex);
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (Exception e) {
+                }
+            }
+        }
+        return sb.toString();
+    }
 
     /**
      * 登录google账户
      */
     private boolean googleLogin() {
-        HttpPost post = new HttpPost("https://www.google.com/accounts/ServiceLoginAuth");
+        // HttpPost post = new
+        // HttpPost("https://www.google.com/accounts/ServiceLoginAuth");
+        HttpPost post = new HttpPost("https://accounts.google.com/ServiceLoginAuth");
 
         post.addHeader("Cookie", "GALX=zidangtou");
 
@@ -47,6 +80,11 @@ public class GoogleBookmarkService {
         try {
             post.setEntity(new UrlEncodedFormEntity(nvps));
             HttpResponse response = mClient.execute(post);
+
+            System.out.println(response.getStatusLine());
+            System.out.println(response.getStatusLine().getStatusCode());
+            System.out.println(getHtmlContent(response.getEntity().getContent()));
+
             if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK && validateLogin()) {
                 return true;
             }
@@ -65,30 +103,13 @@ public class GoogleBookmarkService {
     }
 
     public String getSignature(InputStream inputStream) {
-        BufferedReader reader = null;
-        try {
-            reader = new BufferedReader(new InputStreamReader(inputStream));
-            StringBuffer sb = new StringBuffer();
-            for (String line = null; (line = reader.readLine()) != null;) {
-                sb.append(line);
-            }
-            reader.close();
-            Pattern ptn = Pattern.compile("<smh:signature>(\\w+?)</smh:signature>", Pattern.CASE_INSENSITIVE);
-            Matcher mth = ptn.matcher(sb.toString());
-            if (mth.find()) {
-                return mth.group(1);
-            }
-            throw new RuntimeException("找不到Signature : " + sb.toString());
-        } catch (Exception ex) {
-            throw new RuntimeException("getSignature ERR : " + ex.getMessage(), ex);
-        } finally {
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (Exception e) {
-                }
-            }
+        String html = getHtmlContent(inputStream);
+        Pattern ptn = Pattern.compile("<smh:signature>(\\w+?)</smh:signature>", Pattern.CASE_INSENSITIVE);
+        Matcher mth = ptn.matcher(html);
+        if (mth.find()) {
+            return mth.group(1);
         }
+        throw new RuntimeException("找不到Signature : " + html);
     }
 
     /**
