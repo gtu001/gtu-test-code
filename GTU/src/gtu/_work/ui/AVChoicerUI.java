@@ -101,6 +101,7 @@ import gtu.swing.util.JSwingCommonConfigUtil;
 import gtu.swing.util.JTabbedPaneUtil;
 import gtu.swing.util.JTableUtil;
 import gtu.swing.util.JTableUtil.TableColorDef;
+import gtu.swing.util.JTextFieldUtil;
 import gtu.swing.util.JTreeUtil;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Scene;
@@ -552,6 +553,7 @@ public class AVChoicerUI extends JFrame {
         });
 
         moveToText = new JTextField();
+        JTextFieldUtil.applyDeaultSettings(moveToText);
         panel_15.add(moveToText);
         moveToText.setColumns(10);
         panel_15.add(moveToAddBtn);

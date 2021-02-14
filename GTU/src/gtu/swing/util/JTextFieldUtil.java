@@ -11,23 +11,27 @@ import java.awt.dnd.DropTarget;
 import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
-import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
+import javax.swing.JMenuItem;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentListener;
-import javax.swing.event.EventListenerList;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.reflect.FieldUtils;
+
+import gtu.clipboard.ClipboardUtil;
 
 public class JTextFieldUtil {
 
@@ -183,5 +187,66 @@ public class JTextFieldUtil {
             textComponent.setText(defaultVal);
         }
         return textComponent.getText();
+    }
+
+    public static void applyDeaultSettings(JTextComponent textComponent) {
+        textComponent.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (JMouseEventUtil.buttonRightClick(1, e)) {
+                    JPopupMenuUtil.newInstance(textComponent)//
+                            .addJMenuItem(getJMenuItems_CopyPaste(textComponent))//
+                            .applyEvent(e).show();
+                }
+            }
+        });
+    }
+
+    public static List<JMenuItem> getJMenuItems_CopyPaste(JTextComponent textComponent) {
+        List<JMenuItem> appendLst = new ArrayList<JMenuItem>();
+        final AtomicReference<String> text = new AtomicReference<String>();
+        text.set(textComponent.getSelectedText());
+        if (StringUtils.isBlank(text.get())) {
+            text.set(textComponent.getText());
+        }
+        if (StringUtils.isNotBlank(text.get())) {
+            JMenuItem item1 = new JMenuItem();
+            item1.setText("複製");
+            item1.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    ClipboardUtil.getInstance().setContents(text.get());
+                }
+            });
+            appendLst.add(item1);
+        }
+        String text2 = ClipboardUtil.getInstance().getContents();
+        if (StringUtils.isNotBlank(text2)) {
+            JMenuItem item2 = new JMenuItem();
+            item2.setText("貼上");
+            item2.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    try {
+                        textComponent.getDocument().insertString(textComponent.getCaretPosition(), text2, null);
+                    } catch (BadLocationException e1) {
+                        e1.printStackTrace();
+                    }
+                }
+            });
+            appendLst.add(item2);
+        }
+        if (StringUtils.isNotBlank(text.get())) {
+            JMenuItem item1 = new JMenuItem();
+            item1.setText("清除");
+            item1.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    textComponent.setText("");
+                }
+            });
+            appendLst.add(item1);
+        }
+        return appendLst;
     }
 }

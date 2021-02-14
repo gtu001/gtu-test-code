@@ -1,6 +1,0 @@
-{date}_{channel}_{title}_{res}
-
-Twitch Leecher
-
-https://github.com/Franiac/TwitchLeecher/releases
-
