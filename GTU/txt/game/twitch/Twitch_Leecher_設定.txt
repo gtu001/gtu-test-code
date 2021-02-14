@@ -1,0 +1,14 @@
+Twitch Leecher
+---
+	https://github.com/Franiac/TwitchLeecher/releases
+	
+	{date}_{time24}_{channel}_{title}_{game}_{res}.mp4
+
+	or
+
+	{date}_{channel}_{title}_{res}
+
+	C:\Program Files\Twitch Leecher\TwitchLeecher.exe
+
+	
+
