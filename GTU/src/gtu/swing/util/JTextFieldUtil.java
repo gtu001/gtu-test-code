@@ -78,7 +78,7 @@ public class JTextFieldUtil {
         });
     }
 
-    public static void setTextIgnoreDocumentListener(JTextComponent jtext, String text) {
+    public static void setTextIgnoreDocumentListener(final JTextComponent jtext, final String text) {
         new JTextComponentSetContentProcessor(jtext).setText(text);
     }
 
@@ -124,7 +124,7 @@ public class JTextFieldUtil {
             return new JTextComponentSelectPositionHandler(textArea);
         }
 
-        private JTextComponentSelectPositionHandler(JTextComponent textArea) {
+        private JTextComponentSelectPositionHandler(final JTextComponent textArea) {
             textArea.addCaretListener(new CaretListener() {
                 @Override
                 public void caretUpdate(CaretEvent e) {
@@ -154,7 +154,7 @@ public class JTextFieldUtil {
      * @param font
      * @return
      */
-    public static Dimension getTextBoundary(String text, Font font) {
+    public static Dimension getTextBoundary(final String text, final Font font) {
         // get metrics from the graphics
         FontMetrics metrics = Toolkit.getDefaultToolkit().getFontMetrics(font);
         // get the height of a line of text in this
@@ -169,11 +169,11 @@ public class JTextFieldUtil {
         return size;
     }
 
-    public static void setText_withoutTriggerChange(JTextComponent textArea, String text) {
+    public static void setText_withoutTriggerChange(final JTextComponent textArea, String text) {
         JTextAreaUtil.setText_withoutTriggerChange(textArea, text);
     }
 
-    public static int getValueFailSetDefault(int defaultVal, JTextComponent textComponent) {
+    public static int getValueFailSetDefault(final int defaultVal, final JTextComponent textComponent) {
         try {
             return Integer.parseInt(textComponent.getText());
         } catch (Exception ex) {
@@ -182,7 +182,7 @@ public class JTextFieldUtil {
         }
     }
 
-    public static String getValueFailSetDefault(String defaultVal, JTextComponent textComponent) {
+    public static String getValueFailSetDefault(final String defaultVal, final JTextComponent textComponent) {
         if (StringUtils.isBlank(textComponent.getText())) {
             textComponent.setText(defaultVal);
         }
@@ -202,7 +202,7 @@ public class JTextFieldUtil {
         });
     }
 
-    public static List<JMenuItem> getJMenuItems_CopyPaste(JTextComponent textComponent) {
+    public static List<JMenuItem> getJMenuItems_CopyPaste(final JTextComponent textComponent) {
         List<JMenuItem> appendLst = new ArrayList<JMenuItem>();
         final AtomicReference<String> text = new AtomicReference<String>();
         text.set(textComponent.getSelectedText());
@@ -220,7 +220,7 @@ public class JTextFieldUtil {
             });
             appendLst.add(item1);
         }
-        String text2 = ClipboardUtil.getInstance().getContents();
+        final String text2 = ClipboardUtil.getInstance().getContents();
         if (StringUtils.isNotBlank(text2)) {
             JMenuItem item2 = new JMenuItem();
             item2.setText("貼上");
