@@ -362,8 +362,6 @@ public class BrowserHistoryHandlerUI_LogWatcherDlg extends JDialog {
             int x2 = (pressed.getX() - e.getX());
             int y2 = (pressed.getY() - e.getY());
 
-            System.out.println("x , y = " + x2 + " , " + y2);
-
             switch (nswe) {
             case 'n':
                 dialog.setLocation(location.x, y1);

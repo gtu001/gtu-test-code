@@ -189,7 +189,7 @@ public class JTextFieldUtil {
         return textComponent.getText();
     }
 
-    public static void applyDeaultSettings(JTextComponent textComponent) {
+    public static void applyDeaultSettings(final JTextComponent textComponent) {
         textComponent.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {

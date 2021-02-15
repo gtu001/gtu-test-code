@@ -3373,7 +3373,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
             }
         }
 
-        private LogWatcherPeriodTask(File logFile, JTextPane logWatcherTextArea) {
+        private LogWatcherPeriodTask(final File logFile, final JTextPane logWatcherTextArea) {
             try {
                 this.logFile = logFile;
                 this.logWatcherTextArea = logWatcherTextArea;
@@ -3421,16 +3421,17 @@ public class BrowserHistoryHandlerUI extends JFrame {
     private void logWatcherBtnToggleAction(MouseEvent paramMouseEvent) {
         try {
             JTextPane logWatcherTextArea = this.logWatcherTextArea;
-
-            if (JMouseEventUtil.buttonRightClick(1, paramMouseEvent)) {
-                if (mBrowserHistoryHandlerUI_LogWatcherDlg != null && mBrowserHistoryHandlerUI_LogWatcherDlg.isVisible()) {
-                    mBrowserHistoryHandlerUI_LogWatcherDlg.dispose();
-                }
-                mBrowserHistoryHandlerUI_LogWatcherDlg = BrowserHistoryHandlerUI_LogWatcherDlg.newInstance();
-                logWatcherTextArea = mBrowserHistoryHandlerUI_LogWatcherDlg.getLogWatcherTextArea();
-            }
-
             if (!ArrayUtils.contains(new String[] { "監聽closing", "監聽start" }, logWatcherBtn.getText())) {
+                {
+                    if (JMouseEventUtil.buttonRightClick(1, paramMouseEvent)) {
+                        if (mBrowserHistoryHandlerUI_LogWatcherDlg != null && mBrowserHistoryHandlerUI_LogWatcherDlg.isVisible()) {
+                            mBrowserHistoryHandlerUI_LogWatcherDlg.dispose();
+                        }
+                        mBrowserHistoryHandlerUI_LogWatcherDlg = BrowserHistoryHandlerUI_LogWatcherDlg.newInstance();
+                        logWatcherTextArea = mBrowserHistoryHandlerUI_LogWatcherDlg.getLogWatcherTextArea();
+                    }
+                }
+
                 File logFile = null;
                 if (StringUtils.isNotBlank(logWatcherCustomFileText.getText())) {
                     logFile = DesktopUtil.getFile(logWatcherCustomFileText.getText());
