@@ -37,7 +37,12 @@ public class Log {
         FieldInfo[] myField = myType.GetFields(BindingFlags.Public | BindingFlags.Static);
         Console.WriteLine ("[field] Object Info : " + myType + "\t" + myField.Length);
         for(int i = 0; i < myField.Length; i++){
-            Console.WriteLine (i + "\t" + myField[i].Name + "\t" + myField[i].IsSpecialName);
+            string valueStr = "";
+            try{
+                valueStr = "value:" + myField[i].GetValue(null);
+            }catch(Exception ex) {
+            }
+            Console.WriteLine (i + "\t" + myField[i].Name + "\t" + myField[i].IsSpecialName + "\t" + valueStr);
         }
         Console.WriteLine ("-----------------------------------------------");
     }
@@ -48,7 +53,44 @@ public class Log {
         FieldInfo[] myField = myType.GetFields();//BindingFlags.Public | BindingFlags.Static
         Console.WriteLine ("[field] Object Info : " + myType + "\t" + myField.Length);
         for(int i = 0; i < myField.Length; i++){
-            Console.WriteLine (i + "\t" + myField[i].Name + "\t" + myField[i].IsSpecialName);
+            string valueStr = "";
+            try{
+                valueStr = "value:" + myField[i].GetValue(null);
+            }catch(Exception ex) {
+            }
+            Console.WriteLine (i + "\t" + myField[i].Name + "\t" + myField[i].IsSpecialName + "\t" + valueStr);
+        }
+        Console.WriteLine ("-----------------------------------------------");
+    }
+
+    public static void showPublicProperties (System.Object obj, System.String label = null) {
+        Console.WriteLine ("-----------------------------------------------");
+        Type myType = obj.GetType (); //(typeof(obj));
+        PropertyInfo[] myProps = myType.GetProperties();//BindingFlags.Public | BindingFlags.Static
+        Console.WriteLine ("[properties] Object Info : " + myType + "\t" + myProps.Length);
+        for(int i = 0; i < myProps.Length; i++){
+            string valueStr = "";
+            try{
+                valueStr = "value:" + myProps[i].GetValue(null, null);
+            }catch(Exception ex) {
+            }
+            Console.WriteLine (i + "\t" + myProps[i].Name + "\t" + myProps[i].IsSpecialName + "\t" + valueStr);
+        }
+        Console.WriteLine ("-----------------------------------------------");
+    }
+
+    public static void showPublicProperties (Type obj, System.String label = null) {
+        Console.WriteLine ("-----------------------------------------------");
+        Type myType = obj; //(typeof(obj));
+        PropertyInfo[] myProps = myType.GetProperties();//BindingFlags.Public | BindingFlags.Static
+        Console.WriteLine ("[properties] Object Info : " + myType + "\t" + myProps.Length);
+        for(int i = 0; i < myProps.Length; i++){
+            string valueStr = "";
+            try{
+                valueStr = "value:" + myProps[i].GetValue(null, null);
+            }catch(Exception ex) {
+            }
+            Console.WriteLine (i + "\t" + myProps[i].Name + "\t" + myProps[i].IsSpecialName + "\t" + valueStr);
         }
         Console.WriteLine ("-----------------------------------------------");
     }
@@ -57,11 +99,13 @@ public class Log {
     * Log.showAll(typeof(UnityEngine.Debug));
     */
     public static void showAll(Type obj, System.String label = null) {
+        showPublicProperties(obj, label);
         showPublicFields(obj, label);
         showPublicMethods(obj, label);
     }
 
     public static void showAll(System.Object obj, System.String label = null) {
+        showPublicProperties(obj, label);
         showPublicFields(obj, label);
         showPublicMethods(obj, label);
     }

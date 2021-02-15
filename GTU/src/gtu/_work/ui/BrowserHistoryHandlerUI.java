@@ -638,6 +638,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
             panel_12.add(panel_13, BorderLayout.NORTH);
 
             logWatcherBtn = new JButton("監聽");
+            logWatcherBtn.setToolTipText("右鍵另開視窗");
             logWatcherBtn.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent paramMouseEvent) {

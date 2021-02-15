@@ -54,3 +54,16 @@ https://docs.unity3d.com/Manual/xr-template-vr.html
 
 
 https://www.reddit.com/r/starcraft/comments/9x8k0d/i_have_had_a_consistent_problem_with_lag_for/
+
+
+
+
+I have the same issue.
+In offline mode, the workers move smoothly.
+In online mode, i have the same microstuttering as shown in the youtube video.
+
+No packet loss (checked with CTRL + ALT + F)
+The 60 fps twitch streams are now popular, and its pretty obvious that a majority of streamers doesn't have the issue described in this post. That is a pretty annoying problem.
+
+
+
