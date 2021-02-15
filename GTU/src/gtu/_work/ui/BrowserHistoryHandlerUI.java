@@ -16,6 +16,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -157,6 +158,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
     private JTextField urlText;
     private JLabel modifyTimeLabel;
     private IconProcessThread mIconProcessThread = new IconProcessThread();
+    private BrowserHistoryHandlerUI_LogWatcherDlg mBrowserHistoryHandlerUI_LogWatcherDlg;
 
     private PropertiesUtilBean configSelf = null;
     {
@@ -636,9 +638,10 @@ public class BrowserHistoryHandlerUI extends JFrame {
             panel_12.add(panel_13, BorderLayout.NORTH);
 
             logWatcherBtn = new JButton("監聽");
-            logWatcherBtn.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    logWatcherBtnToggleAction();
+            logWatcherBtn.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent paramMouseEvent) {
+                    logWatcherBtnToggleAction(paramMouseEvent);
                 }
             });
 
@@ -3356,6 +3359,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
         long bringToFrontTime = -1;
         long bringToFrontPeriod = 1500;
         File logFile;
+        JTextPane logWatcherTextArea;
 
         private void bringToFront() {
             if (bringToFrontTime == -1 || (System.currentTimeMillis() - bringToFrontTime) > bringToFrontPeriod) {
@@ -3368,9 +3372,10 @@ public class BrowserHistoryHandlerUI extends JFrame {
             }
         }
 
-        private LogWatcherPeriodTask(File logFile) {
+        private LogWatcherPeriodTask(File logFile, JTextPane logWatcherTextArea) {
             try {
                 this.logFile = logFile;
+                this.logWatcherTextArea = logWatcherTextArea;
                 mTxtFileChecker = new LogWatcher(logFile, "UTF8") {
                     @Override
                     public void write(String line) {
@@ -3412,8 +3417,18 @@ public class BrowserHistoryHandlerUI extends JFrame {
         }
     };
 
-    private void logWatcherBtnToggleAction() {
+    private void logWatcherBtnToggleAction(MouseEvent paramMouseEvent) {
         try {
+            JTextPane logWatcherTextArea = this.logWatcherTextArea;
+
+            if (JMouseEventUtil.buttonRightClick(1, paramMouseEvent)) {
+                if (mBrowserHistoryHandlerUI_LogWatcherDlg != null && mBrowserHistoryHandlerUI_LogWatcherDlg.isVisible()) {
+                    mBrowserHistoryHandlerUI_LogWatcherDlg.dispose();
+                }
+                mBrowserHistoryHandlerUI_LogWatcherDlg = BrowserHistoryHandlerUI_LogWatcherDlg.newInstance();
+                logWatcherTextArea = mBrowserHistoryHandlerUI_LogWatcherDlg.getLogWatcherTextArea();
+            }
+
             if (!ArrayUtils.contains(new String[] { "監聽closing", "監聽start" }, logWatcherBtn.getText())) {
                 File logFile = null;
                 if (StringUtils.isNotBlank(logWatcherCustomFileText.getText())) {
@@ -3434,7 +3449,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
                     logWatcherPeriodText.setText(String.valueOf(period));
                 }
                 logWatcherTextArea.setText("## 監聽開始 : " + DateFormatUtils.format(System.currentTimeMillis(), "yyyy/MM/dd HH:mm:ss.SSS") + "\n");
-                mLogWatcherPeriodTask = new LogWatcherPeriodTask(logFile);
+                mLogWatcherPeriodTask = new LogWatcherPeriodTask(logFile, logWatcherTextArea);
                 new Timer().schedule(mLogWatcherPeriodTask, 0, period);
                 logWatcherBtn.setText("監聽start");
                 logWatcherSizeChangeLbl.setText(String.valueOf(logFile.length()));
