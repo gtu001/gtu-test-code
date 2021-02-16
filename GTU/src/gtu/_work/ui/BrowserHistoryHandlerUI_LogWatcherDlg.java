@@ -6,14 +6,12 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
-import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -43,6 +41,9 @@ public class BrowserHistoryHandlerUI_LogWatcherDlg extends JDialog {
     private final JPanel contentPanel = new JPanel();
     private JTextPane logWatcherTextArea;
     private YellowMarkJTextPaneHandler mYellowMarkJTextPaneHandler;
+
+    private Dimension dialogOrignSize;
+    private Point dialogLocation;
 
     /**
      * Launch the application.
@@ -135,11 +136,43 @@ public class BrowserHistoryHandlerUI_LogWatcherDlg extends JDialog {
 
         getContentPane().add(new AlphaContainer(contentPanel, this), BorderLayout.CENTER);
         {
-            JPanel buttonPane = new JPanel();
+            final JPanel buttonPane = new JPanel();
             buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
             getContentPane().add(new AlphaContainer(buttonPane, this), BorderLayout.SOUTH);
             {
-                JButton okButton = new JButton("OK");
+                final JButton cancelButton = new JButton("隱藏");
+                cancelButton.setActionCommand("hide");
+                buttonPane.add(cancelButton);
+
+                cancelButton.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent arg0) {
+                        JDialog dialog = BrowserHistoryHandlerUI_LogWatcherDlg.this;
+                        Component comp = (Component) arg0.getSource();
+                        if (dialogOrignSize == null && dialogLocation == null) {
+                            cancelButton.setText("隱藏");
+                            int PAD_SIZE = 5;
+                            dialogLocation = dialog.getLocationOnScreen();
+                            dialogOrignSize = dialog.getSize();
+                            Point compLoc = comp.getLocationOnScreen();
+                            int x = (int) compLoc.getX() - PAD_SIZE;
+                            int y = (int) compLoc.getY() - PAD_SIZE;
+                            int width = (int) (dialogOrignSize.getWidth() - ((compLoc.getX() - PAD_SIZE) - dialogLocation.getX()));
+                            int height = (int) (dialogOrignSize.getHeight() - ((compLoc.getY() - PAD_SIZE) - dialogLocation.getY()));
+                            dialog.setLocation(x, y);
+                            dialog.setSize(new Dimension(width, height));
+                        } else {
+                            cancelButton.setText("顯示");
+                            dialog.setLocation(dialogLocation);
+                            dialog.setSize(dialogOrignSize);
+                            dialogOrignSize = null;
+                            dialogLocation = null;
+                        }
+                    }
+                });
+            }
+            {
+                JButton okButton = new JButton("關閉");
                 okButton.setActionCommand("OK");
                 buttonPane.add(okButton);
                 getRootPane().setDefaultButton(okButton);
@@ -150,13 +183,7 @@ public class BrowserHistoryHandlerUI_LogWatcherDlg extends JDialog {
                     public void actionPerformed(ActionEvent paramActionEvent) {
                         dispose();
                     }
-
                 });
-            }
-            {
-                // JButton cancelButton = new JButton("Cancel");
-                // cancelButton.setActionCommand("Cancel");
-                // buttonPane.add(cancelButton);
             }
         }
 
@@ -317,6 +344,15 @@ public class BrowserHistoryHandlerUI_LogWatcherDlg extends JDialog {
             int x = location.x - pressed.getX() + me.getX();
             int y = location.y - pressed.getY() + me.getY();
             dialog.setLocation(x, y);
+
+            applyDiff(x, y);
+        }
+
+        private void applyDiff(int finX, int finY) {
+            if (dialogOrignSize != null && dialogLocation != null) {
+                dialogLocation.x = finX - (dialogOrignSize.width - dialog.getSize().width);
+                dialogLocation.y = finY - (dialogOrignSize.height - dialog.getSize().height);
+            }
         }
     }
 

@@ -14,6 +14,7 @@ import java.awt.event.MouseEvent;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.event.MouseInputAdapter;
 
@@ -23,13 +24,15 @@ public class SwingTransparentDlg extends JDialog {
 
     private static final long serialVersionUID = 3618609891018335257L;
     private final JPanel contentPanel = new JPanel();
+    private Dimension dialogOrignSize;
+    private Point dialogLocation;
 
     /**
      * Launch the application.
      */
     public static void main(String[] args) {
         try {
-            BrowserHistoryHandlerUI_LogWatcherDlg dialog = new BrowserHistoryHandlerUI_LogWatcherDlg();
+            SwingTransparentDlg dialog = new SwingTransparentDlg();
             dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
             dialog.setVisible(true);
         } catch (Exception e) {
@@ -37,8 +40,8 @@ public class SwingTransparentDlg extends JDialog {
         }
     }
 
-    public static BrowserHistoryHandlerUI_LogWatcherDlg newInstance() {
-        BrowserHistoryHandlerUI_LogWatcherDlg dialog = new BrowserHistoryHandlerUI_LogWatcherDlg();
+    public static SwingTransparentDlg newInstance() {
+        SwingTransparentDlg dialog = new SwingTransparentDlg();
         try {
             dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
             dialog.setVisible(true);
@@ -63,7 +66,7 @@ public class SwingTransparentDlg extends JDialog {
     public SwingTransparentDlg() {
         this.applyOnTopUndecorated(this);
 
-        setBounds(100, 100, 450, 300);
+        setBounds(100, 100, 800, 350);
         getContentPane().setLayout(new BorderLayout());
         contentPanel.setLayout(new BorderLayout());
 
@@ -75,33 +78,54 @@ public class SwingTransparentDlg extends JDialog {
         // contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 
         {
-            contentPanel.add(new JPanel(), BorderLayout.CENTER);
+            contentPanel.add(JCommonUtil.createScrollComponent(new JLabel()), BorderLayout.CENTER);
         }
 
         getContentPane().add(new AlphaContainer(contentPanel, this), BorderLayout.CENTER);
         {
-            JPanel buttonPane = new JPanel();
+            final JPanel buttonPane = new JPanel();
             buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
             getContentPane().add(new AlphaContainer(buttonPane, this), BorderLayout.SOUTH);
             {
-                JButton okButton = new JButton("OK");
+                final JButton cancelButton = new JButton("隱藏");
+                cancelButton.setActionCommand("hide");
+                buttonPane.add(cancelButton);
+
+                cancelButton.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent arg0) {
+                        JDialog dialog = SwingTransparentDlg.this;
+                        Component comp = (Component) arg0.getSource();
+                        if (dialogOrignSize == null && dialogLocation == null) {
+                            cancelButton.setText("隱藏");
+                            int PAD_SIZE = 5;
+                            dialogLocation = dialog.getLocationOnScreen();
+                            dialogOrignSize = dialog.getSize();
+                            Point compLoc = comp.getLocationOnScreen();
+                            int x = (int) compLoc.getX() - PAD_SIZE;
+                            int y = (int) compLoc.getY() - PAD_SIZE;
+                            int width = (int) (dialogOrignSize.getWidth() - ((compLoc.getX() - PAD_SIZE) - dialogLocation.getX()));
+                            int height = (int) (dialogOrignSize.getHeight() - ((compLoc.getY() - PAD_SIZE) - dialogLocation.getY()));
+                            dialog.setLocation(x, y);
+                            dialog.setSize(new Dimension(width, height));
+                        } else {
+                            cancelButton.setText("顯示");
+                            dialog.setLocation(dialogLocation);
+                            dialog.setSize(dialogOrignSize);
+                            dialogOrignSize = null;
+                            dialogLocation = null;
+                        }
+                    }
+                });
+            }
+            {
+                JButton okButton = new JButton("關閉");
                 okButton.setActionCommand("OK");
                 buttonPane.add(okButton);
                 getRootPane().setDefaultButton(okButton);
 
                 okButton.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent paramActionEvent) {
-                        dispose();
-                    }
-                });
-            }
-            {
-                JButton cancelButton = new JButton("Cancel");
-                cancelButton.setActionCommand("Cancel");
-                buttonPane.add(cancelButton);
 
-                cancelButton.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent paramActionEvent) {
                         dispose();
@@ -171,6 +195,15 @@ public class SwingTransparentDlg extends JDialog {
             int x = location.x - pressed.getX() + me.getX();
             int y = location.y - pressed.getY() + me.getY();
             dialog.setLocation(x, y);
+
+            applyDiff(x, y);
+        }
+
+        private void applyDiff(int finX, int finY) {
+            if (dialogOrignSize != null && dialogLocation != null) {
+                dialogLocation.x = finX - (dialogOrignSize.width - dialog.getSize().width);
+                dialogLocation.y = finY - (dialogOrignSize.height - dialog.getSize().height);
+            }
         }
     }
 
