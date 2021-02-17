@@ -57,7 +57,7 @@
 		</fileset>
 	</path>
 	<path id="javafx_class_path">
-		<fileset dir="/media/gtu001/OLD_D/my_tool/jfxrt">
+		<fileset dir="C:\\my_tool\\jfxrt">
 			<filename name="**/*.jar" />
 		</fileset>
 		<pathelement path="${build.dir}" />
@@ -150,7 +150,7 @@
 
 	<target name="main">
 		<antcall target="baseFolderChanger">
-			<param name="enable" value="true" /><!--false -->
+			<param name="enable" value="false" /><!--false -->
 		</antcall>
 
 		<antcall target="clean">
@@ -220,7 +220,7 @@
 
 	<target name="compiler" if="${enable}">
 		<echo># compiler ...</echo>
-		<javac fork="yes" compiler="javac1.6" source="1.6" target="1.6" includeantruntime="true" srcdir="${src_dir}" destdir="${build_dir}" deprecation="no" nowarn="true" encoding="UTF-8" debug="on"><!-- -->
+		<javac fork="yes" compiler="javac1.7" source="1.7" target="1.7" includeantruntime="true" srcdir="${src_dir}" destdir="${build_dir}" deprecation="no" nowarn="true" encoding="UTF-8" debug="on"><!-- -->
 			<include name="**/${main_class}.java" /><!--executable="${jdk_javac}" fork="yes" -->
 			<classpath>
 				<path location="${build_dir}" />

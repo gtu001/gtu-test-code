@@ -3,6 +3,7 @@ package gtu._work.etc;
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -15,6 +16,7 @@ import java.awt.geom.RoundRectangle2D;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
@@ -63,7 +65,7 @@ public class ApmTrainerUI extends javax.swing.JFrame {
             public void run() {
                 ApmTrainerUI inst = new ApmTrainerUI();
                 inst.setLocationRelativeTo(null);
-                 gtu.swing.util.JFrameUtil.setVisible(true,inst);
+                gtu.swing.util.JFrameUtil.setVisible(true, inst);
             }
         });
     }
@@ -83,6 +85,24 @@ public class ApmTrainerUI extends javax.swing.JFrame {
 
         g2d.setColor(Color.BLACK);
         g2d.draw(rectagle);
+    }
+
+    void recoverRectagle() {
+        if (rectagle == null) {
+            return;
+        }
+        new Thread(Thread.currentThread().getThreadGroup(), new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(80);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                g2d.setColor(Color.BLACK);
+                g2d.draw(rectagle);
+            }
+        }).start();
     }
 
     boolean checkMouseEvent(MouseEvent m1, MouseEvent m2) {
@@ -117,7 +137,7 @@ public class ApmTrainerUI extends javax.swing.JFrame {
         int rectagleY = (int) rectagle.getY();
         int rectagleW = (int) rectagle.getWidth();
         int rectagleH = (int) rectagle.getHeight();
-        
+
         int left = rectagleX - 5;
         int right = rectagleX + rectagleW + 5;
         int top = rectagleY - 25 - 5;
@@ -138,31 +158,52 @@ public class ApmTrainerUI extends javax.swing.JFrame {
     }
 
     void drawReleaseRectagle(MouseEvent m1, MouseEvent m2) {
-        int x = Math.min(m1.getX() + 5, m2.getX() + 5);
-        int y = Math.min(m1.getY() + 25, m2.getY() + 25);
-        int w = Math.max(m1.getX() + 5, m2.getX() + 5) - x;
-        int h = Math.max(m1.getY() + 25, m2.getY() + 25) - y;
+        final int x = Math.min(m1.getX() + 5, m2.getX() + 5);
+        final int y = Math.min(m1.getY() + 25, m2.getY() + 25);
+        final int w = Math.max(m1.getX() + 5, m2.getX() + 5) - x;
+        final int h = Math.max(m1.getY() + 25, m2.getY() + 25) - y;
         final RoundRectangle2D rect = new RoundRectangle2D.Double(x, y, w, h, 0, 0);
         g2dGreen.draw(rect);
         new Thread(Thread.currentThread().getThreadGroup(), new Runnable() {
             @Override
             public void run() {
                 try {
-                    Thread.sleep(200);
+                    Thread.sleep(50);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
                 g2d.setColor(Color.WHITE);
+                g2d.fillRect(x, y, w, h);
                 g2d.draw(rect);
             }
         }).start();
     }
-    
+
     public ApmTrainerUI() {
         super();
         initGUI();
     }
 
+    private class AlphaContainer extends JComponent {
+        private JComponent component;
+
+        public AlphaContainer(JComponent component) {
+            this.component = component;
+            this.component.setBackground(new Color(0, 0, 0, 0));// 0,0,0,0 全透明
+
+            setLayout(new BorderLayout());
+            setOpaque(false);
+            component.setOpaque(false);
+            add(component);
+        }
+
+        @Override
+        public void paintComponent(Graphics g) {
+            g.setColor(component.getBackground());
+            g.fillRect(0, 0, getWidth(), getHeight());
+        }
+    }
+    
     private void initGUI() {
         try {
             BorderLayout thisLayout = new BorderLayout();
@@ -170,7 +211,7 @@ public class ApmTrainerUI extends javax.swing.JFrame {
             getContentPane().setLayout(thisLayout);
             {
                 jPanel1 = new JPanel();
-                getContentPane().add(jPanel1, BorderLayout.CENTER);
+                getContentPane().add(new AlphaContainer(jPanel1), BorderLayout.CENTER);
                 jPanel1.setBackground(new java.awt.Color(255, 255, 255));
 
                 jPanel1.addMouseListener(new MouseListener() {
@@ -236,6 +277,7 @@ public class ApmTrainerUI extends javax.swing.JFrame {
                             randomRectagle();
                             backgroundApmCounter.correctTime++;
                         } else {
+                            recoverRectagle();
                             backgroundApmCounter.incorrectTime++;
                         }
                     }
@@ -251,7 +293,7 @@ public class ApmTrainerUI extends javax.swing.JFrame {
 
                 jPanel1.addMouseMotionListener(new MouseMotionListener() {
                     List<MouseEvent> allMoveList = new ArrayList<MouseEvent>();
-                    
+
                     void drawReleaseRectagle_forDrag(MouseEvent m1, MouseEvent m2) {
                         int x = Math.min(m1.getX() + 5, m2.getX() + 5);
                         int y = Math.min(m1.getY() + 25, m2.getY() + 25);
@@ -261,7 +303,7 @@ public class ApmTrainerUI extends javax.swing.JFrame {
                         g2d.setColor(Color.WHITE);
                         g2d.draw(rect);
                     }
-                    
+
                     void drawReleaseRectagle_forNew(MouseEvent m1, MouseEvent m2) {
                         int x = Math.min(m1.getX() + 5, m2.getX() + 5);
                         int y = Math.min(m1.getY() + 25, m2.getY() + 25);
@@ -269,34 +311,35 @@ public class ApmTrainerUI extends javax.swing.JFrame {
                         int h = Math.max(m1.getY() + 25, m2.getY() + 25) - y;
                         final RoundRectangle2D rect = new RoundRectangle2D.Double(x, y, w, h, 0, 0);
                         g2dGreen.draw(rect);
+                        g2dGreen.fillRect(x, y, w, h);
                     }
-                    
+
                     void repaintBlackRectagle() {
                         g2d.setColor(Color.BLACK);
                         g2d.draw(rectagle);
                     }
-                    
+
                     @Override
                     public void mouseDragged(MouseEvent e) {
-                        //是否要執行拖曳模式
-                        if(false) {
+                        // 是否要執行拖曳模式
+                        if (false) {
                             return;
                         }
-                        
-                        if(g2dGreen == null || g2d == null) {
+
+                        if (g2dGreen == null || g2d == null) {
                             return;
                         }
-                        
-                        for(int ii = 0 ; ii < allMoveList.size(); ii ++) {
+
+                        for (int ii = 0; ii < allMoveList.size(); ii++) {
                             MouseEvent e2 = allMoveList.get(ii);
                             drawReleaseRectagle_forDrag(e2, mousePressEvent);
                             allMoveList.remove(ii);
-                            ii --;
+                            ii--;
                         }
-                        
+
                         allMoveList.add(e);
                         drawReleaseRectagle_forNew(e, mousePressEvent);
-                        
+
                         repaintBlackRectagle();
                     }
 
@@ -339,6 +382,8 @@ public class ApmTrainerUI extends javax.swing.JFrame {
             setSize(400, 300);
 
             backgroundApmCounterInit();
+
+            JCommonUtil.setJFrameIcon(this, "resource/images/ico/starcraft.ico");
         } catch (Exception e) {
             e.printStackTrace();
         }

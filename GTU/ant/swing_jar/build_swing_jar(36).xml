@@ -214,7 +214,7 @@
 			<classpath>
 				<path location="${build_dir}" />
 			</classpath>
-			<classpath refid="javafx_class_path" />
+			<!--<classpath refid="javafx_class_path" />-->
 		</javac>
 	</target>
 

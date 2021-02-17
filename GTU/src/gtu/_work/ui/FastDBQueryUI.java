@@ -20,14 +20,15 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.StringReader;
-import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -5745,6 +5746,22 @@ public class FastDBQueryUI extends JFrame {
             PropertiesUtil.storeProperties(sqlIdListProp, sqlIdListFile, DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMdd-HHmmss"));
         }
 
+        private void backupFile() {
+            if (!sqlIdListFile.exists()) {
+                return;
+            }
+            Date date1 = new Date(sqlIdListFile.lastModified());
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+            String currentYmd = sdf.format(new Date());
+            String fileYmd = sdf.format(date1);
+            if (!StringUtils.equalsIgnoreCase(currentYmd, fileYmd)) {
+                File backupFile = new File(sqlIdListFile.getParentFile(), FileUtil.getNameNoSubName(sqlIdListFile) + "_" + fileYmd + ".properties");
+                if (!backupFile.exists()) {
+                    FileUtil.copyFile(sqlIdListFile, backupFile);
+                }
+            }
+        }
+
         private void init(String category) {
             if (!sqlIdListFile.exists()) {
                 try {
@@ -5752,6 +5769,8 @@ public class FastDBQueryUI extends JFrame {
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
+            } else {
+                backupFile();
             }
 
             lst.clear();

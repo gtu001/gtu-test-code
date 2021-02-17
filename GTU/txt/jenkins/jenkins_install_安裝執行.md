@@ -52,6 +52,7 @@ docker_jdk11鏡像安裝法
 從Ｗar執行
 ---
 	下載	http://mirrors.jenkins.io/war-stable/latest/jenkins.war
+	或 https://www.jenkins.io/download/
 
 	$ java -jar jenkins.war
 
