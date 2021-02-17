@@ -283,10 +283,12 @@
 		</copy>
 
 		<mkdir dir="${build_dir}/META-INF" />
-		<copy tofile="${build_dir}/META-INF/persistence.xml">
-			<fileset dir="${src_dir}">
-				<filename name="**/persistence.xml" />
-			</fileset>
+		<copy tofile="${build_dir}/META-INF/persistence.xml" overwrite="true">
+			<first count="1">
+				<fileset dir="${src_dir}">
+					<filename name="**/persistence.xml" />
+				</fileset>
+			</first>
 		</copy>
 
 		<unjar dest="${build_dir}" overwrite="true">
