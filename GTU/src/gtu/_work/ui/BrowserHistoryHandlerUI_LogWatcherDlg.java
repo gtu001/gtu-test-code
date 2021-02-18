@@ -11,6 +11,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +31,8 @@ import org.apache.commons.lang.StringUtils;
 
 import gtu.swing.util.JCommonUtil;
 import gtu.swing.util.JCommonUtil.HandleDocumentEvent;
+import gtu.swing.util.JMouseEventUtil;
+import gtu.swing.util.JPopupMenuUtil;
 import gtu.swing.util.JTextAreaUtil;
 import gtu.swing.util.JTextPaneTextStyle;
 import gtu.swing.util.JTextPaneUtil;
@@ -44,6 +47,7 @@ public class BrowserHistoryHandlerUI_LogWatcherDlg extends JDialog {
 
     private Dimension dialogOrignSize;
     private Point dialogLocation;
+    private JButton cancelButton;
 
     /**
      * Launch the application.
@@ -131,6 +135,28 @@ public class BrowserHistoryHandlerUI_LogWatcherDlg extends JDialog {
                     logWatcherTextAreaKeyEventAction(e);
                 }
             });
+            logWatcherTextArea.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    if (JMouseEventUtil.buttonRightClick(1, e)) {
+                        JPopupMenuUtil.newInstance(logWatcherTextArea)//
+                                .addJMenuItem("清除", new ActionListener() {
+                                    @Override
+                                    public void actionPerformed(ActionEvent e) {
+                                        logWatcherTextArea.setText("");
+                                    }
+                                })//
+                                .addJMenuItem("隱藏", new ActionListener() {
+                                    @Override
+                                    public void actionPerformed(ActionEvent e) {
+                                        showAndHide(false);
+                                    }
+                                })//
+                                .applyEvent(e).show();
+                    }
+                }
+            });
+
             contentPanel.add(JCommonUtil.createScrollComponent(logWatcherTextArea), BorderLayout.CENTER);
         }
 
@@ -140,34 +166,14 @@ public class BrowserHistoryHandlerUI_LogWatcherDlg extends JDialog {
             buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
             getContentPane().add(new AlphaContainer(buttonPane, this), BorderLayout.SOUTH);
             {
-                final JButton cancelButton = new JButton("隱藏");
+                cancelButton = new JButton("隱藏");
                 cancelButton.setActionCommand("hide");
                 buttonPane.add(cancelButton);
 
                 cancelButton.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent arg0) {
-                        JDialog dialog = BrowserHistoryHandlerUI_LogWatcherDlg.this;
-                        Component comp = (Component) arg0.getSource();
-                        if (dialogOrignSize == null && dialogLocation == null) {
-                            cancelButton.setText("隱藏");
-                            int PAD_SIZE = 5;
-                            dialogLocation = dialog.getLocationOnScreen();
-                            dialogOrignSize = dialog.getSize();
-                            Point compLoc = comp.getLocationOnScreen();
-                            int x = (int) compLoc.getX() - PAD_SIZE;
-                            int y = (int) compLoc.getY() - PAD_SIZE;
-                            int width = (int) (dialogOrignSize.getWidth() - ((compLoc.getX() - PAD_SIZE) - dialogLocation.getX()));
-                            int height = (int) (dialogOrignSize.getHeight() - ((compLoc.getY() - PAD_SIZE) - dialogLocation.getY()));
-                            dialog.setLocation(x, y);
-                            dialog.setSize(new Dimension(width, height));
-                        } else {
-                            cancelButton.setText("顯示");
-                            dialog.setLocation(dialogLocation);
-                            dialog.setSize(dialogOrignSize);
-                            dialogOrignSize = null;
-                            dialogLocation = null;
-                        }
+                        showAndHide(null);
                     }
                 });
             }
@@ -188,6 +194,36 @@ public class BrowserHistoryHandlerUI_LogWatcherDlg extends JDialog {
         }
 
         JCommonUtil.setLocationToRightBottomCorner(this);
+    }
+
+    private void showAndHide(Boolean isShow) {
+        JDialog dialog = BrowserHistoryHandlerUI_LogWatcherDlg.this;
+        Component comp = (Component) cancelButton;
+        boolean isShow2 = false;
+        if (isShow != null) {
+            isShow2 = isShow;
+        } else {
+            isShow2 = !(dialogOrignSize == null && dialogLocation == null);
+        }
+        if (!isShow2) {
+            cancelButton.setText("隱藏");
+            int PAD_SIZE = 5;
+            dialogLocation = dialog.getLocationOnScreen();
+            dialogOrignSize = dialog.getSize();
+            Point compLoc = comp.getLocationOnScreen();
+            int x = (int) compLoc.getX() - PAD_SIZE;
+            int y = (int) compLoc.getY() - PAD_SIZE;
+            int width = (int) (dialogOrignSize.getWidth() - ((compLoc.getX() - PAD_SIZE) - dialogLocation.getX()));
+            int height = (int) (dialogOrignSize.getHeight() - ((compLoc.getY() - PAD_SIZE) - dialogLocation.getY()));
+            dialog.setLocation(x, y);
+            dialog.setSize(new Dimension(width, height));
+        } else {
+            cancelButton.setText("顯示");
+            dialog.setLocation(dialogLocation);
+            dialog.setSize(dialogOrignSize);
+            dialogOrignSize = null;
+            dialogLocation = null;
+        }
     }
 
     private void logWatcherTextAreaKeyEventAction(KeyEvent e) {
