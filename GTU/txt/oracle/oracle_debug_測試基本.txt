@@ -1,0 +1,16 @@
+set serverout on;
+
+declare 
+ p_RiskCode       varchar2(20) := 'NTIC0201';
+ p_Dutycode       varchar2(20) := 'DNTIC020149';
+ p_InsuredAppage  number := 32;
+ p_InsuredSex     varchar2(20) := '1';
+ p_PayendYear     number := 6;
+ p_InsuYear       number := 111;
+ p_Healthy        varchar2(20) := null;
+ XXXXXX number := 0;      
+                             
+begin 
+    select SLPREM1(p_RiskCode,p_Dutycode,p_InsuredAppage,p_InsuredSex,p_PayendYear,p_InsuYear,p_Healthy) into XXXXXX from dual;
+    dbms_output.put_line('return = ' || to_char(XXXXXX));
+end ;
