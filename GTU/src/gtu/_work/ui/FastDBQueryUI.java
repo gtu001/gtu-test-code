@@ -674,12 +674,14 @@ public class FastDBQueryUI extends JFrame {
 
         newPanel1.add(sqlMappingFilterText);
 
-        for (JTextComponent text : new JTextComponent[] { sqlQueryText, sqlContentFilterText, sqlMappingFilterText_Auto.getTextComponent(), sqlIdCategoryComboBox4Tab1_Auto.getTextComponent() }) {
+        for (final JTextComponent text : new JTextComponent[] { sqlQueryText, sqlContentFilterText, sqlMappingFilterText_Auto.getTextComponent(),
+                sqlIdCategoryComboBox4Tab1_Auto.getTextComponent() }) {
             text.addFocusListener(new FocusAdapter() {
                 @Override
                 public void focusLost(FocusEvent e) {
                     try {
                         // 初始化 sqlList
+                        sqlIdConfigBeanHandler.setRegisterComponent(text);
                         initLoadSqlListConfig();
                     } catch (Exception ex) {
                         JCommonUtil.handleException(ex);
@@ -691,6 +693,7 @@ public class FastDBQueryUI extends JFrame {
                 public void process(DocumentEvent event) {
                     try {
                         // 初始化 sqlList
+                        sqlIdConfigBeanHandler.setRegisterComponent(text);
                         initLoadSqlListConfig();
                     } catch (Exception e) {
                         JCommonUtil.handleException(e);
@@ -5657,6 +5660,27 @@ public class FastDBQueryUI extends JFrame {
     private class SqlIdConfigBeanHandler {
         Properties sqlIdListProp;
         List<SqlIdConfigBean> lst = new ArrayList<SqlIdConfigBean>();
+        JTextComponent registerComponent;
+
+        private void setRegisterComponent(JTextComponent registerComponent) {
+            this.registerComponent = registerComponent;
+        }
+
+        private boolean isOkRegisterComponent() {
+            if (registerComponent == null) {
+                return true;
+            }
+            for (JTextComponent comp : new JTextComponent[] { sqlQueryText, //
+                    sqlContentFilterText, //
+                    sqlMappingFilterText_Auto.getTextComponent(), //
+                    // sqlIdCategoryComboBox4Tab1_Auto.getTextComponent()//
+            }) {//
+                if (comp == registerComponent) {
+                    return true;
+                }
+            }
+            return false;
+        }
 
         private SqlIdConfigBeanHandler() {
             init("");
@@ -5784,7 +5808,12 @@ public class FastDBQueryUI extends JFrame {
                 }
             }
             ListUtil.sortIgnoreCase(lst);
-            sqlIdCategoryComboBox_Auto.applyComboxBoxList(getCategoryLst(lst), category);
+            List<String> categoryLst = getCategoryLst(lst);
+            sqlIdCategoryComboBox_Auto.applyComboxBoxList(categoryLst, category);
+            if (isOkRegisterComponent()) {
+                updateSqlIdCategoryComboBox4Tab1();
+            }
+            setRegisterComponent(null);
         }
 
         private List<String> getCategoryLst(List<SqlIdConfigBean> lst) {
