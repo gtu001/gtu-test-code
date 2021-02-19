@@ -26,9 +26,9 @@ import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -5774,15 +5774,13 @@ public class FastDBQueryUI extends JFrame {
             if (!sqlIdListFile.exists()) {
                 return;
             }
-            Date date1 = new Date(sqlIdListFile.lastModified());
             SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-            String currentYmd = sdf.format(new Date());
-            String fileYmd = sdf.format(date1);
-            if (!StringUtils.equalsIgnoreCase(currentYmd, fileYmd)) {
-                File backupFile = new File(sqlIdListFile.getParentFile(), FileUtil.getNameNoSubName(sqlIdListFile) + "_" + fileYmd + ".properties");
-                if (!backupFile.exists()) {
-                    FileUtil.copyFile(sqlIdListFile, backupFile);
-                }
+            Calendar cal = Calendar.getInstance();
+            cal.add(Calendar.DATE, -1);
+            String fileYmd = sdf.format(cal.getTime());
+            File backupFile = new File(sqlIdListFile.getParentFile(), FileUtil.getNameNoSubName(sqlIdListFile) + "_" + fileYmd + ".properties");
+            if (!backupFile.exists()) {
+                FileUtil.copyFile(sqlIdListFile, backupFile);
             }
         }
 
@@ -8802,56 +8800,62 @@ public class FastDBQueryUI extends JFrame {
             String clipboardText = ClipboardUtil.getInstance().getContents();
 
             List<String> titles = null;
-            Object[] rowData = null;
+            List<Object[]> rowDataLst = new ArrayList<Object[]>();
 
             if ("clipboard".equalsIgnoreCase(fromType)) {
                 mImportFromClipboard.parseMain2(clipboardText);
                 titles = mImportFromClipboard.titles;
-                rowData = mImportFromClipboard.rowLst.get(0);
+                rowDataLst.addAll(mImportFromClipboard.rowLst);
 
             } else if ("selectIndex".equalsIgnoreCase(fromType)) {
                 Pair<List<String>, List<Object[]>> excelImportLst = transRealRowToQuyerLstIndex();// orignQueryResult
-                int selectRowIndex = queryResultTable.getSelectedRow();
                 titles = excelImportLst.getLeft();
-                rowData = excelImportLst.getRight().get(selectRowIndex);
+                for (int selectRowIndex : queryResultTable.getSelectedRows()) {
+                    rowDataLst.add(excelImportLst.getRight().get(selectRowIndex));
+                }
             }
 
-            if (rowData == null || titles == null || rowData.length == 0) {
+            if (titles == null || rowDataLst.isEmpty()) {
                 JCommonUtil._jOptionPane_showMessageDialog_error("無法選擇套用SQL[0893] : " + fromType);
                 return;
             }
 
-            StringBuffer sb = new StringBuffer();
+            StringBuffer sb2 = new StringBuffer();
 
-            Matcher mth = fieldEqualValuePtn.matcher(sql);
-            while (mth.find()) {
-                String column = mth.group(1);
-                String valueStr = "";
+            for (Object[] rowData : rowDataLst) {
+                StringBuffer sb = new StringBuffer();
+                Matcher mth = fieldEqualValuePtn.matcher(sql);
+                while (mth.find()) {
+                    String column = mth.group(1);
+                    String valueStr = "";
 
-                boolean findOk = false;
-                A: for (int ii = 0; ii < titles.size(); ii++) {
-                    String column2 = titles.get(ii);
-                    String column3 = StringUtilForDb.javaToDbField(column2);
-                    if (StringUtils.equalsIgnoreCase(column, column2) || //
-                            StringUtils.equalsIgnoreCase(column, column3)) {
-                        Object value = rowData[ii];
-                        if (value != null) {
-                            valueStr = String.valueOf(value);
+                    boolean findOk = false;
+                    A: for (int ii = 0; ii < titles.size(); ii++) {
+                        String column2 = titles.get(ii);
+                        String column3 = StringUtilForDb.javaToDbField(column2);
+                        if (StringUtils.equalsIgnoreCase(column, column2) || //
+                                StringUtils.equalsIgnoreCase(column, column3)) {
+                            Object value = rowData[ii];
+                            if (value != null) {
+                                valueStr = String.valueOf(value);
+                            }
+                            findOk = true;
+                            break A;
                         }
-                        findOk = true;
-                        break A;
                     }
-                }
 
-                String groupStr = mth.group();
-                if (findOk) {
-                    groupStr = this.replaceGroup(mth, 2, valueStr);
+                    String groupStr = mth.group();
+                    if (findOk) {
+                        groupStr = this.replaceGroup(mth, 2, valueStr);
+                    }
+                    mth.appendReplacement(sb, groupStr);
                 }
-                mth.appendReplacement(sb, groupStr);
+                mth.appendTail(sb);
+                sb2.append(sb.toString());
+                sb2.append("\r\n\r\n");
             }
 
-            mth.appendTail(sb);
-            sqlTextArea.setText(sb.toString());
+            sqlTextArea.setText(sb2.toString());
         }
     }
 

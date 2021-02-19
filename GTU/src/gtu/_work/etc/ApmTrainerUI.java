@@ -3,6 +3,7 @@ package gtu._work.etc;
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.EventQueue;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
@@ -17,12 +18,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JComponent;
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
+import gtu._work.ui.SwingTemplateUI;
 import gtu.number.RandomUtil;
 import gtu.swing.util.JCommonUtil;
+import gtu.swing.util.JFrameUtil;
 import gtu.swing.util.JMouseEventUtil;
 import gtu.swing.util.JPopupMenuUtil;
 
@@ -61,11 +65,17 @@ public class ApmTrainerUI extends javax.swing.JFrame {
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(new Runnable() {
+        if (!JFrameUtil.lockInstance_delable(SwingTemplateUI.class)) {
+            return;
+        }
+        EventQueue.invokeLater(new Runnable() {
             public void run() {
-                ApmTrainerUI inst = new ApmTrainerUI();
-                inst.setLocationRelativeTo(null);
-                gtu.swing.util.JFrameUtil.setVisible(true, inst);
+                try {
+                    ApmTrainerUI inst = new ApmTrainerUI();
+                    gtu.swing.util.JFrameUtil.setVisible(true, inst);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         });
     }
@@ -203,11 +213,13 @@ public class ApmTrainerUI extends javax.swing.JFrame {
             g.fillRect(0, 0, getWidth(), getHeight());
         }
     }
-    
+
     private void initGUI() {
         try {
             BorderLayout thisLayout = new BorderLayout();
-            setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+
+            setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            // setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
             getContentPane().setLayout(thisLayout);
             {
                 jPanel1 = new JPanel();
@@ -382,6 +394,8 @@ public class ApmTrainerUI extends javax.swing.JFrame {
             setSize(400, 300);
 
             backgroundApmCounterInit();
+
+            setLocationRelativeTo(null);
 
             JCommonUtil.setJFrameIcon(this, "resource/images/ico/starcraft.ico");
         } catch (Exception e) {
