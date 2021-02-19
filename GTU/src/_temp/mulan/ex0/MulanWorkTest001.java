@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -22,9 +23,13 @@ import gtu.poi.hssf.ExcelUtil_Xls97;
 public class MulanWorkTest001 {
 
     public static void main(String[] args) {
+
+    }
+
+    public void execute(File xlsFile) {
         ExcelUtil_Xls97 util = ExcelUtil_Xls97.getInstance();
 
-        HSSFWorkbook wb = util.readExcel(new File("/home/gtu001/Desktop/mulan_work1.xls"));
+        HSSFWorkbook wb = util.readExcel(xlsFile);
 
         MulanWorkTest001 t = new MulanWorkTest001();
 
@@ -161,7 +166,8 @@ public class MulanWorkTest001 {
 
         util.applyAutoHeight(workSheet, wb2);
 
-        File excelFile = new File(FileUtil.DESKTOP_DIR, "xxxxxxxxx.xls");
+        String wordExcelName = "mulan_" + DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMdd") + ".xls";
+        File excelFile = new File(FileUtil.DESKTOP_DIR, wordExcelName);
         util.writeExcel(excelFile, wb2);
         System.out.println("File : " + excelFile);
         System.out.println("hasCount : " + hasCount);

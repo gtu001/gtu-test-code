@@ -3,16 +3,27 @@ package gtu._work.ui;
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.util.EventObject;
 
+import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeListener;
 
+import com.jgoodies.forms.factories.FormFactory;
+import com.jgoodies.forms.layout.ColumnSpec;
+import com.jgoodies.forms.layout.FormLayout;
+import com.jgoodies.forms.layout.RowSpec;
+
+import _temp.mulan.ex0.MulanWorkTest001;
 import gtu._work.ui.JMenuBarUtil.JMenuAppender;
 import gtu.swing.util.HideInSystemTrayHelper;
 import gtu.swing.util.JCommonUtil;
@@ -31,6 +42,10 @@ public class MulanWorkTest001UI extends JFrame {
     private SwingActionUtil swingUtil;
     private JTabbedPane tabbedPane;
     private JPanel panel_2;
+    private JLabel lblNewLabel;
+    private JTextField excelFileText;
+    private JPanel panel_3;
+    private JButton executeBtn;
 
     /**
      * Launch the application.
@@ -70,6 +85,29 @@ public class MulanWorkTest001UI extends JFrame {
 
         JPanel panel = new JPanel();
         tabbedPane.addTab("New tab", null, panel, null);
+        panel.setLayout(new FormLayout(new ColumnSpec[] { FormFactory.RELATED_GAP_COLSPEC, FormFactory.DEFAULT_COLSPEC, FormFactory.RELATED_GAP_COLSPEC, ColumnSpec.decode("default:grow"), },
+                new RowSpec[] { FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
+                        FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
+                        FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, RowSpec.decode("default:grow"), }));
+
+        lblNewLabel = new JLabel("excel(xls)");
+        panel.add(lblNewLabel, "2, 2, right, default");
+
+        excelFileText = new JTextField();
+        panel.add(excelFileText, "4, 2, fill, default");
+        excelFileText.setColumns(10);
+        JCommonUtil.jTextFieldSetFilePathMouseEvent(excelFileText, false);
+
+        panel_3 = new JPanel();
+        panel.add(panel_3, "4, 16, fill, fill");
+
+        executeBtn = new JButton("execute");
+        executeBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                swingUtil.invokeAction("executeBtn.click", e);
+            }
+        });
+        panel_3.add(executeBtn);
 
         JPanel panel_1 = new JPanel();
         tabbedPane.addTab("New tab", null, panel_1, null);
@@ -112,6 +150,15 @@ public class MulanWorkTest001UI extends JFrame {
             @Override
             public void action(EventObject evt) throws Exception {
                 System.out.println("tabbedPane : " + tabbedPane.getSelectedIndex());
+            }
+        });
+        swingUtil.addActionHex("executeBtn.click", new Action() {
+            @Override
+            public void action(EventObject evt) throws Exception {
+                File excelFile = JCommonUtil.filePathCheck(excelFileText.getText(), "excel檔", "xls");
+                MulanWorkTest001 t = new MulanWorkTest001();
+                t.execute(excelFile);
+                JCommonUtil._jOptionPane_showMessageDialog_info("產生完成!!");
             }
         });
     }
