@@ -13,6 +13,7 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -58,10 +59,12 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.JToolTip;
 import javax.swing.JViewport;
 import javax.swing.RowFilter;
 import javax.swing.ToolTipManager;
@@ -2214,5 +2217,18 @@ public class JTableUtil {
         };
         ((TableRowSorter) table.getRowSorter()).setRowFilter(filter);
     }
+
+    // ----------------------------------------------------------------------------------------------------------------------
+    public static class JTable4FixToolTip extends JTable {
+        @Override
+        public JToolTip createToolTip() {
+            return JTooltipUtil.createToolTip(null, null, 100);
+        }
+
+        public Point getToolTipLocation(MouseEvent e) {
+            return new Point(e.getPoint().x + 100, e.getPoint().y);// r.width
+        }
+    }
+    // ----------------------------------------------------------------------------------------------------------------------
     // ----------------------------------------------------------------------------------------------------------------------
 }

@@ -16,7 +16,6 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -518,7 +517,7 @@ public class BrowserHistoryHandlerUI extends JFrame {
             JLabel lblNewLabel_3 = new JLabel("           ");
             panel_1.add(lblNewLabel_3, BorderLayout.EAST);
 
-            urlTable = new JTable();
+            urlTable = new JTableUtil.JTable4FixToolTip();
             // JTableUtil.defaultSetting_AutoResize(urlTable);
             JTableUtil.defaultSetting(urlTable);
             panel_1.add(JCommonUtil.createScrollComponent(urlTable), BorderLayout.CENTER);
@@ -546,9 +545,27 @@ public class BrowserHistoryHandlerUI extends JFrame {
                         int rowPos = pair.getLeft();
                         int colPos = UrlTableConfigEnum.VO.ordinal();
                         UrlConfig d = (UrlConfig) jtab.getRealValueAt(rowPos, colPos);
-                        urlTable.setToolTipText(d.url);
+                        String gameImage = findGameUrl(d);
+                        if (gameImage == null) {
+                            urlTable.setToolTipText(null);
+                        } else {
+                            urlTable.setToolTipText("<html><img src=\"" + gameImage + "\" width='320' height='180'></html>");
+                        }
                     } catch (Exception ex) {
                     }
+                }
+
+                Pattern ptn = Pattern.compile("IMAGE\\:\"(.*?)\"", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
+
+                private String findGameUrl(UrlConfig d) {
+                    if (StringUtils.isBlank(d.remark)) {
+                        return null;
+                    }
+                    Matcher mth = ptn.matcher(d.remark);
+                    if (mth.find()) {
+                        return mth.group(1);
+                    }
+                    return null;
                 }
             });
 
@@ -1833,32 +1850,36 @@ public class BrowserHistoryHandlerUI extends JFrame {
         String latestUpdate;
 
         private String getLatestModify(List<UrlConfig> lst) {
-            Collections.sort(lst, new Comparator<UrlConfig>() {
-                SimpleDateFormat SDF = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+            try {
+                Collections.sort(lst, new Comparator<UrlConfig>() {
+                    SimpleDateFormat SDF = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 
-                @Override
-                public int compare(UrlConfig o1, UrlConfig o2) {
-                    if (StringUtils.isBlank(o1.updateTimestamp)) {
-                        return 1;
-                    } else if (StringUtils.isNotBlank(o1.updateTimestamp) && StringUtils.isBlank(o2.updateTimestamp)) {
-                        return -1;
-                    } else if (StringUtils.isBlank(o1.updateTimestamp) && StringUtils.isBlank(o2.updateTimestamp)) {
+                    @Override
+                    public int compare(UrlConfig o1, UrlConfig o2) {
+                        if (StringUtils.isBlank(o1.updateTimestamp)) {
+                            return 1;
+                        } else if (StringUtils.isNotBlank(o1.updateTimestamp) && StringUtils.isBlank(o2.updateTimestamp)) {
+                            return -1;
+                        } else if (StringUtils.isBlank(o1.updateTimestamp) && StringUtils.isBlank(o2.updateTimestamp)) {
+                            return 0;
+                        }
+                        try {
+                            Date d1 = SDF.parse(o1.updateTimestamp);
+                            Date d2 = SDF.parse(o2.updateTimestamp);
+                            if (d1.after(d2)) {
+                                return -1;
+                            } else if (d1.before(d2)) {
+                                return 1;
+                            }
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
                         return 0;
                     }
-                    try {
-                        Date d1 = SDF.parse(o1.updateTimestamp);
-                        Date d2 = SDF.parse(o2.updateTimestamp);
-                        if (d1.after(d2)) {
-                            return -1;
-                        } else if (d1.before(d2)) {
-                            return 1;
-                        }
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                    }
-                    return 0;
-                }
-            });
+                });
+            } catch (Exception ex) {
+                System.err.println("[getLatestModify] ERR:" + ex.getMessage());
+            }
             UrlConfig urlConf = lst.get(0);
             String tmp = urlConf.title + "_" + urlConf.updateTimestamp;
             return tmp;

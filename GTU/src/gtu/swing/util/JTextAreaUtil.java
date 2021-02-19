@@ -263,7 +263,7 @@ public class JTextAreaUtil {
                 } finally {
                     try {
                         reader.close();
-                    } catch (IOException e1) {
+                    } catch (Exception e1) {
                         e1.printStackTrace();
                     }
                 }

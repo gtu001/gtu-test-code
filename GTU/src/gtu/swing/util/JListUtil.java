@@ -2,6 +2,7 @@ package gtu.swing.util;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -18,6 +19,7 @@ import java.util.List;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
+import javax.swing.JToolTip;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -310,5 +312,18 @@ public class JListUtil {
 
     public static void setUnselected(JList jList1) {
         jList1.clearSelection();
+    }
+
+    public static class JList4FixToolTip extends JList {
+        @Override
+        public JToolTip createToolTip() {
+            return JTooltipUtil.createToolTip(null, null, 100);
+        }
+
+        public Point getToolTipLocation(MouseEvent e) {
+            int row = locationToIndex(e.getPoint());
+            Rectangle r = getCellBounds(row, row);
+            return new Point(e.getPoint().x + 100, r.y);// r.width
+        }
     }
 }

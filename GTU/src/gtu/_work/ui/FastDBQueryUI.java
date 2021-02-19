@@ -4,7 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -75,7 +74,6 @@ import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
-import javax.swing.JToolTip;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.MenuKeyEvent;
@@ -558,18 +556,7 @@ public class FastDBQueryUI extends JFrame {
 
         JScrollPane scrollPane = new JScrollPane();
         panel.add(scrollPane, BorderLayout.CENTER);
-        sqlList = new JList() {
-            @Override
-            public JToolTip createToolTip() {
-                return JTooltipUtil.createToolTip(null, null, 100);
-            }
-
-            public Point getToolTipLocation(MouseEvent e) {
-                int row = locationToIndex(e.getPoint());
-                Rectangle r = getCellBounds(row, row);
-                return new Point(e.getPoint().x + 100, r.y);// r.width
-            }
-        };
+        sqlList = new JListUtil.JList4FixToolTip();
         sqlList.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
