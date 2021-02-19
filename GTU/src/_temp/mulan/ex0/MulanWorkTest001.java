@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.apache.poi.hssf.usermodel.HSSFCellStyle;
+import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -24,7 +24,7 @@ public class MulanWorkTest001 {
     public static void main(String[] args) {
         ExcelUtil_Xls97 util = ExcelUtil_Xls97.getInstance();
 
-        HSSFWorkbook wb = util.readExcel(new File("/media/gtu001/Transcend/game/VR/mulan_work1.xls"));
+        HSSFWorkbook wb = util.readExcel(new File("/home/gtu001/Desktop/mulan_work1.xls"));
 
         MulanWorkTest001 t = new MulanWorkTest001();
 
@@ -82,9 +82,11 @@ public class MulanWorkTest001 {
         // ========================================================================================
         Set<String> personNumLst = new LinkedHashSet<String>();
         Set<String> workDateLst = new TreeSet<String>();
+        Map<String, String> personNumNameMap = new HashMap<String, String>();
         for (WorkData p : workLst) {
             personNumLst.add(p.personNum);
             workDateLst.add(p.workDate);
+            personNumNameMap.put(p.personNum, p.name);
         }
 
         List<WorkDataHandler> disWorkLst = new ArrayList<WorkDataHandler>();
@@ -129,11 +131,13 @@ public class MulanWorkTest001 {
 
         int hasCount = 0;
         int noCount = 0;
-        
+
         for (String personNum : personNumLst) {
             rowPos++;
             HSSFRow personRow = workSheet.createRow(rowPos);
-            personRow.createCell(0).setCellValue(personNum);
+
+            String personName = StringUtils.trimToEmpty(personNumNameMap.get(personNum));
+            personRow.createCell(0).setCellValue(personNum + personName);
 
             Map<String, List<WorkData>> innerMap = personNum_workDate_DayLst_MAP.get(personNum);
 
@@ -145,7 +149,7 @@ public class MulanWorkTest001 {
                 if (wLst != null) {
                     hasCount++;
                     for (WorkData w : wLst) {
-                        sb.append(w.regisTime + "\r\n");
+                        sb.append(w.cardType + w.regisTime + "\r\n");
                     }
                 } else {
                     noCount++;
@@ -154,7 +158,7 @@ public class MulanWorkTest001 {
                 cell.setCellValue(sb.toString());
             }
         }
-        
+
         util.applyAutoHeight(workSheet, wb2);
 
         File excelFile = new File(FileUtil.DESKTOP_DIR, "xxxxxxxxx.xls");
