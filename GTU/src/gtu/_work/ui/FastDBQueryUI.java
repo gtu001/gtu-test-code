@@ -41,9 +41,12 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Scanner;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.concurrent.Callable;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -414,6 +417,8 @@ public class FastDBQueryUI extends JFrame {
     private JTextField columnXlsDefLblColorQryText;
     private JLabel lblNewLabel_23;
     private JCheckBox queryResultFakeDataChk;
+    private AtomicBoolean InitLoadSqlListConfigHolder = new AtomicBoolean(false);
+
 
     private final Predicate IGNORE_PREDICT = new Predicate() {
         @Override
@@ -464,6 +469,7 @@ public class FastDBQueryUI extends JFrame {
             @Override
             public void afterInit(SwingTabTemplateUI self) {
                 loadExternalJars();
+                initApplyAppMenu(self);
             }
         });
         tabUI.setEventAfterChangeTab(new ChangeTabHandlerGtu001() {
@@ -525,7 +531,6 @@ public class FastDBQueryUI extends JFrame {
         tabUI.startUI();
         tabUI.getSysTrayUtil().createDefaultTray();
         TAB_UI1 = tabUI;
-        initApplyAppMenu();
     }
 
     /**
@@ -587,10 +592,10 @@ public class FastDBQueryUI extends JFrame {
                         File file = lst.get(0);
                         if (file.getName().endsWith(".yml")) {
                             sqlIdConfigBeanHandler.saveYamlToProp(file, true);
-                            initLoadSqlListConfig();
+                            initLoadSqlListConfig(null);
                         } else if (file.getName().endsWith(".properties")) {
                             sqlIdConfigBeanHandler.saveYamlToProp2(file, true);
-                            initLoadSqlListConfig();
+                            initLoadSqlListConfig(null);
                         } else {
                             JCommonUtil._jOptionPane_showMessageDialog_error("檔案格式有誤!");
                         }
@@ -634,7 +639,7 @@ public class FastDBQueryUI extends JFrame {
         sqlListSortCombobox.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 try {
-                    initLoadSqlListConfig();
+                    initLoadSqlListConfig(null);
                 } catch (Exception ex) {
                     JCommonUtil.handleException(ex);
                 }
@@ -682,7 +687,7 @@ public class FastDBQueryUI extends JFrame {
                     try {
                         // 初始化 sqlList
                         sqlIdConfigBeanHandler.setRegisterComponent(text);
-                        initLoadSqlListConfig();
+                        initLoadSqlListConfig(null);
                     } catch (Exception ex) {
                         JCommonUtil.handleException(ex);
                     }
@@ -694,7 +699,11 @@ public class FastDBQueryUI extends JFrame {
                     try {
                         // 初始化 sqlList
                         sqlIdConfigBeanHandler.setRegisterComponent(text);
-                        initLoadSqlListConfig();
+                        Boolean forceExecute = null;
+                        if (text == sqlIdCategoryComboBox4Tab1_Auto.getTextComponent()) {
+                            forceExecute = true;
+                        }
+                        initLoadSqlListConfig(forceExecute);
                     } catch (Exception e) {
                         JCommonUtil.handleException(e);
                     }
@@ -710,7 +719,7 @@ public class FastDBQueryUI extends JFrame {
                 sqlMappingFilterText_Auto.getTextComponent().setText("");
                 try {
                     // 初始化 sqlList
-                    initLoadSqlListConfig();
+                    initLoadSqlListConfig(null);
                 } catch (Exception e) {
                     JCommonUtil.handleException(e);
                 }
@@ -2119,7 +2128,7 @@ public class FastDBQueryUI extends JFrame {
                         return;
                     }
                     sqlIdConfigBeanHandler.saveYamlToProp(yamlFile, true);
-                    initLoadSqlListConfig();
+                    initLoadSqlListConfig(null);
                 } catch (Exception ex) {
                     JCommonUtil.handleException(ex);
                 }
@@ -2209,7 +2218,7 @@ public class FastDBQueryUI extends JFrame {
             JTableUtil.defaultSetting(queryResultTable);
 
             // 初始化 sqlList
-            initLoadSqlListConfig();
+            initLoadSqlListConfig(null);
             sqlIdListDSMappingHandler.init();
 
             etcConfigHandler = new EtcConfigHandler();
@@ -2379,10 +2388,23 @@ public class FastDBQueryUI extends JFrame {
         }
     }
 
+
     /**
      * 初始化sqlList
      */
-    private void initLoadSqlListConfig() {
+    private void initLoadSqlListConfig(Boolean forceExecute) {
+        if (InitLoadSqlListConfigHolder.get() == false || (forceExecute != null && forceExecute)) {
+            InitLoadSqlListConfigHolder.set(true);
+            new Timer().schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    InitLoadSqlListConfigHolder.set(false);
+                }
+            }, 500);
+        } else {
+            return;
+        }
+
         sqlIdConfigBeanHandler.init(sqlIdCategoryComboBox_Auto.getTextComponent().getText());
         sqlIdListDSMappingHandler.init();
 
@@ -2672,7 +2694,7 @@ public class FastDBQueryUI extends JFrame {
             sqlParameterConfigLoadHandler.init(bean.getUniqueKey());
 
             // 刷新sqlList
-            initLoadSqlListConfig();
+            initLoadSqlListConfig(null); 
             sqlIdListDSMappingHandler.init();
 
             // 儲存變更
@@ -5620,7 +5642,7 @@ public class FastDBQueryUI extends JFrame {
 
             JCommonUtil._jOptionPane_showMessageDialog_info("刪除" + (!paramFile.exists() ? "成功" : "失敗"));
 
-            initLoadSqlListConfig();
+            initLoadSqlListConfig(null);
         }
     }
 
@@ -5661,14 +5683,22 @@ public class FastDBQueryUI extends JFrame {
         Properties sqlIdListProp;
         List<SqlIdConfigBean> lst = new ArrayList<SqlIdConfigBean>();
         JTextComponent registerComponent;
+        JTextField ignoreComponent = new JTextField();
 
         private void setRegisterComponent(JTextComponent registerComponent) {
             this.registerComponent = registerComponent;
         }
 
+        private void setRegisterComponentIgnore() {
+            this.registerComponent = ignoreComponent;
+        }
+
         private boolean isOkRegisterComponent() {
             if (registerComponent == null) {
                 return true;
+            }
+            if (registerComponent == ignoreComponent) {
+                return false;
             }
             for (JTextComponent comp : new JTextComponent[] { sqlQueryText, //
                     sqlContentFilterText, //
@@ -6405,7 +6435,7 @@ public class FastDBQueryUI extends JFrame {
     }
 
     public void reloadAllProperties() {
-        initLoadSqlListConfig();
+        initLoadSqlListConfig(null);
         sqlIdListDSMappingHandler.init();
         // loadParameterTableConfig();//不需要
         refSearchListConfigHandler.reload();
@@ -6646,7 +6676,7 @@ public class FastDBQueryUI extends JFrame {
                 sqlIdConfigBeanHandler.save(bean);
             }
 
-            initLoadSqlListConfig();
+            initLoadSqlListConfig(null);
             JCommonUtil._jOptionPane_showMessageDialog_info("已修正為 : " + bean.getUniqueKey());
 
             // 改變TabUI標題
@@ -9039,7 +9069,7 @@ public class FastDBQueryUI extends JFrame {
     }
 
     // --------------------------------------------------------------------------------------------------------------------------
-    private static void initApplyAppMenu() {
+    private static void initApplyAppMenu(SwingTabTemplateUI TAB_UI1) {
         mAllPageProcess = new AllTabPageProcess(TAB_UI1);
 
         JMenu menu1 = JMenuAppender.newInstance("暫存頁籤")//
