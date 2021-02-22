@@ -141,6 +141,8 @@ public class AutoComboBox extends PlainDocument {
     }
 
     public void setSelectItemAndText(final Object item) {
+        // new Exception("---test---").printStackTrace();
+
         // 設定popup list
         setComboBoxPopupList(item);
 

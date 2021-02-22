@@ -103,14 +103,14 @@ public class KeyEventExecuteHandler {
                 return;
             }
 
-            JFrame relativeFrame = null;
+            final AtomicReference<JFrame> relativeFrame = new AtomicReference<JFrame>();
             if (self instanceof JFrame) {
-                relativeFrame = (JFrame) self;
+                relativeFrame.set((JFrame) self);
             }
 
             final AtomicReference<JProgressBarHelper> proHelper = new AtomicReference<JProgressBarHelper>();
             if (StringUtils.isNotBlank(title)) {
-                proHelper.set(JProgressBarHelper.newInstance(relativeFrame, title));
+                proHelper.set(JProgressBarHelper.newInstance(relativeFrame.get(), title));
                 proHelper.get().indeterminate(true);
                 proHelper.get().modal(false);
                 proHelper.get().build();
@@ -120,15 +120,30 @@ public class KeyEventExecuteHandler {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
+                    System.out.println("===========================================");
+                    System.out.println("= KeyEventExecuteHandler start            =");
+                    System.out.println("===========================================");
                     try {
+                        System.out.println("--------------------------A");
                         runnable.run();
+                        System.out.println("--------------------------B");
                     } catch (Throwable ex) {
                         JCommonUtil.handleException(ex);
                     } finally {
+                        System.out.println("===========================================");
+                        System.out.println("= KeyEventExecuteHandler END              =");
+                        System.out.println("===========================================");
+
+                        System.out.println("--------------------------1");
                         if (proHelper.get() != null) {
+                            System.out.println("--------------------------2");
                             proHelper.get().dismiss();
+                            System.out.println("--------------------------3");
                         }
+                        System.out.println("--------------------------4");
                         isPrecedingExeucte.set(false);
+                        System.out.println("--------------------------5");
+                        
                         System.out.println("KeyEventExecuteHandler ... exe done!!");
                     }
                 }

@@ -75,6 +75,8 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.MenuKeyEvent;
 import javax.swing.event.MenuKeyListener;
@@ -416,6 +418,7 @@ public class FastDBQueryUI extends JFrame {
     private JLabel lblNewLabel_23;
     private JCheckBox queryResultFakeDataChk;
     private AtomicBoolean InitLoadSqlListConfigHolder = new AtomicBoolean(false);
+    private AtomicBoolean executeSqlButtonClickHolder = new AtomicBoolean(false);
 
     private final Predicate IGNORE_PREDICT = new Predicate() {
         @Override
@@ -549,6 +552,20 @@ public class FastDBQueryUI extends JFrame {
         tabbedPane = new JTabbedPane(JTabbedPane.TOP);
         contentPane.add(tabbedPane, BorderLayout.CENTER);
 
+        tabbedPane.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                switch (tabbedPane.getSelectedIndex()) {
+                case 3:
+                    //InitLoadSqlListConfigHolder.set(true);
+                    break;
+                default:
+                    //InitLoadSqlListConfigHolder.set(false);
+                    break;
+                }
+            }
+        });
+
         JPanel panel = new JPanel();
         tabbedPane.addTab("Sql列表", null, panel, null);
         panel.setLayout(new BorderLayout(0, 0));
@@ -680,15 +697,17 @@ public class FastDBQueryUI extends JFrame {
                 }
             });
             text.getDocument().addDocumentListener(JCommonUtil.getDocumentListener(new HandleDocumentEvent() {
+
                 @Override
                 public void process(DocumentEvent event) {
                     try {
                         // 初始化 sqlList
                         sqlIdConfigBeanHandler.setRegisterComponent(text);
                         Boolean forceExecute = null;
-                        if (text == sqlIdCategoryComboBox4Tab1_Auto.getTextComponent()) {
-                            forceExecute = true;
-                        }
+                        // if (text ==
+                        // sqlIdCategoryComboBox4Tab1_Auto.getTextComponent()) {
+                        // forceExecute = true;
+                        // }
                         initLoadSqlListConfig(forceExecute);
                     } catch (Exception e) {
                         JCommonUtil.handleException(e);
@@ -2456,12 +2475,7 @@ public class FastDBQueryUI extends JFrame {
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
         } finally {
-            new Timer().schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    InitLoadSqlListConfigHolder.set(false);
-                }
-            }, 300);
+            resetInitLoadSqlListConfigHolder(300);
         }
     }
 
@@ -2773,18 +2787,27 @@ public class FastDBQueryUI extends JFrame {
         return sql;
     }
 
+
     /**
      * 執行sql
      */
     private void executeSqlButtonClick() {
         long startTime = System.currentTimeMillis();
         try {
+            if (executeSqlButtonClickHolder.get() == false) {
+                executeSqlButtonClickHolder.set(true);
+            } else {
+                System.out.println("! executeSqlButtonClick 執行中!!");
+                return;
+            }
+
             // init
             {
                 isResetQuery = true;
                 filterRowsQueryList = null;// rows 過濾清除
                 importExcelSheetName = null; // 清除匯入黨名
                 queryResultTimeLbl.setText("");
+                InitLoadSqlListConfigHolder.set(true);
             }
 
             JTableUtil util = JTableUtil.newInstance(parametersTable);
@@ -2913,6 +2936,7 @@ public class FastDBQueryUI extends JFrame {
             mSqlIdExecuteTypeHandler.logExecuteType();
 
             // 更新查詢時間
+            sqlIdConfigBeanHandler.setRegisterComponentIgnore();
             sqlIdConfigBeanHandler.updateQueryTime();
 
             // 設定新開視窗預設值
@@ -2934,7 +2958,18 @@ public class FastDBQueryUI extends JFrame {
             BigDecimal duringTime = new BigDecimal(System.currentTimeMillis() - startTime).divide(new BigDecimal(1000), 3, BigDecimal.ROUND_HALF_EVEN);
             queryResultTimeLbl.setText("查詢耗時:  " + duringTime + " 秒");
             JTableUtil.newInstance(queryResultTable).setRowHeightByFontSize();
+            executeSqlButtonClickHolder.set(false);
+            resetInitLoadSqlListConfigHolder(500);
         }
+    }
+
+    private void resetInitLoadSqlListConfigHolder(final long timeout) {
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                InitLoadSqlListConfigHolder.set(false);
+            }
+        }, timeout);
     }
 
     /**
@@ -5734,7 +5769,7 @@ public class FastDBQueryUI extends JFrame {
 
         public void save(SqlIdConfigBean b) {
             b.validate();
-            init("");
+            init_withoutUpdate("");
             if (lst.contains(b)) {
                 SqlIdConfigBean b2 = lst.get(lst.indexOf(b));
                 b2.category = b.category;
@@ -5802,7 +5837,33 @@ public class FastDBQueryUI extends JFrame {
                 FileUtil.copyFile(sqlIdListFile, backupFile);
             }
         }
+        
+        private void init_withoutUpdate(String category) {
+            if (!sqlIdListFile.exists()) {
+                try {
+                    sqlIdListFile.createNewFile();
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            } else {
+                backupFile();
+            }
 
+            lst.clear();
+            sqlIdListProp = PropertiesUtil.loadProperties(sqlIdListFile, null, false);
+            for (Enumeration<Object> enu = sqlIdListProp.keys(); enu.hasMoreElements();) {
+                String key = (String) enu.nextElement();
+                String value = sqlIdListProp.getProperty(key);
+                SqlIdConfigBean bean = SqlIdConfigBean.of(key, value);
+                if (!lst.contains(bean)) {
+                    lst.add(bean);
+                }
+            }
+            ListUtil.sortIgnoreCase(lst);
+            List<String> categoryLst = getCategoryLst(lst);
+            sqlIdCategoryComboBox_Auto.applyComboxBoxList(categoryLst, category);
+        }
+        
         private void init(String category) {
             if (!sqlIdListFile.exists()) {
                 try {

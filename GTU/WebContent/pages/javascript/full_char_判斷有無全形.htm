@@ -1,0 +1,31 @@
+<html>
+<head>
+	<script type="text/javascript">
+	function isASCII(str, extended) {
+	    return (extended ? /^[\x00-\xFF]*$/ : /^[\x00-\x7F]*$/).test(str);
+	}
+
+	function test() {
+		var value = document.querySelector("input[name=field1]").value;
+		if(isASCII(value, false)) {
+			alert('不可含半形');
+			return false;
+		}
+		if(/[a-zA-Z0-9]+/.test(value)) {
+			alert('不可含半形');
+			return false;
+		}
+		if(/[ａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺ０１２３４５６７８９]+/.test(value)) {
+			alert('不可含半形');
+			return false;
+		}
+		alert('正確');
+		return true;
+	}
+	</script>
+</head>
+<body>
+	<input type="text" name="field1" />
+	<input type="button" value="test" onclick="test()" />
+</body>
+</html>
