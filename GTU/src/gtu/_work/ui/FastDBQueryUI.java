@@ -557,10 +557,10 @@ public class FastDBQueryUI extends JFrame {
             public void stateChanged(ChangeEvent e) {
                 switch (tabbedPane.getSelectedIndex()) {
                 case 3:
-                    //InitLoadSqlListConfigHolder.set(true);
+                    // InitLoadSqlListConfigHolder.set(true);
                     break;
                 default:
-                    //InitLoadSqlListConfigHolder.set(false);
+                    // InitLoadSqlListConfigHolder.set(false);
                     break;
                 }
             }
@@ -2403,10 +2403,10 @@ public class FastDBQueryUI extends JFrame {
             return;
         }
         try {
-            sqlIdConfigBeanHandler.init(sqlIdCategoryComboBox_Auto.getTextComponent().getText());
+            sqlIdConfigBeanHandler.init_withoutUpdate("");
             sqlIdListDSMappingHandler.init();
 
-            String categoryTextFilter = StringUtils.trimToEmpty(sqlIdCategoryComboBox4Tab1_Auto.getTextComponent().getText()).toLowerCase();
+            String categoryTextFilter = StringUtils.trimToEmpty(sqlIdConfigBeanHandler.getCurrentCategory()).toLowerCase();
             String queryText = StringUtils.trimToEmpty(sqlQueryText.getText()).toLowerCase();
             String contentFilterText = StringUtils.trimToEmpty(sqlContentFilterText.getText()).toLowerCase();
             String mappingFilterText = StringUtils.trimToEmpty(sqlMappingFilterText_Auto.getTextComponent().getText()).toLowerCase();
@@ -2786,7 +2786,6 @@ public class FastDBQueryUI extends JFrame {
         }
         return sql;
     }
-
 
     /**
      * 執行sql
@@ -5708,6 +5707,7 @@ public class FastDBQueryUI extends JFrame {
         List<SqlIdConfigBean> lst = new ArrayList<SqlIdConfigBean>();
         JTextComponent registerComponent;
         JTextField ignoreComponent = new JTextField();
+        String currentCategory;
 
         private void setRegisterComponent(JTextComponent registerComponent) {
             this.registerComponent = registerComponent;
@@ -5717,6 +5717,16 @@ public class FastDBQueryUI extends JFrame {
             this.registerComponent = ignoreComponent;
         }
 
+        private void initSetCurrentCategory() {
+            if (sqlMappingFilterText_Auto.getTextComponent() == this.registerComponent) {
+                currentCategory = sqlMappingFilterText_Auto.getTextComponent().getText();
+            }
+            if (sqlIdCategoryComboBox4Tab1_Auto.getTextComponent() == this.registerComponent) {
+                currentCategory = sqlIdCategoryComboBox4Tab1_Auto.getTextComponent().getText();
+            }
+            currentCategory = StringUtils.trimToEmpty(currentCategory);
+        }
+
         private boolean isOkRegisterComponent() {
             if (registerComponent == null) {
                 return true;
@@ -5724,6 +5734,7 @@ public class FastDBQueryUI extends JFrame {
             if (registerComponent == ignoreComponent) {
                 return false;
             }
+            initSetCurrentCategory();
             for (JTextComponent comp : new JTextComponent[] { sqlQueryText, //
                     sqlContentFilterText, //
                     sqlMappingFilterText_Auto.getTextComponent(), //
@@ -5837,7 +5848,7 @@ public class FastDBQueryUI extends JFrame {
                 FileUtil.copyFile(sqlIdListFile, backupFile);
             }
         }
-        
+
         private void init_withoutUpdate(String category) {
             if (!sqlIdListFile.exists()) {
                 try {
@@ -5861,9 +5872,10 @@ public class FastDBQueryUI extends JFrame {
             }
             ListUtil.sortIgnoreCase(lst);
             List<String> categoryLst = getCategoryLst(lst);
-            sqlIdCategoryComboBox_Auto.applyComboxBoxList(categoryLst, category);
+            // sqlIdCategoryComboBox_Auto.applyComboxBoxList(categoryLst,
+            // category);
         }
-        
+
         private void init(String category) {
             if (!sqlIdListFile.exists()) {
                 try {
@@ -5910,6 +5922,10 @@ public class FastDBQueryUI extends JFrame {
         private void updateSqlIdCategoryComboBox4Tab1() {
             String defaultText = sqlIdCategoryComboBox4Tab1_Auto.getTextComponent().getText();
             sqlIdCategoryComboBox4Tab1_Auto.applyComboxBoxList(sqlIdCategoryComboBox_Auto.getDropdownList(), defaultText);
+        }
+
+        private String getCurrentCategory() {
+            return currentCategory;
         }
     }
 
@@ -9375,10 +9391,17 @@ public class FastDBQueryUI extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    String tableNameAndSchema = StringUtils.trimToEmpty(JCommonUtil._jOptionPane_showInputDialog("schema.table", ""));
-                    if (StringUtils.isBlank(tableNameAndSchema)) {
-                        return;
+                    String tableNameAndSchema = "";
+                    if (StringUtils.isNotBlank(sqlTextArea.getSelectedText())) {
+                        tableNameAndSchema = StringUtils.trimToEmpty(sqlTextArea.getSelectedText());
                     }
+                    if (StringUtils.isBlank(tableNameAndSchema)) {
+                        tableNameAndSchema = StringUtils.trimToEmpty(JCommonUtil._jOptionPane_showInputDialog("schema.table", ""));
+                        if (StringUtils.isBlank(tableNameAndSchema)) {
+                            return;
+                        }
+                    }
+
                     Pair<String, String> tabNSch = getTableNSchema(tableNameAndSchema);
                     StringBuilder sb1 = new StringBuilder();
                     sb1.append("   SELECT cols.table_name, cols.column_name, cols.position, cons.status, cons.owner, cons.CONSTRAINT_NAME   \n");//
@@ -9516,6 +9539,8 @@ public class FastDBQueryUI extends JFrame {
             }
         }
     }
+    // --------------------------------------------------------------------------------------------------------------------------
+    // --------------------------------------------------------------------------------------------------------------------------
     // --------------------------------------------------------------------------------------------------------------------------
     // --------------------------------------------------------------------------------------------------------------------------
     // --------------------------------------------------------------------------------------------------------------------------
