@@ -5707,7 +5707,6 @@ public class FastDBQueryUI extends JFrame {
         List<SqlIdConfigBean> lst = new ArrayList<SqlIdConfigBean>();
         JTextComponent registerComponent;
         JTextField ignoreComponent = new JTextField();
-        String currentCategory;
 
         private void setRegisterComponent(JTextComponent registerComponent) {
             this.registerComponent = registerComponent;
@@ -5717,16 +5716,6 @@ public class FastDBQueryUI extends JFrame {
             this.registerComponent = ignoreComponent;
         }
 
-        private void initSetCurrentCategory() {
-            if (sqlMappingFilterText_Auto.getTextComponent() == this.registerComponent) {
-                currentCategory = sqlMappingFilterText_Auto.getTextComponent().getText();
-            }
-            if (sqlIdCategoryComboBox4Tab1_Auto.getTextComponent() == this.registerComponent) {
-                currentCategory = sqlIdCategoryComboBox4Tab1_Auto.getTextComponent().getText();
-            }
-            currentCategory = StringUtils.trimToEmpty(currentCategory);
-        }
-
         private boolean isOkRegisterComponent() {
             if (registerComponent == null) {
                 return true;
@@ -5734,11 +5723,10 @@ public class FastDBQueryUI extends JFrame {
             if (registerComponent == ignoreComponent) {
                 return false;
             }
-            initSetCurrentCategory();
             for (JTextComponent comp : new JTextComponent[] { sqlQueryText, //
                     sqlContentFilterText, //
                     sqlMappingFilterText_Auto.getTextComponent(), //
-                    // sqlIdCategoryComboBox4Tab1_Auto.getTextComponent()//
+                    sqlIdCategoryComboBox4Tab1_Auto.getTextComponent()//
             }) {//
                 if (comp == registerComponent) {
                     return true;
@@ -5925,6 +5913,14 @@ public class FastDBQueryUI extends JFrame {
         }
 
         private String getCurrentCategory() {
+            String currentCategory = "";
+            if (sqlMappingFilterText_Auto.getTextComponent() == this.registerComponent) {
+                currentCategory = sqlMappingFilterText_Auto.getTextComponent().getText();
+            }
+            if (sqlIdCategoryComboBox4Tab1_Auto.getTextComponent() == this.registerComponent) {
+                currentCategory = sqlIdCategoryComboBox4Tab1_Auto.getTextComponent().getText();
+            }
+            currentCategory = StringUtils.trimToEmpty(currentCategory);
             return currentCategory;
         }
     }
