@@ -125,10 +125,10 @@ public class KeyEventExecuteHandler {
                     } catch (Throwable ex) {
                         JCommonUtil.handleException(ex);
                     } finally {
-                        isPrecedingExeucte.set(false);
                         if (proHelper.get() != null) {
                             proHelper.get().dismiss();
                         }
+                        isPrecedingExeucte.set(false);
                         System.out.println("KeyEventExecuteHandler ... exe done!!");
                     }
                 }

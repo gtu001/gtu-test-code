@@ -417,7 +417,6 @@ public class FastDBQueryUI extends JFrame {
     private JCheckBox queryResultFakeDataChk;
     private AtomicBoolean InitLoadSqlListConfigHolder = new AtomicBoolean(false);
 
-
     private final Predicate IGNORE_PREDICT = new Predicate() {
         @Override
         public boolean evaluate(Object input) {
@@ -2375,92 +2374,95 @@ public class FastDBQueryUI extends JFrame {
         }
     }
 
-
     /**
      * 初始化sqlList
      */
     private void initLoadSqlListConfig(Boolean forceExecute) {
         if (InitLoadSqlListConfigHolder.get() == false || (forceExecute != null && forceExecute)) {
             InitLoadSqlListConfigHolder.set(true);
+        } else {
+            return;
+        }
+        try {
+            sqlIdConfigBeanHandler.init(sqlIdCategoryComboBox_Auto.getTextComponent().getText());
+            sqlIdListDSMappingHandler.init();
+
+            String categoryTextFilter = StringUtils.trimToEmpty(sqlIdCategoryComboBox4Tab1_Auto.getTextComponent().getText()).toLowerCase();
+            String queryText = StringUtils.trimToEmpty(sqlQueryText.getText()).toLowerCase();
+            String contentFilterText = StringUtils.trimToEmpty(sqlContentFilterText.getText()).toLowerCase();
+            String mappingFilterText = StringUtils.trimToEmpty(sqlMappingFilterText_Auto.getTextComponent().getText()).toLowerCase();
+
+            List<SqlIdConfigBean> sqlIdList = new ArrayList<SqlIdConfigBean>();
+            for (SqlIdConfigBean enu : sqlIdConfigBeanHandler.lst) {
+                String sqlId = enu.sqlId;
+                String category = StringUtils.trimToEmpty(enu.category).toLowerCase();
+                String sqlIdCompare = sqlId.toLowerCase().toLowerCase();
+                String content = StringUtils.trimToEmpty(enu.sql).toLowerCase();
+                String comment = StringUtils.trimToEmpty(enu.sqlComment).toLowerCase();
+
+                boolean findOk = false;
+
+                if (StringUtils.isBlank(queryText) && StringUtils.isBlank(contentFilterText)) {
+                    findOk = true;
+                } else {
+                    if (StringUtils.isNotBlank(queryText)) {
+                        if ((category.contains(queryText) || sqlIdCompare.contains(queryText) || comment.contains(queryText))) {
+                            findOk = true;
+                        }
+                    }
+
+                    if (!findOk && StringUtils.isNotBlank(contentFilterText)) {
+                        if (content.contains(contentFilterText)) {
+                            findOk = true;
+                        } else if (mSqlIdColumnHolder.isColumnExists(sqlId, contentFilterText)) {
+                            findOk = true;
+                        }
+                    }
+                }
+
+                if (StringUtils.isNotBlank(mappingFilterText)) {
+                    if (findOk) {
+                        if (StringUtils.isNotBlank(sqlIdListDSMappingHandler.getProperty(sqlId)) && //
+                                sqlIdListDSMappingHandler.getProperty(sqlId).toLowerCase().contains(mappingFilterText)) {
+                        } else {
+                            findOk = false;
+                        }
+                    }
+                }
+
+                if (StringUtils.isNotBlank(categoryTextFilter)) {
+                    if (findOk) {
+                        if (StringUtils.isNotBlank(category) && //
+                                category.toLowerCase().contains(categoryTextFilter)) {
+                        } else {
+                            findOk = false;
+                        }
+                    }
+                }
+
+                if (findOk) {
+                    sqlIdList.add(enu);
+                }
+            }
+
+            // 資料排序
+            sortSqlListProcess(sqlIdList);
+
+            DefaultListModel model = JListUtil.createModel();
+            for (SqlIdConfigBean s : sqlIdList) {
+                model.addElement(s);
+            }
+            sqlList.setModel(model);
+        } catch (Exception ex) {
+            JCommonUtil.handleException(ex);
+        } finally {
             new Timer().schedule(new TimerTask() {
                 @Override
                 public void run() {
                     InitLoadSqlListConfigHolder.set(false);
                 }
-            }, 500);
-        } else {
-            return;
+            }, 300);
         }
-
-        sqlIdConfigBeanHandler.init(sqlIdCategoryComboBox_Auto.getTextComponent().getText());
-        sqlIdListDSMappingHandler.init();
-
-        String categoryTextFilter = StringUtils.trimToEmpty(sqlIdCategoryComboBox4Tab1_Auto.getTextComponent().getText()).toLowerCase();
-        String queryText = StringUtils.trimToEmpty(sqlQueryText.getText()).toLowerCase();
-        String contentFilterText = StringUtils.trimToEmpty(sqlContentFilterText.getText()).toLowerCase();
-        String mappingFilterText = StringUtils.trimToEmpty(sqlMappingFilterText_Auto.getTextComponent().getText()).toLowerCase();
-
-        List<SqlIdConfigBean> sqlIdList = new ArrayList<SqlIdConfigBean>();
-        for (SqlIdConfigBean enu : sqlIdConfigBeanHandler.lst) {
-            String sqlId = enu.sqlId;
-            String category = StringUtils.trimToEmpty(enu.category).toLowerCase();
-            String sqlIdCompare = sqlId.toLowerCase().toLowerCase();
-            String content = StringUtils.trimToEmpty(enu.sql).toLowerCase();
-            String comment = StringUtils.trimToEmpty(enu.sqlComment).toLowerCase();
-
-            boolean findOk = false;
-
-            if (StringUtils.isBlank(queryText) && StringUtils.isBlank(contentFilterText)) {
-                findOk = true;
-            } else {
-                if (StringUtils.isNotBlank(queryText)) {
-                    if ((category.contains(queryText) || sqlIdCompare.contains(queryText) || comment.contains(queryText))) {
-                        findOk = true;
-                    }
-                }
-
-                if (!findOk && StringUtils.isNotBlank(contentFilterText)) {
-                    if (content.contains(contentFilterText)) {
-                        findOk = true;
-                    } else if (mSqlIdColumnHolder.isColumnExists(sqlId, contentFilterText)) {
-                        findOk = true;
-                    }
-                }
-            }
-
-            if (StringUtils.isNotBlank(mappingFilterText)) {
-                if (findOk) {
-                    if (StringUtils.isNotBlank(sqlIdListDSMappingHandler.getProperty(sqlId)) && //
-                            sqlIdListDSMappingHandler.getProperty(sqlId).toLowerCase().contains(mappingFilterText)) {
-                    } else {
-                        findOk = false;
-                    }
-                }
-            }
-
-            if (StringUtils.isNotBlank(categoryTextFilter)) {
-                if (findOk) {
-                    if (StringUtils.isNotBlank(category) && //
-                            category.toLowerCase().contains(categoryTextFilter)) {
-                    } else {
-                        findOk = false;
-                    }
-                }
-            }
-
-            if (findOk) {
-                sqlIdList.add(enu);
-            }
-        }
-
-        // 資料排序
-        sortSqlListProcess(sqlIdList);
-
-        DefaultListModel model = JListUtil.createModel();
-        for (SqlIdConfigBean s : sqlIdList) {
-            model.addElement(s);
-        }
-        sqlList.setModel(model);
     }
 
     // ---------------------------------------------db conn combox ↓↓↓↓↓↓
@@ -2681,7 +2683,7 @@ public class FastDBQueryUI extends JFrame {
             sqlParameterConfigLoadHandler.init(bean.getUniqueKey());
 
             // 刷新sqlList
-            initLoadSqlListConfig(null); 
+            initLoadSqlListConfig(null);
             sqlIdListDSMappingHandler.init();
 
             // 儲存變更
