@@ -2963,10 +2963,12 @@ public class FastDBQueryUI extends JFrame {
     }
 
     private void resetInitLoadSqlListConfigHolder(final long timeout) {
-        new Timer().schedule(new TimerTask() {
+        final Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
             @Override
             public void run() {
                 InitLoadSqlListConfigHolder.set(false);
+                timer.cancel();
             }
         }, timeout);
     }
@@ -4795,7 +4797,7 @@ public class FastDBQueryUI extends JFrame {
 
                 prog.dismissByMax();
             }
-        }).start();
+        }, "---thread1").start();
     }
 
     private void excelImportSingleSheet(File xlsfile) {
@@ -4925,7 +4927,7 @@ public class FastDBQueryUI extends JFrame {
 
                 prog.dismiss();
             }
-        }).start();
+        }, "---thread1").start();
     }
 
     private void excelExportBtnAction() {
@@ -5140,7 +5142,7 @@ public class FastDBQueryUI extends JFrame {
                             JCommonUtil._jOptionPane_showMessageDialog_info("檔名有誤!");
                         }
                     }
-                }).start();
+                }, "---thread1").start();
             } else if (radio_export_json == selBtn) {
                 final AtomicReference<Triple<List<String>, List<Class<?>>, List<Object[]>>> tmpQueryList = new AtomicReference<Triple<List<String>, List<Class<?>>, List<Object[]>>>();
                 if (filterRowsQueryList != null && !isResetQuery) {
@@ -5172,7 +5174,7 @@ public class FastDBQueryUI extends JFrame {
                     public void run() {
                         showJsonArry(tmpQueryList.get(), Integer.MAX_VALUE, prog);
                     }
-                }).start();
+                }, "---thread1").start();
             }
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
@@ -8313,7 +8315,7 @@ public class FastDBQueryUI extends JFrame {
                                 prog.dismiss();
                                 loadingInfoListener = loadingInfoListener_DEFAULT;
                             }
-                        }).start();
+                        }, "---thread1").start();
                     }
                 }
             });

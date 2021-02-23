@@ -1,10 +1,8 @@
 package gtu.swing.util;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
-import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
@@ -14,12 +12,20 @@ import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyVetoException;
+import java.beans.VetoableChangeListener;
+import java.beans.VetoableChangeSupport;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.TreeMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
+import javax.swing.DefaultSingleSelectionModel;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
@@ -45,11 +51,14 @@ public class SwingTabTemplateUI {
     private SysTrayUtil sysTray = SysTrayUtil.newInstance();
     private boolean isFixTabName;
     private List<String> tooltipLst = new ArrayList<String>();
+    private static AtomicBoolean MY_CLICK_TAB_EVENT_HOLDER = new AtomicBoolean(false);
 
     /**
      * Launch the application.
      */
     public static void main(String[] args) {
+        SwingTabTemplateUI TAB = SwingTabTemplateUI.newInstance("XXXXX", null, null, false, null);
+        TAB.startUI();
     }
 
     public static SwingTabTemplateUI newInstance(String title, String iconPath, Class<?> uiJframeClass, boolean initOneTab, SwingTabTemplateUI_Callback callback) {
@@ -76,6 +85,8 @@ public class SwingTabTemplateUI {
 
         tabbedPane = new DraggableTabbedPane();// new
                                                // JTabbedPane(JTabbedPane.TOP);
+        tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
+
         tabbedPane.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
                 System.out.println("changeTab : " + tabbedPane.getSelectedIndex());
@@ -91,6 +102,7 @@ public class SwingTabTemplateUI {
                 }
             }
         });
+
         tabbedPane.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -98,6 +110,16 @@ public class SwingTabTemplateUI {
                     final int idx = tabbedPane.getSelectedIndex();
                     final int clickTabIdx = getClickTabIndex(e);
                     System.out.println("tab clk " + idx + " / " + clickTabIdx);
+
+                    if (JMouseEventUtil.buttonLeftClick(2, e)) {
+                        if (idx == clickTabIdx) {
+                            String newName = JCommonUtil._jOptionPane_showInputDialog("修改分頁名子", tabbedPane.getTitleAt(idx));
+                            if (StringUtils.isBlank(newName)) {
+                                return;
+                            }
+                            tabbedPane.setTitleAt(idx, newName);
+                        }
+                    }
 
                     if (JMouseEventUtil.buttonRightClick(1, e)) {
                         JPopupMenuUtil popupUtil = JPopupMenuUtil.newInstance(tabbedPane);//
@@ -174,21 +196,12 @@ public class SwingTabTemplateUI {
                         popupUtil.applyEvent(e);
                         popupUtil.show();
                     }
-
-                    if (JMouseEventUtil.buttonLeftClick(2, e)) {
-                        if (idx == clickTabIdx) {
-                            String newName = JCommonUtil._jOptionPane_showInputDialog("修改分頁名子", tabbedPane.getTitleAt(idx));
-                            if (StringUtils.isBlank(newName)) {
-                                return;
-                            }
-                            tabbedPane.setTitleAt(idx, newName);
-                        }
-                    }
                 } catch (Exception ex) {
                     JCommonUtil.handleException(ex);
                 }
             }
         });
+
         tabbedPane.setEventOfMove(new DraggableTabbedPaneMove() {
             @Override
             public void beforeMoveFromTo(int fromIndex, int toIndex) {
@@ -220,6 +233,11 @@ public class SwingTabTemplateUI {
                 flushTooltips();
             }
         });
+
+        VetoableSingleSelectionModel model = new VetoableSingleSelectionModel();
+        model.addVetoableChangeListener(validator);
+        tabbedPane.setModel(model);
+
         jframe.addWindowFocusListener(new WindowFocusListener() {
 
             @Override
@@ -379,6 +397,9 @@ public class SwingTabTemplateUI {
     public JFrame addTab(String tabName, boolean moveToNew) {
         JFrame childFrame = null;
         try {
+            if (this.uiJframeClass == null) {
+                this.uiJframeClass = JFrame.class;
+            }
             childFrame = (JFrame) this.uiJframeClass.newInstance();
             JPanel panel = new JPanel();
             tabbedPane.addTab(tabName, null, panel, null);
@@ -511,6 +532,80 @@ public class SwingTabTemplateUI {
             }
             String html = "<html><font color='BLUE'><b>" + tabIndex1 + "</b></font>" + StringUtils.trimToEmpty(tooltip1) + "<html>";
             tabbedPane.setToolTipTextAt(tabIndex1, html);
+        }
+    }
+
+    VetoableChangeListener validator = new VetoableChangeListener() {
+        @Override
+        public void vetoableChange(PropertyChangeEvent evt) throws PropertyVetoException {
+            int oldSelection = (int) evt.getOldValue();
+            if ((oldSelection == -1) || isValidTab(evt))
+                return;
+            throw new PropertyVetoException("change not valid", evt);
+        }
+
+        private boolean isValidTab(PropertyChangeEvent evt) {
+            // implement your validation logic here
+            // System.out.println("MySelection --- " + evt);
+
+            // 自訂click event ↓↓↓↓↓↓
+            if (MY_CLICK_TAB_EVENT_HOLDER.get() == false) {
+                MY_CLICK_TAB_EVENT_HOLDER.set(true);
+                final Timer timer = new Timer();
+                timer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        MY_CLICK_TAB_EVENT_HOLDER.set(false);
+                        timer.cancel();
+                    }
+                }, 300);
+                return true;
+            }
+            // 自訂click event ↑↑↑↑↑↑
+            return false;
+        }
+    };
+
+    public static class VetoableSingleSelectionModel extends DefaultSingleSelectionModel {
+
+        private VetoableChangeSupport vetoableChangeSupport;
+
+        @Override
+        public void setSelectedIndex(int index) {
+            if (getSelectedIndex() == index)
+                return;
+            try {
+                fireVetoableChange(getSelectedIndex(), index);
+            } catch (PropertyVetoException e) {
+                return;
+            }
+            super.setSelectedIndex(index);
+        }
+
+        private void fireVetoableChange(int oldSelectionIndex, int newSelectionIndex) throws PropertyVetoException {
+            if (!isVetoable())
+                return;
+            vetoableChangeSupport.fireVetoableChange("selectedIndex", oldSelectionIndex, newSelectionIndex);
+
+        }
+
+        private boolean isVetoable() {
+            if (vetoableChangeSupport == null)
+                return false;
+            return vetoableChangeSupport.hasListeners(null);
+        }
+
+        public void addVetoableChangeListener(VetoableChangeListener l) {
+            if (vetoableChangeSupport == null) {
+                vetoableChangeSupport = new VetoableChangeSupport(this);
+            }
+            vetoableChangeSupport.addVetoableChangeListener(l);
+        }
+
+        public void removeVetoableChangeListener(VetoableChangeListener l) {
+            if (vetoableChangeSupport == null)
+                return;
+            vetoableChangeSupport.removeVetoableChangeListener(l);
         }
     }
 }
