@@ -538,7 +538,7 @@ public class SwingTabTemplateUI {
     VetoableChangeListener validator = new VetoableChangeListener() {
         @Override
         public void vetoableChange(PropertyChangeEvent evt) throws PropertyVetoException {
-            int oldSelection = (int) evt.getOldValue();
+            int oldSelection = (Integer) evt.getOldValue();
             if ((oldSelection == -1) || isValidTab(evt))
                 return;
             throw new PropertyVetoException("change not valid", evt);
@@ -546,7 +546,6 @@ public class SwingTabTemplateUI {
 
         private boolean isValidTab(PropertyChangeEvent evt) {
             // implement your validation logic here
-            // System.out.println("MySelection --- " + evt);
 
             // 自訂click event ↓↓↓↓↓↓
             if (MY_CLICK_TAB_EVENT_HOLDER.get() == false) {
