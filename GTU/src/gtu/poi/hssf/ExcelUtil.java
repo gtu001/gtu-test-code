@@ -37,6 +37,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import gtu.file.FileUtil;
 import gtu.regex.RegExpUtil;
+import gtu.swing.util.JCommonUtil;
 
 public class ExcelUtil {
 
@@ -335,6 +336,26 @@ public class ExcelUtil {
             try {
                 inputStream.close();
             } catch (IOException e) {
+            }
+        }
+    }
+
+    public void writeExcelConfirmDlg(File file, Workbook workbook, String fileLabel) {
+        fileLabel = StringUtils.trimToEmpty(fileLabel);
+        if (file.exists()) {
+            boolean overwrite = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("檔案已存在,是否覆蓋 : " + file, file.getName());
+            if (overwrite) {
+                writeExcel(file, workbook);
+                if (file.exists()) {
+                    JCommonUtil._jOptionPane_showMessageDialog_info("覆蓋" + fileLabel + "檔案:" + file);
+                }
+            } else {
+                JCommonUtil._jOptionPane_showMessageDialog_info("操作取消!");
+            }
+        } else {
+            writeExcel(file, workbook);
+            if (file.exists()) {
+                JCommonUtil._jOptionPane_showMessageDialog_info("產生" + fileLabel + "檔案:" + file);
             }
         }
     }
@@ -849,7 +870,11 @@ public class ExcelUtil {
             for (int jj = 0; jj < row.getLastCellNum(); jj++) {
                 Cell cell = row.getCell(jj);
                 if (cell != null) {
-                    cell.setCellStyle(style);
+                    if (cell.getCellStyle() != null) {
+                        cell.getCellStyle().setWrapText(true);
+                    } else {
+                        cell.setCellStyle(style);
+                    }
                 }
             }
         }

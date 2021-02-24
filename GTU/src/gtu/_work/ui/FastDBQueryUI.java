@@ -1184,6 +1184,18 @@ public class FastDBQueryUI extends JFrame {
                                     getShowAfterCurrentSQL(true);
                                 }
                             })//
+                            .addJMenuItem("以ToString()設定參數", new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    new ToStringReplaceParameterTable().execute("clipboard");
+                                }
+                            })//
+                            .addJMenuItem("以ToString()設定參數[垂]", new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    new ToStringReplaceParameterTable().execute("clipboard_vertical");
+                                }
+                            })//
                             .applyEvent(e)//
                             .show();
                 }
@@ -3473,11 +3485,11 @@ public class FastDBQueryUI extends JFrame {
                 String strValue = "";
                 if (value != null) {
                     strValue = "'" + value + "'";
-                    try {
-                        Double.parseDouble((String) value);
-                        strValue = String.valueOf(value);
-                    } catch (Exception ex) {
-                    }
+                    // try {
+                    // Double.parseDouble((String) value);
+                    // strValue = String.valueOf(value);
+                    // } catch (Exception ex) {
+                    // }
                 }
                 mth2.appendReplacement(sb3, strValue);
             }
@@ -3782,11 +3794,11 @@ public class FastDBQueryUI extends JFrame {
                 String strValue = "";
                 if (value != null) {
                     strValue = "'" + value + "'";
-                    try {
-                        Double.parseDouble((String) value);
-                        strValue = String.valueOf(value);
-                    } catch (Exception ex) {
-                    }
+                    // try {
+                    // Double.parseDouble((String) value);
+                    // strValue = String.valueOf(value);
+                    // } catch (Exception ex) {
+                    // }
                 }
                 mth2.appendReplacement(sb2, strValue);
             }
@@ -4320,6 +4332,18 @@ public class FastDBQueryUI extends JFrame {
                     }
                 });//
 
+                ppap.addJMenuItem("逆向設定參數", new ActionListener() {
+
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        try {
+                            new ToStringReplaceParameterTable().execute("selectIndex");
+                        } catch (Exception ex) {
+                            JCommonUtil.handleException(ex);
+                        }
+                    }
+                });//
+
                 ppap.addJMenuItem(addBase64Menus())//
                         .applyEvent(e)//
                         .show();
@@ -4559,7 +4583,7 @@ public class FastDBQueryUI extends JFrame {
         return chdMenu.getMenu();
     }
 
-    private String getRandom_TableNSchema() {
+    public String getRandom_TableNSchema() {
         Pattern ptn = Pattern.compile("from\\s+(\\w+[\\.\\w]+|\\w+)", Pattern.CASE_INSENSITIVE | Pattern.DOTALL | Pattern.MULTILINE);
         String sql = StringUtils.trimToEmpty(currentSQL.get());
         if (StringUtils.isBlank(sql)) {
@@ -5134,10 +5158,7 @@ public class FastDBQueryUI extends JFrame {
                         }
                         if (StringUtils.isNotBlank(filename) || !filename.endsWith(".xls")) {
                             File exportFile = new File(FileUtil.DESKTOP_DIR, filename);
-                            exlUtl.writeExcel(exportFile, wk);
-                            if (exportFile.exists()) {
-                                JCommonUtil._jOptionPane_showMessageDialog_info("匯出成功!");
-                            }
+                            exlUtl.writeExcelConfirmDlg(exportFile, wk, "匯出檔");
                         } else {
                             JCommonUtil._jOptionPane_showMessageDialog_info("檔名有誤!");
                         }
@@ -5233,6 +5254,7 @@ public class FastDBQueryUI extends JFrame {
             }
         }
         exlUtl.setSheetWidth(sheet2, new short[] { 8000, 8000 });
+        exlUtl.applyAutoHeight(sheet2, wk);
     }
 
     private void removeConnectionBtnAction() {
@@ -5493,6 +5515,17 @@ public class FastDBQueryUI extends JFrame {
                 public void actionPerformed(ActionEvent e) {
                     try {
                         new ToStringReplaceOldSql().execute("clipboard");
+                    } catch (Exception ex) {
+                        JCommonUtil.handleException(ex);
+                    }
+                }
+            });//
+
+            jpopUtil.addJMenuItem("以ToString()替換SQL條件[垂]", new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    try {
+                        new ToStringReplaceOldSql().execute("clipboard_vertical");
                     } catch (Exception ex) {
                         JCommonUtil.handleException(ex);
                     }
@@ -8863,31 +8896,51 @@ public class FastDBQueryUI extends JFrame {
     // --------------------------------------------------------------------------------------------------------------------------
 
     private class ToStringReplaceOldSql {
-        Pattern fieldEqualValuePtn = Pattern.compile("(\\w+)\\s*\\=\\s*(\\'.+?\\'|\\-?[\\.\\d]+)");
+        Pattern fieldEqualValuePtn = Pattern.compile("(\\w+)\\s*\\=\\s*(\\'.+?\\'|\\-?[\\.\\d]+|\\:\\w+)");
 
-        private boolean isQuoteStartEnd(String replaceBefore) {
-            if (replaceBefore.length() > 0 && replaceBefore.substring(0, 1).contentEquals("'") && StringUtils.substring(replaceBefore, -1).equals("'")) {
+        protected boolean isQuoteStartEnd(String replaceBefore) {
+            if (replaceBefore.length() > 0 && //
+                    replaceBefore.substring(0, 1).contentEquals("'")//
+                    && StringUtils.substring(replaceBefore, -1).equals("'")) {
                 return true;
             }
             return false;
         }
 
-        public String replaceGroup(Matcher mth, int groupIndex, String replaceStr) {
+        protected String replaceGroup(Matcher mth, int groupIndex, String replaceStr) {
             int offset = mth.start();
             int start = mth.start(groupIndex) - offset;
             int end = mth.end(groupIndex) - offset;
             String replaceBefore = mth.group(groupIndex);
-            if (isQuoteStartEnd(replaceBefore) && !isQuoteStartEnd(replaceStr)) {
+            if (// isQuoteStartEnd(replaceBefore) && //
+            !isQuoteStartEnd(replaceStr)) {
                 replaceStr = "'" + replaceStr + "'";
             }
             String groupOrigin = mth.group();
-            groupOrigin = StringUtils.rightPad(groupOrigin, mth.group().length());
+            // groupOrigin = StringUtils.rightPad(groupOrigin,
+            // mth.group().length());
             StringBuilder sb = new StringBuilder(groupOrigin);
             sb.replace(start, end, StringUtils.defaultString(replaceStr));
             return sb.toString();
         }
 
-        private void execute(String fromType) {
+        protected Object[] parseForVertical(String content) {
+            List<String> lst = StringUtil_.readContentToList(content, true, true, true);
+            List<String> titles = new ArrayList<String>();
+            List<Object> values = new ArrayList<Object>();
+            for (String splitString : lst) {
+                String[] arry = splitString.split("\\t");
+                if (arry.length == 2) {
+                    String columnName = StringUtils.trimToEmpty(arry[0]);
+                    String value = StringUtils.trimToEmpty(arry[1]);
+                    titles.add(columnName);
+                    values.add(value);
+                }
+            }
+            return new Object[] { titles, values.toArray() };
+        }
+
+        protected Object[] beforeProcess(String fromType) {
             String sql = StringUtils.defaultString(sqlTextArea.getText());
 
             ImportFromClipboard mImportFromClipboard = new ImportFromClipboard();
@@ -8901,6 +8954,12 @@ public class FastDBQueryUI extends JFrame {
                 titles = mImportFromClipboard.titles;
                 rowDataLst.addAll(mImportFromClipboard.rowLst);
 
+            } else if ("clipboard_vertical".equalsIgnoreCase(fromType)) {
+                Object[] data1 = parseForVertical(clipboardText);
+                titles = (List<String>) data1[0];
+                Object[] row = (Object[]) data1[1];
+                rowDataLst.add(row);
+
             } else if ("selectIndex".equalsIgnoreCase(fromType)) {
                 Pair<List<String>, List<Object[]>> excelImportLst = transRealRowToQuyerLstIndex();// orignQueryResult
                 titles = excelImportLst.getLeft();
@@ -8911,9 +8970,25 @@ public class FastDBQueryUI extends JFrame {
 
             if (titles == null || rowDataLst.isEmpty()) {
                 JCommonUtil._jOptionPane_showMessageDialog_error("無法選擇套用SQL[0893] : " + fromType);
+                return null;
+            }
+            return new Object[] { titles, rowDataLst, sql };
+        }
+
+        protected void execute(String fromType) {
+            Object[] data = this.beforeProcess(fromType);
+            if (data == null) {
                 return;
             }
 
+            List<String> titles = (List<String>) data[0];
+            List<Object[]> rowDataLst = (List<Object[]>) data[1];
+            String sql = (String) data[2];
+
+            this.finalProcess(titles, rowDataLst, sql);
+        }
+
+        protected void finalProcess(List<String> titles, List<Object[]> rowDataLst, String sql) {
             StringBuffer sb2 = new StringBuffer();
 
             for (Object[] rowData : rowDataLst) {
@@ -8950,6 +9025,47 @@ public class FastDBQueryUI extends JFrame {
             }
 
             sqlTextArea.setText(sb2.toString());
+        }
+    }
+
+    private class ToStringReplaceParameterTable extends ToStringReplaceOldSql {
+
+        protected void finalProcess(List<String> titles, List<Object[]> rowDataLst, String sql) {
+            if (rowDataLst.isEmpty()) {
+                return;
+            }
+
+            Object[] dataRow = rowDataLst.get(0);
+
+            JTableUtil util = JTableUtil.newInstance(parametersTable);
+            A: for (int ii = 0; ii < parametersTable.getRowCount(); ii++) {
+                Boolean isInUse = (Boolean) util.getRealValueAt(ii, ParameterTableColumnDef.USE.idx);
+                if (isInUse == null) {
+                    isInUse = false;
+                }
+
+                String columnName = (String) util.getRealValueAt(ii, ParameterTableColumnDef.COLUMN.idx);
+                for (int jj = 0; jj < titles.size(); jj++) {
+                    String columnName2 = titles.get(jj);
+                    if (StringUtils.equalsIgnoreCase(columnName, columnName2)) {
+                        util.setValueAt(true, dataRow[jj], ii, ParameterTableColumnDef.VALUE.idx);
+                        continue A;
+                    }
+                }
+            }
+        }
+
+        protected void execute(String fromType) {
+            Object[] data = this.beforeProcess(fromType);
+            if (data == null) {
+                return;
+            }
+
+            List<String> titles = (List<String>) data[0];
+            List<Object[]> rowDataLst = (List<Object[]>) data[1];
+            String sql = (String) data[2];
+
+            this.finalProcess(titles, rowDataLst, sql);
         }
     }
 

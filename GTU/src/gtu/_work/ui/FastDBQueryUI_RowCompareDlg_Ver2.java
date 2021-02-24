@@ -462,15 +462,15 @@ public class FastDBQueryUI_RowCompareDlg_Ver2 extends JDialog {
                 _parent.appendExcelSQLSheet(wb);
             }
 
-            String filename1 = FastDBQueryUI.class.getSimpleName() + "_" + DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMddHHmmss");
+            String middleName = StringUtils.trimToEmpty(_parent.getRandom_TableNSchema());
+            String filename1 = FastDBQueryUI.class.getSimpleName() + "_" + middleName + "_" + DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMddHHmmss");
             filename1 = JCommonUtil._jOptionPane_showInputDialog("輸入檔名", filename1);
             if (StringUtils.isBlank(filename1)) {
                 return;
             }
             String filename = filename1 + ".xls";
             File xlsFile = new File(FileUtil.DESKTOP_DIR, filename);
-            util.writeExcel(xlsFile, wb);
-            JCommonUtil._jOptionPane_showMessageDialog_info("產生比對檔:" + filename);
+            util.writeExcelConfirmDlg(xlsFile, wb, "比對檔");
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
         }
