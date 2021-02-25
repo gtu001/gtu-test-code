@@ -3627,7 +3627,8 @@ public class FastDBQueryUI extends JFrame {
 
                     // fix 修正回原來的 ↓↓↓↓↓↓↓
                     System.out.println("quote[2] : " + realQuoteLine);
-                    realQuoteLine = StringUtils.substring(beforeSQL, mth.start(2), mth.end(2));
+                    // realQuoteLine = StringUtils.substring(beforeSQL,
+                    // mth.start(2), mth.end(2));//<---不須修正
                     System.out.println("quote[3] : " + realQuoteLine);
                     // fix 修正回原來的 ↑↑↑↑↑↑↑
 
@@ -3667,7 +3668,8 @@ public class FastDBQueryUI extends JFrame {
                     String realQuoteLine = mth.group(3);
                     // fix 修正回原來的 ↓↓↓↓↓↓↓
                     System.out.println("quote[4] : " + realQuoteLine);
-                    realQuoteLine = StringUtils.substring(beforeSQL, mth.start(3), mth.end(3));
+                    // realQuoteLine = StringUtils.substring(beforeSQL,
+                    // mth.start(3), mth.end(3));//<---不須修正
                     System.out.println("quote[5] : " + realQuoteLine);
                     // fix 修正回原來的 ↑↑↑↑↑↑↑
 
