@@ -419,6 +419,8 @@ public class FastDBQueryUI extends JFrame {
     private JCheckBox queryResultFakeDataChk;
     private AtomicBoolean InitLoadSqlListConfigHolder = new AtomicBoolean(false);
     private AtomicBoolean executeSqlButtonClickHolder = new AtomicBoolean(false);
+    private FastDBQueryUI_RefCodeTableDlg mFastDBQueryUI_RefCodeTableDlg;
+    private JButton codeTableConfigBtn;
 
     private final Predicate IGNORE_PREDICT = new Predicate() {
         @Override
@@ -1354,6 +1356,21 @@ public class FastDBQueryUI extends JFrame {
 
         lblNewLabel_14 = new JLabel();
         panel_13.add(lblNewLabel_14);
+
+        codeTableConfigBtn = new JButton("codetable");
+        codeTableConfigBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if (mFastDBQueryUI_RefCodeTableDlg == null) {
+                    mFastDBQueryUI_RefCodeTableDlg = new FastDBQueryUI_RefCodeTableDlg();
+                }
+                if (mFastDBQueryUI_RefCodeTableDlg != null && mFastDBQueryUI_RefCodeTableDlg.isVisible()) {
+                    mFastDBQueryUI_RefCodeTableDlg.dispose();
+                }
+                mFastDBQueryUI_RefCodeTableDlg.show();
+            }
+        });
+
+        panel_13.add(codeTableConfigBtn);
 
         queryResultFakeDataChk = new JCheckBox("");
         queryResultFakeDataChk.setToolTipText("查無資料時使用假資料!");
@@ -7844,30 +7861,33 @@ public class FastDBQueryUI extends JFrame {
                     }
                 }
             }
-            if (!columnCodeValueMap.isEmpty()) {
-                JTableUtil.newInstance(queryResultTable).applyOnHoverEvent(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        Pair<Integer, Integer> pair = (Pair<Integer, Integer>) e.getSource();
-                        /*
-                         * Object title =
-                         * JTableUtil.newInstance(queryResultTable).
-                         * getColumnTitle(pair.getRight()); if (title == null) {
-                         * queryResultTable.setToolTipText(null); return; }
-                         * String column = (String) title; if
-                         * (columnCodeValueMap.containsKey(column)) { Object val
-                         * =
-                         * JTableUtil.newInstance(queryResultTable).getValueAt(
-                         * true, pair.getLeft(), pair.getRight()); Map<String,
-                         * String> codeValueMap = MapUtil.getIgnorecase(column,
-                         * columnCodeValueMap); if (val != null) { String value
-                         * = StringUtils.trimToEmpty(String.valueOf(val));
-                         * String mappingLabel = MapUtil.getIgnorecase(value,
-                         * codeValueMap);
-                         * queryResultTable.setToolTipText(mappingLabel);
-                         * return; } } queryResultTable.setToolTipText(null);
-                         */
-                        queryResultTable.setToolTipText(null);
+
+            JTableUtil.newInstance(queryResultTable).applyOnHoverEvent(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    Pair<Integer, Integer> pair = (Pair<Integer, Integer>) e.getSource();
+
+                    Object title = JTableUtil.newInstance(queryResultTable).getColumnTitle(pair.getRight());
+
+                    /*
+                     * if (title == null) {
+                     * queryResultTable.setToolTipText(null); return; } String
+                     * column = (String) title; if
+                     * (columnCodeValueMap.containsKey(column)) { Object val =
+                     * JTableUtil.newInstance(queryResultTable).getValueAt(
+                     * true, pair.getLeft(), pair.getRight()); Map<String,
+                     * String> codeValueMap = MapUtil.getIgnorecase(column,
+                     * columnCodeValueMap); if (val != null) { String value =
+                     * StringUtils.trimToEmpty(String.valueOf(val)); String
+                     * mappingLabel = MapUtil.getIgnorecase(value,
+                     * codeValueMap);
+                     * queryResultTable.setToolTipText(mappingLabel); return; }
+                     * } queryResultTable.setToolTipText(null);
+                     */
+
+                    queryResultTable.setToolTipText(null);
+
+                    if (!columnCodeValueMap.isEmpty()) {
                         if (columnCodeValueMap2.containsKey(pair.getRight())) {
                             Map<String, String> codeValueMap = columnCodeValueMap2.get(pair.getRight());
                             Object val = JTableUtil.newInstance(queryResultTable).getValueAt(true, pair.getLeft(), pair.getRight());
@@ -7879,8 +7899,19 @@ public class FastDBQueryUI extends JFrame {
                             }
                         }
                     }
-                });
-            }
+
+                    // ↓↓↓↓↓↓ 參考 codeTable
+                    if (mFastDBQueryUI_RefCodeTableDlg != null) {
+                        String referenceValue = mFastDBQueryUI_RefCodeTableDlg.getTooltipReference((String) title, pair.getRight(), getDataSource());
+                        if (referenceValue != null) {
+                            queryResultTable.setToolTipText(referenceValue);
+                        } else {
+                            queryResultTable.setToolTipText(null);
+                        }
+                    }
+                    // ↑↑↑↑↑↑ 參考 codeTable
+                }
+            });
         } catch (Exception ex) {
             JCommonUtil.handleException(ex);
         }
