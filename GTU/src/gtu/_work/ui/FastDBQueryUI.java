@@ -8925,16 +8925,19 @@ public class FastDBQueryUI extends JFrame {
         }
 
         protected Object[] parseForVertical(String content) {
-            List<String> lst = StringUtil_.readContentToList(content, true, true, true);
+            List<String> lst = StringUtil_.readContentToList(StringUtils.defaultString(content), true, true, true);
             List<String> titles = new ArrayList<String>();
             List<Object> values = new ArrayList<Object>();
             for (String splitString : lst) {
-                String[] arry = splitString.split("\\t");
-                if (arry.length == 2) {
-                    String columnName = StringUtils.trimToEmpty(arry[0]);
-                    String value = StringUtils.trimToEmpty(arry[1]);
-                    titles.add(columnName);
-                    values.add(value);
+                for (String ptn : new String[] { "\\t", "\\s+" }) {
+                    String[] arry = splitString.split(ptn);
+                    if (arry.length >= 2) {
+                        String columnName = StringUtils.trimToEmpty(arry[0]);
+                        String value = StringUtils.trimToEmpty(arry[1]);
+                        titles.add(columnName);
+                        values.add(value);
+                        continue;
+                    }
                 }
             }
             return new Object[] { titles, values.toArray() };
