@@ -23,7 +23,9 @@ import gtu.poi.hssf.ExcelUtil_Xls97;
 public class MulanWorkTest001 {
 
     public static void main(String[] args) {
-
+        MulanWorkTest001 t = new MulanWorkTest001();
+        File xlsFile = new File("C:\\Users\\wistronits\\Downloads\\mulan_work1.xls");
+        t.execute(xlsFile);
     }
 
     public void execute(File xlsFile) {
@@ -172,6 +174,10 @@ public class MulanWorkTest001 {
         System.out.println("File : " + excelFile);
         System.out.println("hasCount : " + hasCount);
         System.out.println("noCount : " + noCount);
+
+        File destionCsvFolder = new File(FileUtil.DESKTOP_DIR, "mulan_" + DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMdd") + "_csv");
+        destionCsvFolder.mkdirs();
+        ExcelUtil_Xls97.getInstance().convertToCsv(excelFile, destionCsvFolder);
     }
 
     private static class WorkDataHandler {
