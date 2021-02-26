@@ -191,7 +191,7 @@ public class FastDBQueryUI_RefCodeTableDlg extends JDialog {
                                             FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC,
                                             FormFactory.DEFAULT_ROWSPEC, FormFactory.RELATED_GAP_ROWSPEC, RowSpec.decode("default:grow"), }));
                     {
-                        JLabel lblNewLabel = new JLabel("對應欄位Category");
+                        JLabel lblNewLabel = new JLabel("Category對應欄位");
                         panel.add(lblNewLabel, "2, 2, right, default");
                     }
                     {
