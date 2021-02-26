@@ -70,9 +70,9 @@ public class FastDBQueryUI_RefCodeTableDlg extends JDialog {
 
     private static String PARAM_STR = "(\\w+)";
     private static String PARAM_STR2 = "(?:like|\\=)";
-    private static String PARAM_STR_LEFT = "[\\|\'\\%\\+\\w\\(]*";
-    private static String PARAM_STR_RIGHT = "[\\|\'\\%\\+\\w\\)]*";
-    private Pattern QUESTION_PTN1 = Pattern.compile(PARAM_STR + PARAM_STR_RIGHT + "\\s*" + PARAM_STR2 + "\\s*" + PARAM_STR_LEFT + "\\?");
+    private static String PARAM_STR_LEFT = "[\\|\'\\%\\+\\w\\s\\(]*";
+    private static String PARAM_STR_RIGHT = "[\\|\'\\%\\+\\w\\s\\)]*";
+    private Pattern QUESTION_PTN1 = Pattern.compile(PARAM_STR + PARAM_STR_RIGHT + PARAM_STR2 + PARAM_STR_LEFT + "\\?");
 
     public FastDBQueryUI_RefCodeTableDlg() {
         setTitle("定義CodeTable");

@@ -379,8 +379,9 @@ public class ExcelToCSV {
      */
     private void openWorkbook(File file) throws FileNotFoundException, IOException, EncryptedDocumentException, InvalidFormatException {
         System.out.println("Opening workbook [" + file.getName() + "]");
-        try (FileInputStream fis = new FileInputStream(file)) {
-
+        FileInputStream fis = null;
+        try {
+            fis = new FileInputStream(file);
             // Open the workbook and then create the FormulaEvaluator and
             // DataFormatter instances that will be needed to, respectively,
             // force evaluation of forumlae found in cells and create a
@@ -388,6 +389,8 @@ public class ExcelToCSV {
             this.workbook = WorkbookFactory.create(fis);
             this.evaluator = this.workbook.getCreationHelper().createFormulaEvaluator();
             this.formatter = new DataFormatter(true);
+        } finally {
+            fis.close();
         }
     }
 
@@ -449,7 +452,9 @@ public class ExcelToCSV {
         // Open a writer onto the CSV file.
         // try (BufferedWriter bw = Files.newBufferedWriter(file.toPath(),
         // Charset.forName("big5"))) { // StandardCharsets.ISO_8859_1
-        try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "BIG5"))) {
+        BufferedWriter bw = null;
+        try {
+            bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "BIG5"));
 
             System.out.println("Saving the CSV file [" + file.getName() + "]");
 
@@ -500,6 +505,8 @@ public class ExcelToCSV {
                     bw.newLine();
                 }
             }
+        } finally {
+            bw.close();
         }
     }
 
