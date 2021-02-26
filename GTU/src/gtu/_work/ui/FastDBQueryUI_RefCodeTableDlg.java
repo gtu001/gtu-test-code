@@ -10,7 +10,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -18,6 +17,8 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.sql.DataSource;
 import javax.swing.DefaultListModel;
@@ -31,6 +32,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
 import com.jgoodies.forms.factories.FormFactory;
 import com.jgoodies.forms.layout.ColumnSpec;
@@ -47,14 +49,15 @@ import gtu.swing.util.JTextAreaUtil;
 
 public class FastDBQueryUI_RefCodeTableDlg extends JDialog {
 
+    private static final long serialVersionUID = 1L;
     private PropertiesUtilBean config = new PropertiesUtilBean(FastDBQueryUI_RefCodeTableDlg.class);
 
     public static void main(String[] args) {
 
     }
 
-    private Map<CodeTableBean, Map<String, String>> holderMap = new HashMap<CodeTableBean, Map<String, String>>();
-    private Map<String, Map<String, String>> commonMap = new HashMap<String, Map<String, String>>();
+    private Map<CodeTableBean, Pair<String, Map<String, String>>> holderMap = new HashMap<CodeTableBean, Pair<String, Map<String, String>>>();
+    private Map<String, Pair<String, Map<String, String>>> commonMap = new HashMap<String, Pair<String, Map<String, String>>>();
     private boolean enable = false;
 
     private JList codetableDefList;
@@ -64,6 +67,12 @@ public class FastDBQueryUI_RefCodeTableDlg extends JDialog {
     private JTextArea sqlTextArea;
     private JCheckBox enableCheck;
     private JCheckBox useQuestionConditionChk;
+
+    private static String PARAM_STR = "(\\w+)";
+    private static String PARAM_STR2 = "(?:like|\\=)";
+    private static String PARAM_STR_LEFT = "[\\|\'\\%\\+\\w\\(]*";
+    private static String PARAM_STR_RIGHT = "[\\|\'\\%\\+\\w\\)]*";
+    private Pattern QUESTION_PTN1 = Pattern.compile(PARAM_STR + PARAM_STR_RIGHT + "\\s*" + PARAM_STR2 + "\\s*" + PARAM_STR_LEFT + "\\?");
 
     public FastDBQueryUI_RefCodeTableDlg() {
         setTitle("定義CodeTable");
@@ -308,6 +317,8 @@ public class FastDBQueryUI_RefCodeTableDlg extends JDialog {
 
                 boolean useCustomCodetableConfig = false;
 
+                String tooltipCategory = "";
+
                 String tooltipPrefix = "";
 
                 for (CodeTableBean bean : lst) {
@@ -316,15 +327,24 @@ public class FastDBQueryUI_RefCodeTableDlg extends JDialog {
 
                         if (!holderMap.containsKey(bean)) {
 
-                            refMap = this.getReferenceMap("@自訂@", bean, category, dataSource);
+                            Pair<Map<String, String>, String> pair = this.getReferenceMap("@自訂@", bean, category, dataSource);
 
-                            holderMap.put(bean, refMap);
+                            refMap = pair.getLeft();
+                            tooltipCategory = pair.getRight();
+
+                            holderMap.put(bean, Pair.of(tooltipCategory, refMap));
                             System.out.println("新增[holderMap] : " + category1 + "\t" + refMap);
                         } else {
-                            refMap = holderMap.get(bean);
+
+                            Pair<String, Map<String, String>> refPair = holderMap.get(bean);
+                            tooltipCategory = refPair.getLeft();
+                            refMap = refPair.getRight();
                         }
 
-                        tooltipPrefix = getTooltipPrefix(bean, category);
+                        if (StringUtils.isBlank(tooltipCategory)) {
+                            tooltipCategory = category;
+                        }
+                        tooltipPrefix = getTooltipPrefix(bean, tooltipCategory);
                     }
                 }
 
@@ -340,15 +360,24 @@ public class FastDBQueryUI_RefCodeTableDlg extends JDialog {
                     if (commonBean != null) {
                         if (!commonMap.containsKey(category1)) {
 
-                            refMap = this.getReferenceMap("@預設@", commonBean, category, dataSource);
+                            Pair<Map<String, String>, String> pair = this.getReferenceMap("@預設@", commonBean, category, dataSource);
 
-                            commonMap.put(category1, refMap);
-                            System.out.println("新增[commonMap] : " + category1 + "\t" + refMap);
+                            refMap = pair.getLeft();
+                            tooltipCategory = pair.getRight();
+
+                            commonMap.put(category1, Pair.of(tooltipCategory, refMap));
+                            System.out.println("新增[holderMap] : " + category1 + "\t" + refMap);
                         } else {
-                            refMap = commonMap.get(category1);
+
+                            Pair<String, Map<String, String>> refPair = commonMap.get(category1);
+                            tooltipCategory = refPair.getLeft();
+                            refMap = refPair.getRight();
                         }
 
-                        tooltipPrefix = getTooltipPrefix(commonBean, category);
+                        if (StringUtils.isBlank(tooltipCategory)) {
+                            tooltipCategory = category;
+                        }
+                        tooltipPrefix = getTooltipPrefix(commonBean, tooltipCategory);
                     }
                 }
 
@@ -360,6 +389,14 @@ public class FastDBQueryUI_RefCodeTableDlg extends JDialog {
             ex.printStackTrace();
         }
         return null;
+    }
+
+    private String getCategoryColumn(String sql) {
+        Matcher mth = QUESTION_PTN1.matcher(sql);
+        if (mth.find()) {
+            return mth.group(1);
+        }
+        return "";
     }
 
     private String getTooltipPrefix(CodeTableBean bean, String category) {
@@ -378,8 +415,9 @@ public class FastDBQueryUI_RefCodeTableDlg extends JDialog {
         return message;
     }
 
-    private Map<String, String> getReferenceMap(String errorLabel, CodeTableBean bean, String category, DataSource dataSource) {
+    private Pair<Map<String, String>, String> getReferenceMap(String errorLabel, CodeTableBean bean, String category, DataSource dataSource) {
         Map<String, String> refMap = new HashMap<String, String>();
+        String realCategory = "";
         try {
             String valueColumn1 = StringUtils.trimToEmpty(bean.sqlValueColumn.toUpperCase()).toUpperCase();
             String labelColumn1 = StringUtils.trimToEmpty(bean.sqlLabelColumn.toUpperCase()).toUpperCase();
@@ -391,6 +429,8 @@ public class FastDBQueryUI_RefCodeTableDlg extends JDialog {
                 condition = new Object[] { category };
             }
 
+            String categoryColumn = getCategoryColumn(bean.sql);
+
             List<Map<String, Object>> queryLst = JdbcDBUtil.queryForList(bean.sql, condition, conn, true);
             for (Map<String, Object> map : queryLst) {
                 if (MapUtil.constainIgnorecase(valueColumn1, map) && //
@@ -398,6 +438,14 @@ public class FastDBQueryUI_RefCodeTableDlg extends JDialog {
                     String key1 = toStringProcess(MapUtil.getIgnorecase(valueColumn1, map));
                     String value1 = toStringProcess(MapUtil.getIgnorecase(labelColumn1, map));
                     refMap.put(key1, value1);
+
+                    if (StringUtils.isNotBlank(categoryColumn) && //
+                            MapUtil.constainIgnorecase(categoryColumn, map)) {
+                        realCategory = toStringProcess(MapUtil.getIgnorecase(categoryColumn, map));
+                        System.out.println("getReferenceMap 找到實際category值 : " + realCategory);
+                    } else {
+                        System.out.println("getReferenceMap 不找到實際category值: " + categoryColumn);
+                    }
                 } else {
                     break;
                 }
@@ -406,7 +454,7 @@ public class FastDBQueryUI_RefCodeTableDlg extends JDialog {
             String message = "[ SQL : " + bean.sql + " , parameter : " + category + "]";
             System.err.println("[" + errorLabel + "] getReferenceMap ERR : " + ex.getMessage() + " --> \n" + message);
         }
-        return refMap;
+        return Pair.of(refMap, realCategory);
     }
 
     public void setEnable(boolean enable) {
