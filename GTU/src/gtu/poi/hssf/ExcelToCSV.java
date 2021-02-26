@@ -26,7 +26,6 @@ import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 
 import org.apache.poi.EncryptedDocumentException;
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.DataFormatter;
@@ -190,13 +189,17 @@ public class ExcelToCSV {
      * @throws InvalidFormatException
      * @throws EncryptedDocumentException
      */
-    public void convertExcelToCSV(String strSource, String strDestination) throws FileNotFoundException, IOException, IllegalArgumentException, EncryptedDocumentException, InvalidFormatException {
+    public void convertExcelToCSV(String strSource, String strDestination) {
 
         // Simply chain the call to the overloaded convertExcelToCSV(String,
         // String, String, int) method, pass the default separator and ensure
         // that certain embedded characters are escaped in accordance with
         // Excel's formatting conventions
-        this.convertExcelToCSV(strSource, strDestination, ExcelToCSV.DEFAULT_SEPARATOR, ExcelToCSV.EXCEL_STYLE_ESCAPING);
+        try {
+            this.convertExcelToCSV(strSource, strDestination, ExcelToCSV.DEFAULT_SEPARATOR, ExcelToCSV.EXCEL_STYLE_ESCAPING);
+        } catch (Exception ex) {
+            throw new RuntimeException("convertExcelToCSV ERR : " + ex.getMessage(), ex);
+        }
     }
 
     /**
@@ -234,14 +237,18 @@ public class ExcelToCSV {
      * @throws InvalidFormatException
      * @throws EncryptedDocumentException
      */
-    public void convertExcelToCSV(String strSource, String strDestination, String separator)
-            throws FileNotFoundException, IOException, IllegalArgumentException, EncryptedDocumentException, InvalidFormatException {
+    public void convertExcelToCSV(String strSource, String strDestination, String separator) {
 
         // Simply chain the call to the overloaded convertExcelToCSV(String,
         // String, String, int) method and ensure that certain embedded
         // characters are escaped in accordance with Excel's formatting
         // conventions
-        this.convertExcelToCSV(strSource, strDestination, separator, ExcelToCSV.EXCEL_STYLE_ESCAPING);
+
+        try {
+            this.convertExcelToCSV(strSource, strDestination, separator, ExcelToCSV.EXCEL_STYLE_ESCAPING);
+        } catch (Exception ex) {
+            throw new RuntimeException("convertExcelToCSV ERR : " + ex.getMessage(), ex);
+        }
     }
 
     /**
@@ -287,7 +294,7 @@ public class ExcelToCSV {
      * @throws EncryptedDocumentException
      */
     public void convertExcelToCSV(String strSource, String strDestination, String separator, int formattingConvention)
-            throws FileNotFoundException, IOException, IllegalArgumentException, EncryptedDocumentException, InvalidFormatException {
+            throws FileNotFoundException, IOException, IllegalArgumentException, EncryptedDocumentException {
         // Check that the source file/folder exists.
         File source = new File(strSource);
         if (!source.exists()) {
@@ -345,7 +352,11 @@ public class ExcelToCSV {
         if (filesList != null) {
             for (File excelFile : filesList) {
                 // Open the workbook
-                this.openWorkbook(excelFile);
+                try {
+                    this.openWorkbook(excelFile);
+                } catch (Exception ex) {
+                    throw new RuntimeException("openWorkbook ERR : " + ex.getMessage(), ex);
+                }
 
                 // Convert it's contents into a CSV file
                 this.convertToCSV();
@@ -377,7 +388,7 @@ public class ExcelToCSV {
      * @throws InvalidFormatException
      * @throws EncryptedDocumentException
      */
-    private void openWorkbook(File file) throws FileNotFoundException, IOException, EncryptedDocumentException, InvalidFormatException {
+    private void openWorkbook(File file) {
         System.out.println("Opening workbook [" + file.getName() + "]");
         FileInputStream fis = null;
         try {
@@ -389,8 +400,13 @@ public class ExcelToCSV {
             this.workbook = WorkbookFactory.create(fis);
             this.evaluator = this.workbook.getCreationHelper().createFormulaEvaluator();
             this.formatter = new DataFormatter(true);
+        } catch (Exception ex) {
+            throw new RuntimeException("openWorkbook ERR : " + ex.getMessage(), ex);
         } finally {
-            fis.close();
+            try {
+                fis.close();
+            } catch (Exception ex) {
+            }
         }
     }
 
@@ -402,7 +418,7 @@ public class ExcelToCSV {
         Sheet sheet;
         Row row;
         int lastRowNum;
-        this.csvData = new ArrayList<>();
+        this.csvData = new ArrayList<ArrayList<String>>();
 
         System.out.println("Converting files contents to CSV format.");
 
