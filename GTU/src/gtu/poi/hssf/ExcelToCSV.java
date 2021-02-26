@@ -546,7 +546,7 @@ public class ExcelToCSV {
     private void rowToCSV(Row row) {
         Cell cell;
         int lastCellNum;
-        ArrayList<String> csvLine = new ArrayList<>();
+        ArrayList<String> csvLine = new ArrayList<String>();
 
         // Check to ensure that a row was recovered from the sheet as it is
         // possible that one or more rows between other populated rows could be

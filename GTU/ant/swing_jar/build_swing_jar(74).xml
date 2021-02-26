@@ -108,10 +108,9 @@
 			<packagename mode="pom" name="commons-beanutils-1.8.0.jar">org/apache/commons/beanutils/DynaBean</packagename>
 			<packagename mode="small" name="platform-3.4.0.jar">com.sun.jna.platform.FileUtils</packagename>
 
-			<packagename mode="small">org.apache.poi.hssf.usermodel.HSSFSheet</packagename>
-			<packagename mode="exact">org.apache.poi.ss.usermodel.WorkbookFactory</packagename>
+			<packagename mode="small" name="poi-3.15.jar" pathname="" unjar="">org.apache.poi.hssf.usermodel.HSSFSheet</packagename>
+			<packagename mode="pom" name="poi-ooxml-3.15.jar" pathname="" unjar="">org.apache.poi.ss.usermodel.WorkbookFactory</packagename>
 
-			
 
 		</jarfinder>
 
