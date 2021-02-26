@@ -82,6 +82,13 @@ public class ExternalJDBCDriverJarLoader {
         }
         return false;
     }
+    
+    public boolean isEmpty() {
+        if(jarLst == null || jarLst.isEmpty()) {
+            return true;
+        }
+        return false;
+    }
 
     public static void main(String[] args) throws MalformedURLException {
         ExternalJDBCDriverJarLoader t = new ExternalJDBCDriverJarLoader();

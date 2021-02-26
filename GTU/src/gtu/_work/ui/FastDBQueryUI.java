@@ -1357,7 +1357,7 @@ public class FastDBQueryUI extends JFrame {
         lblNewLabel_14 = new JLabel();
         panel_13.add(lblNewLabel_14);
 
-        codeTableConfigBtn = new JButton("codetable");
+        codeTableConfigBtn = new JButton("<html><font color=Blue>CT</font></html>");
         codeTableConfigBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if (mFastDBQueryUI_RefCodeTableDlg == null) {
@@ -2597,7 +2597,7 @@ public class FastDBQueryUI extends JFrame {
             dataSourceConfig.saveConfig(param);
             mDBNameIdTextHandler.reload_DataSourceConfig_autoComplete();
 
-            if (externalJDBCDriverJarLoader.get() != null) {
+            if (externalJDBCDriverJarLoader.get() != null && !externalJDBCDriverJarLoader.get().isEmpty()) {
                 System.out.println("## use custom class loader");
                 externalJDBCDriverJarLoader.get().registerDriver(driver);
                 Class.forName(driver, true, externalJDBCDriverJarLoader.get().getUrlClassLoader());
@@ -4033,7 +4033,7 @@ public class FastDBQueryUI extends JFrame {
         bds.setUsername(user);
         bds.setPassword(pwd);
         bds.setDriverClassName(driver);
-        if (externalJDBCDriverJarLoader.get() != null) {
+        if (externalJDBCDriverJarLoader.get() != null && !externalJDBCDriverJarLoader.get().isEmpty()) {
             System.out.println("## use custom class loader");
             externalJDBCDriverJarLoader.get().registerDriver(driver);
             bds.setDriverClassLoader(externalJDBCDriverJarLoader.get().getUrlClassLoader());
@@ -7902,7 +7902,8 @@ public class FastDBQueryUI extends JFrame {
 
                     // ↓↓↓↓↓↓ 參考 codeTable
                     if (mFastDBQueryUI_RefCodeTableDlg != null) {
-                        String referenceValue = mFastDBQueryUI_RefCodeTableDlg.getTooltipReference((String) title, pair.getRight(), getDataSource());
+                        Object val = JTableUtil.newInstance(queryResultTable).getValueAt(true, pair.getLeft(), pair.getRight());
+                        String referenceValue = mFastDBQueryUI_RefCodeTableDlg.getTooltipReference((String) title, val, getDataSource());
                         if (referenceValue != null) {
                             queryResultTable.setToolTipText(referenceValue);
                         } else {
