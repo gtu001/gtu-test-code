@@ -132,6 +132,14 @@ import org.apache.poi.ss.usermodel.WorkbookFactory;
  */
 @SuppressWarnings({ "java:S106", "java:S4823", "java:S1192" })
 public class ExcelToCSV {
+    
+    public static void convertToCsv(File fromXls, File toCsvFolder) {
+        try {
+            new ExcelToCSV().convertExcelToCSV(fromXls.getAbsolutePath(), toCsvFolder.getAbsolutePath());
+        } catch (Exception e) {
+            throw new RuntimeException("convertToCsv ERR : " + e.getMessage(), e);
+        }
+    }
 
     private Workbook workbook;
     private ArrayList<ArrayList<String>> csvData;

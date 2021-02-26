@@ -779,13 +779,5 @@ public class ExcelUtil_Xls97 {
         }
     }
 
-    public void convertToCsv(File fromXls, File toCsvFolder) {
-        try {
-            new ExcelToCSV().convertExcelToCSV(fromXls.getAbsolutePath(), toCsvFolder.getAbsolutePath());
-        } catch (Exception e) {
-            throw new RuntimeException("convertToCsv ERR : " + e.getMessage(), e);
-        }
-    }
-
     private static final ExcelUtil_Xls97 INSTANCE = new ExcelUtil_Xls97();
 }

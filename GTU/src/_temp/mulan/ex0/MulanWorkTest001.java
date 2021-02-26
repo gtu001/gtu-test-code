@@ -18,6 +18,7 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 
 import gtu.file.FileUtil;
+import gtu.poi.hssf.ExcelToCSV;
 import gtu.poi.hssf.ExcelUtil_Xls97;
 
 public class MulanWorkTest001 {
@@ -177,7 +178,7 @@ public class MulanWorkTest001 {
 
         File destionCsvFolder = new File(FileUtil.DESKTOP_DIR, "mulan_" + DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMdd") + "_csv");
         destionCsvFolder.mkdirs();
-        ExcelUtil_Xls97.getInstance().convertToCsv(excelFile, destionCsvFolder);
+        ExcelToCSV.convertToCsv(excelFile, destionCsvFolder);
     }
 
     private static class WorkDataHandler {
