@@ -27,7 +27,8 @@
 	如果顯示 刷新XX項目  離開 VitaShell 會看到新增的遊戲
 
 
-安裝
+安裝MaiDump
+---
 	下載 https://github.com/LioMajor/MaiDumpToolEN/releases
 	遊戲檔案放到 ux0:mai/底下 
 
