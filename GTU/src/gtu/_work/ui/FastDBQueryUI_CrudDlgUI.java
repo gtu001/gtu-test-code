@@ -259,6 +259,27 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
             this.clz = clz;
         }
 
+        static DataType isTypeOfClass(Class clz) {
+            if (clz == null) {
+                return NULL;
+            }
+            for (DataType e : DataType.values()) {
+                for (Class<?> c : e.clz) {
+                    if (c == clz) {
+                        return e;
+                    }
+                }
+            }
+            for (DataType e : DataType.values()) {
+                for (Class<?> c : e.clz) {
+                    if (c.isAssignableFrom(clz)) {
+                        return e;
+                    }
+                }
+            }
+            return UNKNOW;
+        }
+
         static DataType isTypeOf(Object value) {
             if (value == null) {
                 return NULL;
@@ -295,8 +316,8 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
         }
     }
 
-    public static FastDBQueryUI_CrudDlgUI newInstance(final List<Map<String, Object>> rowMapLst, final String tableNSchema, final Triple<List<String>, List<Class<?>>, List<Object[]>> queryList,
-            final ActionListener onCloseListener, final FastDBQueryUI _parent) {
+    public static FastDBQueryUI_CrudDlgUI newInstance(final List<Map<String, Pair<Object, Class>>> rowMapLst, final String tableNSchema,
+            final Triple<List<String>, List<Class<?>>, List<Object[]>> queryList, final ActionListener onCloseListener, final FastDBQueryUI _parent) {
         try {
             final FastDBQueryUI_CrudDlgUI dialog = new FastDBQueryUI_CrudDlgUI(_parent);
             dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -1902,7 +1923,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
     }
 
     private class RecordsHandler {
-        List<Map<String, Object>> rowMapLst;
+        List<Map<String, Pair<Object, Class>>> rowMapLst;
         Map<Integer, Map<String, ColumnConf>> rowMapLstHolder = new TreeMap<Integer, Map<String, ColumnConf>>();
         int index = 0;
         Map<String, ColumnConf> columnPkConf = Collections.EMPTY_MAP;
@@ -1947,7 +1968,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
             DefaultTableModel model = initRowTable();
             JTableUtil.newInstance(rowTable).setRowHeightByFontSize();
 
-            Map<String, Object> rowMapZ = rowMapLst.get(index);
+            Map<String, Pair<Object, Class>> rowMapZ = rowMapLst.get(index);
 
             Map<String, ColumnConf> rowMapForBackup = MapUtil.createIngoreCaseMap();
             if (rowMapLstHolder.containsKey(index)) {
@@ -1962,12 +1983,14 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                 if (rowMapForBackup.containsKey(col) && !reset) {
                     df = rowMapForBackup.get(col);
                 } else {
-                    Object value = rowMapZ.get(col);
+                    Pair<Object, Class> pair = rowMapZ.get(col);
+                    Object value = pair.getLeft();
+                    Class type = pair.getRight();
                     value = valueFixHandler.getValueFix(value);
 
                     df = new ColumnConf();
                     df.columnName = col;
-                    df.dtype = DataType.isTypeOf(value);
+                    df.dtype = DataType.isTypeOfClass(type);
                     df.value = value;
                     df.orignValue = value;
 
@@ -2000,7 +2023,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
             System.out.println("-------------init size : " + rowMap.get().size());
         }
 
-        private RecordsHandler(List<Map<String, Object>> rowMapLst, Triple<List<String>, List<Class<?>>, List<Object[]>> queryList2) {
+        private RecordsHandler(List<Map<String, Pair<Object, Class>>> rowMapLst, Triple<List<String>, List<Class<?>>, List<Object[]>> queryList2) {
             this.rowMapLst = rowMapLst;
             this.queryList = queryList2;
             init(true);
@@ -2042,7 +2065,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
 
         private void applyThisValueToAll(boolean reset, String column, Object value1) {
             for (int ii = 0; ii < rowMapLst.size(); ii++) {
-                Map<String, Object> rowMapZ = rowMapLst.get(ii);
+                Map<String, Pair<Object, Class>> rowMapZ = rowMapLst.get(ii);
 
                 Map<String, ColumnConf> rowMapForBackup = MapUtil.createIngoreCaseMap();
                 if (rowMapLstHolder.containsKey(ii)) {
@@ -2057,12 +2080,14 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                     if (rowMapForBackup.containsKey(col) && !reset) {
                         df = rowMapForBackup.get(col);
                     } else {
-                        Object value = rowMapZ.get(col);
+                        Pair<Object, Class> pair = rowMapZ.get(col);
+                        Object value = pair.getLeft();
+                        Class type = pair.getRight();
                         value = valueFixHandler.getValueFix(value);
 
                         df = new ColumnConf();
                         df.columnName = col;
-                        df.dtype = DataType.isTypeOf(value);
+                        df.dtype = DataType.isTypeOfClass(type);
                         df.value = value;
                         df.orignValue = value;
 
@@ -2085,11 +2110,12 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
             // List<String> cols = queryList.getLeft();
             if (isAllData) {
                 for (int iii = 0; iii < rowMapLst.size(); iii++) {
-                    Map<String, Object> map = rowMapLst.get(iii);
+                    Map<String, Pair<Object, Class>> map = rowMapLst.get(iii);
                     Map<String, String> map2 = new LinkedHashMap<String, String>();
                     for (String key : map.keySet()) {
                         String strVal = null;
-                        Object val = map.get(key);
+                        Pair<Object, Class> pair = map.get(key);
+                        Object val = pair.getLeft();
                         if (val != null) {
                             strVal = String.valueOf(val);
                         }

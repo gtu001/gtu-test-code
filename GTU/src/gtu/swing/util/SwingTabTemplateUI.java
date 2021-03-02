@@ -24,6 +24,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.DefaultSingleSelectionModel;
 import javax.swing.JFrame;
@@ -108,11 +109,16 @@ public class SwingTabTemplateUI {
             public void mouseClicked(MouseEvent e) {
                 try {
                     final int idx = tabbedPane.getSelectedIndex();
-                    final int clickTabIdx = getClickTabIndex(e);
+                    final AtomicInteger clickTabIdx = new AtomicInteger();
+                    try {
+                        clickTabIdx.set(getClickTabIndex(e));
+                    } catch (Exception ex) {
+                        System.err.println("[12321A] tabbedPane.mouseClicked, getClickTabIndex ERR : " + ex.getMessage());
+                    }
                     System.out.println("tab clk " + idx + " / " + clickTabIdx);
 
                     if (JMouseEventUtil.buttonLeftClick(2, e)) {
-                        if (idx == clickTabIdx) {
+                        if (idx == clickTabIdx.get()) {
                             String newName = JCommonUtil._jOptionPane_showInputDialog("修改分頁名子", tabbedPane.getTitleAt(idx));
                             if (StringUtils.isBlank(newName)) {
                                 return;
@@ -123,7 +129,7 @@ public class SwingTabTemplateUI {
 
                     if (JMouseEventUtil.buttonRightClick(1, e)) {
                         JPopupMenuUtil popupUtil = JPopupMenuUtil.newInstance(tabbedPane);//
-                        if (clickTabIdx == -1) {
+                        if (clickTabIdx.get() == -1) {
                             popupUtil.addJMenuItem("新增分頁", new ActionListener() {
                                 @Override
                                 public void actionPerformed(ActionEvent e) {
@@ -135,12 +141,12 @@ public class SwingTabTemplateUI {
                                 }
                             });//
                         }
-                        if (idx == clickTabIdx) {
+                        if (idx == clickTabIdx.get()) {
                             if (cloneTabInterfaceGtu001 != null) {
                                 popupUtil.addJMenuItem("複製分頁", new ActionListener() {
                                     @Override
                                     public void actionPerformed(ActionEvent e) {
-                                        cloneTab(clickTabIdx, true);
+                                        cloneTab(clickTabIdx.get(), true);
                                     }
                                 });//
                             }
@@ -557,7 +563,7 @@ public class SwingTabTemplateUI {
                         MY_CLICK_TAB_EVENT_HOLDER.set(false);
                         timer.cancel();
                     }
-                }, 300);
+                }, 500);
                 return true;
             }
             // 自訂click event ↑↑↑↑↑↑

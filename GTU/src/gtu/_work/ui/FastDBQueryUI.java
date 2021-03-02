@@ -4082,14 +4082,14 @@ public class FastDBQueryUI extends JFrame {
                     JTableUtil jutil = JTableUtil.newInstance(queryResultTable);
                     int[] orignRowPosArry = queryResultTable.getSelectedRows();
 
-                    List<Map<String, Object>> rowMapLst = new ArrayList<Map<String, Object>>();
+                    List<Map<String, Pair<Object,Class>>> rowMapLst = new ArrayList<Map<String, Pair<Object,Class>>>();
                     for (int orignRowPos : orignRowPosArry) {
                         System.out.println("orignRowPos " + orignRowPos);
                         int rowPos = JTableUtil.getRealRowPos(orignRowPos, queryResultTable);
                         System.out.println("rowPos " + rowPos);
 
                         int queryLstIndex = transRealRowToQuyerLstIndex(rowPos, queryList.getRight());
-                        Map<String, Object> rowMap = getDetailToMap(queryLstIndex);
+                        Map<String, Pair<Object,Class>> rowMap = getDetailToMap(queryLstIndex);
                         rowMapLst.add(rowMap);
                     }
 
@@ -4700,11 +4700,13 @@ public class FastDBQueryUI extends JFrame {
         return isContainObjectArray_Index(newLst, arry);
     }
 
-    private Map<String, Object> getDetailToMap(int queryListIndex) {
+    private Map<String, Pair<Object, Class>> getDetailToMap(int queryListIndex) {
         List<String> columns = queryList.getLeft();
         Object[] row = queryList.getRight().get(queryListIndex);
+        List<Class<?>> clzOrignLst = queryList.getMiddle();
 
         Map<String, List<Object>> multiMap = new LinkedHashMap<String, List<Object>>();
+        Map<String, List<Class>> multiClzMap = new LinkedHashMap<String, List<Class>>();
         for (int ii = 0; ii < columns.size(); ii++) {
             String col = columns.get(ii);
             Object val = row[ii];
@@ -4714,19 +4716,29 @@ public class FastDBQueryUI extends JFrame {
             }
             valueLst.add(val);
             multiMap.put(col, valueLst);
+
+            List<Class> clzLst = new ArrayList<Class>();
+            if (multiClzMap.containsKey(col)) {
+                clzLst = multiClzMap.get(col);
+            }
+            clzLst.add(clzOrignLst.get(ii));
+            multiClzMap.put(col, clzLst);
         }
 
-        Map<String, Object> rtnMap = new LinkedHashMap<String, Object>();
+        Map<String, Pair<Object, Class>> rtnMap = new LinkedHashMap<String, Pair<Object, Class>>();
         for (String col : multiMap.keySet()) {
             List<Object> valueLst = multiMap.get(col);
+            List<Class> clzLst = multiClzMap.get(col);
             if (valueLst.size() == 1) {
-                rtnMap.put(col, valueLst.get(0));
+                rtnMap.put(col, Pair.of(valueLst.get(0), clzLst.get(0)));
             } else {
                 if (!ListUtil.isAllEquals(valueLst)) {
                     Object value = JCommonUtil._JOptionPane_showInputDialog("此欄位[" + col + "]顯示多次,請選擇正確的值:", col, valueLst.toArray(), valueLst.get(0));
-                    rtnMap.put(col, value);
+                    int pos = valueLst.indexOf(value);
+                    Class clz = clzLst.get(pos);
+                    rtnMap.put(col, Pair.of(value, clz));
                 } else {
-                    rtnMap.put(col, valueLst.get(0));
+                    rtnMap.put(col, Pair.of(valueLst.get(0), clzLst.get(0)));
                 }
             }
         }

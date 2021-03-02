@@ -25,7 +25,7 @@ public class MulanWorkTest001 {
 
     public static void main(String[] args) {
         MulanWorkTest001 t = new MulanWorkTest001();
-        File xlsFile = new File("C:\\Users\\wistronits\\Downloads\\mulan_work1.xls");
+        File xlsFile = new File("C:\\Users\\wistronits\\Downloads\\mulan_work1(1).xls");
         t.execute(xlsFile);
     }
 
@@ -82,7 +82,10 @@ public class MulanWorkTest001 {
                 p.workType = ExcelUtil_Xls97.getInstance().readCell(row.getCell(jj++));
                 p.groupType = ExcelUtil_Xls97.getInstance().readCell(row.getCell(jj++));
                 System.out.println(p);
-                workLst.add(p);
+
+                if (StringUtils.isNotBlank(p.personNum)) {
+                    workLst.add(p);
+                }
             }
         }
 
