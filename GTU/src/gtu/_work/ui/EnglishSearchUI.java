@@ -166,6 +166,7 @@ public class EnglishSearchUI extends JFrame {
     private AutoComboBox searchEnglishIdText_auto;
     private List<String> englishLst;
     Integer tvModeDlgFontSize = null;
+    private AtomicBoolean queryButtonActionHolder = new AtomicBoolean();
 
     private PropertiesUtilBean propertyBean = new PropertiesUtilBean(this.getClass());
     {
@@ -199,6 +200,8 @@ public class EnglishSearchUI extends JFrame {
     private SimpleCheckListDlg mSimpleCheckListDlg;
     private AtomicReference<String> notFoundWord = new AtomicReference<String>();
     private LRUMap propOtherMap = new LRUMap(3000);
+    private ReentrantLock brinToTopLock = new ReentrantLock();
+    private JCheckBox forceOfflineCheckbox;
 
     /**
      * Launch the application.
@@ -992,6 +995,9 @@ public class EnglishSearchUI extends JFrame {
 
         lostFocusHiddenChk = new JCheckBox("失焦隱藏");
         panel.add(lostFocusHiddenChk, "4, 24");
+
+        forceOfflineCheckbox = new JCheckBox("強制離線");
+        panel.add(forceOfflineCheckbox, "4, 26");
         panel.add(configSettingBtn, "2, 30");
 
         panel_4 = new JPanel();
@@ -1285,17 +1291,8 @@ public class EnglishSearchUI extends JFrame {
 
         // 置中
         JCommonUtil.setJFrameCenter(this);
-        listenClipboardChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("listenClipboardChk")));
-        rightBottomCornerChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("rightBottomCornerChk")));
-        autoSearchChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("autoSearchChk")));
-        showNewWordTxtBtn.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("showNewWordTxtBtn")));
-        mouseSelectionChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("mouseSelectionChk")));
-        offlineModeChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("offlineModeChk")));
-        offlineModeFirstChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("offlineModeFirstChk")));
-        simpleSentanceChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("simpleSentanceChk")));
-        robotFocusChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("robotFocusChk")));
-        lostFocusHiddenChk.setSelected(Boolean.valueOf(propertyBean.getConfigProp().getProperty("lostFocusHiddenChk")));
-        offlineConfigText.setText(propertyBean.getConfigProp().getProperty(OFFLINE_WORD_PATH));
+
+        propertyBean.reflectInit(this);
 
         // service ----------------------------
         mEnglishIdDropdownHandler = new EnglishIdDropdownHandler();
@@ -1374,8 +1371,6 @@ public class EnglishSearchUI extends JFrame {
         } catch (InterruptedException e) {
         }
     }
-
-    private ReentrantLock brinToTopLock = new ReentrantLock();
 
     private void bringToTop() {
         // if (searchEnglishIdTextController.isFocusOwner()) {
@@ -1744,6 +1739,18 @@ public class EnglishSearchUI extends JFrame {
 
     private void queryButtonAction(boolean bringToFront) {
         try {
+            if (queryButtonActionHolder.get() == false) {
+                queryButtonActionHolder.set(true);
+                new Timer().schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        queryButtonActionHolder.set(false);
+                    }
+                }, 500);
+            } else {
+                return;
+            }
+
             mEnglishIdDropdownHandler.hidePopup4EnglishIdText();
 
             if (!queryButton.isEnabled()) {
@@ -1756,15 +1763,19 @@ public class EnglishSearchUI extends JFrame {
                 return;
             }
 
-            if (offlineModeFirstChk.isSelected()) {
-                if (!this.queryButtonAction_offline(text)) {
-                    this.queryButtonAction_online(text);
-                }
+            if (forceOfflineCheckbox.isSelected()) {
+                this.queryButtonAction_offline(text);
             } else {
-                if (offlineModeChk.isSelected()) {
-                    this.queryButtonAction_offline(text);
+                if (offlineModeFirstChk.isSelected()) {
+                    if (!this.queryButtonAction_offline(text)) {
+                        this.queryButtonAction_online(text);
+                    }
                 } else {
-                    this.queryButtonAction_online(text);
+                    if (offlineModeChk.isSelected()) {
+                        this.queryButtonAction_offline(text);
+                    } else {
+                        this.queryButtonAction_online(text);
+                    }
                 }
             }
 
@@ -1964,7 +1975,8 @@ public class EnglishSearchUI extends JFrame {
     }
 
     private File getAppendTextFile() {
-        String val = propertyBean.getConfigProp().getProperty(NEW_WORD_PATH);
+        // String val = propertyBean.getConfigProp().getProperty(NEW_WORD_PATH);
+        String val = StringUtils.trimToEmpty(newWordTxtPathText.getText());
         if (StringUtils.isBlank(val)) {
             JCommonUtil._jOptionPane_showMessageDialog_error("未設定new_word.txt路徑, 建立一個在桌面!");
             File newFile = new File(FileUtil.DESKTOP_PATH + File.separator + "new_word.txt");
@@ -1982,24 +1994,27 @@ public class EnglishSearchUI extends JFrame {
 
     private void configSettingBtnAction() {
         try {
-            if (StringUtils.isBlank(newWordTxtPathText.getText())) {
-                File fff = new File(FileUtil.DESKTOP_PATH, "new_word.txt");
-                if (!fff.exists()) {
-                    fff.createNewFile();
-                }
-                newWordTxtPathText.setText(fff.getAbsolutePath());
-            }
-            File f = JCommonUtil.filePathCheck(newWordTxtPathText.getText(), "請輸入new_word.txt路徑", "txt");
-            if (!f.getName().equals("new_word.txt")) {
-                JCommonUtil._jOptionPane_showMessageDialog_error("檔案名稱必須為 new_word.txt!");
-                return;
-            }
+            /*
+             * if (StringUtils.isBlank(newWordTxtPathText.getText())) { File fff
+             * = new File(FileUtil.DESKTOP_PATH, "new_word.txt"); if
+             * (!fff.exists()) { fff.createNewFile(); }
+             * newWordTxtPathText.setText(fff.getAbsolutePath()); } File f =
+             * JCommonUtil.filePathCheck(newWordTxtPathText.getText(),
+             * "請輸入new_word.txt路徑", "txt"); if
+             * (!f.getName().equals("new_word.txt")) { JCommonUtil.
+             * _jOptionPane_showMessageDialog_error("檔案名稱必須為 new_word.txt!");
+             * return; }
+             * 
+             * if (new File(offlineConfigText.getText()).exists()) {
+             * propertyBean.getConfigProp().setProperty(OFFLINE_WORD_PATH,
+             * offlineConfigText.getText()); }
+             * 
+             * propertyBean.getConfigProp().put(NEW_WORD_PATH,
+             * f.getCanonicalPath());
+             * 
+             */
 
-            if (new File(offlineConfigText.getText()).exists()) {
-                propertyBean.getConfigProp().setProperty(OFFLINE_WORD_PATH, offlineConfigText.getText());
-            }
-
-            propertyBean.getConfigProp().put(NEW_WORD_PATH, f.getCanonicalPath());
+            propertyBean.reflectSetConfig(this);
             propertyBean.store();
 
             JCommonUtil._jOptionPane_showMessageDialog_info("設定成功!");

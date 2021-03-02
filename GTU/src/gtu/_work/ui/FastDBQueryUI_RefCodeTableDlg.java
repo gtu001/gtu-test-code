@@ -31,6 +31,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -94,6 +95,18 @@ public class FastDBQueryUI_RefCodeTableDlg extends JDialog {
                             bean.sql = JCommonUtil.isBlankErrorMsg(sqlTextArea, "sql不可為空");
                             bean.enable = enableCheck.isSelected() ? "Y" : "N";
                             bean.useQuestion = useQuestionConditionChk.isSelected() ? "Y" : "N";
+                            List<CodeTableBean> lst = getCodeTableLst();
+                            if (lst.contains(bean)) {
+                                CodeTableBean bean2 = lst.get(lst.indexOf(bean));
+                                if (isEqualDeepCompare(bean, bean2)) {
+                                    return;
+                                } else {
+                                    boolean saveConfirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("以存在設定,是否覆蓋?:" + bean.columnName, "儲存確認");
+                                    if (!saveConfirm) {
+                                        return;
+                                    }
+                                }
+                            }
                             config.getConfigProp().setProperty(bean.getKey(), bean.getValue());
                             config.store();
                             initCodeTableList();
@@ -459,6 +472,18 @@ public class FastDBQueryUI_RefCodeTableDlg extends JDialog {
 
     public void setEnable(boolean enable) {
         this.enable = enable;
+    }
+
+    private boolean isEqualDeepCompare(CodeTableBean bean, CodeTableBean bean2) {
+        if (ObjectUtils.equals(bean.columnName, bean2.columnName) && //
+                ObjectUtils.equals(bean.sqlValueColumn, bean2.sqlValueColumn) && //
+                ObjectUtils.equals(bean.sqlLabelColumn, bean2.sqlLabelColumn) && //
+                ObjectUtils.equals(bean.sql, bean2.sql) && //
+                ObjectUtils.equals(bean.enable, bean2.enable) && //
+                ObjectUtils.equals(bean.useQuestion, bean2.useQuestion)) {//
+            return true;
+        }
+        return false;
     }
 
     public static class CodeTableBean {
