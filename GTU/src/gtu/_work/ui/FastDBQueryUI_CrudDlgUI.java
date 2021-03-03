@@ -252,6 +252,12 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
         }, //
         number(Number.class) {
         }, //
+        bool(Boolean.class) {
+            protected void applyDataChange(Object value, JTable table, int row, FastDBQueryUI_CrudDlgUI self) {
+                System.out.println("-------" + value + " -> " + value.getClass());
+                table.setValueAt(value, row, ColumnOrderDef.value.ordinal());
+            }
+        }, //
         NULL(void.class) {
             protected void applyDataChange(Object value, JTable table, int row, FastDBQueryUI_CrudDlgUI self) {
                 System.out.println("-------" + value + " -> " + value.getClass());
