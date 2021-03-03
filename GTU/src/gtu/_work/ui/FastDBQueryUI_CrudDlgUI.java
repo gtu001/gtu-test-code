@@ -2493,6 +2493,11 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
         Set<String> columns = rowMap.get().keySet();
         for (String column : columns) {
             ColumnConf conf = rowMap.get().get(column);
+
+            if (StringUtils.isBlank(tableAndSchemaText.getText()) && conf.isAddFromCustomTableName) {
+                continue;
+            }
+
             Row row = xlsUtil.getRowChk(sheet, rowIdx++);
             xlsUtil.getCellChk(row, 0).setCellValue(conf.columnName);
             xlsUtil.getCellChk(row, 1).setCellValue(String.valueOf(conf.orignValue));
