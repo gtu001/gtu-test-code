@@ -2560,7 +2560,7 @@ public class FastDBQueryUI extends JFrame {
         if (param.containsKey("url") && StringUtils.isNotBlank(param.get("url"))) {
             dbUrlText.setText(param.get("url"));
         }
-        if (param.containsKey("user") && StringUtils.isNotBlank(param.get("user"))) {
+        if (param.containsKey("user")) {// user可空
             dbUserText.setText(param.get("user"));
         }
         if (param.containsKey("pwd")) {// 密碼可以空
@@ -2583,7 +2583,7 @@ public class FastDBQueryUI extends JFrame {
             String driver = dbDriverText.getText();
             JCommonUtil.isBlankErrorMsg(dbNameId, "DBName empty");
             JCommonUtil.isBlankErrorMsg(url, "url empty");
-            JCommonUtil.isBlankErrorMsg(user, "user empty");
+            // JCommonUtil.isBlankErrorMsg(user, "user empty"); //使用者可空
             // JCommonUtil.isBlankErrorMsg(pwd, "pwd empty");//密碼可以空
             JCommonUtil.isBlankErrorMsg(driver, "driver empty");
 
@@ -4082,14 +4082,14 @@ public class FastDBQueryUI extends JFrame {
                     JTableUtil jutil = JTableUtil.newInstance(queryResultTable);
                     int[] orignRowPosArry = queryResultTable.getSelectedRows();
 
-                    List<Map<String, Pair<Object,Class>>> rowMapLst = new ArrayList<Map<String, Pair<Object,Class>>>();
+                    List<Map<String, Pair<Object, Class>>> rowMapLst = new ArrayList<Map<String, Pair<Object, Class>>>();
                     for (int orignRowPos : orignRowPosArry) {
                         System.out.println("orignRowPos " + orignRowPos);
                         int rowPos = JTableUtil.getRealRowPos(orignRowPos, queryResultTable);
                         System.out.println("rowPos " + rowPos);
 
                         int queryLstIndex = transRealRowToQuyerLstIndex(rowPos, queryList.getRight());
-                        Map<String, Pair<Object,Class>> rowMap = getDetailToMap(queryLstIndex);
+                        Map<String, Pair<Object, Class>> rowMap = getDetailToMap(queryLstIndex);
                         rowMapLst.add(rowMap);
                     }
 

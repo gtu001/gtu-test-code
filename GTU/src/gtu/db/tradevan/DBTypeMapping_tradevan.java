@@ -9,7 +9,7 @@ import java.sql.Struct;
 import java.sql.Timestamp;
 
 public class DBTypeMapping_tradevan {
-
+    
     public enum JdbcTypeMappingToJava {
         CHAR(java.sql.Types.CHAR, String.class), //
         NCHAR(java.sql.Types.NCHAR, String.class), //
@@ -19,6 +19,7 @@ public class DBTypeMapping_tradevan {
         NUMERIC(java.sql.Types.NUMERIC, BigDecimal.class), //
         DECIMAL(java.sql.Types.DECIMAL, BigDecimal.class), //
         BIT(java.sql.Types.BIT, Boolean.class), //
+        BOOLEAN(java.sql.Types.BOOLEAN, Boolean.class), //
         TINYINT(java.sql.Types.TINYINT, Integer.class), //
         SMALLINT(java.sql.Types.SMALLINT, Short.class), //
         INTEGER(java.sql.Types.INTEGER, Integer.class), //
