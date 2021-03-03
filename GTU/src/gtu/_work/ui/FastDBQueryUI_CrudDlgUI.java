@@ -25,6 +25,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -68,17 +69,24 @@ import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.hssf.util.HSSFColor;
+import org.apache.poi.ss.usermodel.Row;
 
 import gtu._work.ui.FastDBQueryUI_ColumnSearchFilter.FindTextHandler;
 import gtu._work.ui.JMenuBarUtil.JMenuAppender;
 import gtu.binary.StringUtil4FullChar;
-import gtu.collection.MapUtil;
 import gtu.db.JdbcDBUtil;
 import gtu.db.jdbc.util.DBDateUtil;
 import gtu.db.jdbc.util.DBDateUtil.DBDateFormat;
 import gtu.db.sqlMaker.DbSqlCreater.FieldInfo4DbSqlCreater;
 import gtu.db.sqlMaker.DbSqlCreater.TableInfo;
 import gtu.file.FileUtil;
+import gtu.poi.hssf.ExcelUtil_Xls97;
+import gtu.poi.hssf.ExcelWriter;
+import gtu.poi.hssf.ExcelWriter.CellStyleHandler;
 import gtu.string.StringUtilForDb;
 import gtu.swing.util.JButtonGroupUtil;
 import gtu.swing.util.JCommonUtil;
@@ -106,7 +114,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
     private JRadioButton rdbtnDelete;
     private JComboBox dbTypeComboBox;
 
-    private AtomicReference<Map<String, ColumnConf>> rowMap = new AtomicReference<Map<String, ColumnConf>>();
+    private AtomicReference<LinkedMapIgnoreCase<String, ColumnConf>> rowMap = new AtomicReference<LinkedMapIgnoreCase<String, ColumnConf>>();
     private JRadioButton rdbtnOthers;
     private FastDBQueryUI _parent;
     private JCheckBox applyAllQueryResultCheckBox;
@@ -143,6 +151,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
     private JButton sqlQueryNextBtn;
     private JLabel sqlQueryCountLbl;
     private SqlQueryHolder mSqlQueryHolder;
+    private JButton exportExcelBtn;
 
     private enum ColumnOrderDef {
         columnName("欄位", 25, false), //
@@ -666,7 +675,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
             public Pair<Color, Color> getTableColour(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 JTableUtil util = JTableUtil.newInstance(rowTable);
                 String columnName = (String) util.getRealValueAt(row, ColumnOrderDef.columnName.ordinal());
-                Map<String, ColumnConf> conf = rowMap.get();
+                LinkedMapIgnoreCase<String, ColumnConf> conf = rowMap.get();
                 if (conf.containsKey(columnName)) {
                     ColumnConf cf = conf.get(columnName);
                     if (cf.isAddFromCustomTableName) {
@@ -683,7 +692,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                 String columnName = (String) util.getRealValueAt(row, ColumnOrderDef.columnName.ordinal());
                 // String v1 = (String) util.getRealValueAt(row,
                 // ColumnOrderDef.value.ordinal());
-                Map<String, ColumnConf> conf = rowMap.get();
+                LinkedMapIgnoreCase<String, ColumnConf> conf = rowMap.get();
                 if (conf.containsKey(columnName)) {
                     ColumnConf cf = conf.get(columnName);
                     String orignValue = "";
@@ -786,14 +795,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
 
             private void updateCurrentValueLength(Object currentOrignValue, int row, int col) {
                 if (col == ColumnOrderDef.value.ordinal()) {
-                    String valueStr = currentOrignValue == null ? "" : String.valueOf(currentOrignValue);
-                    int currentLength = 0;
-                    if ("null".equals(valueStr)) {
-                        currentLength = 0;
-                    } else {
-                        currentLength = StringUtil4FullChar.length(valueStr);
-                    }
-                    System.out.println(" currentLength : " + valueStr + " -> " + currentLength);
+                    int currentLength = getCurrentValueLength(currentOrignValue);
                     JTableUtil.newInstance(rowTable).setValueAt(false, currentLength, row, ColumnOrderDef.currentLength.ordinal());
                 }
             }
@@ -822,9 +824,23 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
         return tableUtil.getModel();
     }
 
+    private int getCurrentValueLength(Object currentOrignValue) {
+        String valueStr = currentOrignValue == null ? "" : String.valueOf(currentOrignValue);
+        int currentLength = 0;
+        if ("null".equals(valueStr)) {
+            currentLength = 0;
+        } else {
+            currentLength = StringUtil4FullChar.length(valueStr);
+        }
+        System.out.println(" currentLength : " + valueStr + " -> " + currentLength);
+        return currentLength;
+    }
+
     // 自動設定pk
     private void tableAndSchemaText_focusLost_action(JTextField tableAndSchemaText) {
         try {
+            TableInfo tableInfo = new TableInfo();
+
             String tableAndSchema = StringUtils.trimToEmpty(tableAndSchemaText.getText());
             if (StringUtils.isNotBlank(tableAndSchema)) {
                 boolean confirm = JCommonUtil._JOptionPane_showConfirmDialog_yesNoOption("是否要重設 " + tableAndSchema + " 的 PK", "重設?");
@@ -832,7 +848,6 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                     return;
                 }
 
-                TableInfo tableInfo = new TableInfo();
                 JCommonUtil.isBlankErrorMsg(tableAndSchema, "輸入表名稱!");
 
                 DBDateUtil.DBDateFormat dbDateDateFormat = (DBDateUtil.DBDateFormat) dbTypeComboBox.getSelectedItem();
@@ -841,110 +856,113 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                 if (StringUtils.isBlank(tableInfo.getTableName())) {
                     tableInfo.setTableName(tableAndSchema);
                 }
+            }
 
-                Set<String> success = new LinkedHashSet<String>();
-                Set<String> failed = new LinkedHashSet<String>();
+            Set<String> success = new LinkedHashSet<String>();
+            Set<String> failed = new LinkedHashSet<String>();
 
-                Map<String, ColumnConf> columnPkConf = new HashMap<String, ColumnConf>();
+            Map<String, ColumnConf> columnPkConf = new HashMap<String, ColumnConf>();
 
-                if (columnsLst == null || columnsLst.isEmpty()) {
-                    Validate.isTrue(false, "資料欄位尚未初始化！[columnsLst-123]");
+            if (columnsLst == null || columnsLst.isEmpty()) {
+                Validate.isTrue(false, "資料欄位尚未初始化！[columnsLst-123]");
+            }
+
+            for (String columnName : columnsLst) {
+                ColumnConf df = new ColumnConf();
+                df.isPk = false;
+                df.isAddFromCustomTableName = false;
+                df.bakupColumnName = "";
+                df.columnName = columnName;
+                columnPkConf.put(columnName, df);
+            }
+
+            List<String> finOkColumnLst = new ArrayList<String>();
+
+            for (String rowColumnName : columnPkConf.keySet()) {
+                boolean findOk = false;
+                C: for (String columnName : tableInfo.getColumnInfo().keySet()) {
+                    boolean useRealColumn = false;
+                    if (StringUtils.equalsIgnoreCase(rowColumnName, columnName)) {
+                        findOk = true;
+                        finOkColumnLst.add(columnName);
+                    }
+                    if (StringUtils.equalsIgnoreCase(rowColumnName, StringUtilForDb.dbFieldToJava(columnName))) {
+                        findOk = true;
+                        useRealColumn = true;
+                        finOkColumnLst.add(rowColumnName);
+                        finOkColumnLst.add(columnName);
+                    }
+                    if (findOk) {
+                        FieldInfo4DbSqlCreater info = tableInfo.getColumnInfo().get(columnName);
+                        columnPkConf.get(rowColumnName).maxLength = info.getColumnDisplaySize();
+                        if (useRealColumn) {
+                            columnPkConf.get(rowColumnName).bakupColumnName = columnName;
+                        }
+                        break C;
+                    }
                 }
+                if (!findOk) {
+                    columnPkConf.get(rowColumnName).maxLength = null;
+                }
+            }
 
-                for (String columnName : columnsLst) {
+            addFromCustomTableColumnLst.clear();
+            for (String columnName : tableInfo.getColumnInfo().keySet()) {
+                if (!finOkColumnLst.contains(columnName)) {
                     ColumnConf df = new ColumnConf();
-                    df.isPk = false;
-                    df.isAddFromCustomTableName = false;
-                    df.bakupColumnName = "";
                     df.columnName = columnName;
+                    df.isAddFromCustomTableName = true;
+                    FieldInfo4DbSqlCreater info = tableInfo.getColumnInfo().get(columnName);
+                    df.maxLength = info.getColumnDisplaySize();
                     columnPkConf.put(columnName, df);
+                    addFromCustomTableColumnLst.add(columnName);
                 }
+            }
 
-                List<String> finOkColumnLst = new ArrayList<String>();
-
-                for (String rowColumnName : columnPkConf.keySet()) {
-                    boolean findOk = false;
-                    C: for (String columnName : tableInfo.getColumnInfo().keySet()) {
-                        boolean useRealColumn = false;
-                        if (StringUtils.equalsIgnoreCase(rowColumnName, columnName)) {
-                            findOk = true;
-                            finOkColumnLst.add(columnName);
-                        }
-                        if (StringUtils.equalsIgnoreCase(rowColumnName, StringUtilForDb.dbFieldToJava(columnName))) {
-                            findOk = true;
-                            useRealColumn = true;
-                            finOkColumnLst.add(rowColumnName);
-                            finOkColumnLst.add(columnName);
-                        }
-                        if (findOk) {
-                            FieldInfo4DbSqlCreater info = tableInfo.getColumnInfo().get(columnName);
-                            columnPkConf.get(rowColumnName).maxLength = info.getColumnDisplaySize();
-                            if (useRealColumn) {
-                                columnPkConf.get(rowColumnName).bakupColumnName = columnName;
-                            }
+            for (String columnName : tableInfo.getNoNullsCol()) {
+                if (columnPkConf.containsKey(columnName)) {
+                    columnPkConf.get(columnName).isPk = true;
+                    success.add(columnName);
+                } else {
+                    C: for (String columnName2 : columnPkConf.keySet()) {
+                        String bakupColumnName = StringUtilForDb.javaToDbField(columnName2);
+                        if (StringUtils.equalsIgnoreCase(columnName, bakupColumnName)) {
+                            columnPkConf.get(columnName).isPk = true;
+                            success.add(columnName);
+                            break C;
+                        } else {
+                            failed.add(columnName);
                             break C;
                         }
                     }
-                    if (!findOk) {
-                        columnPkConf.get(rowColumnName).maxLength = null;
-                    }
                 }
+            }
 
-                addFromCustomTableColumnLst.clear();
-                for (String columnName : tableInfo.getColumnInfo().keySet()) {
-                    if (!finOkColumnLst.contains(columnName)) {
-                        ColumnConf df = new ColumnConf();
-                        df.columnName = columnName;
-                        df.isAddFromCustomTableName = true;
-                        FieldInfo4DbSqlCreater info = tableInfo.getColumnInfo().get(columnName);
-                        df.maxLength = info.getColumnDisplaySize();
-                        columnPkConf.put(columnName, df);
-                        addFromCustomTableColumnLst.add(columnName);
-                    }
+            System.out.println("Debug Start ===========================================");
+            for (String columnName : columnPkConf.keySet()) {
+                ColumnConf col = columnPkConf.get(columnName);
+                if (col.isPk || col.isIgnore) {
+                    System.out.println("\t" + columnName + ": pk :" + col.isPk + " , ignore : " + col.isIgnore + " , isAddFromCustomTable : " + col.isAddFromCustomTableName + " , bakColumn : "
+                            + col.bakupColumnName);
                 }
+            }
+            System.out.println("Debug End   ===========================================");
 
-                for (String columnName : tableInfo.getNoNullsCol()) {
-                    if (columnPkConf.containsKey(columnName)) {
-                        columnPkConf.get(columnName).isPk = true;
-                        success.add(columnName);
-                    } else {
-                        C: for (String columnName2 : columnPkConf.keySet()) {
-                            String bakupColumnName = StringUtilForDb.javaToDbField(columnName2);
-                            if (StringUtils.equalsIgnoreCase(columnName, bakupColumnName)) {
-                                columnPkConf.get(columnName).isPk = true;
-                                success.add(columnName);
-                                break C;
-                            } else {
-                                failed.add(columnName);
-                                break C;
-                            }
-                        }
-                    }
-                }
+            // 重設 pk 與 忽略
+            for (String columnName : rowMap.get().keySet()) {
+                ColumnConf conf = rowMap.get().get(columnName);
+                conf.isPk = false;
+                conf.isIgnore = false;
+            }
 
-                System.out.println("Debug Start ===========================================");
-                for (String columnName : columnPkConf.keySet()) {
-                    ColumnConf col = columnPkConf.get(columnName);
-                    if (col.isPk || col.isIgnore) {
-                        System.out.println("\t" + columnName + ": pk :" + col.isPk + " , ignore : " + col.isIgnore + " , isAddFromCustomTable : " + col.isAddFromCustomTableName + " , bakColumn : "
-                                + col.bakupColumnName);
-                    }
-                }
-                System.out.println("Debug End   ===========================================");
+            // 重新設定 pk
+            mRecordsHandler.setColumnPkConf(columnPkConf);
+            mRecordsHandler.mergePkConfig();
 
-                // 重設 pk 與 忽略
-                for (String columnName : rowMap.get().keySet()) {
-                    rowMap.get().get(columnName).isPk = false;
-                    rowMap.get().get(columnName).isIgnore = false;
-                }
+            // 刷新table
+            searchTextFilter();
 
-                // 重新設定 pk
-                mRecordsHandler.setColumnPkConf(columnPkConf);
-                mRecordsHandler.mergePkConfig();
-
-                // 刷新table
-                searchTextFilter();
-
+            if (StringUtils.isNotBlank(tableAndSchema)) {
                 JCommonUtil._jOptionPane_showMessageDialog_info("設定完成 \n 已設定:" + success + "\n 找不到 :" + failed);
             }
         } catch (Exception e) {
@@ -1693,6 +1711,15 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                     public void actionPerformed(ActionEvent e) {
                     }
                 });
+                {
+                    exportExcelBtn = new JButton("匯出excel");
+                    exportExcelBtn.addActionListener(new ActionListener() {
+                        public void actionPerformed(ActionEvent e) {
+                            exportExcelBtnAction();
+                        }
+                    });
+                    buttonPane.add(exportExcelBtn);
+                }
                 okButton.setActionCommand("OK");
                 buttonPane.add(okButton);
                 // getRootPane().setDefaultButton(okButton);//取消調預設按鈕
@@ -1912,7 +1939,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
 
     // 儲存 欄位編輯歷史紀錄
     private void updateColumnHistory() {
-        Map<String, ColumnConf> colDef = this.rowMap.get();
+        LinkedMapIgnoreCase<String, ColumnConf> colDef = this.rowMap.get();
         for (String col : colDef.keySet()) {
             ColumnConf def = colDef.get(col);
             if (def.isModify) {
@@ -1922,9 +1949,28 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
         _parent.getEditColumnConfig().store();
     }
 
+    private class LinkedMapIgnoreCase<K, V> extends TreeMap<K, V> {
+
+        public LinkedMapIgnoreCase() {
+            super((Comparator<? super K>) String.CASE_INSENSITIVE_ORDER);
+        }
+
+        Set<K> keys = new LinkedHashSet<K>();
+
+        public V put(K key, V value) {
+            keys.add(key);
+            super.put(key, value);
+            return value;
+        }
+
+        public Set<K> keySet() {
+            return keys;
+        }
+    }
+
     private class RecordsHandler {
         List<Map<String, Pair<Object, Class>>> rowMapLst;
-        Map<Integer, Map<String, ColumnConf>> rowMapLstHolder = new TreeMap<Integer, Map<String, ColumnConf>>();
+        Map<Integer, LinkedMapIgnoreCase> rowMapLstHolder = new TreeMap<Integer, LinkedMapIgnoreCase>();
         int index = 0;
         Map<String, ColumnConf> columnPkConf = Collections.EMPTY_MAP;
         Triple<List<String>, List<Class<?>>, List<Object[]>> queryList;
@@ -1970,7 +2016,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
 
             Map<String, Pair<Object, Class>> rowMapZ = rowMapLst.get(index);
 
-            Map<String, ColumnConf> rowMapForBackup = MapUtil.createIngoreCaseMap();
+            LinkedMapIgnoreCase<String, ColumnConf> rowMapForBackup = new LinkedMapIgnoreCase<String, ColumnConf>();
             if (rowMapLstHolder.containsKey(index)) {
                 rowMapForBackup = rowMapLstHolder.get(index);
             } else {
@@ -2067,7 +2113,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
             for (int ii = 0; ii < rowMapLst.size(); ii++) {
                 Map<String, Pair<Object, Class>> rowMapZ = rowMapLst.get(ii);
 
-                Map<String, ColumnConf> rowMapForBackup = MapUtil.createIngoreCaseMap();
+                LinkedMapIgnoreCase<String, ColumnConf> rowMapForBackup = new LinkedMapIgnoreCase<String, ColumnConf>();
                 if (rowMapLstHolder.containsKey(ii)) {
                     rowMapForBackup = rowMapLstHolder.get(ii);
                 } else {
@@ -2133,7 +2179,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                 }
             }
             for (Integer index : rowMapLstHolder.keySet()) {
-                Map<String, ColumnConf> confMap = rowMapLstHolder.get(index);
+                LinkedMapIgnoreCase<String, ColumnConf> confMap = rowMapLstHolder.get(index);
                 Map<String, String> map = new LinkedHashMap<String, String>();
                 boolean hasModify = false;
                 for (String col : columnPkConf.keySet()) {
@@ -2422,5 +2468,53 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                 JCommonUtil.handleException(ex);
             }
         }
+    }
+
+    private void exportExcelBtnAction() {
+        ExcelUtil_Xls97 xlsUtil = ExcelUtil_Xls97.getInstance();
+        HSSFWorkbook wb = new HSSFWorkbook();
+        HSSFSheet sheet = wb.createSheet("欄位定義");
+
+        int rowIdx = 0;
+
+        HSSFRow titleRow = sheet.createRow(rowIdx++);
+
+        xlsUtil.getCellChk(titleRow, 0).setCellValue("欄位名");
+        xlsUtil.getCellChk(titleRow, 1).setCellValue("原始值");
+        xlsUtil.getCellChk(titleRow, 2).setCellValue("類型");
+        xlsUtil.getCellChk(titleRow, 3).setCellValue("是否為PK");
+        xlsUtil.getCellChk(titleRow, 4).setCellValue("是否忽略");
+        xlsUtil.getCellChk(titleRow, 5).setCellValue("是否修改");
+        xlsUtil.getCellChk(titleRow, 6).setCellValue("當前長度");
+        xlsUtil.getCellChk(titleRow, 7).setCellValue("最大長度");
+        xlsUtil.getCellChk(titleRow, 8).setCellValue("原始欄位名");
+        xlsUtil.getCellChk(titleRow, 9).setCellValue("是否為擴增欄位");
+
+        Set<String> columns = rowMap.get().keySet();
+        for (String column : columns) {
+            ColumnConf conf = rowMap.get().get(column);
+            Row row = xlsUtil.getRowChk(sheet, rowIdx++);
+            xlsUtil.getCellChk(row, 0).setCellValue(conf.columnName);
+            xlsUtil.getCellChk(row, 1).setCellValue(String.valueOf(conf.orignValue));
+            xlsUtil.getCellChk(row, 2).setCellValue(conf.dtype != null ? conf.dtype.name() : "NA");
+            xlsUtil.getCellChk(row, 3).setCellValue(conf.isPk ? "Y" : "N");
+            xlsUtil.getCellChk(row, 4).setCellValue(conf.isIgnore ? "Y" : "N");
+            xlsUtil.getCellChk(row, 5).setCellValue(conf.isModify ? "Y" : "N");
+            xlsUtil.getCellChk(row, 6).setCellValue(getCurrentValueLength(conf.orignValue));
+            xlsUtil.getCellChk(row, 7).setCellValue(conf.maxLength != null ? String.valueOf(conf.maxLength) : "NA");
+            xlsUtil.getCellChk(row, 8).setCellValue(StringUtils.trimToEmpty(conf.bakupColumnName));
+            xlsUtil.getCellChk(row, 9).setCellValue(conf.isAddFromCustomTableName ? "Y" : "N");
+        }
+
+        xlsUtil.autoCellSize(sheet);
+
+        CellStyleHandler leftChangeCs = ExcelWriter.CellStyleHandler.newInstance(wb.createCellStyle())//
+                .setForegroundColor(new HSSFColor.SEA_GREEN());
+        leftChangeCs.setSheet(sheet);
+        leftChangeCs.applyStyle(0, 0, 0, 9);
+
+        String name = FastDBQueryUI_CrudDlgUI.class.getSimpleName() + "_" + DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMddHHmmss") + ".xls";
+        File file = new File(FileUtil.DESKTOP_DIR, name);
+        xlsUtil.writeExcelConfirmDlg(file, wb, "欄位定義匯出檔");
     }
 }
