@@ -3633,9 +3633,9 @@ public class FastDBQueryUI extends JFrame {
             while (mth.find()) {
                 String quoteLine = mth.group(1);
                 // fix 修正回原來的 ↓↓↓↓↓↓↓
-                System.out.println("quote[0] : " + quoteLine);
+//                System.out.println("quote[0] : " + quoteLine);
                 quoteLine = StringUtils.substring(beforeSQL, mth.start(1), mth.end(1));
-                System.out.println("quote[1] : " + quoteLine);
+//                System.out.println("quote[1] : " + quoteLine);
                 // fix 修正回原來的 ↑↑↑↑↑↑↑
 
                 // 非必填檢查
@@ -3643,10 +3643,10 @@ public class FastDBQueryUI extends JFrame {
                     String realQuoteLine = mth.group(2);
 
                     // fix 修正回原來的 ↓↓↓↓↓↓↓
-                    System.out.println("quote[2] : " + realQuoteLine);
+//                    System.out.println("quote[2] : " + realQuoteLine);
                     // realQuoteLine = StringUtils.substring(beforeSQL,
                     // mth.start(2), mth.end(2));//<---不須修正
-                    System.out.println("quote[3] : " + realQuoteLine);
+//                    System.out.println("quote[3] : " + realQuoteLine);
                     // fix 修正回原來的 ↑↑↑↑↑↑↑
 
                     Pattern ptn2 = Pattern.compile(SQL_PARAM_PTN);
@@ -3684,10 +3684,10 @@ public class FastDBQueryUI extends JFrame {
                 else {
                     String realQuoteLine = mth.group(3);
                     // fix 修正回原來的 ↓↓↓↓↓↓↓
-                    System.out.println("quote[4] : " + realQuoteLine);
+//                    System.out.println("quote[4] : " + realQuoteLine);
                     // realQuoteLine = StringUtils.substring(beforeSQL,
                     // mth.start(3), mth.end(3));//<---不須修正
-                    System.out.println("quote[5] : " + realQuoteLine);
+//                    System.out.println("quote[5] : " + realQuoteLine);
                     // fix 修正回原來的 ↑↑↑↑↑↑↑
 
                     sqlParam.paramSet.add(realQuoteLine);

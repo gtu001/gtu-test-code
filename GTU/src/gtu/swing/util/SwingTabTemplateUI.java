@@ -591,7 +591,6 @@ public class SwingTabTemplateUI {
             if (!isVetoable())
                 return;
             vetoableChangeSupport.fireVetoableChange("selectedIndex", oldSelectionIndex, newSelectionIndex);
-
         }
 
         private boolean isVetoable() {
