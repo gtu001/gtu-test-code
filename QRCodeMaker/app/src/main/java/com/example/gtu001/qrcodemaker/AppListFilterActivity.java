@@ -34,6 +34,7 @@ import com.example.gtu001.qrcodemaker.common.Log;
 import com.example.gtu001.qrcodemaker.common.SimpleAdapterDecorator;
 import com.example.gtu001.qrcodemaker.common.SingleAutoCompleteDialog;
 import com.example.gtu001.qrcodemaker.common.TitleUtil;
+import com.example.gtu001.qrcodemaker.util.FileUtil;
 
 
 import org.apache.commons.lang3.StringUtils;
@@ -125,8 +126,7 @@ public class AppListFilterActivity extends Activity {
                     return;
                 }
 
-                String[] items = new String[]{"開啟", "修改Tag"};
-
+                String[] items = new String[]{"開啟", "系統管理", "修改Tag"};
                 new AlertDialog.Builder(AppListFilterActivity.this)//
                         .setTitle(app.getLabel())//
 //                        .setMessage(app.getInstalledPackage())//
@@ -138,6 +138,9 @@ public class AppListFilterActivity extends Activity {
                                         app.run(AppListFilterActivity.this);
                                         break;
                                     case 1:
+                                        app.setting(AppListFilterActivity.this);
+                                        break;
+                                    case 2:
                                         final SingleAutoCompleteDialog dialog = new SingleAutoCompleteDialog(//
                                                 AppListFilterActivity.this,//
                                                 app.getTag(),//
@@ -179,12 +182,18 @@ public class AppListFilterActivity extends Activity {
         }
 
         private Map<String, Object> getItem2Map(AppListService.AppInfo item) {
+            long usageSize = AppListService.getUsageSize(context, item.getInstalledPackage());
+            String sizeDesc = "";
+            if (usageSize != -1) {
+                sizeDesc = FileUtil.getSizeDescription(usageSize);
+            }
+
             Map<String, Object> map = new HashMap<String, Object>();
             map.put("item_image", null);// 圖像資源的ID
             map.put("item_title", item.getLabel());
             map.put("item_text", item.getInstalledPackage());
             map.put("item_image_check", item.getIcon());
-            map.put("item_text_desc", StringUtils.trimToEmpty(item.getTag()));
+            map.put("item_text_desc", StringUtils.trimToEmpty(item.getTag()) + " ---- " + sizeDesc);
             map.put("item", item);
             return map;
         }

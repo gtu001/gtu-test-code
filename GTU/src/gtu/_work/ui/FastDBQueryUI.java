@@ -7492,32 +7492,6 @@ public class FastDBQueryUI extends JFrame {
         String lastestStatusArea;
         List<Pair<Integer, Integer>> findLst = new ArrayList<Pair<Integer, Integer>>();
 
-        public boolean findKey() {
-            findKey = JCommonUtil._jOptionPane_showInputDialog("搜尋:", "");
-            if (StringUtils.isBlank(findKey)) {
-                return true;
-            }
-            lastestStatusArea = StringUtils.defaultString(sqlTextArea.getText());
-
-            Pattern findPtn = Pattern.compile(Pattern.quote(findKey), Pattern.DOTALL | Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
-            Matcher findMth = findPtn.matcher(lastestStatusArea);
-
-            boolean isFirst = true;
-            while (findMth.find()) {
-                findLst.add(Pair.of(findMth.start(), findMth.end()));
-
-                if (isFirst) {
-                    sqlTextArea.setSelectionStart(findMth.start());
-                    sqlTextArea.setSelectionEnd(findMth.end());
-                    isFirst = false;
-                }
-            }
-            if (isFirst) {
-                JCommonUtil._jOptionPane_showMessageDialog_error("找不到 : " + findKey);
-            }
-            return true;
-        }
-
         public boolean replaceAll() {
             if (StringUtils.isBlank(findKey)) {
                 findKey = JCommonUtil._jOptionPane_showInputDialog("搜尋:", "");
@@ -7542,6 +7516,40 @@ public class FastDBQueryUI extends JFrame {
             sqlTextArea.setText(sb.toString());
             sqlTextArea.setSelectionStart(StringUtils.defaultString(sqlTextArea.getText()).length());
             sqlTextArea.updateUI();
+            return true;
+        }
+
+        public boolean findKey() {
+            findKey = JCommonUtil._jOptionPane_showInputDialog("搜尋:", "");
+            if (StringUtils.isBlank(findKey)) {
+                return true;
+            }
+
+            String tempTextAreaString = StringUtils.defaultString(sqlTextArea.getText());
+            if (StringUtils.isNotBlank(lastestStatusArea)) {
+                if (!StringUtils.equals(tempTextAreaString, lastestStatusArea)) {
+                    findLst.clear();
+                }
+            }
+
+            lastestStatusArea = tempTextAreaString;
+
+            Pattern findPtn = Pattern.compile(Pattern.quote(findKey), Pattern.DOTALL | Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
+            Matcher findMth = findPtn.matcher(lastestStatusArea);
+
+            boolean isFirst = true;
+            while (findMth.find()) {
+                findLst.add(Pair.of(findMth.start(), findMth.end()));
+
+                if (isFirst) {
+                    sqlTextArea.setSelectionStart(findMth.start());
+                    sqlTextArea.setSelectionEnd(findMth.end());
+                    isFirst = false;
+                }
+            }
+            if (isFirst) {
+                JCommonUtil._jOptionPane_showMessageDialog_error("找不到 : " + findKey);
+            }
             return true;
         }
 

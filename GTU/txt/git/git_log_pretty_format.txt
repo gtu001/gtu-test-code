@@ -1,0 +1,14 @@
+最後一次commit(版號)
+	git log -n 1 --pretty=format:%H --  '**/PEdorACDetailBL.java'
+
+最後一次commit(時間UNIX Timestamp (常整數))
+	git log -n 1 --pretty=format:%at --  '**/PEdorACDetailBL.java'
+
+最後一次commit(時間 作者 message)
+git log -n 1 --date=format:'%Y-%m-%d %H:%M:%S' --pretty=format:'%ad %aN %s'  --  '**/PEdorACDetailBL.java'
+
+	-n 1 只顯示最後一筆
+	--date=format:'%Y-%m-%d %H:%M:%S'  指定日期格式
+	%ad 日期
+	%aN 作者
+

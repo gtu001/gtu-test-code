@@ -1,18 +1,30 @@
 package com.example.gtu001.qrcodemaker.common;
 
+import android.app.Activity;
+import android.app.usage.StorageStats;
+import android.app.usage.StorageStatsManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
+import android.content.pm.IPackageStatsObserver;
 import android.content.pm.PackageManager;
+import android.content.pm.PackageStats;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
+import android.os.RemoteException;
+import android.os.UserHandle;
+import android.os.storage.StorageManager;
+import android.provider.Settings;
 
 import com.example.gtu001.qrcodemaker.dao.AppInfoDAO;
 import com.example.gtu001.qrcodemaker.services.AppInfoService;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class AppListService {
 
@@ -37,6 +49,10 @@ public class AppListService {
 
         public void run(Context context) {
             AppListService.launchApp(context, installedPackage);
+        }
+
+        public void setting(Activity context) {
+            AppListService.setting(context, installedPackage);
         }
 
         public String getInstalledPackage() {
@@ -284,6 +300,53 @@ public class AppListService {
             Log.e(TAG, e.getMessage(), e);
         }
         return name;
+    }
+
+    public static long getUsageSize(Context context, String packagename) {
+        final AtomicLong size = new AtomicLong(0);
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            final StorageStatsManager storageStatsManager;
+            storageStatsManager = (StorageStatsManager) context.getSystemService(Context.STORAGE_STATS_SERVICE);
+            final StorageManager storageManager = (StorageManager) context.getSystemService(Context.STORAGE_SERVICE);
+            try {
+                ApplicationInfo ai = context.getPackageManager().getApplicationInfo(packagename, 0);
+                UserHandle user = android.os.Process.myUserHandle();
+
+                StorageStats storageStats = storageStatsManager.queryStatsForUid(ai.storageUuid, ai.uid);
+                long cacheSize = storageStats.getCacheBytes();
+                long dataSize = storageStats.getDataBytes();
+                long apkSize = storageStats.getAppBytes();
+                size.addAndGet(cacheSize);
+                size.addAndGet(dataSize);
+                size.addAndGet(apkSize);
+            } catch (Exception e) {
+                Log.e(TAG, "getUsageSize ERR : " + e.getMessage(), e);
+            }
+        } else {
+            try {
+                PackageManager pm = context.getPackageManager();
+                Method getPackageSizeInfo = pm.getClass().getMethod(
+                        "getPackageSizeInfo", String.class, IPackageStatsObserver.class);
+                getPackageSizeInfo.invoke(pm, packagename,
+                        new IPackageStatsObserver.Stub() {
+                            @Override
+                            public void onGetStatsCompleted(PackageStats pStats, boolean succeeded)
+                                    throws RemoteException {
+                                size.addAndGet(pStats.cacheSize);
+                                size.addAndGet(pStats.codeSize);
+                                size.addAndGet(pStats.dataSize);
+                            }
+                        });
+            } catch (Exception e) {
+                Log.e(TAG, "getUsageSize ERR : " + e.getMessage(), e);
+            }
+        }
+        return size.get();
+    }
+
+    public static void setting(Activity context, String packageName) {
+        Intent i = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + packageName));//getPackageName()
+        context.startActivityForResult(i, 0);
     }
 
     public static void launchApp(Context context, String packageName) {

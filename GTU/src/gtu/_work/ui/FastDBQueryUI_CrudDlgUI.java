@@ -265,14 +265,6 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
             }
         }, //
         UNKNOW(void.class) {
-            protected void applyDataChange(Object value, JTable table, int row, FastDBQueryUI_CrudDlgUI self) {
-                System.out.println("############################################################");
-                System.out.println("#                       UNKNOW                             #");
-                System.out.println("-------" + value + " -> " + value.getClass());
-                table.setValueAt(value, row, ColumnOrderDef.value.ordinal());
-                System.out.println("#                                                          #");
-                System.out.println("############################################################");
-            }
         },//
         ;
 
@@ -280,6 +272,19 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
 
         DataType(Class<?>... clz) {
             this.clz = clz;
+        }
+
+        static void showUnknowValue(Object value, Class clz) {
+            System.out.println("############################################################");
+            System.out.println("#                       UNKNOW                             #");
+            if (value != null) {
+                System.out.println("-------" + value + " -> " + value.getClass());
+            }
+            if (clz != null) {
+                System.out.println("-------" + "NA" + " -> " + clz);
+            }
+            System.out.println("#                                                          #");
+            System.out.println("############################################################");
         }
 
         static DataType isTypeOfClass(Class clz) {
@@ -300,6 +305,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                     }
                 }
             }
+            showUnknowValue(null, clz);
             return UNKNOW;
         }
 
@@ -321,6 +327,7 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
                     }
                 }
             }
+            showUnknowValue(value, null);
             return UNKNOW;
         }
     }
