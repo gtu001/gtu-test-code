@@ -265,6 +265,14 @@ public class FastDBQueryUI_CrudDlgUI extends JDialog {
             }
         }, //
         UNKNOW(void.class) {
+            protected void applyDataChange(Object value, JTable table, int row, FastDBQueryUI_CrudDlgUI self) {
+                System.out.println("############################################################");
+                System.out.println("#                       UNKNOW                             #");
+                System.out.println("-------" + value + " -> " + value.getClass());
+                table.setValueAt(value, row, ColumnOrderDef.value.ordinal());
+                System.out.println("#                                                          #");
+                System.out.println("############################################################");
+            }
         },//
         ;
 
