@@ -30,12 +30,32 @@
 	<typedef name="antDebug" classname="gtu.ant.AntDebug" classpathref="my_test_classpath" />
 	<typedef name="jarToExe" classname="gtu.ant.AntJarToExe" classpathref="my_test_classpath" />
 	<typedef name="notify" classname="gtu.ant.AntNotify" classpathref="my_test_classpath" />
+	<typedef name="obfuscator" classname="gtu.ant.AntObfuscator" classpathref="my_test_classpath" />
+	<typedef name="baseFolderChanger" classname="gtu.ant.AntBaseFolderChanger" classpathref="my_test_classpath" />
 
+	<macrodef name="set" >
+        <attribute name="name"/>
+        <attribute name="value"/>
+        <sequential>
+            <script language="javascript">
+                <![CDATA[
+                project.setProperty("@{name}", "@{value}");
+                ]]>
+            </script>
+        </sequential>
+    </macrodef>
+	
 	<!-- 參考的jar -->
 	<path id="class_path">
 		<fileset dir="${jar_repsitory}">
 			<filename name="**/*.jar" />
 		</fileset>
+	</path>
+	<path id="javafx_class_path">
+		<fileset dir="/media/gtu001/OLD_D/my_tool/jfxrt">
+			<filename name="**/*.jar" />
+		</fileset>
+		<pathelement path="${build.dir}" />
 	</path>
 
 	<!--
@@ -45,6 +65,16 @@
 		<echo># buildTest ..</echo>
 	</target>
 	-->
+
+	<target name="baseFolderChanger" if="${enable}">
+		<echo># baseFolderChanger = ${enable}</echo>
+		<baseFolderChanger>
+			<FolderPlaceholder name="build_dir_fix">${build_dir}</FolderPlaceholder>
+			<FolderPlaceholder name="jars_dir_fix">${jars_dir}</FolderPlaceholder>
+		</baseFolderChanger>
+		<set name="build_dir" value="${build_dir_fix}" />
+		<set name="jars_dir" value="${jars_dir_fix}" />
+	</target>
 
 	<target name="jarToExe" if="${enable}">
 		<echo># jarToExe = ${enable}</echo>
@@ -97,24 +127,33 @@
 	<path id="config">
 		<fileset dir="${src_dir}">
 			<exclude name="**/*.java" />
+			<exclude name="**/log4j.properties" />
+			<exclude name="**/logback.xml" />
+			<exclude name="**/velocity.properties" />
 		</fileset>
 	</path>
 
 	<target name="main">
+		<antcall target="baseFolderChanger">
+			<param name="enable" value="true" /><!--false -->
+		</antcall>
+
 		<antcall target="clean">
 			<!--清除-->
-			<param name="enable" value="true" />
+			<param name="enable" value="true" /><!--false -->
 		</antcall>
 
 		<antcall target="buildClassSet">
-			<param name="enable" value="true" />
+			<param name="enable" value="true" /><!--false -->
 		</antcall>
 
 		<antcall target="copyReference">
-			<param name="enable" value="true" />
+			<param name="enable" value="true" /><!--false -->
 		</antcall>
 
-		<antcall target="compiler" />
+		<antcall target="compiler">
+			<param name="enable" value="true" />
+		</antcall>
 
 		<antcall target="runClass">
 			<param name="enable" value="false" />
@@ -125,6 +164,10 @@
 		</antcall>
 
 		<antcall target="runJar">
+			<param name="enable" value="false" />
+		</antcall>
+	
+		<antcall target="obfuscator">
 			<param name="enable" value="false" />
 		</antcall>
 
@@ -138,7 +181,7 @@
 
 		<antcall target="clean">
 			<!--清除-->
-			<param name="enable" value="true" />
+			<param name="enable" value="true" /><!--false -->
 		</antcall>
 
 		<antcall target="jarToExe">
@@ -160,13 +203,14 @@
 		<notify type="info" title="build完成" message="create ${main_class}.jar complete!!" />
 	</target>
 
-	<target name="compiler">
+	<target name="compiler" if="${enable}">
 		<echo># compiler ...</echo>
-		<javac compiler="javac1.6" source="1.6" target="1.6" includeantruntime="true" srcdir="${src_dir}" destdir="${build_dir}" deprecation="no" nowarn="true" encoding="UTF-8" debug="on">
-			<include name="**/${main_class}.java" />
+		<javac fork="yes" compiler="javac1.6" source="1.6" target="1.6" includeantruntime="true" srcdir="${src_dir}" destdir="${build_dir}" deprecation="no" nowarn="true" encoding="UTF-8" debug="on"><!-- -->
+			<include name="**/${main_class}.java" /><!--executable="${jdk_javac}" fork="yes" -->
 			<classpath>
 				<path location="${build_dir}" />
 			</classpath>
+			<!--<classpath refid="javafx_class_path" />-->
 		</javac>
 	</target>
 
@@ -182,12 +226,12 @@
 	<target name="createJar" if="${enable}">
 		<echo># create ${main_class}.jar</echo>
 		<!--
-				<jar destfile="${main_class}.jar" basedir="${build_dir}">
-					<manifest>
-						<attribute name="Main-Class" value="${main_class_full}" />
-					</manifest>
-				</jar>
-				-->
+			<jar destfile="${main_class}.jar" basedir="${build_dir}">
+				<manifest>
+					<attribute name="Main-Class" value="${main_class_full}" />
+				</manifest>
+			</jar>
+			-->
 		<jar destfile="${main_class}.jar">
 			<zipfileset dir="${build_dir}">
 				<exclude name="META-INF/**" />
@@ -197,7 +241,7 @@
 			<manifest>
 				<attribute name="Main-Class" value="${main_class_full}" />
 				<attribute name="Class-Path" value="." />
-				<!--<attribute name="Rsrc-Class-Path" value="./ ojdbc14.jar" />-->
+				<attribute name="Rsrc-Class-Path" value="./ ojdbc14.jar" />
 			</manifest>
 		</jar>
 	</target>
@@ -237,16 +281,23 @@
 		</copy>
 
 		<mkdir dir="${build_dir}/META-INF" />
-		<copy tofile="${build_dir}/META-INF/persistence.xml">
-			<fileset dir="${src_dir}">
-				<filename name="**/persistence.xml" />
-			</fileset>
+		<copy tofile="${build_dir}/META-INF/persistence.xml" overwrite="true">
+			<first count="1">
+				<fileset dir="${src_dir}">
+					<filename name="**/persistence.xml" />
+				</fileset>
+			</first>
 		</copy>
 
-		<unjar dest="${build_dir}">
+		<unjar dest="${build_dir}" overwrite="true">
 			<fileset dir="${jars_dir}">
 				<include name="**/*.jar" />
 			</fileset>
 		</unjar>
+	</target>
+
+	<target name="obfuscator" if="${enable}">
+		<echo># obfuscator = ${enable}</echo>
+		<obfuscator jarDir="${obfuscator_dir}" inJar="${basedir}/${main_class}.jar" />
 	</target>
 </project>

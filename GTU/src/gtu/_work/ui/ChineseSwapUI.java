@@ -24,6 +24,7 @@ import javax.swing.event.ChangeListener;
 import org.apache.commons.lang3.StringUtils;
 
 import gtu._work.ui.JMenuBarUtil.JMenuAppender;
+import gtu.binary.Base64JdkUtil;
 import gtu.file.FileUtil;
 import gtu.swing.util.HideInSystemTrayHelper;
 import gtu.swing.util.JButtonGroupUtil;
@@ -57,6 +58,8 @@ public class ChineseSwapUI extends JFrame {
     private JLabel lblNewLabel_1;
     private JTextField fromEncodeText;
     private ButtonGroup btnGroup;
+    private JRadioButton toEncodeBase64Radio;
+    private JRadioButton toDecodeBase64Radio;
 
     /**
      * Launch the application.
@@ -139,6 +142,14 @@ public class ChineseSwapUI extends JFrame {
                 swingUtil.invokeAction("translateBtn.click", e);
             }
         });
+
+        toEncodeBase64Radio = new JRadioButton("encode base64");
+        toEncodeBase64Radio.setSelected(true);
+        panel_6.add(toEncodeBase64Radio);
+
+        toDecodeBase64Radio = new JRadioButton("decode base64");
+        toDecodeBase64Radio.setSelected(true);
+        panel_6.add(toDecodeBase64Radio);
         panel_6.add(translateBtn);
 
         chineseArea = new JTextArea();
@@ -153,7 +164,7 @@ public class ChineseSwapUI extends JFrame {
         panel_2.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 
         {
-            btnGroup = JButtonGroupUtil.createRadioButtonGroup(toBig5Radio, toGbkRadio);
+            btnGroup = JButtonGroupUtil.createRadioButtonGroup(toBig5Radio, toGbkRadio, toEncodeBase64Radio, toDecodeBase64Radio);
 
             // 掛載所有event
             applyAllEvents();
@@ -198,6 +209,10 @@ public class ChineseSwapUI extends JFrame {
                         chineseArea.setText(JChineseConvertor.getInstance().s2t(text));
                     } else if (JButtonGroupUtil.getSelectedButton(btnGroup) == toGbkRadio) {
                         chineseArea.setText(JChineseConvertor.getInstance().t2s(text));
+                    } else if (JButtonGroupUtil.getSelectedButton(btnGroup) == toEncodeBase64Radio) {
+                        chineseArea.setText(Base64JdkUtil.encode(text));
+                    } else if (JButtonGroupUtil.getSelectedButton(btnGroup) == toDecodeBase64Radio) {
+                        chineseArea.setText(Base64JdkUtil.decodeToString(text));
                     }
                 }
 
