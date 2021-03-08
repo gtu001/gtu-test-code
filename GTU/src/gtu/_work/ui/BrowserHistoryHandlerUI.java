@@ -769,9 +769,15 @@ public class BrowserHistoryHandlerUI extends JFrame {
 
             configSelf.reflectInit(this);
 
+            boolean configSelfOk = false;
             if (configSelf.getConfigProp().containsKey("bookmarkConfigText")) {
-                bookmarkConfig = new PropertiesUtilBean(new File(configSelf.getConfigProp().getProperty("bookmarkConfigText")));
-            } else {
+                File confile = new File(configSelf.getConfigProp().getProperty("bookmarkConfigText"));
+                if (confile.exists()) {
+                    bookmarkConfig = new PropertiesUtilBean(confile);
+                    configSelfOk = true;
+                }
+            }
+            if (configSelfOk == false) {
                 // 使用jar 所在路徑
                 File bookmarkConfigFile = new File(PropertiesUtil.getJarCurrentPath(getClass()), "BrowserHistoryHandlerUI_bookmark.properties");
                 if (bookmarkConfigFile.exists()) {

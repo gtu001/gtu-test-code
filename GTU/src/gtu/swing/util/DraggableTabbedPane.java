@@ -9,6 +9,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.image.BufferedImage;
+import java.lang.reflect.Field;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -76,8 +77,7 @@ public class DraggableTabbedPane extends JTabbedPane {
 
         addMouseListener(new MouseAdapter() {
             public void mouseReleased(MouseEvent e) {
-
-                if (dragging) {
+                if (dragging && checkPageRemoveTabAble(draggedTabIndex)) {
                     int tabNumber = getUI().tabForCoordinate(DraggableTabbedPane.this, e.getX(), 10);
 
                     if (tabNumber >= 0) {
@@ -88,6 +88,7 @@ public class DraggableTabbedPane extends JTabbedPane {
 
                         Component comp = getComponentAt(draggedTabIndex);
                         String title = getTitleAt(draggedTabIndex);
+
                         removeTabAt(draggedTabIndex);
                         insertTab(title, null, comp, null, tabNumber);
 
@@ -102,6 +103,20 @@ public class DraggableTabbedPane extends JTabbedPane {
                 tabImage = null;
             }
         });
+    }
+
+    private boolean checkPageRemoveTabAble(int index) {
+        try {
+            Field f1 = JTabbedPane.class.getDeclaredField("pages");
+            f1.setAccessible(true);
+            java.util.List lst = (java.util.List) f1.get(this);
+            if (lst.size() > index && lst.size() > this.getSelectedIndex()) {
+                return true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     public interface DraggableTabbedPaneMove {

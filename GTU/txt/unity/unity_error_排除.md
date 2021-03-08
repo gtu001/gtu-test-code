@@ -4,3 +4,7 @@ unity_error_排除.md
 	加入 using UnityEngine.UI;
 
 
+
+
+# Disconnecting is no longer implemented
+	左邊 Hierarchy 對藍色物件 點右鍵 Prefab > Unpack 

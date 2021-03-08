@@ -1934,9 +1934,6 @@ public class EnglishSearchUI extends JFrame {
 
     private int writeNewData2(String word, boolean isDelete) throws IOException {
         File file = getAppendTextFile();
-        if (!file.exists()) {
-            file.createNewFile();
-        }
         BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), "utf8"));
         Set<String> set = new LinkedHashSet<String>();
         word = getFixWord(word);
@@ -1980,16 +1977,24 @@ public class EnglishSearchUI extends JFrame {
         if (StringUtils.isBlank(val)) {
             JCommonUtil._jOptionPane_showMessageDialog_error("未設定new_word.txt路徑, 建立一個在桌面!");
             File newFile = new File(FileUtil.DESKTOP_PATH + File.separator + "new_word.txt");
-            try {
-                newFile.createNewFile();
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
             val = newFile.getAbsolutePath();
             newWordTxtPathText.setText(val);
             propertyBean.getConfigProp().setProperty(NEW_WORD_PATH, val);
         }
-        return new File(val);
+        File file = new File(val);
+        if (!file.exists()) {
+            try {
+                file.createNewFile();
+            } catch (IOException e1) {
+                file = new File(PropertiesUtil.getJarCurrentPath(getClass()), "new_word.txt");
+                try {
+                    file.createNewFile();
+                } catch (IOException e2) {
+                    throw new RuntimeException("getAppendTextFile ERR : " + e2.getMessage(), e2);
+                }
+            }
+        }
+        return file;
     }
 
     private void configSettingBtnAction() {
