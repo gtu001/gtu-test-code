@@ -36,6 +36,7 @@ import javax.swing.event.ChangeListener;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
+import org.apache.commons.lang3.time.DateFormatUtils;
 
 import com.jgoodies.forms.factories.FormFactory;
 import com.jgoodies.forms.layout.ColumnSpec;
@@ -161,6 +162,7 @@ public class GitConflictDetectUI extends JFrame {
 
             @Override
             public void afterInit(SwingTabTemplateUI self) {
+                tabUI.getJframe().setTitle(DateFormatUtils.format(System.currentTimeMillis(), "yyyy-MM-dd"));
             }
         });
         tabUI.setSize(701, 559 + 25);
@@ -1151,7 +1153,11 @@ public class GitConflictDetectUI extends JFrame {
 
         private boolean resolve() {
             // return resolveFile.renameTo(gitFile.file);
-            return FileUtil.copyFile(resolveFile, gitFile.file);
+            // return FileUtil.copyFile(resolveFile, gitFile.file);
+            String content = FileUtil.loadFromFile(resolveFile, getEncoding());
+            FileUtil.saveToFile(gitFile.file, content, getEncoding());
+            String content2 = FileUtil.loadFromFile(gitFile.file, getEncoding());
+            return StringUtils.equals(content, content2);
         }
     }
 
