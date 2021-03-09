@@ -17,6 +17,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
+import javax.swing.plaf.TabbedPaneUI;
 
 import sun.swing.SwingUtilities2;
 
@@ -98,7 +99,7 @@ public class DraggableTabbedPane extends JTabbedPane {
                             removeTabAt(draggedTabIndex);
                         } catch (Exception ex) {
                             System.out.println("removeTabAt ERR : " + ex.getMessage());
-                            
+
                             dragging = false;
                             tabImage = null;
                             return;
@@ -124,6 +125,14 @@ public class DraggableTabbedPane extends JTabbedPane {
             return super.getSelectedIndex();
         } catch (Exception ex) {
             return -1;
+        }
+    }
+
+    public String getToolTipText(MouseEvent event) {
+        try {
+            return super.getToolTipText(event);
+        } catch (Exception ex) {
+            return null;
         }
     }
 
