@@ -4,6 +4,8 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
+using System.Text.RegularExpressions;
+
 public class Log {
 
     private static Log Instance = new Log ();
@@ -57,7 +59,7 @@ public class Log {
         Console.WriteLine ("-----------------------------------------------");
         Type myType = obj.GetType (); //(typeof(obj));
         PropertyInfo[] myField = myType.GetProperties(BindingFlags.Public | BindingFlags.Static);
-        Console.WriteLine ("[field] Object Info : " + myType + "\t" + myField.Length);
+        Console.WriteLine ("[properties] Object Info : " + myType + "\t" + myField.Length);
         for(int i = 0; i < myField.Length; i++){
             Console.WriteLine (i + "\t" + myField[i].Name + "\t" + myField[i].IsSpecialName);
         }
@@ -68,9 +70,35 @@ public class Log {
         Console.WriteLine ("-----------------------------------------------");
         Type myType = obj; //(typeof(obj));
         PropertyInfo[] myField = myType.GetProperties();//BindingFlags.Public | BindingFlags.Static
-        Console.WriteLine ("[field] Object Info : " + myType + "\t" + myField.Length);
+        Console.WriteLine ("[properties] Object Info : " + myType + "\t" + myField.Length);
         for(int i = 0; i < myField.Length; i++){
             Console.WriteLine (i + "\t" + myField[i].Name + "\t" + myField[i].IsSpecialName);
+        }
+        Console.WriteLine ("-----------------------------------------------");
+    }
+
+    public static void showNamespace() {
+        Console.WriteLine ("-----------------------------------------------");
+        System.Reflection.Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
+        Regex rx = new Regex(@"(?<word>[\w\.]+?)\,", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        for(int i = 0 ; i < assemblies.Length; i ++) {
+            string strVal = assemblies[i].ToString();
+            MatchCollection matches = rx.Matches(strVal);
+            if(matches.Count > 0) {
+                Match mth = matches[0];
+                GroupCollection groups = mth.Groups;
+                string name = groups["word"].Value;
+                Console.WriteLine (i + "\t" + name + "\t" );
+            }
+        }
+        Console.WriteLine ("-----------------------------------------------");
+    }
+
+    public static void showNamespace_My() {
+        Console.WriteLine ("-----------------------------------------------");
+        System.Type[] runTypes = Assembly.GetExecutingAssembly().GetTypes();
+        for(int i = 0 ; i < runTypes.Length; i ++) {
+            Console.WriteLine (i + "\t" + runTypes[i].Name + "\t" + runTypes[i].IsSpecialName);
         }
         Console.WriteLine ("-----------------------------------------------");
     }

@@ -22,6 +22,7 @@ import javax.swing.JList;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 import javax.swing.event.EventListenerList;
 import javax.swing.event.ListDataListener;
 import javax.swing.plaf.basic.BasicComboPopup;
@@ -314,51 +315,55 @@ public class AutoComboBox extends PlainDocument {
 
     // -------------------------------------------------------------------------------------------
 
-    public AutoComboBox applyComboxBoxList(List<String> lst) {
-        return applyComboxBoxList(lst, "", true);
+    public void applyComboxBoxList(List<String> lst) {
+        applyComboxBoxList(lst, "", true);
     }
 
-    public AutoComboBox applyComboxBoxList(List<String> lst, boolean doSort) {
-        return applyComboxBoxList(lst, "", doSort);
+    public void applyComboxBoxList(List<String> lst, boolean doSort) {
+        applyComboxBoxList(lst, "", doSort);
     }
 
-    public AutoComboBox applyComboxBoxList(List<String> lst, String defaultText) {
-        return applyComboxBoxList(lst, defaultText, true);
+    public void applyComboxBoxList(List<String> lst, String defaultText) {
+        applyComboxBoxList(lst, defaultText, true);
     }
 
-    public AutoComboBox applyComboxBoxList(List<String> lst, String defaultText, boolean doSort) {
-        if (lst == null) {
-            lst = new ArrayList<String>();
-        }
-        this.dropdownLst = lst;
+    public void applyComboxBoxList(final List<String> lst, final String defaultText, final boolean doSort) {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                dropdownLst = lst;
+                if (dropdownLst == null) {
+                    dropdownLst = new ArrayList<String>();
+                }
 
-        LinkedList<String> cloneLst = new LinkedList<String>(lst);
-        for (int ii = 0; ii < cloneLst.size(); ii++) {
-            if (StringUtils.isBlank(cloneLst.get(ii))) {
-                cloneLst.remove(ii);
-                ii--;
+                LinkedList<String> cloneLst = new LinkedList<String>(lst);
+                for (int ii = 0; ii < cloneLst.size(); ii++) {
+                    if (StringUtils.isBlank(cloneLst.get(ii))) {
+                        cloneLst.remove(ii);
+                        ii--;
+                    }
+                }
+                cloneLst.push("");// 塞個空的放第一個
+
+                if (doSort) {
+                    Collections.sort(cloneLst, ignoreCaseSort);
+                }
+
+                final DefaultComboBoxModel m1 = new DefaultComboBoxModel();
+                for (String s : cloneLst) {
+                    m1.addElement(s);
+                }
+                model = m1;
+                comboBox.setModel(model);
+
+                comboBox.setEditable(true);
+                JTextComponent editor = (JTextComponent) comboBox.getEditor().getEditorComponent();
+                String defaultText1 = StringUtils.trimToEmpty(defaultText);
+                // editor.setText(defaultText1);
+                setSelectItemAndText(defaultText1);
+                editor.setDocument(AutoComboBox.this);
             }
-        }
-        cloneLst.push("");// 塞個空的放第一個
-
-        if (doSort) {
-            Collections.sort(cloneLst, ignoreCaseSort);
-        }
-
-        final DefaultComboBoxModel m1 = new DefaultComboBoxModel();
-        for (String s : cloneLst) {
-            m1.addElement(s);
-        }
-        model = m1;
-        comboBox.setModel(model);
-
-        comboBox.setEditable(true);
-        JTextComponent editor = (JTextComponent) comboBox.getEditor().getEditorComponent();
-        defaultText = StringUtils.trimToEmpty(defaultText);
-        // editor.setText(defaultText);
-        this.setSelectItemAndText(defaultText);
-        editor.setDocument(this);
-        return this;
+        });
     }
 
     public static AutoComboBox applyAutoComboBox(JComboBox comboBox, List<String> lst, String defaultText) {

@@ -11,9 +11,14 @@ import java.awt.event.MouseMotionAdapter;
 import java.awt.image.BufferedImage;
 import java.lang.reflect.Field;
 
+import javax.accessibility.AccessibleContext;
+import javax.accessibility.AccessibleState;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JTabbedPane;
+import javax.swing.SwingUtilities;
+
+import sun.swing.SwingUtilities2;
 
 public class DraggableTabbedPane extends JTabbedPane {
 
@@ -89,7 +94,16 @@ public class DraggableTabbedPane extends JTabbedPane {
                         Component comp = getComponentAt(draggedTabIndex);
                         String title = getTitleAt(draggedTabIndex);
 
-                        removeTabAt(draggedTabIndex);
+                        try {
+                            removeTabAt(draggedTabIndex);
+                        } catch (Exception ex) {
+                            System.out.println("removeTabAt ERR : " + ex.getMessage());
+                            
+                            dragging = false;
+                            tabImage = null;
+                            return;
+                        }
+
                         insertTab(title, null, comp, null, tabNumber);
 
                         // 更改 tab index
@@ -103,6 +117,14 @@ public class DraggableTabbedPane extends JTabbedPane {
                 tabImage = null;
             }
         });
+    }
+
+    public int getSelectedIndex() {
+        try {
+            return super.getSelectedIndex();
+        } catch (Exception ex) {
+            return -1;
+        }
     }
 
     private boolean checkPageRemoveTabAble(int index) {
