@@ -564,6 +564,7 @@ GameObject:
   - component: {fileID: 1596518050}
   - component: {fileID: 1596518051}
   - component: {fileID: 1596518052}
+  - component: {fileID: 1596518053}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -648,6 +649,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mainSpeed: 30
   camSens: 0.05
+--- !u!114 &1596518053
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1596518047}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d13855ba544b962498afe97521fc076b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  triggerAxisThreshold: 0.4
+  invertYAxis: 0
+  lookSensitivity: 1
 --- !u!1 &2075426095
 GameObject:
   m_ObjectHideFlags: 0

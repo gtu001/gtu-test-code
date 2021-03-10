@@ -162,7 +162,7 @@ public class GitConflictDetectUI extends JFrame {
 
             @Override
             public void afterInit(SwingTabTemplateUI self) {
-                tabUI.getJframe().setTitle(DateFormatUtils.format(System.currentTimeMillis(), "yyyy-MM-dd"));
+                self.getJframe().setTitle(DateFormatUtils.format(System.currentTimeMillis(), "yyyy-MM-dd"));
             }
         });
         tabUI.setSize(701, 559 + 25);
