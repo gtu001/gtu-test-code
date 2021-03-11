@@ -717,6 +717,19 @@ public class FastDBQueryUI extends JFrame {
                 }
             }));
         }
+        
+        sqlIdCategoryComboBox4Tab1.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    // 初始化 sqlList
+                    sqlIdConfigBeanHandler.setRegisterComponent(sqlIdCategoryComboBox4Tab1_Auto.getTextComponent());
+                    initLoadSqlListConfig(null);
+                } catch (Exception ex) {
+                    JCommonUtil.handleException(ex);
+                }
+            }
+        });
 
         sqlFilterClearBtn = new JButton("清除");
         sqlFilterClearBtn.addActionListener(new ActionListener() {

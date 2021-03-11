@@ -46,11 +46,17 @@ public class JListUtil {
         if ((pos = jList1.getLeadSelectionIndex()) == -1) {
             return null;
         }
+        if (jList1.getModel().getSize() == 0 || jList1.getModel().getSize() < pos) {
+            return null;
+        }
         return (T) jList1.getModel().getElementAt(pos);
     }
 
     public static <T> List<T> getLeadSelectionArry(JList jList1) {
         if (jList1.getLeadSelectionIndex() == -1) {
+            return null;
+        }
+        if (jList1.getModel().getSize() == 0) {
             return null;
         }
         int[] posArry = jList1.getSelectedIndices();
@@ -322,6 +328,9 @@ public class JListUtil {
 
         public Point getToolTipLocation(MouseEvent e) {
             int row = locationToIndex(e.getPoint());
+            if (row == -1) {
+                return null;
+            }
             Rectangle r = getCellBounds(row, row);
             return new Point(e.getPoint().x + 100, r.y);// r.width
         }

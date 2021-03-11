@@ -362,6 +362,9 @@ public class AutoComboBox extends PlainDocument {
                 // editor.setText(defaultText1);
                 setSelectItemAndText(defaultText1);
                 editor.setDocument(AutoComboBox.this);
+                
+                comboBox.invalidate();
+                comboBox.repaint();
             }
         });
     }

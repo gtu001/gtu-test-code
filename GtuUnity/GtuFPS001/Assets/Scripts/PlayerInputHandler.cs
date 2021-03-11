@@ -24,23 +24,23 @@ public class PlayerInputHandler : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Log.debug("---------------------------------------------------------");
+        // Log.debug("---------------------------------------------------------");
 
-        testInput();
+        // testInput();
 
-        Log.debug("isCanProcessInput" + " -- " + isCanProcessInput());
-        Log.debug("getFireInputHeld" + " -- " + getFireInputHeld());
-        Log.debug("getMoveInput" + " -- " + getMoveInput());
-        Log.debug("getJumpInputDown" + " -- " + getJumpInputDown());
-        Log.debug("getJumpInputHeld" + " -- " + getJumpInputHeld());
-        Log.debug("getAimInputHeld" + " -- " + getAimInputHeld());
-        Log.debug("getSprintInputHeld" + " -- " + getSprintInputHeld());
-        Log.debug("getCrouchInputDown" + " -- " + getCrouchInputDown());
-        Log.debug("getCrouchInputReleased" + " -- " + getCrouchInputReleased());
-        Log.debug("getSwitchWeaponInput" + " -- " + getSwitchWeaponInput());
-        Log.debug("getSelectWeaponInput" + " -- " + getSelectWeaponInput());
-        Log.debug("getLookInputsHorizontal" + " -- " + getLookInputsHorizontal());
-        Log.debug("getLookInputsVertical" + " -- " + getLookInputsVertical());
+        // Log.debug("isCanProcessInput" + " -- " + isCanProcessInput());
+        // Log.debug("getFireInputHeld" + " -- " + getFireInputHeld());
+        // Log.debug("getMoveInput" + " -- " + getMoveInput());
+        // Log.debug("getJumpInputDown" + " -- " + getJumpInputDown());
+        // Log.debug("getJumpInputHeld" + " -- " + getJumpInputHeld());
+        // Log.debug("getAimInputHeld" + " -- " + getAimInputHeld());
+        // Log.debug("getSprintInputHeld" + " -- " + getSprintInputHeld());
+        // Log.debug("getCrouchInputDown" + " -- " + getCrouchInputDown());
+        // Log.debug("getCrouchInputReleased" + " -- " + getCrouchInputReleased());
+        // Log.debug("getSwitchWeaponInput" + " -- " + getSwitchWeaponInput());
+        // Log.debug("getSelectWeaponInput" + " -- " + getSelectWeaponInput());
+        // Log.debug("getLookInputsHorizontal" + " -- " + getLookInputsHorizontal());
+        // Log.debug("getLookInputsVertical" + " -- " + getLookInputsVertical());
     }
 
     // https://www.raywenderlich.com/9671886-new-unity-input-system-getting-started
@@ -96,7 +96,8 @@ public class PlayerInputHandler : MonoBehaviour
     }
 
     public bool getCrouchInputDown() {
-        return Input.GetButtonDown("Crouch");
+        bool result = Input.GetButtonDown("Crouch");
+        return result;
     }
 
     public bool getCrouchInputReleased() {
@@ -164,10 +165,14 @@ public class PlayerInputHandler : MonoBehaviour
     }
 
     public float getLookInputsHorizontal() {
-        return getMouseOrStickLookAxis("Mouse X", "Look X");
+        float result = getMouseOrStickLookAxis("Mouse X", "Look X");
+        Log.debug("getLookInputsHorizontal : " + result);
+        return result;
     }
 
     public float getLookInputsVertical() {
-        return getMouseOrStickLookAxis("Mouse Y", "Look Y");
+        float result = getMouseOrStickLookAxis("Mouse Y", "Look Y");
+        Log.debug("getLookInputsVertical : " + result);
+        return result;
     }
 }
